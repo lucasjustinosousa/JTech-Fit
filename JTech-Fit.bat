@@ -1,10 +1,6 @@
 @echo off
 title JTech Fit App Launcher
-<<<<<<< HEAD
-set APP_PATH=file:///c:/Users/TI/Desktop/Foco/index.html
-=======
 set APP_PATH="file:///%~dp0index.html"
->>>>>>> 992c6cf (feat: adicionar configuracoes PWA Vercel, chaves Supabase e estrutura nativa mobile)
 
 echo Iniciando JTech Fit...
 

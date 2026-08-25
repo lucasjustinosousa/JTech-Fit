@@ -71,11 +71,7 @@ self.addEventListener('notificationclick', (event) => {
         }
       }
       if (clients.openWindow) {
-<<<<<<< HEAD
-        return clients.openWindow('./index.html#active');
-=======
         return clients.openWindow('./#active');
->>>>>>> 992c6cf (feat: adicionar configuracoes PWA Vercel, chaves Supabase e estrutura nativa mobile)
       }
     })
   );
