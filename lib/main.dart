@@ -21,8 +21,13 @@ void main() async {
 
   // Inicializar Supabase se chaves configuradas
   await SupabaseService.instance.initialize(
+<<<<<<< HEAD
     url: '', // Preencha com sua URL do Supabase
     anonKey: '', // Preencha com sua chave anônima do Supabase
+=======
+    url: 'https://gplgywrvejefulsjpkax.supabase.co', // Preencha com sua URL do Supabase
+    anonKey: 'sb_publishable_em6WHZt2Ol8JZ16fe_Lcyg_ETq_kIPY', // Preencha com sua chave anônima do Supabase
+>>>>>>> 992c6cf (feat: adicionar configuracoes PWA Vercel, chaves Supabase e estrutura nativa mobile)
   );
 
   runApp(

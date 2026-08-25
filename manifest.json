@@ -2,7 +2,11 @@
   "name": "JTech Fit — Acompanhamento de Treinos",
   "short_name": "JTech Fit",
   "description": "Aplicativo de acompanhamento de treinos de musculação, divisões de treino, biblioteca de exercícios, cronômetro de descanso e histórico offline.",
+<<<<<<< HEAD
   "start_url": "./index.html",
+=======
+  "start_url": "./",
+>>>>>>> 992c6cf (feat: adicionar configuracoes PWA Vercel, chaves Supabase e estrutura nativa mobile)
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -29,14 +33,22 @@
       "name": "Iniciar Treino",
       "short_name": "Treinar",
       "description": "Iniciar treino em andamento imediatamente",
+<<<<<<< HEAD
       "url": "./index.html#start",
+=======
+      "url": "./#start",
+>>>>>>> 992c6cf (feat: adicionar configuracoes PWA Vercel, chaves Supabase e estrutura nativa mobile)
       "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Exercícios",
       "short_name": "Exercícios",
       "description": "Abrir biblioteca de exercícios",
+<<<<<<< HEAD
       "url": "./index.html#exercises",
+=======
+      "url": "./#exercises",
+>>>>>>> 992c6cf (feat: adicionar configuracoes PWA Vercel, chaves Supabase e estrutura nativa mobile)
       "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
