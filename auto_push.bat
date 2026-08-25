@@ -1,7 +1,7 @@
 @echo off
-title JTech Fit - Auto Commit & Deploy Vercel
+title JTech Fit - Auto Commit ^& Deploy Vercel
 echo ========================================================
-echo   JTech Fit - Sincronizacao automatica Git & Vercel
+echo   JTech Fit - Sincronizacao automatica Git ^& Vercel
 echo ========================================================
 echo.
 
