@@ -1,0 +1,176 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/theme/jtech_theme.dart';
+import '../../data/repositories/workout_repository.dart';
+import '../../data/models/models.dart';
+import 'workout_builder_screen.dart';
+
+class WorkoutListScreen extends StatelessWidget {
+  final Function(Treino treino) onStartWorkout;
+
+  const WorkoutListScreen({super.key, required this.onStartWorkout});
+
+  Color _parseColor(String hex) {
+    try {
+      return Color(int.parse(hex.replaceAll('#', '0xFF')));
+    } catch (_) {
+      return JTechTheme.primaryBlue;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final repo = Provider.of<WorkoutRepository>(context);
+    final treinos = repo.treinos;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Divisões de Treino'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add, color: JTechTheme.accentCyan),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const WorkoutBuilderScreen()),
+              );
+            },
+          ),
+        ],
+      ),
+      body: treinos.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.fitness_center_outlined, size: 64, color: JTechTheme.textMuted),
+                  const SizedBox(height: 16),
+                  const Text('Nenhum treino criado ainda.', style: TextStyle(color: JTechTheme.textGrey, fontSize: 16)),
+                  const SizedBox(height: 12),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const WorkoutBuilderScreen()),
+                      );
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text('Criar Novo Treino'),
+                  ),
+                ],
+              ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: treinos.length,
+              itemBuilder: (context, index) {
+                final treino = treinos[index];
+                final cardColor = _parseColor(treino.corHex);
+
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border(left: BorderSide(color: cardColor, width: 6)),
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                treino.nome,
+                                style: const TextStyle(
+                                  color: JTechTheme.textWhite,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            PopupMenuButton<String>(
+                              icon: const Icon(Icons.more_vert, color: JTechTheme.textGrey),
+                              color: JTechTheme.surfaceDark,
+                              onSelected: (val) {
+                                if (val == 'editar') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => WorkoutBuilderScreen(treinoExistente: treino)),
+                                  );
+                                } else if (val == 'duplicar') {
+                                  repo.duplicarTreino(treino);
+                                } else if (val == 'deletar') {
+                                  repo.deletarTreino(treino.id);
+                                }
+                              },
+                              itemBuilder: (ctx) => [
+                                const PopupMenuItem(value: 'editar', child: Text('Editar Treino', style: TextStyle(color: Colors.white))),
+                                const PopupMenuItem(value: 'duplicar', child: Text('Duplicar', style: TextStyle(color: Colors.white))),
+                                const PopupMenuItem(value: 'deletar', child: Text('Excluir', style: TextStyle(color: JTechTheme.errorRed))),
+                              ],
+                            ),
+                          ],
+                        ),
+                        if (treino.descricao.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(treino.descricao, style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12)),
+                        ],
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          children: treino.diasSemana.map((d) => Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: cardColor.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              d,
+                              style: TextStyle(color: cardColor, fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
+                          )).toList(),
+                        ),
+                        const Divider(height: 24, color: JTechTheme.dividerColor),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${treino.exercicios.length} exercícios cadastrados',
+                              style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12),
+                            ),
+                            ElevatedButton.icon(
+                              onPressed: () => onStartWorkout(treino),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: JTechTheme.successGreen,
+                                minimumSize: const Size(130, 40),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                              icon: const Icon(Icons.play_arrow, size: 20),
+                              label: const Text('INICIAR', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: JTechTheme.primaryBlue,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const WorkoutBuilderScreen()),
+          );
+        },
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text('CRIAR NOVO TREINO', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+}

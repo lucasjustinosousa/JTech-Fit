@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>JTech Fit — Acompanhamento de Treinos</title>
+
+  <!-- PWA Meta Tags & Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1e88e5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JTech Fit">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+
+  <!-- Tipografia Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-black: #0d0d0d;
+      --surface-dark: #16181c;
+      --card-dark: #22252a;
+      --primary-blue: #1e88e5;
+      --primary-hover: #1565c0;
+      --accent-cyan: #00d2ff;
+      --success-green: #4caf50;
+      --warning-orange: #ff9800;
+      --error-red: #ef5350;
+      --text-white: #ffffff;
+      --text-grey: #a0aab8;
+      --text-muted: #6c757d;
+      --divider: #2c3036;
+      --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-white);
+      font-family: var(--font-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .app-frame {
+      width: 100%;
+      max-width: 480px;
+      height: 100vh;
+      max-height: 920px;
+      background: var(--bg-black);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+      border-radius: 0;
+    }
+
+    @media (min-width: 500px) {
+      .app-frame {
+        border-radius: 40px;
+        height: 90vh;
+        border: 10px solid #1c1f26;
+      }
+    }
+
+    .header {
+      background: var(--surface-dark);
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--divider);
+      z-index: 10;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
+
+    .brand-logo span {
+      color: var(--accent-cyan);
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      background: var(--primary-blue);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      padding-bottom: 90px;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--card-dark);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid var(--divider);
+      margin-bottom: 16px;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, var(--primary-blue), #0d47a1);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 20px rgba(30, 136, 229, 0.3);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font-main);
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary-blue);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-success {
+      background: var(--success-green);
+      color: white;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--primary-blue);
+      color: var(--primary-blue);
+    }
+
+    .btn-text {
+      background: transparent;
+      color: var(--text-grey);
+    }
+
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background: var(--surface-dark);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid var(--divider);
+      z-index: 20;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s;
+      flex: 1;
+    }
+
+    .nav-item.active {
+      color: var(--primary-blue);
+    }
+
+    .nav-icon {
+      font-size: 20px;
+    }
+
+    .rest-timer-bar {
+      background: #1a2332;
+      border-bottom: 2px solid var(--accent-cyan);
+      padding: 12px 16px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .rest-timer-bar.active {
+      display: flex;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: var(--card-dark);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent-cyan);
+      width: 100%;
+      transition: width 1s linear;
+    }
+
+    .safety-banner {
+      background: #231b0e;
+      border: 1px solid var(--warning-orange);
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .safety-banner p {
+      font-size: 11px;
+      color: var(--text-grey);
+      line-height: 1.4;
+    }
+
+    .pwa-install-banner {
+      background: linear-gradient(135deg, #1e88e5, #00d2ff);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 210, 255, 0.25);
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-grey);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      background: var(--card-dark);
+      border: 1px solid var(--divider);
+      border-radius: 10px;
+      color: white;
+      font-family: var(--font-main);
+      font-size: 14px;
+    }
+
+    .chip-container {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+
+    .chip {
+      padding: 6px 14px;
+      background: var(--card-dark);
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--text-grey);
+      white-space: nowrap;
+      cursor: pointer;
+      border: 1px solid var(--divider);
+    }
+
+    .chip.active {
+      background: var(--primary-blue);
+      color: white;
+      border-color: var(--primary-blue);
+    }
+
+    .set-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: var(--card-dark);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      border: 1px solid var(--divider);
+    }
+
+    .set-row.done {
+      background: rgba(76, 175, 80, 0.15);
+      border-color: var(--success-green);
+    }
+
+    .set-badge {
+      width: 28px;
+      height: 28px;
+      background: var(--primary-blue);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .set-row.done .set-badge {
+      background: var(--success-green);
+    }
+
+    .set-check {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 2px solid var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .set-row.done .set-check {
+      background: var(--success-green);
+      border-color: var(--success-green);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-frame">
+    <!-- Header -->
+    <div class="header">
+      <div class="brand-logo">
+        <div class="brand-icon">🏋️‍♂️</div>
+        JTECH <span>FIT</span>
+      </div>
+      <div id="connectionStatus" style="font-size: 11px; background: rgba(76,175,80,0.2); color: var(--success-green); padding: 4px 8px; border-radius: 12px;">
+        ● PWA Híbrido Offline
+      </div>
+    </div>
+
+    <!-- Rest Timer Bar Floating -->
+    <div id="restTimerBar" class="rest-timer-bar">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="color: var(--accent-cyan); font-weight: 700; font-size: 13px;">⏳ CRONÔMETRO DE DESCANSO</span>
+        <span id="restTimerText" style="font-size: 20px; font-weight: 900; color: white;">00:60</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div id="restProgressFill" class="progress-bar-fill"></div>
+      </div>
+      <div style="display: flex; justify-content: space-around; font-size: 12px;">
+        <button onclick="adjustRestTimer(-15)" class="btn-text" style="padding: 4px;">-15s</button>
+        <button onclick="togglePauseRestTimer()" class="btn-text" style="padding: 4px; color: var(--accent-cyan);" id="pauseRestBtn">Pausar</button>
+        <button onclick="adjustRestTimer(15)" class="btn-text" style="padding: 4px;">+15s</button>
+        <button onclick="skipRestTimer()" class="btn-text" style="padding: 4px; color: var(--warning-orange);">Pular</button>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="content-area">
+
+      <!-- BANNER DE INSTALAÇÃO DO PWA -->
+      <div id="pwaInstallBanner" class="pwa-install-banner" style="display: none;">
+        <div>
+          <div style="font-weight: 800; font-size: 14px;">Instalar o JTech Fit</div>
+          <div style="font-size: 11px; opacity: 0.9;">Instale o app na tela inicial para acesso rápido offline.</div>
+        </div>
+        <button onclick="triggerPWAInstall()" style="background: white; color: #1e88e5; border: none; font-weight: 800; padding: 8px 14px; border-radius: 8px; font-size: 12px; cursor: pointer;">
+          INSTALAR
+        </button>
+      </div>
+
+      <!-- TELA DE ABERTURA / AUTH -->
+      <div id="screenAuth" class="screen">
+        <div style="text-align: center; padding: 30px 10px;">
+          <div style="width: 80px; height: 80px; background: var(--primary-blue); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 40px;">
+            🏋️‍♂️
+          </div>
+          <h2 style="font-size: 26px; font-weight: 900;">JTECH <span style="color: var(--accent-cyan);">FIT</span></h2>
+          <p style="color: var(--text-grey); font-size: 14px; margin-top: 4px;">Seu Treino sob Controle Absoluto (PWA)</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input type="email" class="form-input" placeholder="atleta@jtechfit.com" value="atleta@jtechfit.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input type="password" class="form-input" value="123456">
+        </div>
+
+        <button onclick="loginUser()" class="btn btn-primary" style="margin-top: 10px;">ENTRAR</button>
+        <button onclick="loginUser()" class="btn btn-outline" style="margin-top: 10px;">CRIAR MINHA CONTA</button>
+        <button onclick="loginUser()" class="btn btn-text" style="margin-top: 10px;">Continuar sem cadastro (Modo Convidado)</button>
+
+        <div class="safety-banner">
+          <div>⚠️</div>
+          <p><strong>Aviso Importante:</strong> O JTech Fit não substitui o acompanhamento de um profissional de Educação Física ou Médico. Interrompa se sentir dor.</p>
+        </div>
+      </div>
+
+      <!-- TELA INICIAL / DASHBOARD -->
+      <div id="screenHome" class="screen active">
+        <h3 style="font-size: 20px; font-weight: 800;">Olá, Atleta JTech! 👋</h3>
+        <p style="color: var(--text-grey); font-size: 13px; margin-bottom: 16px;">Bora superar seus limites hoje?</p>
+
+        <!-- Hero Card -->
+        <div class="hero-card">
+          <span style="font-size: 10px; font-weight: 800; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 10px;">TREINO RECOMENDADO HOJE</span>
+          <h2 style="font-size: 22px; font-weight: 800; margin-top: 8px;">Treino A — Peito & Tríceps</h2>
+          <p style="font-size: 12px; opacity: 0.9; margin-top: 4px;">4 exercícios • ~45 min de duração</p>
+          <button onclick="startActiveWorkout('Treino A — Peito & Tríceps')" class="btn btn-success" style="margin-top: 16px;">
+            ▶ INICIAR TREINO AGORA
+          </button>
+        </div>
+
+        <!-- Weekly Summary -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+          <div class="card" style="flex: 1; margin: 0;">
+            <div style="font-size: 20px; color: var(--accent-cyan);">📊</div>
+            <div style="font-size: 20px; font-weight: 800; margin-top: 6px;">4 treinos</div>
+            <div style="font-size: 11px; color: var(--text-grey);">Concluídos na semana</div>
+          </div>
+          <div class="card" style="flex: 1; margin: 0;">
+            <div style="font-size: 20px; color: var(--success-green);">✅</div>
+            <div style="font-size: 20px; font-weight: 800; margin-top: 6px;">Ontem</div>
+            <div style="font-size: 11px; color: var(--text-grey);">Treino B — Costas</div>
+          </div>
+        </div>
+
+        <div class="safety-banner">
+          <div>🛡️</div>
+          <p><strong>Dica de Segurança:</strong> Em caso de fadiga excessiva ou dor articular, reduza a carga ou consulte um instrutor.</p>
+        </div>
+      </div>
+
+      <!-- TELA TREINOS / DIVISÕES -->
+      <div id="screenWorkouts" class="screen">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-size: 18px; font-weight: 800;">Divisões de Treino</h3>
+          <button onclick="alert('Criador de treinos aberto!')" class="btn btn-primary" style="width: auto; padding: 8px 14px; font-size: 12px;">+ Criar Treino</button>
+        </div>
+
+        <div class="card" style="border-left: 5px solid var(--primary-blue);">
+          <div style="display: flex; justify-content: space-between;">
+            <h4 style="font-size: 16px; font-weight: 800;">Treino A — Peito & Tríceps</h4>
+            <span style="color: var(--text-muted);">⋮</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">Segunda-feira • Quinta-feira</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+            <span style="font-size: 12px; color: var(--accent-cyan);">4 exercícios</span>
+            <button onclick="startActiveWorkout('Treino A — Peito & Tríceps')" class="btn btn-success" style="width: auto; padding: 8px 16px; font-size: 12px;">INICIAR</button>
+          </div>
+        </div>
+
+        <div class="card" style="border-left: 5px solid var(--accent-cyan);">
+          <div style="display: flex; justify-content: space-between;">
+            <h4 style="font-size: 16px; font-weight: 800;">Treino B — Costas & Bíceps</h4>
+            <span style="color: var(--text-muted);">⋮</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">Terça-feira • Sexta-feira</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+            <span style="font-size: 12px; color: var(--accent-cyan);">5 exercícios</span>
+            <button onclick="startActiveWorkout('Treino B — Costas & Bíceps')" class="btn btn-success" style="width: auto; padding: 8px 16px; font-size: 12px;">INICIAR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TELA EXERCÍCIOS / BIBLIOTECA -->
+      <div id="screenExercises" class="screen">
+        <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 12px;">Biblioteca de Exercícios</h3>
+
+        <div class="form-group">
+          <input type="text" class="form-input" placeholder="🔍 Buscar exercício por nome ou grupo...">
+        </div>
+
+        <div class="chip-container">
+          <div class="chip active">Todos</div>
+          <div class="chip">Peito</div>
+          <div class="chip">Costas</div>
+          <div class="chip">Pernas</div>
+          <div class="chip">Ombros</div>
+          <div class="chip">Bíceps</div>
+          <div class="chip">Tríceps</div>
+        </div>
+
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h4 style="font-size: 15px; font-weight: 700;">Supino Reto com Barra</h4>
+              <p style="font-size: 11px; color: var(--text-grey);">Peito • Equipamento: Barra e Banco</p>
+            </div>
+            <span style="font-size: 18px; color: gold;">★</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-grey); margin-top: 8px;">
+            Deite-se no banco, empurre a barra estufando o peitoral.
+          </p>
+        </div>
+
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h4 style="font-size: 15px; font-weight: 700;">Puxada Frontal na Polia</h4>
+              <p style="font-size: 11px; color: var(--text-grey);">Costas • Equipamento: Polia Alta</p>
+            </div>
+            <span style="font-size: 18px; color: var(--text-muted);">☆</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-grey); margin-top: 8px;">
+            Puxe a barra em direção ao peito com pegada aberta.
+          </p>
+        </div>
+      </div>
+
+      <!-- TELA TREINO EM ANDAMENTO -->
+      <div id="screenActiveWorkout" class="screen">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 id="activeWorkoutTitle" style="font-size: 16px; font-weight: 800; color: var(--accent-cyan);">Treino A — Peito & Tríceps</h3>
+          <div style="font-size: 16px; font-weight: 900; color: var(--success-green);" id="activeTimer">00:00</div>
+        </div>
+
+        <div class="card">
+          <span style="font-size: 11px; color: var(--primary-blue); font-weight: 800;">EXERCÍCIO 1 DE 4</span>
+          <h3 style="font-size: 18px; font-weight: 800; margin-top: 4px;">Supino Reto com Barra</h3>
+          <p style="font-size: 12px; color: var(--text-grey);">4 séries x 10-12 repetições • 60s descanso</p>
+        </div>
+
+        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">Registro de Séries</h4>
+
+        <div class="set-row" id="setRow1">
+          <div class="set-badge">1</div>
+          <div style="flex: 1;">
+            <input type="number" class="form-input" value="40" style="padding: 6px 10px; font-size: 12px;" placeholder="Carga kg">
+          </div>
+          <div style="flex: 1;">
+            <input type="number" class="form-input" value="12" style="padding: 6px 10px; font-size: 12px;" placeholder="Reps">
+          </div>
+          <div class="set-check" onclick="toggleSetDone('setRow1')">✓</div>
+        </div>
+
+        <div class="set-row" id="setRow2">
+          <div class="set-badge">2</div>
+          <div style="flex: 1;">
+            <input type="number" class="form-input" value="40" style="padding: 6px 10px; font-size: 12px;" placeholder="Carga kg">
+          </div>
+          <div style="flex: 1;">
+            <input type="number" class="form-input" value="10" style="padding: 6px 10px; font-size: 12px;" placeholder="Reps">
+          </div>
+          <div class="set-check" onclick="toggleSetDone('setRow2')">✓</div>
+        </div>
+
+        <button onclick="finishActiveWorkout()" class="btn btn-success" style="margin-top: 20px;">
+          FINALIZAR TREINO COMPLETO
+        </button>
+      </div>
+
+      <!-- TELA HISTÓRICO -->
+      <div id="screenHistory" class="screen">
+        <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 16px;">Histórico de Treinos</h3>
+        <div class="card">
+          <div style="display: flex; justify-content: space-between;">
+            <div>
+              <h4 style="font-size: 15px; font-weight: 700;">Treino A — Peito & Tríceps</h4>
+              <p style="font-size: 11px; color: var(--text-grey);">Hoje • Duração: 48 min</p>
+            </div>
+            <span style="color: var(--success-green); font-weight: 800;">Concluído</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TELA PERFIL -->
+      <div id="screenProfile" class="screen">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <div style="width: 70px; height: 70px; background: var(--primary-blue); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 32px;">👤</div>
+          <h3 style="font-size: 18px; font-weight: 800;">Atleta JTech</h3>
+          <p style="font-size: 12px; color: var(--text-grey);">atleta@jtechfit.com</p>
+        </div>
+
+        <div class="card">
+          <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">PWA & Sincronização</h4>
+          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--divider);">
+            <span>Status PWA</span>
+            <span style="color: var(--success-green); font-weight: 700;">Pronto (Service Worker Ativo)</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+            <span>Sincronização Cloud</span>
+            <span style="color: var(--accent-cyan); font-weight: 700;">Supabase Híbrido</span>
+          </div>
+        </div>
+
+        <button onclick="switchTab('screenAuth')" class="btn btn-outline" style="margin-top: 16px;">Sair da Conta</button>
+      </div>
+
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav" id="bottomNav">
+      <div class="nav-item active" onclick="switchTab('screenHome', this)">
+        <div class="nav-icon">🏠</div>
+        Início
+      </div>
+      <div class="nav-item" onclick="switchTab('screenWorkouts', this)">
+        <div class="nav-icon">📋</div>
+        Treinos
+      </div>
+      <div class="nav-item" onclick="switchTab('screenExercises', this)">
+        <div class="nav-icon">🏋️‍♂️</div>
+        Exercícios
+      </div>
+      <div class="nav-item" onclick="switchTab('screenHistory', this)">
+        <div class="nav-icon">📊</div>
+        Histórico
+      </div>
+      <div class="nav-item" onclick="switchTab('screenProfile', this)">
+        <div class="nav-icon">👤</div>
+        Perfil
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Registro do Service Worker do PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('[PWA] Service Worker registrado com sucesso:', reg.scope))
+          .catch((err) => console.log('[PWA] Falha ao registrar Service Worker:', err));
+      });
+    }
+
+    // Instalação do PWA
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('pwaInstallBanner').style.display = 'flex';
+    });
+
+    function triggerPWAInstall() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choice) => {
+          if (choice.outcome === 'accepted') {
+            document.getElementById('pwaInstallBanner').style.display = 'none';
+          }
+          deferredPrompt = null;
+        });
+      }
+    }
+
+    let restTimerInterval = null;
+    let restTimeRemaining = 60;
+    let activeWorkoutInterval = null;
+    let activeWorkoutSeconds = 0;
+
+    function switchTab(screenId, navElement) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+
+      if (navElement) {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        navElement.classList.add('active');
+      }
+    }
+
+    function loginUser() {
+      switchTab('screenHome');
+      document.getElementById('bottomNav').style.display = 'flex';
+    }
+
+    function startActiveWorkout(title) {
+      document.getElementById('activeWorkoutTitle').innerText = title;
+      switchTab('screenActiveWorkout');
+      activeWorkoutSeconds = 0;
+      clearInterval(activeWorkoutInterval);
+      activeWorkoutInterval = setInterval(() => {
+        activeWorkoutSeconds++;
+        let m = String(Math.floor(activeWorkoutSeconds / 60)).padStart(2, '0');
+        let s = String(activeWorkoutSeconds % 60).padStart(2, '0');
+        document.getElementById('activeTimer').innerText = `${m}:${s}`;
+      }, 1000);
+    }
+
+    function finishActiveWorkout() {
+      clearInterval(activeWorkoutInterval);
+      alert('🏆 Treino Concluído com Sucesso! Resumo salvo no histórico.');
+      switchTab('screenHistory');
+    }
+
+    function toggleSetDone(rowId) {
+      const row = document.getElementById(rowId);
+      row.classList.toggle('done');
+      if (row.classList.contains('done')) {
+        startRestTimer(60);
+      }
+    }
+
+    function startRestTimer(seconds) {
+      restTimeRemaining = seconds;
+      document.getElementById('restTimerBar').classList.add('active');
+      updateRestUI();
+
+      clearInterval(restTimerInterval);
+      restTimerInterval = setInterval(() => {
+        restTimeRemaining--;
+        if (restTimeRemaining <= 0) {
+          clearInterval(restTimerInterval);
+          playAudioBeep();
+          alert('🔔 Tempo de Descanso Concluído! Inicie sua próxima série.');
+          document.getElementById('restTimerBar').classList.remove('active');
+        }
+        updateRestUI();
+      }, 1000);
+    }
+
+    function updateRestUI() {
+      let m = String(Math.floor(restTimeRemaining / 60)).padStart(2, '0');
+      let s = String(restTimeRemaining % 60).padStart(2, '0');
+      document.getElementById('restTimerText').innerText = `${m}:${s}`;
+      let fillPct = (restTimeRemaining / 60) * 100;
+      document.getElementById('restProgressFill').style.width = `${fillPct}%`;
+    }
+
+    function adjustRestTimer(seconds) {
+      restTimeRemaining = Math.max(0, restTimeRemaining + seconds);
+      updateRestUI();
+    }
+
+    function skipRestTimer() {
+      clearInterval(restTimerInterval);
+      document.getElementById('restTimerBar').classList.remove('active');
+    }
+
+    function playAudioBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+      } catch (e) {}
+    }
+  </script>
+</body>
+</html>

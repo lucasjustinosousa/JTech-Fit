@@ -1,0 +1,52 @@
+name: jtech_fit
+description: "JTech Fit - Aplicativo de Acompanhamento de Treinos de Musculação"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI e Design Icons
+  cupertino_icons: ^1.0.6
+  google_fonts: ^6.1.0
+  flutter_svg: ^2.0.9
+  fl_chart: ^0.66.0
+  table_calendar: ^3.0.9
+
+  # Gerenciamento de Estado
+  provider: ^6.1.1
+
+  # Banco de Dados & Persistence (Offline & Online)
+  supabase_flutter: ^2.3.4
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  shared_preferences: ^2.2.2
+
+  # Mídia e Recurso de Treino
+  audioplayers: ^5.2.1
+  vibration: ^1.8.4
+  flutter_local_notifications: ^17.0.0
+  video_player: ^2.8.2
+  cached_network_image: ^3.3.1
+
+  # Utilitários
+  intl: ^0.19.0
+  uuid: ^4.3.3
+  share_plus: ^7.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/videos/
+    - assets/sounds/
