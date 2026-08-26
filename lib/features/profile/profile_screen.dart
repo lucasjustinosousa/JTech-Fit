@@ -163,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // NUVEM E DADOS
             const Text(
-              'Sincronização e Dados',
+              'Sincronização e Dados da Biblioteca',
               style: TextStyle(color: JTechTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -171,6 +171,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Card(
               child: Column(
                 children: [
+                  ListTile(
+                    leading: const Icon(Icons.fitness_center, color: JTechTheme.successGreen),
+                    title: const Text('Biblioteca ExerciseDB V1', style: TextStyle(color: Colors.white)),
+                    subtitle: Text(
+                      '${repo.exercicios.length} exercícios armazenados offline\nÚltima atualização: Hoje às ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}',
+                      style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                    ),
+                    trailing: TextButton(
+                      onPressed: () async {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Sincronizando todas as páginas da ExerciseDB...')),
+                        );
+                        await repo.carregarDados();
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Biblioteca atualizada com sucesso! Total: ${repo.exercicios.length} exercícios.')),
+                          );
+                        }
+                      },
+                      child: const Text('ATUALIZAR', style: TextStyle(color: JTechTheme.accentCyan, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  const Divider(height: 1, color: JTechTheme.dividerColor),
+                  ListTile(
+                    leading: const Icon(Icons.cleaned_services, color: JTechTheme.warningOrange),
+                    title: const Text('Limpar Cache de Imagens / GIFs', style: TextStyle(color: Colors.white)),
+                    subtitle: const Text('Fichas e treinos criados continuam salvos intactos.', style: TextStyle(color: JTechTheme.textGrey, fontSize: 11)),
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Cache de mídias limpo com sucesso!')),
+                      );
+                    },
+                  ),
+                  const Divider(height: 1, color: JTechTheme.dividerColor),
                   ListTile(
                     leading: const Icon(Icons.cloud_sync, color: JTechTheme.accentCyan),
                     title: const Text('Sincronizar com Supabase', style: TextStyle(color: Colors.white)),

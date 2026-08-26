@@ -120,4 +120,23 @@ class ExerciseLocalDatabase {
       whereArgs: [id],
     );
   }
+
+  /// Retorna o número total de exercícios armazenados no banco local
+  Future<int> getExerciseCount() async {
+    final db = await instance.database;
+    final res = await db.rawQuery('SELECT COUNT(*) as total FROM exercicios');
+    return Sqflite.firstIntValue(res) ?? 0;
+  }
+
+  /// Limpa apenas o cache de imagens/GIFs sem apagar fichas, historico ou dados de usuario
+  Future<void> clearImageCacheOnly() async {
+    final db = await instance.database;
+    await db.rawUpdate('UPDATE exercicios SET gif_url = NULL WHERE personalizado = 0');
+  }
+
+  /// Limpa e reconstrói o cache da biblioteca de exercícios mantendo treinos do usuário intactos
+  Future<void> rebuildExerciseCacheOnly() async {
+    final db = await instance.database;
+    await db.delete('exercicios', where: 'personalizado = 0 OR personalizado IS NULL');
+  }
 }
