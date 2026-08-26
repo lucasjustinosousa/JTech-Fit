@@ -156,15 +156,6 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _descController,
-              style: const TextStyle(color: JTechTheme.textWhite),
-              decoration: const InputDecoration(
-                labelText: 'Ou digite o foco personalizado (opcional)',
-                prefixIcon: Icon(Icons.notes, color: JTechTheme.textGrey),
-              ),
-            ),
             const SizedBox(height: 20),
 
             // Dias da Semana
