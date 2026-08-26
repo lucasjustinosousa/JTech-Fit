@@ -737,18 +737,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Cor do Card</label>
-        <div style="display: flex; gap: 10px; margin-top: 4px;">
-          <div onclick="selectWorkoutColor('#1E88E5', this)" class="color-picker-dot active" style="background:#1E88E5;"></div>
-          <div onclick="selectWorkoutColor('#00D2FF', this)" class="color-picker-dot" style="background:#00D2FF;"></div>
-          <div onclick="selectWorkoutColor('#4CAF50', this)" class="color-picker-dot" style="background:#4CAF50;"></div>
-          <div onclick="selectWorkoutColor('#FF9800', this)" class="color-picker-dot" style="background:#FF9800;"></div>
-          <div onclick="selectWorkoutColor('#9C27B0', this)" class="color-picker-dot" style="background:#9C27B0;"></div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Dias da Semana</label>
+        <label class="form-label">Dias da Semana (opcional)</label>
         <div class="chip-container" style="margin-bottom: 0;">
           <div class="chip" onclick="toggleDayChip(this, 'Segunda-feira')">Segunda</div>
           <div class="chip" onclick="toggleDayChip(this, 'Terça-feira')">Terça</div>
@@ -761,13 +750,71 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Exercícios do Treino</label>
-        <div id="selectedExercisesList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;">
-          <!-- Exercícios adicionados aparecem aqui -->
+        <label class="form-label">Exercícios do Treino *</label>
+
+        <select id="exerciseSelectDropdown" class="form-input" style="margin-bottom: 8px; font-size: 13px;" onchange="handleExerciseSelectChange(this)">
+          <option value="">-- Selecione um Exercício da Biblioteca --</option>
+          <optgroup label="Peito">
+            <option value="Supino Reto com Barra">Supino Reto com Barra</option>
+            <option value="Supino Inclinado com Halteres">Supino Inclinado com Halteres</option>
+            <option value="Crucifixo no Crossover (Polia Alta)">Crucifixo no Crossover (Polia Alta)</option>
+            <option value="Peck Deck / Voador">Peck Deck / Voador</option>
+            <option value="Flexão de Braços">Flexão de Braços</option>
+          </optgroup>
+          <optgroup label="Costas">
+            <option value="Puxada Frontal na Polia">Puxada Frontal na Polia</option>
+            <option value="Remada Curvada com Barra">Remada Curvada com Barra</option>
+            <option value="Remada Unilateral com Halter (Serrote)">Remada Unilateral com Halter (Serrote)</option>
+            <option value="Puxada Articulada">Puxada Articulada</option>
+            <option value="Barra Fixa (Pull-up)">Barra Fixa (Pull-up)</option>
+          </optgroup>
+          <optgroup label="Pernas">
+            <option value="Agachamento Livre com Barra">Agachamento Livre com Barra</option>
+            <option value="Leg Press 45º">Leg Press 45º</option>
+            <option value="Cadeira Extensora">Cadeira Extensora</option>
+            <option value="Mesa Flexora">Mesa Flexora</option>
+            <option value="Stiff com Halteres / Barra">Stiff com Halteres / Barra</option>
+            <option value="Elevação de Gêmeos (Panturrilha)">Elevação de Gêmeos (Panturrilha)</option>
+          </optgroup>
+          <optgroup label="Ombros">
+            <option value="Desenvolvimento com Halteres">Desenvolvimento com Halteres</option>
+            <option value="Elevação Lateral com Halteres">Elevação Lateral com Halteres</option>
+            <option value="Elevação Frontal">Elevação Frontal</option>
+            <option value="Crucifixo Invertido">Crucifixo Invertido</option>
+          </optgroup>
+          <optgroup label="Bíceps">
+            <option value="Rosca Direta com Barra W">Rosca Direta com Barra W</option>
+            <option value="Rosca Martelo com Halteres">Rosca Martelo com Halteres</option>
+            <option value="Rosca Concentrada">Rosca Concentrada</option>
+            <option value="Rosca Scott na Polia">Rosca Scott na Polia</option>
+          </optgroup>
+          <optgroup label="Tríceps">
+            <option value="Tríceps Pulley na Corda">Tríceps Pulley na Corda</option>
+            <option value="Tríceps Testa com Barra W">Tríceps Testa com Barra W</option>
+            <option value="Tríceps Coice com Halter">Tríceps Coice com Halter</option>
+            <option value="Mergulho no Banco (Dips)">Mergulho no Banco (Dips)</option>
+          </optgroup>
+          <optgroup label="Abdômen & Core">
+            <option value="Abdominal Infra no Solo / Elevação de Pernas">Abdominal Infra no Solo</option>
+            <option value="Prancha Ventral Isométrica">Prancha Ventral Isométrica</option>
+            <option value="Abdominal Supra na Polia / Solo">Abdominal Supra</option>
+          </optgroup>
+          <optgroup label="Outros / Personalizado">
+            <option value="__custom__">✏️ Outro (digitar nome personalizado)...</option>
+          </optgroup>
+        </select>
+
+        <input type="text" id="customExerciseInput" class="form-input" style="display: none; margin-bottom: 8px;" placeholder="Digite o nome do exercício personalizado...">
+
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+          <input type="number" id="newExSeries" class="form-input" style="flex: 1; padding: 8px; font-size: 12px;" placeholder="Séries (opcional, ex: 4)">
+          <input type="text" id="newExReps" class="form-input" style="flex: 1; padding: 8px; font-size: 12px;" placeholder="Reps (opcional, ex: 10-12)">
         </div>
-        <div style="display: flex; gap: 8px;">
-          <input type="text" id="quickExerciseName" class="form-input" style="flex: 1; padding: 8px;" placeholder="Nome do exercício (ex: Agachamento Livre)">
-          <button onclick="addQuickExercise()" class="btn btn-outline" style="width: auto; padding: 8px 12px; font-size: 12px;">+ Adicionar</button>
+
+        <button onclick="addSelectedExerciseToWorkout()" class="btn btn-outline" style="width: 100%; padding: 10px; font-size: 13px; margin-bottom: 12px;">+ Adicionar Exercício ao Treino</button>
+
+        <div id="selectedExercisesList" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Exercícios adicionados aparecem aqui -->
         </div>
       </div>
 
@@ -915,14 +962,21 @@
     // ==========================================
     // CRIADOR DE TREINOS - LÓGICA E SINCRONIZAÇÃO
     // ==========================================
-    let selectedColor = '#1E88E5';
     let selectedDays = [];
     let newWorkoutExercises = [];
 
     function openCreateWorkoutModal() {
       document.getElementById('newWorkoutName').value = '';
       document.getElementById('newWorkoutDesc').value = '';
-      document.getElementById('quickExerciseName').value = '';
+      const dropdown = document.getElementById('exerciseSelectDropdown');
+      if (dropdown) dropdown.value = '';
+      const customInput = document.getElementById('customExerciseInput');
+      if (customInput) { customInput.value = ''; customInput.style.display = 'none'; }
+      const seriesInput = document.getElementById('newExSeries');
+      if (seriesInput) seriesInput.value = '';
+      const repsInput = document.getElementById('newExReps');
+      if (repsInput) repsInput.value = '';
+
       selectedDays = [];
       newWorkoutExercises = [];
       document.querySelectorAll('#modalCreateWorkout .chip').forEach(c => c.classList.remove('active'));
@@ -934,12 +988,6 @@
       document.getElementById('modalCreateWorkout').classList.remove('active');
     }
 
-    function selectWorkoutColor(hex, element) {
-      selectedColor = hex;
-      document.querySelectorAll('.color-picker-dot').forEach(dot => dot.classList.remove('active'));
-      element.classList.add('active');
-    }
-
     function toggleDayChip(chipEl, dayName) {
       chipEl.classList.toggle('active');
       if (chipEl.classList.contains('active')) {
@@ -949,20 +997,51 @@
       }
     }
 
-    function addQuickExercise() {
-      const input = document.getElementById('quickExerciseName');
-      const name = input.value.trim();
-      if (!name) {
-        alert('Informe o nome do exercício para adicionar ao treino.');
+    function handleExerciseSelectChange(selectEl) {
+      const customInput = document.getElementById('customExerciseInput');
+      if (selectEl.value === '__custom__') {
+        customInput.style.display = 'block';
+        customInput.focus();
+      } else {
+        customInput.style.display = 'none';
+      }
+    }
+
+    function addSelectedExerciseToWorkout() {
+      const dropdown = document.getElementById('exerciseSelectDropdown');
+      const customInput = document.getElementById('customExerciseInput');
+      const seriesInput = document.getElementById('newExSeries');
+      const repsInput = document.getElementById('newExReps');
+
+      let exerciseName = '';
+      if (dropdown.value === '__custom__') {
+        exerciseName = customInput.value.trim();
+      } else {
+        exerciseName = dropdown.value.trim();
+      }
+
+      if (!exerciseName) {
+        alert('Por favor, selecione um exercício da biblioteca ou digite o nome personalizado.');
         return;
       }
+
+      const seriesVal = seriesInput.value.trim() ? seriesInput.value.trim() : '4';
+      const repsVal = repsInput.value.trim() ? repsInput.value.trim() : '10-12';
+
       newWorkoutExercises.push({
         id: 'ex_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-        nome: name,
-        series: 4,
-        reps: '10-12'
+        nome: exerciseName,
+        series: seriesVal,
+        reps: repsVal
       });
-      input.value = '';
+
+      // Reset dos campos de exercício
+      dropdown.value = '';
+      customInput.value = '';
+      customInput.style.display = 'none';
+      seriesInput.value = '';
+      repsInput.value = '';
+
       renderNewWorkoutExercisesList();
     }
 
@@ -975,7 +1054,7 @@
       const container = document.getElementById('selectedExercisesList');
       if (newWorkoutExercises.length === 0) {
         container.innerHTML = `<div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px; border: 1px dashed var(--divider); border-radius: 10px;">
-          Nenhum exercício adicionado ainda. Digite o nome acima e clique em + Adicionar.
+          Nenhum exercício adicionado ainda. Escolha no seletor acima e clique em + Adicionar.
         </div>`;
         return;
       }
@@ -983,7 +1062,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--divider);">
           <div>
             <div style="font-size: 13px; font-weight: 700; color: white;">${ex.nome}</div>
-            <div style="font-size: 11px; color: var(--text-grey);">${ex.series} séries x ${ex.reps} reps</div>
+            <div style="font-size: 11px; color: var(--text-grey);">${ex.series} séries • ${ex.reps} reps</div>
           </div>
           <button onclick="removeExerciseFromNewWorkout(${idx})" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 16px;">🗑️</button>
         </div>
@@ -1008,7 +1087,7 @@
         nome: name,
         descricao: descInput.value.trim(),
         diasSemana: selectedDays,
-        corHex: selectedColor,
+        corHex: '#1E88E5',
         exerciciosCount: countEx,
         criadoEm: new Date().toISOString()
       };
