@@ -19,6 +19,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root {
       --bg-black: #0d0d0d;
@@ -60,7 +63,7 @@
       width: 100%;
       max-width: 480px;
       height: 100vh;
-      max-height: 920px;
+      height: 100dvh;
       background: var(--bg-black);
       display: flex;
       flex-direction: column;
@@ -673,6 +676,15 @@
   </div>
 
   <script>
+    // Inicialização do Supabase JS Client
+    const SUPABASE_URL = 'https://gplgywrvejefulsjpkax.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_em6WHZt2Ol8JZ16fe_Lcyg_ETq_kIPY';
+    let _supabase = null;
+    if (window.supabase) {
+      _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      console.log('[PWA] Supabase conectado com sucesso no Web PWA!');
+    }
+
     // Registro do Service Worker do PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
