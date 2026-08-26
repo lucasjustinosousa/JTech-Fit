@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../../core/theme/jtech_theme.dart';
 import '../../data/repositories/workout_repository.dart';
 import '../../data/models/models.dart';
-import '../exercises/exercise_library_screen.dart';
+import '../exercises/exercise_selection_screen.dart';
 
 class WorkoutBuilderScreen extends StatefulWidget {
   final Treino? treinoExistente;
@@ -40,28 +40,26 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
   }
 
   void _adicionarExercicioDaBiblioteca() async {
-    final Exercicio? selecionado = await Navigator.push(
+    final dynamic resultado = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const ExerciseLibraryScreen(modoSelecao: true),
+        builder: (_) => const ExerciseSelectionScreen(),
       ),
     );
 
-    if (selecionado != null) {
+    if (resultado != null && resultado is List<Exercicio>) {
       setState(() {
-        _exerciciosDoTreino.add(
-          ExercicioDoTreino(
-            id: const Uuid().v4(),
-            treinoId: widget.treinoExistente?.id ?? '',
-            exercicioId: selecionado.id,
-            ordem: _exerciciosDoTreino.length + 1,
-            quantidadeSeries: 4,
-            repeticoes: '10-12',
-            cargaInicial: 0.0,
-            descansoSegundos: 60,
-            exercicioInfo: selecionado,
-          ),
-        );
+        for (var selecionado in resultado) {
+          _exerciciosDoTreino.add(
+            ExercicioDoTreino(
+              id: const Uuid().v4(),
+              treinoId: widget.treinoExistente?.id ?? '',
+              exercicioId: selecionado.id,
+              ordem: _exerciciosDoTreino.length + 1,
+              exercicioInfo: selecionado,
+            ),
+          );
+        }
       });
     }
   }

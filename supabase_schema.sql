@@ -28,20 +28,33 @@ CREATE TABLE public.usuarios (
     criado_em TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. TABELA DE EXERCÍCIOS
+-- 4. TABELA DE EXERCÍCIOS (EXPANDIDA EXERCISEDB V1)
 CREATE TABLE public.exercicios (
     id TEXT PRIMARY KEY,
+    exercise_db_id TEXT,
     nome TEXT NOT NULL,
+    nome_original TEXT,
+    nome_traduzido TEXT,
     grupo_muscular TEXT NOT NULL,
+    parte_corpo_original TEXT,
+    parte_corpo_traduzida TEXT,
+    musculo_principal_original TEXT,
+    musculo_principal_traduzido TEXT,
+    musculos_secundarios TEXT DEFAULT '',
     musculos_auxiliares TEXT DEFAULT '',
     equipamento TEXT NOT NULL,
+    equipamento_original TEXT,
+    equipamento_traduzido TEXT,
     instrucoes TEXT NOT NULL,
     cuidados TEXT DEFAULT '',
+    gif_url TEXT,
     video_url TEXT,
     imagem_url TEXT,
     personalizado BOOLEAN DEFAULT FALSE,
     usuario_id UUID REFERENCES public.usuarios(id) ON DELETE CASCADE,
     is_favorito BOOLEAN DEFAULT FALSE,
+    favorito BOOLEAN DEFAULT FALSE,
+    atualizado_em TIMESTAMPTZ DEFAULT NOW(),
     criado_em TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -56,17 +69,17 @@ CREATE TABLE public.treinos (
     criado_em TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 6. TABELA DE EXERCÍCIOS DO TREINO
+-- 6. TABELA DE EXERCÍCIOS DO TREINO (CAMPOS OPCIONAIS / ACEITA VAZIO)
 CREATE TABLE public.exercicios_do_treino (
     id TEXT PRIMARY KEY,
     treino_id TEXT REFERENCES public.treinos(id) ON DELETE CASCADE,
     exercicio_id TEXT REFERENCES public.exercicios(id) ON DELETE CASCADE,
     ordem INT NOT NULL,
-    quantidade_series INT DEFAULT 4,
-    repeticoes TEXT DEFAULT '10-12',
-    carga_inicial NUMERIC(6,2) DEFAULT 0.0,
-    descanso_segundos INT DEFAULT 60,
-    observacoes TEXT DEFAULT ''
+    quantidade_series INT,
+    repeticoes TEXT,
+    carga_inicial NUMERIC(6,2),
+    descanso_segundos INT,
+    observacoes TEXT
 );
 
 -- 7. TABELA DE SESSÕES DE TREINO (HISTÓRICO / EM ANDAMENTO)

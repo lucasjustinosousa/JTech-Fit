@@ -50,12 +50,18 @@ class Usuario {
 // 2. EXERCICIOS
 class Exercicio {
   final String id;
+  final String? exerciseDbId;
   final String nome;
+  final String? nomeOriginal;
   final String grupoMuscular; // Peito, Costas, Pernas, Ombros, Bíceps, Tríceps, Abdômen, Corpo inteiro, Mobilidade
+  final String? parteCorpoOriginal;
+  final String? musculoPrincipalOriginal;
   final String musculosAuxiliares;
   final String equipamento; // Halteres, Barra, Máquina, Peso corporal, etc.
+  final String? equipamentoOriginal;
   final String instrucoes;
   final String cuidados;
+  final String? gifUrl;
   final String? videoUrl;
   final String? imagemUrl;
   final bool personalizado;
@@ -64,12 +70,18 @@ class Exercicio {
 
   Exercicio({
     required this.id,
+    this.exerciseDbId,
     required this.nome,
+    this.nomeOriginal,
     required this.grupoMuscular,
+    this.parteCorpoOriginal,
+    this.musculoPrincipalOriginal,
     this.musculosAuxiliares = '',
     required this.equipamento,
+    this.equipamentoOriginal,
     required this.instrucoes,
     this.cuidados = '',
+    this.gifUrl,
     this.videoUrl,
     this.imagemUrl,
     this.personalizado = false,
@@ -80,12 +92,18 @@ class Exercicio {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'exercise_db_id': exerciseDbId,
       'nome': nome,
+      'nome_original': nomeOriginal,
       'grupo_muscular': grupoMuscular,
+      'parte_corpo_original': parteCorpoOriginal,
+      'musculo_principal_original': musculoPrincipalOriginal,
       'musculos_auxiliares': musculosAuxiliares,
       'equipamento': equipamento,
+      'equipamento_original': equipamentoOriginal,
       'instrucoes': instrucoes,
       'cuidados': cuidados,
+      'gif_url': gifUrl,
       'video_url': videoUrl,
       'imagem_url': imagemUrl,
       'personalizado': personalizado ? 1 : 0,
@@ -97,29 +115,41 @@ class Exercicio {
   factory Exercicio.fromMap(Map<String, dynamic> map) {
     return Exercicio(
       id: map['id'] ?? '',
-      nome: map['nome'] ?? '',
-      grupoMuscular: map['grupo_muscular'] ?? 'Geral',
-      musculosAuxiliares: map['musculos_auxiliares'] ?? '',
-      equipamento: map['equipamento'] ?? 'Nenhum',
+      exerciseDbId: map['exercise_db_id'],
+      nome: map['nome_traduzido'] ?? map['nome'] ?? '',
+      nomeOriginal: map['nome_original'],
+      grupoMuscular: map['parte_corpo_traduzida'] ?? map['grupo_muscular'] ?? 'Geral',
+      parteCorpoOriginal: map['parte_corpo_original'],
+      musculoPrincipalOriginal: map['musculo_principal_original'],
+      musculosAuxiliares: map['musculos_secundarios'] ?? map['musculos_auxiliares'] ?? '',
+      equipamento: map['equipamento_traduzido'] ?? map['equipamento'] ?? 'Nenhum',
+      equipamentoOriginal: map['equipamento_original'],
       instrucoes: map['instrucoes'] ?? '',
       cuidados: map['cuidados'] ?? '',
+      gifUrl: map['gif_url'],
       videoUrl: map['video_url'],
       imagemUrl: map['imagem_url'],
       personalizado: map['personalizado'] == 1 || map['personalizado'] == true,
       usuarioId: map['usuario_id'],
-      isFavorito: map['is_favorito'] == 1 || map['is_favorito'] == true,
+      isFavorito: map['is_favorito'] == 1 || map['is_favorito'] == true || map['favorito'] == 1 || map['favorito'] == true,
     );
   }
 
   Exercicio copyWith({bool? isFavorito}) {
     return Exercicio(
       id: id,
+      exerciseDbId: exerciseDbId,
       nome: nome,
+      nomeOriginal: nomeOriginal,
       grupoMuscular: grupoMuscular,
+      parteCorpoOriginal: parteCorpoOriginal,
+      musculoPrincipalOriginal: musculoPrincipalOriginal,
       musculosAuxiliares: musculosAuxiliares,
       equipamento: equipamento,
+      equipamentoOriginal: equipamentoOriginal,
       instrucoes: instrucoes,
       cuidados: cuidados,
+      gifUrl: gifUrl,
       videoUrl: videoUrl,
       imagemUrl: imagemUrl,
       personalizado: personalizado,
@@ -194,11 +224,11 @@ class ExercicioDoTreino {
   final String treinoId;
   final String exercicioId;
   final int ordem;
-  final int quantidadeSeries;
-  final String repeticoes; // Ex: "10-12" ou "12"
-  final double cargaInicial;
-  final int descansoSegundos;
-  final String observacoes;
+  final int? quantidadeSeries;
+  final String? repeticoes;
+  final double? cargaInicial;
+  final int? descansoSegundos;
+  final String? observacoes;
   final Exercicio? exercicioInfo;
 
   ExercicioDoTreino({
@@ -206,11 +236,11 @@ class ExercicioDoTreino {
     required this.treinoId,
     required this.exercicioId,
     required this.ordem,
-    this.quantidadeSeries = 4,
-    this.repeticoes = '10-12',
-    this.cargaInicial = 0.0,
-    this.descansoSegundos = 60,
-    this.observacoes = '',
+    this.quantidadeSeries,
+    this.repeticoes,
+    this.cargaInicial,
+    this.descansoSegundos,
+    this.observacoes,
     this.exercicioInfo,
   });
 
@@ -234,11 +264,11 @@ class ExercicioDoTreino {
       treinoId: map['treino_id'] ?? '',
       exercicioId: map['exercicio_id'] ?? '',
       ordem: map['ordem'] ?? 0,
-      quantidadeSeries: map['quantidade_series'] ?? 4,
-      repeticoes: map['repeticoes'] ?? '10-12',
-      cargaInicial: (map['carga_inicial'] ?? 0.0).toDouble(),
-      descansoSegundos: map['descanso_segundos'] ?? 60,
-      observacoes: map['observacoes'] ?? '',
+      quantidadeSeries: map['quantidade_series'],
+      repeticoes: map['repeticoes'],
+      cargaInicial: map['carga_inicial'] != null ? (map['carga_inicial'] as num).toDouble() : null,
+      descansoSegundos: map['descanso_segundos'],
+      observacoes: map['observacoes'],
       exercicioInfo: exercicioInfo,
     );
   }

@@ -43,7 +43,24 @@ class WorkoutRepository extends ChangeNotifier {
 
   Future<void> carregarDados() async {
     try {
-      _exercicios = await LocalDatabase.instance.getExercicios();
+      // 1. Carregar exercicios salvos localmente no SQLite
+      _exercicios = await ExerciseLocalDatabase.instance.getLocalExercises();
+      
+      // Se banco local estiver vazio, carregar da ExerciseDB/Mirror
+      if (_exercicios.isEmpty) {
+        final dbService = ExerciseDbService();
+        final fetched = await dbService.fetchExercises(limit: 150);
+        if (fetched.isNotEmpty) {
+          await ExerciseLocalDatabase.instance.saveExercisesBatch(fetched);
+          _exercicios = await ExerciseLocalDatabase.instance.getLocalExercises();
+        }
+      }
+
+      // Fallback secundario se ainda assim estiver vazio
+      if (_exercicios.isEmpty) {
+        _exercicios = await LocalDatabase.instance.getExercicios();
+      }
+
       _treinos = await LocalDatabase.instance.getTreinos(_usuarioAtual?.id ?? 'guest_user_1');
       _historico = await LocalDatabase.instance.getHistoricoSessoes();
 
