@@ -4,197 +4,124 @@ import 'package:http/http.dart' as http;
 import 'exercise_translation_service.dart';
 
 class ExerciseDbService {
-  static const String _baseUrl = 'https://exercisedb.p.rapidapi.com';
-  static const String _mirrorUrl = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/exercises.json';
-  static const String _gifBaseUrl = 'https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/dist/gifs/';
+  static const String _officialEndpoint = 'https://oss.exercisedb.dev/api/v1/exercises';
+  static const String _mediaBaseUrl = 'https://static.exercisedb.dev/media/';
 
-  final String? rapidApiKey;
-
-  ExerciseDbService({this.rapidApiKey});
-
-  /// Realiza a busca paginada completa da ExerciseDB V1 sem cortes pequenos fixos
+  /// Realiza a busca paginada por cursor da ExerciseDB V1 oficial (sem RapidAPI)
   Future<List<Map<String, dynamic>>> fetchAllExercisesPaginated({
     Function(int current, int total)? onProgress,
   }) async {
     final List<Map<String, dynamic>> allResults = [];
     final Set<String> seenIds = {};
 
-    int pageOffset = 0;
-    const int pageLimit = 100;
-    bool hasMorePages = true;
-
+    String? currentCursor;
+    bool hasNextPage = true;
+    int apiTotal = 1500;
     int totalReceived = 0;
-    int totalDuplicates = 0;
-    int unavailableMedia = 0;
+    int totalGifsAvailable = 0;
 
-    // Se houver chave RapidAPI configurada, tenta buscar paginado via API oficial
-    if (rapidApiKey != null && rapidApiKey!.isNotEmpty) {
-      while (hasMorePages) {
-        final url = '$_baseUrl/exercises?limit=$pageLimit&offset=$pageOffset';
-        try {
-          final response = await http.get(
-            Uri.parse(url),
-            headers: {
-              'X-RapidAPI-Key': rapidApiKey!,
-              'X-RapidAPI-Host': 'exercisedb.p.rapidapi.com',
-            },
-          ).timeout(const Duration(seconds: 12));
+    while (hasNextPage) {
+      String url = _officialEndpoint;
+      if (currentCursor != null && currentCursor.isNotEmpty) {
+        url = '$_officialEndpoint?cursor=$currentCursor';
+      }
 
-          debugPrint('[ExerciseDb] Consultando URL: $url | Status: ${response.statusCode}');
+      try {
+        debugPrint('[ExerciseDb V1] Consultando Endpoint Oficial: $url');
+        final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 12));
 
-          if (response.statusCode == 200) {
-            final parsedData = _parseResponseJson(response.body);
-            debugPrint('[ExerciseDb] Recebidos: ${parsedData.length} exercícios na página (offset $pageOffset)');
+        debugPrint('[ExerciseDb V1] Status HTTP: ${response.statusCode}');
 
-            if (parsedData.isNotEmpty && pageOffset == 0) {
-              debugPrint('[ExerciseDb] Primeiro Objeto JSON: ${jsonEncode(parsedData.first)}');
-              debugPrint('[ExerciseDb] Campo GIF original: ${parsedData.first['gifUrl'] ?? parsedData.first['gif_url']}');
-            }
+        if (response.statusCode >= 200 && response.statusCode <= 299) {
+          final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
-            if (parsedData.isEmpty) {
-              hasMorePages = false;
-              break;
-            }
+          final bool isSuccess = jsonResponse['success'] == true;
+          final Map<String, dynamic>? meta = jsonResponse['meta'];
+          final List<dynamic>? data = jsonResponse['data'];
 
-            for (var rawItem in parsedData) {
+          if (meta != null) {
+            apiTotal = meta['total'] ?? apiTotal;
+            hasNextPage = meta['hasNextPage'] == true;
+            currentCursor = meta['nextCursor']?.toString();
+
+            debugPrint('[ExerciseDb V1] Meta -> Total: $apiTotal | hasNextPage: $hasNextPage | nextCursor: $currentCursor');
+          } else {
+            hasNextPage = false;
+          }
+
+          if (isSuccess && data != null && data.isNotEmpty) {
+            debugPrint('[ExerciseDb V1] Exercícios recebidos nesta página: ${data.length}');
+
+            for (var item in data) {
               totalReceived++;
-              final mapped = _mapExerciseApiData(rawItem);
-              final String dbId = mapped['exercise_db_id'] ?? '';
+              final mapped = _mapOfficialExerciseData(item as Map<String, dynamic>);
+              final String exId = mapped['exercise_db_id'] ?? '';
 
-              if (mapped['gif_url'] == null || (mapped['gif_url'] as String).isEmpty) {
-                unavailableMedia++;
+              if (mapped['gif_url'] != null && (mapped['gif_url'] as String).isNotEmpty) {
+                totalGifsAvailable++;
               }
 
-              if (seenIds.contains(dbId)) {
-                totalDuplicates++;
-              } else {
-                seenIds.add(dbId);
+              if (!seenIds.contains(exId)) {
+                seenIds.add(exId);
                 allResults.add(mapped);
               }
             }
 
-            pageOffset += pageLimit;
-            if (onProgress != null) onProgress(allResults.length, 1500);
+            if (onProgress != null) onProgress(allResults.length, apiTotal);
           } else {
-            // Erros HTTP (401, 403, 404, 429, 500)
-            debugPrint('[ExerciseDb] Erro HTTP ${response.statusCode}. Ativando fallback para o espelho público.');
-            hasMorePages = false;
+            hasNextPage = false;
           }
-        } catch (e) {
-          debugPrint('[ExerciseDb] Exceção de rede na página offset $pageOffset: $e');
-          hasMorePages = false;
-        }
-      }
-    }
-
-    // Se o retorno da API estiver vazio ou sem RapidAPI, ativa o fallback completo do espelho gratuito
-    if (allResults.isEmpty) {
-      final mirrorResults = await _fetchFromMirror();
-      for (var mapped in mirrorResults) {
-        totalReceived++;
-        final String dbId = mapped['exercise_db_id'] ?? '';
-        if (mapped['gif_url'] == null || (mapped['gif_url'] as String).isEmpty) {
-          unavailableMedia++;
-        }
-        if (seenIds.contains(dbId)) {
-          totalDuplicates++;
         } else {
-          seenIds.add(dbId);
-          allResults.add(mapped);
+          debugPrint('[ExerciseDb V1] Erro HTTP ${response.statusCode} na chamada $url');
+          hasNextPage = false;
         }
+      } catch (e) {
+        debugPrint('[ExerciseDb V1] Falha de conexão na requisição $url: $e');
+        hasNextPage = false;
       }
     }
 
-    debugPrint('Sincronização finalizada: $totalReceived exercícios recebidos, ${allResults.length} salvos, $totalDuplicates duplicados e $unavailableMedia mídias indisponíveis.');
+    debugPrint('Integração ExerciseDB concluída: ${allResults.length} de $apiTotal exercícios carregados e $totalGifsAvailable GIFs disponíveis.');
 
     return allResults;
   }
 
-  /// Aceita respostas nos formatos: Lista direta [...], Objeto {"results": [...]}, Objeto {"exercises": [...]}
-  List<Map<String, dynamic>> _parseResponseJson(String responseBody) {
-    try {
-      final dynamic decoded = jsonDecode(responseBody);
-      if (decoded is List) {
-        return decoded.map((e) => e as Map<String, dynamic>).toList();
-      } else if (decoded is Map<String, dynamic>) {
-        if (decoded.containsKey('results') && decoded['results'] is List) {
-          return (decoded['results'] as List).map((e) => e as Map<String, dynamic>).toList();
-        } else if (decoded.containsKey('exercises') && decoded['exercises'] is List) {
-          return (decoded['exercises'] as List).map((e) => e as Map<String, dynamic>).toList();
-        } else if (decoded.containsKey('data') && decoded['data'] is List) {
-          return (decoded['data'] as List).map((e) => e as Map<String, dynamic>).toList();
-        }
-      }
-    } catch (e) {
-      debugPrint('[ExerciseDb] Erro ao decodificar JSON: $e');
+  Map<String, dynamic> _mapOfficialExerciseData(Map<String, dynamic> item) {
+    final String exerciseId = item['exerciseId']?.toString() ?? item['id']?.toString() ?? '';
+    final String originalName = item['name'] ?? 'Exercício';
+
+    final List<dynamic> bodyParts = item['bodyParts'] ?? [];
+    final List<dynamic> equipments = item['equipments'] ?? [];
+    final List<dynamic> targetMuscles = item['targetMuscles'] ?? [];
+    final List<dynamic> secondaryMuscles = item['secondaryMuscles'] ?? [];
+    final List<dynamic> instructions = item['instructions'] ?? [];
+
+    final String rawBodyPart = bodyParts.isNotEmpty ? bodyParts.first.toString() : '';
+    final String rawEquipment = equipments.isNotEmpty ? equipments.first.toString() : '';
+    final String rawTarget = targetMuscles.isNotEmpty ? targetMuscles.first.toString() : '';
+
+    String gifUrl = item['gifUrl'] ?? '';
+    if (gifUrl.isEmpty && exerciseId.isNotEmpty) {
+      gifUrl = '$_mediaBaseUrl$exerciseId.gif';
     }
-    return [];
-  }
-
-  Future<List<Map<String, dynamic>>> _fetchFromMirror() async {
-    try {
-      debugPrint('[ExerciseDb] Consultando espelho público: $_mirrorUrl');
-      final response = await http.get(Uri.parse(_mirrorUrl)).timeout(const Duration(seconds: 12));
-      debugPrint('[ExerciseDb] Espelho Status HTTP: ${response.statusCode}');
-
-      if (response.statusCode == 200) {
-        final parsedData = _parseResponseJson(response.body);
-        debugPrint('[ExerciseDb] Espelho retornou ${parsedData.length} exercícios no total.');
-        return parsedData.map((item) => _mapExerciseApiData(item)).toList();
-      }
-    } catch (e) {
-      debugPrint('[ExerciseDb] Falha ao consultar espelho remoto: $e');
-    }
-    return [];
-  }
-
-  Map<String, dynamic> _mapExerciseApiData(Map<String, dynamic> item) {
-    final String rawBodyPart = item['bodyPart'] ?? item['category'] ?? '';
-    final String rawEquipment = item['equipment'] ?? '';
-    final String rawTarget = item['target'] ?? item['primaryMuscles']?[0] ?? '';
-    final List<dynamic> rawSecondary = item['secondaryMuscles'] ?? [];
-    
-    dynamic rawInstructions = item['instructions'] ?? item['steps'] ?? [];
-    String instructionsText = '';
-    if (rawInstructions is List) {
-      instructionsText = rawInstructions.join('\n');
-    } else {
-      instructionsText = rawInstructions.toString();
-    }
-
-    final String originalName = item['name'] ?? item['title'] ?? 'Exercício';
-    final String rawGif = item['gifUrl'] ?? item['gif_url'] ?? item['imageUrl'] ?? item['image'] ?? '';
-
-    // Resolução de URL do GIF demonstrativo
-    String finalGifUrl = '';
-    if (rawGif.isNotEmpty) {
-      if (rawGif.startsWith('http://') || rawGif.startsWith('https://')) {
-        finalGifUrl = rawGif;
-      } else {
-        // Se retornar apenas o nome do arquivo ou ID do GIF
-        final String cleanFileName = rawGif.startsWith('/') ? rawGif.substring(1) : rawGif;
-        finalGifUrl = '$_gifBaseUrl$cleanFileName';
-        if (!finalGifUrl.endsWith('.gif')) {
-          finalGifUrl = '$finalGifUrl.gif';
-        }
-      }
-    }
-
-    final String dbId = item['id']?.toString() ?? originalName.replaceAll(' ', '_').toLowerCase();
 
     return {
-      'exercise_db_id': dbId,
+      'exercise_db_id': exerciseId,
+      'id': exerciseId,
       'nome_original': originalName,
       'nome_traduzido': ExerciseTranslationService.translateExerciseName(originalName),
+      'nome': ExerciseTranslationService.translateExerciseName(originalName),
       'parte_corpo_original': rawBodyPart,
       'parte_corpo_traduzida': ExerciseTranslationService.translateBodyPart(rawBodyPart),
+      'grupo_muscular': ExerciseTranslationService.translateBodyPart(rawBodyPart),
       'musculo_principal_original': rawTarget,
       'musculo_principal_traduzido': ExerciseTranslationService.translateTargetMuscle(rawTarget),
-      'musculos_secundarios': ExerciseTranslationService.translateSecondaryMuscles(rawSecondary),
+      'musculos_secundarios': ExerciseTranslationService.translateSecondaryMuscles(secondaryMuscles),
       'equipamento_original': rawEquipment,
       'equipamento_traduzido': ExerciseTranslationService.translateEquipment(rawEquipment),
-      'instrucoes': instructionsText,
-      'gif_url': finalGifUrl,
+      'equipamento': ExerciseTranslationService.translateEquipment(rawEquipment),
+      'instrucoes': instructions.join('\n'),
+      'gif_url': gifUrl,
     };
   }
 }

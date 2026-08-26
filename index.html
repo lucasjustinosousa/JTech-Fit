@@ -1294,238 +1294,318 @@
     }
 
     // ==========================================
-    // BIBLIOTECA DE EXERCÍCIOS - BASE DE DADOS & INTERAÇÃO
+    // BIBLIOTECA DE EXERCÍCIOS - EXERCISEDB V1 OFICIAL
     // ==========================================
-    const FULL_EXERCISE_DATABASE = [
-      {
-        id: 'ex_supino_reto',
-        nome: 'Supino Reto com Barra',
-        grupoMuscular: 'Peito',
-        equipamento: 'Barra e Banco Plano',
-        instrucoes: 'Deite-se no banco, posicione as mãos levemente mais abertas que os ombros. Desça a barra até tocar o peitoral e empurre com força até a extensão quase total.',
-        cuidados: 'Mantenha as escápulas retraídas e os pés firmes no chão.'
-      },
-      {
-        id: 'ex_supino_inclinado',
-        nome: 'Supino Inclinado com Halteres',
-        grupoMuscular: 'Peito',
-        equipamento: 'Halteres e Banco Inclinado',
-        instrucoes: 'Ajuste o banco em 30º-45º. Suba os halteres alinhados ao peitoral superior, focando na contração.',
-        cuidados: 'Evite inclinar demais o banco para não sobrecarregar os ombros.'
-      },
-      {
-        id: 'ex_crucifixo_crossover',
-        nome: 'Crucifixo no Crossover (Polia Alta)',
-        grupoMuscular: 'Peito',
-        equipamento: 'Polia Dupla Alta',
-        instrucoes: 'Dê um passo à frente com braços levemente flexionados. Junte as mãos à frente do quadril cruzando levemente os punhos.',
-        cuidados: 'Não dobre excessivamente os cotovelos durante o movimento.'
-      },
-      {
-        id: 'ex_peck_deck',
-        nome: 'Peck Deck / Voador',
-        grupoMuscular: 'Peito',
-        equipamento: 'Máquina Peck Deck',
-        instrucoes: 'Sente-se com as costas apoiadas, empurre as hastes até se tocarem no centro e retorne controladamente.',
-        cuidados: 'Mantenha os cotovelos na altura do peito.'
-      },
-      {
-        id: 'ex_puxada_frontal',
-        nome: 'Puxada Frontal na Polia',
-        grupoMuscular: 'Costas',
-        equipamento: 'Polia Alta com Barra Larga',
-        instrucoes: 'Puxe a barra em direção à parte superior do peito estufando o tórax. Retorne estendendo totalmente os braços.',
-        cuidados: 'Não incline o tronco excessivamente para trás.'
-      },
-      {
-        id: 'ex_remada_curvada',
-        nome: 'Remada Curvada com Barra',
-        grupoMuscular: 'Costas',
-        equipamento: 'Barra e Anilhas',
-        instrucoes: 'Incline o tronco a 45º com joelhos levemente dobrados. Puxe a barra no sentido do umbigo contraindo as dorsais.',
-        cuidados: 'Mantenha a coluna neutra e firme.'
-      },
-      {
-        id: 'ex_remada_serrote',
-        nome: 'Remada Unilateral com Halter (Serrote)',
-        grupoMuscular: 'Costas',
-        equipamento: 'Halter e Banco',
-        instrucoes: 'Apoie o joelho e mão no banco. Puxe o halter na lateral do quadril aproximando a escápula.',
-        cuidados: 'Evite rotacionar o tronco na subida.'
-      },
-      {
-        id: 'ex_agachamento_livre',
-        nome: 'Agachamento Livre com Barra',
-        grupoMuscular: 'Pernas',
-        equipamento: 'Barra e Racks de Agachamento',
-        instrucoes: 'Apoie a barra no trapézio. Agache projetando o quadril para trás até 90º ou mais e suba empurrando os calcanhares.',
-        cuidados: 'Mantenha joelhos alinhados com as pontas dos pés.'
-      },
-      {
-        id: 'ex_leg_press',
-        nome: 'Leg Press 45º',
-        grupoMuscular: 'Pernas',
-        equipamento: 'Máquina Leg Press 45º',
-        instrucoes: 'Posicione os pés na largura dos ombros. Destrave e desça a plataforma até 90º. Empurre firme.',
-        cuidados: 'Nunca trave os joelhos em extensão total no topo.'
-      },
-      {
-        id: 'ex_cadeira_extensora',
-        nome: 'Cadeira Extensora',
-        grupoMuscular: 'Pernas',
-        equipamento: 'Cadeira Extensora',
-        instrucoes: 'Ajuste o rolo na altura dos tornozelos. Estenda as pernas completamente até contrair o quadríceps.',
-        cuidados: 'Não descole as costas do encosto.'
-      },
-      {
-        id: 'ex_mesa_flexora',
-        nome: 'Mesa Flexora (Posterior)',
-        grupoMuscular: 'Pernas',
-        equipamento: 'Mesa Flexora deitada',
-        instrucoes: 'Deite-se de bruços, flexione os joelhos trazendo o rolo em direção aos glúteos.',
-        cuidados: 'Evite elevar o quadril durante a subida.'
-      },
-      {
-        id: 'ex_desenvolvimento_halteres',
-        nome: 'Desenvolvimento com Halteres',
-        grupoMuscular: 'Ombros',
-        equipamento: 'Halteres e Banco 90º',
-        instrucoes: 'Sente-se ereto, segure os halteres na altura dos ombros e empurre para cima até se aproximarem.',
-        cuidados: 'Não arquie excessivamente a lombar.'
-      },
-      {
-        id: 'ex_elevacao_lateral',
-        nome: 'Elevação Lateral com Halteres',
-        grupoMuscular: 'Ombros',
-        equipamento: 'Halteres',
-        instrucoes: 'Em pé, eleve os halteres lateralmente até a altura dos ombros com cotovelos levemente semi-flexionados.',
-        cuidados: 'Controle a descida sem deixar os halteres despencarem.'
-      },
-      {
-        id: 'ex_rosca_direta',
-        nome: 'Rosca Direta com Barra W',
-        grupoMuscular: 'Bíceps',
-        equipamento: 'Barra W',
-        instrucoes: 'Mantenha os cotovelos junto ao corpo. Flexione os braços subindo a barra e aperte o bíceps no topo.',
-        cuidados: 'Evite usar o balanço do corpo para subir o peso.'
-      },
-      {
-        id: 'ex_rosca_martelo',
-        nome: 'Rosca Martelo com Halteres',
-        grupoMuscular: 'Bíceps',
-        equipamento: 'Halteres',
-        instrucoes: 'Pegada neutra (palmas voltadas para dentro). Flexione alternada ou simultaneamente.',
-        cuidados: 'Trabalha fortemente o braquial e antebraço.'
-      },
-      {
-        id: 'ex_triceps_pulley',
-        nome: 'Tríceps Pulley na Corda',
-        grupoMuscular: 'Tríceps',
-        equipamento: 'Polia Alta com Corda',
-        instrucoes: 'Puxe a corda para baixo afastando as pontas no final do movimento para máxima contração do tríceps.',
-        cuidados: 'Mantenha cotovelos colados ao tronco.'
-      },
-      {
-        id: 'ex_triceps_testa',
-        nome: 'Tríceps Testa com Barra W',
-        grupoMuscular: 'Tríceps',
-        equipamento: 'Barra W e Banco Plano',
-        instrucoes: 'Deitado, flexione os cotovelos trazendo a barra em direção à testa. Estenda totalmente para cima.',
-        cuidados: 'Mantenha os cotovelos apontados para o teto sem abrir.'
-      },
-      {
-        id: 'ex_abdominal_infra',
-        nome: 'Abdominal Infra / Elevação de Pernas',
-        grupoMuscular: 'Abdômen',
-        equipamento: 'Solo ou Colchonete',
-        instrucoes: 'Deitado, eleve as pernas estendidas até 90º e desça lentamente sem encostar os calcanhares no chão.',
-        cuidados: 'Mantenha a região lombar apoiada no solo.'
-      },
-      {
-        id: 'ex_prancha',
-        nome: 'Prancha Ventral Isométrica',
-        grupoMuscular: 'Abdômen',
-        equipamento: 'Colchonete',
-        instrucoes: 'Apoie antebraços e pontas dos pés no solo. Mantenha o corpo em linha reta contraindo o core.',
-        cuidados: 'Não deixe o quadril ceder ou ficar muito elevado.'
-      },
-      {
-        id: 'ex_mobilidade_ombro',
-        nome: 'Mobilidade de Ombro com Bastão',
-        grupoMuscular: 'Mobilidade',
-        equipamento: 'Bastão / Cabo de Vassoura',
-        instrucoes: 'Segure o bastão com pegada bem aberta. Passe-o por cima da cabeça até a lombar e retorne.',
-        cuidados: 'Realize com movimento suave sem dar trancos.'
-      }
-    ];
+    const OFFICIAL_EXERCISED_ENDPOINT = 'https://oss.exercisedb.dev/api/v1/exercises';
+    const PROXY_EXERCISED_ENDPOINT = '/api/exercises';
+    const EXERCISED_MEDIA_BASE = 'https://static.exercisedb.dev/media/';
 
+    const BODYPART_MAP = {
+      'chest': 'Peito',
+      'back': 'Costas',
+      'upper arms': 'Braços',
+      'lower arms': 'Antebraços',
+      'upper legs': 'Pernas',
+      'lower legs': 'Panturrilhas',
+      'shoulders': 'Ombros',
+      'waist': 'Abdômen',
+      'cardio': 'Aeróbico',
+      'neck': 'Pescoço'
+    };
+
+    const EQUIPMENT_MAP = {
+      'barbell': 'Barra',
+      'dumbbell': 'Halteres',
+      'body weight': 'Peso Corporal',
+      'cable': 'Polia',
+      'leverage machine': 'Máquina Alavancada',
+      'smith machine': 'Barra Guiada (Smith)',
+      'kettlebell': 'Kettlebell',
+      'band': 'Elástico',
+      'medicine ball': 'Bola Medicinal',
+      'assisted': 'Assistido'
+    };
+
+    const TARGET_MAP = {
+      'biceps': 'Bíceps',
+      'triceps': 'Tríceps',
+      'abs': 'Abdominais',
+      'delts': 'Deltoides',
+      'latissimus dorsi': 'Dorsais',
+      'pectorals': 'Peitoral',
+      'quads': 'Quadríceps',
+      'hamstrings': 'Posterior de Coxa',
+      'glutes': 'Glúteos',
+      'calves': 'Panturrilhas',
+      'traps': 'Trapézio',
+      'forearms': 'Antebraços',
+      'lats': 'Dorsais',
+      'cardiovascular system': 'Sistema Cardiovascular'
+    };
+
+    function translateTerm(term, map) {
+      if (!term) return 'Geral';
+      const key = String(term).toLowerCase().trim();
+      return map[key] || (term.charAt(0).toUpperCase() + term.slice(1));
+    }
+
+    let exerciseDbList = [];
     let currentSelectedGroup = 'Todos';
     let onlyFavoritesFilter = false;
     let favoritesSet = new Set(JSON.parse(localStorage.getItem('jtech_fit_fav_exercises') || '[]'));
+    let selectedForWorkoutSet = new Set();
+    let currentExerciseState = 'CARREGANDO'; // 'CARREGANDO', 'SUCESSO', 'LISTA_VAZIA', 'ERRO'
+    let lastErrorCode = 0;
 
-    function renderExercisesLibrary() {
+    async function fetchExerciseDbOfficial(forceRefresh = false) {
+      currentExerciseState = 'CARREGANDO';
+      renderExercisesLibraryUI();
+
+      // 1. Tentar carregar do cache local primeiro
+      if (!forceRefresh) {
+        try {
+          const cached = localStorage.getItem('jtech_fit_exercisedb_cache');
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              exerciseDbList = parsed;
+              currentExerciseState = 'SUCESSO';
+              renderExercisesLibraryUI();
+              // Atualizar em segundo plano
+              syncOfficialApiInBackground();
+              return;
+            }
+          }
+        } catch (e) {}
+      }
+
+      await syncOfficialApiInBackground();
+    }
+
+    async function syncOfficialApiInBackground() {
+      let cursor = null;
+      let hasNextPage = true;
+      const fetchedItems = [];
+      const seenIds = new Set();
+
+      let apiTotal = 1500;
+      let gifsCount = 0;
+      let totalReceived = 0;
+
+      while (hasNextPage) {
+        let endpointUrl = OFFICIAL_EXERCISED_ENDPOINT;
+        if (cursor) {
+          endpointUrl = `${OFFICIAL_EXERCISED_ENDPOINT}?cursor=${encodeURIComponent(cursor)}`;
+        }
+
+        try {
+          console.log('[ExerciseDB V1] Consultando Endpoint:', endpointUrl);
+          let response = await fetch(endpointUrl).catch(() => null);
+
+          // Fallback para rota proxy Vercel caso haja bloqueio CORS no navegador
+          if (!response || !response.ok) {
+            let proxyUrl = PROXY_EXERCISED_ENDPOINT;
+            if (cursor) proxyUrl = `${PROXY_EXERCISED_ENDPOINT}?cursor=${encodeURIComponent(cursor)}`;
+            console.log('[ExerciseDB V1] Ativando fallback Proxy Vercel:', proxyUrl);
+            response = await fetch(proxyUrl).catch(() => null);
+          }
+
+          if (!response || !response.ok) {
+            lastErrorCode = response ? response.status : 500;
+            console.error('[ExerciseDB V1] Erro HTTP:', lastErrorCode);
+            if (fetchedItems.length === 0 && exerciseDbList.length === 0) {
+              currentExerciseState = 'ERRO';
+              renderExercisesLibraryUI();
+            }
+            return;
+          }
+
+          const json = await response.json();
+          console.log('[ExerciseDB V1] HTTP Status:', response.status);
+          console.log('[ExerciseDB V1] Meta:', json.meta);
+
+          const isSuccess = json.success === true;
+          const meta = json.meta || {};
+          const data = Array.isArray(json.data) ? json.data : [];
+
+          apiTotal = meta.total || apiTotal;
+          hasNextPage = meta.hasNextPage === true;
+          cursor = meta.nextCursor || null;
+
+          console.log('[ExerciseDB V1] Exercícios recebidos na página:', data.length);
+
+          if (isSuccess && data.length > 0) {
+            for (const item of data) {
+              totalReceived++;
+              const exId = String(item.exerciseId || item.id || '');
+              const name = String(item.name || 'Exercício');
+              let gifUrl = item.gifUrl || '';
+
+              if (!gifUrl && exId) {
+                gifUrl = `${EXERCISED_MEDIA_BASE}${exId}.gif`;
+              }
+              if (gifUrl) gifsCount++;
+
+              const rawBodyPart = Array.isArray(item.bodyParts) && item.bodyParts.length > 0 ? item.bodyParts[0] : '';
+              const rawEquip = Array.isArray(item.equipments) && item.equipments.length > 0 ? item.equipments[0] : '';
+              const rawTarget = Array.isArray(item.targetMuscles) && item.targetMuscles.length > 0 ? item.targetMuscles[0] : '';
+              const rawSec = Array.isArray(item.secondaryMuscles) ? item.secondaryMuscles.join(', ') : '';
+              const rawInst = Array.isArray(item.instructions) ? item.instructions.join('\n') : (item.instructions || '');
+
+              if (!seenIds.has(exId)) {
+                seenIds.add(exId);
+                fetchedItems.push({
+                  exerciseId: exId,
+                  id: exId,
+                  name: name,
+                  nome: name,
+                  gifUrl: gifUrl,
+                  bodyParts: item.bodyParts || [rawBodyPart],
+                  equipments: item.equipments || [rawEquip],
+                  targetMuscles: item.targetMuscles || [rawTarget],
+                  secondaryMuscles: item.secondaryMuscles || [],
+                  instructions: item.instructions || [rawInst],
+                  // Formato interno traduzido
+                  grupoMuscular: translateTerm(rawBodyPart, BODYPART_MAP),
+                  equipamento: translateTerm(rawEquip, EQUIPMENT_MAP),
+                  musculoPrincipal: translateTerm(rawTarget, TARGET_MAP),
+                  musculosSecundarios: rawSec,
+                  instrucoes: rawInst
+                });
+              }
+            }
+          } else {
+            hasNextPage = false;
+          }
+        } catch (err) {
+          console.error('[ExerciseDB V1] Exceção durante requisição:', err);
+          hasNextPage = false;
+        }
+      }
+
+      if (fetchedItems.length > 0) {
+        exerciseDbList = fetchedItems;
+        currentExerciseState = 'SUCESSO';
+        try {
+          localStorage.setItem('jtech_fit_exercisedb_cache', JSON.stringify(fetchedItems));
+        } catch (e) {}
+
+        console.log(`Integração ExerciseDB concluída: ${fetchedItems.length} de ${apiTotal} exercícios carregados e ${gifsCount} GIFs disponíveis.`);
+      } else if (exerciseDbList.length === 0) {
+        currentExerciseState = 'ERRO';
+      }
+
+      renderExercisesLibraryUI();
+    }
+
+    function renderExercisesLibraryUI() {
       const container = document.getElementById('exerciseListContainer');
       if (!container) return;
+
+      if (currentExerciseState === 'CARREGANDO') {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px 16px; color: var(--text-grey);">
+            <div style="font-size: 32px; animation: spin 1s infinite linear; display: inline-block;">⏳</div>
+            <div style="font-weight: 700; font-size: 15px; color: white; margin-top: 12px;">Carregando exercícios...</div>
+            <div style="font-size: 12px; margin-top: 4px; color: var(--accent-cyan);">Sincronizando com a ExerciseDB V1 Oficial</div>
+          </div>
+        `;
+        return;
+      }
+
+      if (currentExerciseState === 'ERRO') {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 30px 16px; color: var(--error-red); background: var(--card-dark); border-radius: 12px; border: 1px solid rgba(244,67,54,0.3);">
+            <div style="font-size: 36px; margin-bottom: 8px;">⚠️</div>
+            <div style="font-weight: 800; font-size: 15px; color: white;">Não foi possível carregar a biblioteca</div>
+            <div style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">Código do erro: ${lastErrorCode || 'Conexão ou CORS'}. Tente novamente.</div>
+            <button onclick="fetchExerciseDbOfficial(true)" class="btn btn-outline" style="width: auto; margin-top: 16px; padding: 8px 16px; font-size: 12px;">🔄 Tentar Novamente</button>
+          </div>
+        `;
+        return;
+      }
 
       const searchInput = document.getElementById('exerciseSearchInput');
       const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
 
-      const filtered = FULL_EXERCISE_DATABASE.filter(ex => {
+      const filtered = exerciseDbList.filter(ex => {
         const matchesQuery = !query ||
-          ex.nome.toLowerCase().includes(query) ||
+          ex.name.toLowerCase().includes(query) ||
           ex.grupoMuscular.toLowerCase().includes(query) ||
-          ex.equipamento.toLowerCase().includes(query);
+          ex.equipamento.toLowerCase().includes(query) ||
+          ex.musculoPrincipal.toLowerCase().includes(query);
 
         const matchesGroup = currentSelectedGroup === 'Todos' || ex.grupoMuscular.toLowerCase() === currentSelectedGroup.toLowerCase();
-        const matchesFav = !onlyFavoritesFilter || favoritesSet.has(ex.id);
+        const matchesFav = !onlyFavoritesFilter || favoritesSet.has(ex.exerciseId);
 
         return matchesQuery && matchesGroup && matchesFav;
       });
 
+      // Atualizar contador no topo
+      const statsBadge = document.getElementById('exerciseStatsBadge');
+      if (statsBadge) {
+        statsBadge.innerText = `${filtered.length} de ${exerciseDbList.length} exercícios`;
+      }
+
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div style="text-align: center; padding: 30px 16px; color: var(--text-grey);">
-            <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
-            <div style="font-weight: 700; font-size: 14px; color: white;">Nenhum exercício encontrado</div>
-            <div style="font-size: 12px; margin-top: 4px;">Tente mudar o termo da busca ou o filtro de grupo muscular.</div>
+          <div style="text-align: center; padding: 35px 16px; color: var(--text-grey);">
+            <div style="font-size: 36px; margin-bottom: 8px;">🔍</div>
+            <div style="font-weight: 700; font-size: 15px; color: white;">Nenhum exercício encontrado</div>
+            <div style="font-size: 12px; margin-top: 4px; margin-bottom: 14px;">Tente limpar a pesquisa ou os filtros de grupo muscular.</div>
+            <button onclick="resetExerciseFilters()" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 12px;">Limpar Filtros</button>
           </div>
         `;
         return;
       }
 
       container.innerHTML = filtered.map(ex => {
-        const isFav = favoritesSet.has(ex.id);
+        const isFav = favoritesSet.has(ex.exerciseId);
+        const isChecked = selectedForWorkoutSet.has(ex.exerciseId);
+
         return `
-          <div class="card" style="border-left: 4px solid var(--accent-cyan); transition: transform 0.2s;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div>
-                <h4 style="font-size: 15px; font-weight: 700; color: white;">${ex.nome}</h4>
-                <p style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">
-                  <strong style="color: var(--accent-cyan);">${ex.grupoMuscular}</strong> • Equipamento: ${ex.equipamento}
-                </p>
-              </div>
-              <button onclick="toggleFavoriteExercise('${ex.id}', this)" style="background: none; border: none; font-size: 20px; cursor: pointer; padding: 0 4px;">
-                ${isFav ? '⭐' : '☆'}
-              </button>
+          <div class="card" style="border-left: 4px solid var(--accent-cyan); display: flex; gap: 12px; align-items: center; padding: 12px;">
+            <div style="width: 70px; height: 70px; background: #000; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider);">
+              <img src="${ex.gifUrl}" alt="${ex.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.onerror=null; this.src='https://via.placeholder.com/70/111827/00D2FF?text=GIF';">
             </div>
-            <p style="font-size: 12px; color: var(--text-grey); margin-top: 10px; line-height: 1.4; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
-              💡 <strong>Como executar:</strong> ${ex.instrucoes}
-            </p>
-            ${ex.cuidados ? `<p style="font-size: 11px; color: var(--warning-orange); margin-top: 6px;">⚠️ <strong>Cuidado:</strong> ${ex.cuidados}</p>` : ''}
+
+            <div style="flex: 1; min-width: 0;">
+              <h4 style="font-size: 14px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ex.name}</h4>
+              <p style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">
+                <strong style="color: var(--accent-cyan);">${ex.grupoMuscular}</strong> • ${ex.equipamento}
+              </p>
+              <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
+                <button onclick="openExerciseDetailModal('${ex.exerciseId}')" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px;">🔍 Ver exercício</button>
+                <button onclick="toggleFavoriteExercise('${ex.exerciseId}', this)" style="background: none; border: none; font-size: 18px; cursor: pointer;">${isFav ? '⭐' : '☆'}</button>
+              </div>
+            </div>
+
+            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleSelectForWorkout('${ex.exerciseId}', this)" style="width: 20px; height: 20px; accent-color: var(--success-green); cursor: pointer; flex-shrink: 0;">
           </div>
         `;
       }).join('');
+    }
+
+    function resetExerciseFilters() {
+      const searchInput = document.getElementById('exerciseSearchInput');
+      if (searchInput) searchInput.value = '';
+      currentSelectedGroup = 'Todos';
+      onlyFavoritesFilter = false;
+      document.querySelectorAll('#exerciseGroupChips .chip').forEach(c => c.classList.remove('active'));
+      const firstChip = document.querySelector('#exerciseGroupChips .chip');
+      if (firstChip) firstChip.classList.add('active');
+      renderExercisesLibraryUI();
     }
 
     function filterExerciseGroup(groupName, chipElement) {
       currentSelectedGroup = groupName;
       document.querySelectorAll('#exerciseGroupChips .chip').forEach(c => c.classList.remove('active'));
       if (chipElement) chipElement.classList.add('active');
-      renderExercisesLibrary();
+      renderExercisesLibraryUI();
     }
 
     function filterExercisesLibrary() {
-      renderExercisesLibrary();
+      renderExercisesLibraryUI();
     }
 
     function toggleOnlyFavoritesFilter() {
@@ -1540,19 +1620,32 @@
         btn.style.borderColor = 'var(--divider)';
         btn.innerText = '⭐ Apenas Favoritos';
       }
-      renderExercisesLibrary();
+      renderExercisesLibraryUI();
     }
 
     function toggleFavoriteExercise(id, btnElement) {
       if (favoritesSet.has(id)) {
         favoritesSet.delete(id);
-        btnElement.innerText = '☆';
       } else {
         favoritesSet.add(id);
-        btnElement.innerText = '⭐';
       }
       localStorage.setItem('jtech_fit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
-      if (onlyFavoritesFilter) renderExercisesLibrary();
+      renderExercisesLibraryUI();
+    }
+
+    function toggleSelectForWorkout(id, checkboxEl) {
+      if (checkboxEl.checked) {
+        selectedForWorkoutSet.add(id);
+      } else {
+        selectedForWorkoutSet.delete(id);
+      }
+    }
+
+    function openExerciseDetailModal(exerciseId) {
+      const ex = exerciseDbList.find(e => e.exerciseId === exerciseId || e.id === exerciseId);
+      if (!ex) return;
+
+      alert(`🏋️‍♂️ ${ex.name}\n\n🎯 Músculo: ${ex.grupoMuscular} (${ex.musculoPrincipal})\n🏋️ Equipamento: ${ex.equipamento}\n\n💡 Instruções:\n${ex.instrucoes}`);
     }
 
     // Carregar treinos criados anteriormente, histórico e biblioteca ao abrir a página
@@ -1563,7 +1656,7 @@
       } catch (e) {}
 
       loadHistoryFromStorage();
-      renderExercisesLibrary();
+      fetchExerciseDbOfficial(false);
     });
   </script>
 </body>
