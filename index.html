@@ -569,46 +569,34 @@
 
       <!-- TELA EXERCÍCIOS / BIBLIOTECA -->
       <div id="screenExercises" class="screen">
-        <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 12px;">Biblioteca de Exercícios</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h3 style="font-size: 18px; font-weight: 800;">Biblioteca de Exercícios</h3>
+          <button onclick="toggleOnlyFavoritesFilter()" id="btnFavFilter" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px; color: var(--text-grey); border-color: var(--divider);">
+            ⭐ Apenas Favoritos
+          </button>
+        </div>
 
+        <!-- BARRA DE PESQUISA DA BIBLIOTECA -->
         <div class="form-group">
-          <input type="text" class="form-input" placeholder="🔍 Buscar exercício por nome ou grupo...">
+          <input type="text" id="exerciseSearchInput" class="form-input" placeholder="🔍 Buscar exercício por nome, equipamento ou grupo..." oninput="filterExercisesLibrary()">
         </div>
 
-        <div class="chip-container">
-          <div class="chip active">Todos</div>
-          <div class="chip">Peito</div>
-          <div class="chip">Costas</div>
-          <div class="chip">Pernas</div>
-          <div class="chip">Ombros</div>
-          <div class="chip">Bíceps</div>
-          <div class="chip">Tríceps</div>
+        <!-- CHIPS DE GRUPOS MUSCULARES DA BIBLIOTECA -->
+        <div class="chip-container" id="exerciseGroupChips">
+          <div class="chip active" onclick="filterExerciseGroup('Todos', this)">Todos</div>
+          <div class="chip" onclick="filterExerciseGroup('Peito', this)">Peito</div>
+          <div class="chip" onclick="filterExerciseGroup('Costas', this)">Costas</div>
+          <div class="chip" onclick="filterExerciseGroup('Pernas', this)">Pernas</div>
+          <div class="chip" onclick="filterExerciseGroup('Ombros', this)">Ombros</div>
+          <div class="chip" onclick="filterExerciseGroup('Bíceps', this)">Bíceps</div>
+          <div class="chip" onclick="filterExerciseGroup('Tríceps', this)">Tríceps</div>
+          <div class="chip" onclick="filterExerciseGroup('Abdômen', this)">Abdômen</div>
+          <div class="chip" onclick="filterExerciseGroup('Mobilidade', this)">Mobilidade</div>
         </div>
 
-        <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <h4 style="font-size: 15px; font-weight: 700;">Supino Reto com Barra</h4>
-              <p style="font-size: 11px; color: var(--text-grey);">Peito • Equipamento: Barra e Banco</p>
-            </div>
-            <span style="font-size: 18px; color: gold;">★</span>
-          </div>
-          <p style="font-size: 12px; color: var(--text-grey); margin-top: 8px;">
-            Deite-se no banco, empurre a barra estufando o peitoral.
-          </p>
-        </div>
-
-        <div class="card">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <h4 style="font-size: 15px; font-weight: 700;">Puxada Frontal na Polia</h4>
-              <p style="font-size: 11px; color: var(--text-grey);">Costas • Equipamento: Polia Alta</p>
-            </div>
-            <span style="font-size: 18px; color: var(--text-muted);">☆</span>
-          </div>
-          <p style="font-size: 12px; color: var(--text-grey); margin-top: 8px;">
-            Puxe a barra em direção ao peito com pegada aberta.
-          </p>
+        <!-- CONTAINER DA LISTA DE EXERCÍCIOS -->
+        <div id="exerciseListContainer" style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">
+          <!-- Exercícios renderizados dinamicamente via JS -->
         </div>
       </div>
 
@@ -1294,14 +1282,269 @@
       }
     }
 
-    function clearAllHistory() {
-      if (confirm('Deseja realmente apagar TODO o seu histórico de treinos?')) {
-        localStorage.removeItem('jtech_fit_history');
-        loadHistoryFromStorage();
+    // ==========================================
+    // BIBLIOTECA DE EXERCÍCIOS - BASE DE DADOS & INTERAÇÃO
+    // ==========================================
+    const FULL_EXERCISE_DATABASE = [
+      {
+        id: 'ex_supino_reto',
+        nome: 'Supino Reto com Barra',
+        grupoMuscular: 'Peito',
+        equipamento: 'Barra e Banco Plano',
+        instrucoes: 'Deite-se no banco, posicione as mãos levemente mais abertas que os ombros. Desça a barra até tocar o peitoral e empurre com força até a extensão quase total.',
+        cuidados: 'Mantenha as escápulas retraídas e os pés firmes no chão.'
+      },
+      {
+        id: 'ex_supino_inclinado',
+        nome: 'Supino Inclinado com Halteres',
+        grupoMuscular: 'Peito',
+        equipamento: 'Halteres e Banco Inclinado',
+        instrucoes: 'Ajuste o banco em 30º-45º. Suba os halteres alinhados ao peitoral superior, focando na contração.',
+        cuidados: 'Evite inclinar demais o banco para não sobrecarregar os ombros.'
+      },
+      {
+        id: 'ex_crucifixo_crossover',
+        nome: 'Crucifixo no Crossover (Polia Alta)',
+        grupoMuscular: 'Peito',
+        equipamento: 'Polia Dupla Alta',
+        instrucoes: 'Dê um passo à frente com braços levemente flexionados. Junte as mãos à frente do quadril cruzando levemente os punhos.',
+        cuidados: 'Não dobre excessivamente os cotovelos durante o movimento.'
+      },
+      {
+        id: 'ex_peck_deck',
+        nome: 'Peck Deck / Voador',
+        grupoMuscular: 'Peito',
+        equipamento: 'Máquina Peck Deck',
+        instrucoes: 'Sente-se com as costas apoiadas, empurre as hastes até se tocarem no centro e retorne controladamente.',
+        cuidados: 'Mantenha os cotovelos na altura do peito.'
+      },
+      {
+        id: 'ex_puxada_frontal',
+        nome: 'Puxada Frontal na Polia',
+        grupoMuscular: 'Costas',
+        equipamento: 'Polia Alta com Barra Larga',
+        instrucoes: 'Puxe a barra em direção à parte superior do peito estufando o tórax. Retorne estendendo totalmente os braços.',
+        cuidados: 'Não incline o tronco excessivamente para trás.'
+      },
+      {
+        id: 'ex_remada_curvada',
+        nome: 'Remada Curvada com Barra',
+        grupoMuscular: 'Costas',
+        equipamento: 'Barra e Anilhas',
+        instrucoes: 'Incline o tronco a 45º com joelhos levemente dobrados. Puxe a barra no sentido do umbigo contraindo as dorsais.',
+        cuidados: 'Mantenha a coluna neutra e firme.'
+      },
+      {
+        id: 'ex_remada_serrote',
+        nome: 'Remada Unilateral com Halter (Serrote)',
+        grupoMuscular: 'Costas',
+        equipamento: 'Halter e Banco',
+        instrucoes: 'Apoie o joelho e mão no banco. Puxe o halter na lateral do quadril aproximando a escápula.',
+        cuidados: 'Evite rotacionar o tronco na subida.'
+      },
+      {
+        id: 'ex_agachamento_livre',
+        nome: 'Agachamento Livre com Barra',
+        grupoMuscular: 'Pernas',
+        equipamento: 'Barra e Racks de Agachamento',
+        instrucoes: 'Apoie a barra no trapézio. Agache projetando o quadril para trás até 90º ou mais e suba empurrando os calcanhares.',
+        cuidados: 'Mantenha joelhos alinhados com as pontas dos pés.'
+      },
+      {
+        id: 'ex_leg_press',
+        nome: 'Leg Press 45º',
+        grupoMuscular: 'Pernas',
+        equipamento: 'Máquina Leg Press 45º',
+        instrucoes: 'Posicione os pés na largura dos ombros. Destrave e desça a plataforma até 90º. Empurre firme.',
+        cuidados: 'Nunca trave os joelhos em extensão total no topo.'
+      },
+      {
+        id: 'ex_cadeira_extensora',
+        nome: 'Cadeira Extensora',
+        grupoMuscular: 'Pernas',
+        equipamento: 'Cadeira Extensora',
+        instrucoes: 'Ajuste o rolo na altura dos tornozelos. Estenda as pernas completamente até contrair o quadríceps.',
+        cuidados: 'Não descole as costas do encosto.'
+      },
+      {
+        id: 'ex_mesa_flexora',
+        nome: 'Mesa Flexora (Posterior)',
+        grupoMuscular: 'Pernas',
+        equipamento: 'Mesa Flexora deitada',
+        instrucoes: 'Deite-se de bruços, flexione os joelhos trazendo o rolo em direção aos glúteos.',
+        cuidados: 'Evite elevar o quadril durante a subida.'
+      },
+      {
+        id: 'ex_desenvolvimento_halteres',
+        nome: 'Desenvolvimento com Halteres',
+        grupoMuscular: 'Ombros',
+        equipamento: 'Halteres e Banco 90º',
+        instrucoes: 'Sente-se ereto, segure os halteres na altura dos ombros e empurre para cima até se aproximarem.',
+        cuidados: 'Não arquie excessivamente a lombar.'
+      },
+      {
+        id: 'ex_elevacao_lateral',
+        nome: 'Elevação Lateral com Halteres',
+        grupoMuscular: 'Ombros',
+        equipamento: 'Halteres',
+        instrucoes: 'Em pé, eleve os halteres lateralmente até a altura dos ombros com cotovelos levemente semi-flexionados.',
+        cuidados: 'Controle a descida sem deixar os halteres despencarem.'
+      },
+      {
+        id: 'ex_rosca_direta',
+        nome: 'Rosca Direta com Barra W',
+        grupoMuscular: 'Bíceps',
+        equipamento: 'Barra W',
+        instrucoes: 'Mantenha os cotovelos junto ao corpo. Flexione os braços subindo a barra e aperte o bíceps no topo.',
+        cuidados: 'Evite usar o balanço do corpo para subir o peso.'
+      },
+      {
+        id: 'ex_rosca_martelo',
+        nome: 'Rosca Martelo com Halteres',
+        grupoMuscular: 'Bíceps',
+        equipamento: 'Halteres',
+        instrucoes: 'Pegada neutra (palmas voltadas para dentro). Flexione alternada ou simultaneamente.',
+        cuidados: 'Trabalha fortemente o braquial e antebraço.'
+      },
+      {
+        id: 'ex_triceps_pulley',
+        nome: 'Tríceps Pulley na Corda',
+        grupoMuscular: 'Tríceps',
+        equipamento: 'Polia Alta com Corda',
+        instrucoes: 'Puxe a corda para baixo afastando as pontas no final do movimento para máxima contração do tríceps.',
+        cuidados: 'Mantenha cotovelos colados ao tronco.'
+      },
+      {
+        id: 'ex_triceps_testa',
+        nome: 'Tríceps Testa com Barra W',
+        grupoMuscular: 'Tríceps',
+        equipamento: 'Barra W e Banco Plano',
+        instrucoes: 'Deitado, flexione os cotovelos trazendo a barra em direção à testa. Estenda totalmente para cima.',
+        cuidados: 'Mantenha os cotovelos apontados para o teto sem abrir.'
+      },
+      {
+        id: 'ex_abdominal_infra',
+        nome: 'Abdominal Infra / Elevação de Pernas',
+        grupoMuscular: 'Abdômen',
+        equipamento: 'Solo ou Colchonete',
+        instrucoes: 'Deitado, eleve as pernas estendidas até 90º e desça lentamente sem encostar os calcanhares no chão.',
+        cuidados: 'Mantenha a região lombar apoiada no solo.'
+      },
+      {
+        id: 'ex_prancha',
+        nome: 'Prancha Ventral Isométrica',
+        grupoMuscular: 'Abdômen',
+        equipamento: 'Colchonete',
+        instrucoes: 'Apoie antebraços e pontas dos pés no solo. Mantenha o corpo em linha reta contraindo o core.',
+        cuidados: 'Não deixe o quadril ceder ou ficar muito elevado.'
+      },
+      {
+        id: 'ex_mobilidade_ombro',
+        nome: 'Mobilidade de Ombro com Bastão',
+        grupoMuscular: 'Mobilidade',
+        equipamento: 'Bastão / Cabo de Vassoura',
+        instrucoes: 'Segure o bastão com pegada bem aberta. Passe-o por cima da cabeça até a lombar e retorne.',
+        cuidados: 'Realize com movimento suave sem dar trancos.'
       }
+    ];
+
+    let currentSelectedGroup = 'Todos';
+    let onlyFavoritesFilter = false;
+    let favoritesSet = new Set(JSON.parse(localStorage.getItem('jtech_fit_fav_exercises') || '[]'));
+
+    function renderExercisesLibrary() {
+      const container = document.getElementById('exerciseListContainer');
+      if (!container) return;
+
+      const searchInput = document.getElementById('exerciseSearchInput');
+      const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+
+      const filtered = FULL_EXERCISE_DATABASE.filter(ex => {
+        const matchesQuery = !query ||
+          ex.nome.toLowerCase().includes(query) ||
+          ex.grupoMuscular.toLowerCase().includes(query) ||
+          ex.equipamento.toLowerCase().includes(query);
+
+        const matchesGroup = currentSelectedGroup === 'Todos' || ex.grupoMuscular.toLowerCase() === currentSelectedGroup.toLowerCase();
+        const matchesFav = !onlyFavoritesFilter || favoritesSet.has(ex.id);
+
+        return matchesQuery && matchesGroup && matchesFav;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 30px 16px; color: var(--text-grey);">
+            <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
+            <div style="font-weight: 700; font-size: 14px; color: white;">Nenhum exercício encontrado</div>
+            <div style="font-size: 12px; margin-top: 4px;">Tente mudar o termo da busca ou o filtro de grupo muscular.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(ex => {
+        const isFav = favoritesSet.has(ex.id);
+        return `
+          <div class="card" style="border-left: 4px solid var(--accent-cyan); transition: transform 0.2s;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <h4 style="font-size: 15px; font-weight: 700; color: white;">${ex.nome}</h4>
+                <p style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">
+                  <strong style="color: var(--accent-cyan);">${ex.grupoMuscular}</strong> • Equipamento: ${ex.equipamento}
+                </p>
+              </div>
+              <button onclick="toggleFavoriteExercise('${ex.id}', this)" style="background: none; border: none; font-size: 20px; cursor: pointer; padding: 0 4px;">
+                ${isFav ? '⭐' : '☆'}
+              </button>
+            </div>
+            <p style="font-size: 12px; color: var(--text-grey); margin-top: 10px; line-height: 1.4; background: rgba(255,255,255,0.03); padding: 8px; border-radius: 6px;">
+              💡 <strong>Como executar:</strong> ${ex.instrucoes}
+            </p>
+            ${ex.cuidados ? `<p style="font-size: 11px; color: var(--warning-orange); margin-top: 6px;">⚠️ <strong>Cuidado:</strong> ${ex.cuidados}</p>` : ''}
+          </div>
+        `;
+      }).join('');
     }
 
-    // Carregar treinos criados anteriormente e histórico ao abrir a página
+    function filterExerciseGroup(groupName, chipElement) {
+      currentSelectedGroup = groupName;
+      document.querySelectorAll('#exerciseGroupChips .chip').forEach(c => c.classList.remove('active'));
+      if (chipElement) chipElement.classList.add('active');
+      renderExercisesLibrary();
+    }
+
+    function filterExercisesLibrary() {
+      renderExercisesLibrary();
+    }
+
+    function toggleOnlyFavoritesFilter() {
+      onlyFavoritesFilter = !onlyFavoritesFilter;
+      const btn = document.getElementById('btnFavFilter');
+      if (onlyFavoritesFilter) {
+        btn.style.color = 'gold';
+        btn.style.borderColor = 'gold';
+        btn.innerText = '★ Exibindo Favoritos';
+      } else {
+        btn.style.color = 'var(--text-grey)';
+        btn.style.borderColor = 'var(--divider)';
+        btn.innerText = '⭐ Apenas Favoritos';
+      }
+      renderExercisesLibrary();
+    }
+
+    function toggleFavoriteExercise(id, btnElement) {
+      if (favoritesSet.has(id)) {
+        favoritesSet.delete(id);
+        btnElement.innerText = '☆';
+      } else {
+        favoritesSet.add(id);
+        btnElement.innerText = '⭐';
+      }
+      localStorage.setItem('jtech_fit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
+      if (onlyFavoritesFilter) renderExercisesLibrary();
+    }
+
+    // Carregar treinos criados anteriormente, histórico e biblioteca ao abrir a página
     window.addEventListener('load', () => {
       try {
         let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
@@ -1309,6 +1552,7 @@
       } catch (e) {}
 
       loadHistoryFromStorage();
+      renderExercisesLibrary();
     });
   </script>
 </body>
