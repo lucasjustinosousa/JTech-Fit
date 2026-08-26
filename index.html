@@ -656,15 +656,13 @@
 
       <!-- TELA HISTÓRICO -->
       <div id="screenHistory" class="screen">
-        <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 16px;">Histórico de Treinos</h3>
-        <div class="card">
-          <div style="display: flex; justify-content: space-between;">
-            <div>
-              <h4 style="font-size: 15px; font-weight: 700;">Treino A — Peito & Tríceps</h4>
-              <p style="font-size: 11px; color: var(--text-grey);">Hoje • Duração: 48 min</p>
-            </div>
-            <span style="color: var(--success-green); font-weight: 800;">Concluído</span>
-          </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-size: 18px; font-weight: 800;">Histórico de Treinos</h3>
+          <button onclick="clearAllHistory()" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px; color: var(--text-grey); border-color: var(--divider);">Limpar Histórico</button>
+        </div>
+
+        <div id="historyListContainer">
+          <!-- Histórico de treinos concluídos renderizado dinamicamente -->
         </div>
       </div>
 
@@ -897,10 +895,57 @@
       }, 1000);
     }
 
-    function finishActiveWorkout() {
+    async function finishActiveWorkout() {
       clearInterval(activeWorkoutInterval);
-      alert('🏆 Treino Concluído com Sucesso! Resumo salvo no histórico.');
-      switchTab('screenHistory');
+
+      const title = document.getElementById('activeWorkoutTitle').innerText || 'Treino Realizado';
+      const duracao = Math.max(1, Math.floor(activeWorkoutSeconds / 60));
+      const now = new Date();
+      const dataFormatada = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      const historyItem = {
+        id: 'sessao_' + Date.now(),
+        nomeTreino: title,
+        duracaoMinutos: duracao,
+        data: dataFormatada,
+        inicioIso: new Date(now.getTime() - activeWorkoutSeconds * 1000).toISOString(),
+        fimIso: now.toISOString(),
+        concluido: true
+      };
+
+      // 1. Salvar no localStorage
+      let historyList = [];
+      try {
+        historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
+      } catch (e) {}
+      historyList.unshift(historyItem);
+      localStorage.setItem('jtech_fit_history', JSON.stringify(historyList));
+
+      // 2. Sincronizar com Supabase se online
+      if (_supabase) {
+        try {
+          await _supabase.from('sessoes_de_treino').upsert({
+            id: historyItem.id,
+            nome_treino: title,
+            inicio: historyItem.inicioIso,
+            fim: historyItem.fimIso,
+            concluido: true
+          });
+          console.log('[Supabase] Sessão de treino salva no histórico online:', title);
+        } catch (e) {
+          console.log('[Supabase] Aviso: Histórico mantido offline (sem conexão):', e);
+        }
+      }
+
+      // 3. Renderizar o card no topo do histórico
+      renderHistoryCardUI(historyItem, true);
+
+      // Reset dos contadores
+      activeWorkoutSeconds = 0;
+      document.getElementById('activeTimer').innerText = '00:00';
+
+      alert(`🏆 Treino "${title}" finalizado com sucesso em ${duracao} min!\nSalvo no histórico e sincronizado.`);
+      switchTab('screenHistory', document.querySelectorAll('.nav-item')[3]);
     }
 
     function toggleSetDone(rowId) {
@@ -1156,12 +1201,94 @@
       }
     }
 
-    // Carregar treinos criados anteriormente ao abrir a página
+    function renderHistoryCardUI(item, prepend = false) {
+      const container = document.getElementById('historyListContainer');
+      if (!container) return;
+
+      const emptyEl = container.querySelector('.empty-history-msg');
+      if (emptyEl) emptyEl.remove();
+
+      const cardHtml = `
+        <div class="card" id="history_${item.id}" style="border-left: 4px solid var(--success-green); animation: fadeIn 0.3s ease-in-out;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <h4 style="font-size: 15px; font-weight: 700; color: white;">${item.nomeTreino}</h4>
+              <p style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">
+                📅 ${item.data || 'Hoje'} • ⏱ Duração: ${item.duracaoMinutos || 1} min
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: var(--success-green); font-weight: 800; font-size: 11px; background: rgba(76,175,80,0.15); padding: 4px 8px; border-radius: 6px;">✓ Concluído</span>
+              <button onclick="deleteHistoryItem('${item.id}')" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 14px;">🗑️</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      if (prepend) {
+        container.insertAdjacentHTML('afterbegin', cardHtml);
+      } else {
+        container.insertAdjacentHTML('beforeend', cardHtml);
+      }
+    }
+
+    function loadHistoryFromStorage() {
+      const container = document.getElementById('historyListContainer');
+      if (!container) return;
+
+      container.innerHTML = '';
+      let historyList = [];
+      try {
+        historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
+      } catch (e) {}
+
+      if (historyList.length === 0) {
+        container.innerHTML = `
+          <div class="empty-history-msg" style="text-align: center; padding: 30px 16px; color: var(--text-grey);">
+            <div style="font-size: 32px; margin-bottom: 8px;">📊</div>
+            <div style="font-weight: 700; font-size: 14px; color: white;">Nenhum treino no histórico ainda</div>
+            <div style="font-size: 12px; margin-top: 4px;">Inicie e finalize um treino para acompanhar o seu progresso aqui!</div>
+          </div>
+        `;
+        return;
+      }
+
+      historyList.forEach(item => renderHistoryCardUI(item, false));
+    }
+
+    function deleteHistoryItem(id) {
+      if (confirm('Deseja excluir este registro do histórico?')) {
+        const card = document.getElementById(`history_${id}`);
+        if (card) card.remove();
+
+        try {
+          let historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
+          historyList = historyList.filter(h => h.id !== id);
+          localStorage.setItem('jtech_fit_history', JSON.stringify(historyList));
+        } catch (e) {}
+
+        const container = document.getElementById('historyListContainer');
+        if (container && container.children.length === 0) {
+          loadHistoryFromStorage();
+        }
+      }
+    }
+
+    function clearAllHistory() {
+      if (confirm('Deseja realmente apagar TODO o seu histórico de treinos?')) {
+        localStorage.removeItem('jtech_fit_history');
+        loadHistoryFromStorage();
+      }
+    }
+
+    // Carregar treinos criados anteriormente e histórico ao abrir a página
     window.addEventListener('load', () => {
       try {
         let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
         saved.forEach(w => renderWorkoutCardUI(w));
       } catch (e) {}
+
+      loadHistoryFromStorage();
     });
   </script>
 </body>
