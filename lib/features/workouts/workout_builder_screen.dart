@@ -118,12 +118,50 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Observações / Descrição
+            // Foco / Objetivo do Treino (Chips de seleção rápida)
+            const Text(
+              'Foco / Objetivo do Treino (Opcional)',
+              style: TextStyle(color: JTechTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              children: [
+                '💪 Hipertrofia',
+                '🔥 Emagrecimento',
+                '🏋️‍♂️ Força Bruta',
+                '⚡ Resistência',
+                '🔰 Iniciante',
+                '🏃 Cardio',
+              ].map((foco) {
+                final cleanName = foco.replaceFirst(RegExp(r'^[^\s]+\s*'), '');
+                final isSelected = _descController.text == cleanName;
+                return ChoiceChip(
+                  label: Text(foco),
+                  selected: isSelected,
+                  selectedColor: JTechTheme.primaryBlue,
+                  labelStyle: TextStyle(color: isSelected ? Colors.white : JTechTheme.textGrey, fontSize: 12),
+                  onSelected: (val) {
+                    setState(() {
+                      if (val) {
+                        _descController.text = cleanName;
+                      } else {
+                        if (_descController.text == cleanName) {
+                          _descController.clear();
+                        }
+                      }
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 8),
             TextField(
               controller: _descController,
               style: const TextStyle(color: JTechTheme.textWhite),
               decoration: const InputDecoration(
-                labelText: 'Observações / Objetivo do treino (opcional)',
+                labelText: 'Ou digite o foco personalizado (opcional)',
                 prefixIcon: Icon(Icons.notes, color: JTechTheme.textGrey),
               ),
             ),

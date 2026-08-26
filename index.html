@@ -730,8 +730,16 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Foco / Observações (opcional)</label>
-        <input type="text" id="newWorkoutDesc" class="form-input" placeholder="ex: Foco em quadríceps e carga progressiva">
+        <label class="form-label">Foco / Objetivo do Treino (opcional)</label>
+        <div class="chip-container" style="margin-bottom: 8px;">
+          <div class="chip focus-chip" onclick="selectFocusChip(this, 'Hipertrofia')">💪 Hipertrofia</div>
+          <div class="chip focus-chip" onclick="selectFocusChip(this, 'Emagrecimento')">🔥 Emagrecimento</div>
+          <div class="chip focus-chip" onclick="selectFocusChip(this, 'Força Bruta')">🏋️‍♂️ Força Bruta</div>
+          <div class="chip focus-chip" onclick="selectFocusChip(this, 'Resistência')">⚡ Resistência</div>
+          <div class="chip focus-chip" onclick="selectFocusChip(this, 'Iniciante')">🔰 Iniciante</div>
+          <div class="chip focus-chip" onclick="selectFocusChip(this, 'Cardio')">🏃 Cardio</div>
+        </div>
+        <input type="text" id="newWorkoutDesc" class="form-input" placeholder="Ou digite um foco personalizado (ex: Foco em quadríceps)">
       </div>
 
       <div class="form-group">
@@ -1031,6 +1039,19 @@
 
     function closeCreateWorkoutModal() {
       document.getElementById('modalCreateWorkout').classList.remove('active');
+    }
+
+    function selectFocusChip(chipEl, focusName) {
+      document.querySelectorAll('#modalCreateWorkout .focus-chip').forEach(c => {
+        if (c !== chipEl) c.classList.remove('active');
+      });
+      chipEl.classList.toggle('active');
+      const input = document.getElementById('newWorkoutDesc');
+      if (chipEl.classList.contains('active')) {
+        input.value = focusName;
+      } else {
+        if (input.value === focusName) input.value = '';
+      }
     }
 
     function toggleDayChip(chipEl, dayName) {
