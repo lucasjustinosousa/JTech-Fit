@@ -381,6 +381,46 @@
       border-color: var(--success-green);
       color: white;
     }
+
+    /* Modal Criar Treino */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.active {
+      display: flex;
+      animation: fadeIn 0.2s ease-out;
+    }
+    .modal-card {
+      background: var(--surface-dark);
+      border: 1px solid var(--divider);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 440px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.9);
+    }
+    .color-picker-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .color-picker-dot.active {
+      border-color: white;
+      transform: scale(1.15);
+    }
   </style>
 </head>
 <body>
@@ -496,30 +536,33 @@
       <div id="screenWorkouts" class="screen">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
           <h3 style="font-size: 18px; font-weight: 800;">Divisões de Treino</h3>
-          <button onclick="alert('Criador de treinos aberto!')" class="btn btn-primary" style="width: auto; padding: 8px 14px; font-size: 12px;">+ Criar Treino</button>
+          <button onclick="openCreateWorkoutModal()" class="btn btn-primary" style="width: auto; padding: 8px 14px; font-size: 12px;">+ Criar Treino</button>
         </div>
 
-        <div class="card" style="border-left: 5px solid var(--primary-blue);">
-          <div style="display: flex; justify-content: space-between;">
-            <h4 style="font-size: 16px; font-weight: 800;">Treino A — Peito & Tríceps</h4>
-            <span style="color: var(--text-muted);">⋮</span>
+        <div id="workoutListContainer">
+          <!-- Cards de treinos renderizados dinamicamente -->
+          <div class="card" style="border-left: 5px solid var(--primary-blue);">
+            <div style="display: flex; justify-content: space-between;">
+              <h4 style="font-size: 16px; font-weight: 800;">Treino A — Peito & Tríceps</h4>
+              <span style="color: var(--text-muted); cursor: pointer;" onclick="deleteWorkoutCard(this, 'Treino A — Peito & Tríceps')">🗑️</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">Segunda-feira • Quinta-feira</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+              <span style="font-size: 12px; color: var(--accent-cyan);">4 exercícios</span>
+              <button onclick="startActiveWorkout('Treino A — Peito & Tríceps')" class="btn btn-success" style="width: auto; padding: 8px 16px; font-size: 12px;">INICIAR</button>
+            </div>
           </div>
-          <p style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">Segunda-feira • Quinta-feira</p>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
-            <span style="font-size: 12px; color: var(--accent-cyan);">4 exercícios</span>
-            <button onclick="startActiveWorkout('Treino A — Peito & Tríceps')" class="btn btn-success" style="width: auto; padding: 8px 16px; font-size: 12px;">INICIAR</button>
-          </div>
-        </div>
 
-        <div class="card" style="border-left: 5px solid var(--accent-cyan);">
-          <div style="display: flex; justify-content: space-between;">
-            <h4 style="font-size: 16px; font-weight: 800;">Treino B — Costas & Bíceps</h4>
-            <span style="color: var(--text-muted);">⋮</span>
-          </div>
-          <p style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">Terça-feira • Sexta-feira</p>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
-            <span style="font-size: 12px; color: var(--accent-cyan);">5 exercícios</span>
-            <button onclick="startActiveWorkout('Treino B — Costas & Bíceps')" class="btn btn-success" style="width: auto; padding: 8px 16px; font-size: 12px;">INICIAR</button>
+          <div class="card" style="border-left: 5px solid var(--accent-cyan);">
+            <div style="display: flex; justify-content: space-between;">
+              <h4 style="font-size: 16px; font-weight: 800;">Treino B — Costas & Bíceps</h4>
+              <span style="color: var(--text-muted); cursor: pointer;" onclick="deleteWorkoutCard(this, 'Treino B — Costas & Bíceps')">🗑️</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">Terça-feira • Sexta-feira</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+              <span style="font-size: 12px; color: var(--accent-cyan);">5 exercícios</span>
+              <button onclick="startActiveWorkout('Treino B — Costas & Bíceps')" class="btn btn-success" style="width: auto; padding: 8px 16px; font-size: 12px;">INICIAR</button>
+            </div>
           </div>
         </div>
       </div>
@@ -675,6 +718,66 @@
     </div>
   </div>
 
+  <!-- MODAL DE CRIAÇÃO DE TREINOS -->
+  <div id="modalCreateWorkout" class="modal-overlay">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="font-size: 18px; font-weight: 800; color: white;">🏋️‍♂️ Criar Novo Treino</h3>
+        <button onclick="closeCreateWorkoutModal()" style="background: none; border: none; color: var(--text-grey); font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nome da Divisão / Ficha *</label>
+        <input type="text" id="newWorkoutName" class="form-input" placeholder="ex: Treino C — Pernas & Ombros">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Foco / Observações (opcional)</label>
+        <input type="text" id="newWorkoutDesc" class="form-input" placeholder="ex: Foco em quadríceps e carga progressiva">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Cor do Card</label>
+        <div style="display: flex; gap: 10px; margin-top: 4px;">
+          <div onclick="selectWorkoutColor('#1E88E5', this)" class="color-picker-dot active" style="background:#1E88E5;"></div>
+          <div onclick="selectWorkoutColor('#00D2FF', this)" class="color-picker-dot" style="background:#00D2FF;"></div>
+          <div onclick="selectWorkoutColor('#4CAF50', this)" class="color-picker-dot" style="background:#4CAF50;"></div>
+          <div onclick="selectWorkoutColor('#FF9800', this)" class="color-picker-dot" style="background:#FF9800;"></div>
+          <div onclick="selectWorkoutColor('#9C27B0', this)" class="color-picker-dot" style="background:#9C27B0;"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Dias da Semana</label>
+        <div class="chip-container" style="margin-bottom: 0;">
+          <div class="chip" onclick="toggleDayChip(this, 'Segunda-feira')">Segunda</div>
+          <div class="chip" onclick="toggleDayChip(this, 'Terça-feira')">Terça</div>
+          <div class="chip" onclick="toggleDayChip(this, 'Quarta-feira')">Quarta</div>
+          <div class="chip" onclick="toggleDayChip(this, 'Quinta-feira')">Quinta</div>
+          <div class="chip" onclick="toggleDayChip(this, 'Sexta-feira')">Sexta</div>
+          <div class="chip" onclick="toggleDayChip(this, 'Sábado')">Sábado</div>
+          <div class="chip" onclick="toggleDayChip(this, 'Domingo')">Domingo</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Exercícios do Treino</label>
+        <div id="selectedExercisesList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;">
+          <!-- Exercícios adicionados aparecem aqui -->
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="quickExerciseName" class="form-input" style="flex: 1; padding: 8px;" placeholder="Nome do exercício (ex: Agachamento Livre)">
+          <button onclick="addQuickExercise()" class="btn btn-outline" style="width: auto; padding: 8px 12px; font-size: 12px;">+ Adicionar</button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button onclick="closeCreateWorkoutModal()" class="btn btn-text" style="flex: 1;">Cancelar</button>
+        <button onclick="saveNewWorkout()" class="btn btn-success" style="flex: 1.5;">SALVAR TREINO</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Inicialização do Supabase JS Client
     const SUPABASE_URL = 'https://gplgywrvejefulsjpkax.supabase.co';
@@ -808,6 +911,179 @@
         osc.stop(audioCtx.currentTime + 0.4);
       } catch (e) {}
     }
+
+    // ==========================================
+    // CRIADOR DE TREINOS - LÓGICA E SINCRONIZAÇÃO
+    // ==========================================
+    let selectedColor = '#1E88E5';
+    let selectedDays = [];
+    let newWorkoutExercises = [];
+
+    function openCreateWorkoutModal() {
+      document.getElementById('newWorkoutName').value = '';
+      document.getElementById('newWorkoutDesc').value = '';
+      document.getElementById('quickExerciseName').value = '';
+      selectedDays = [];
+      newWorkoutExercises = [];
+      document.querySelectorAll('#modalCreateWorkout .chip').forEach(c => c.classList.remove('active'));
+      renderNewWorkoutExercisesList();
+      document.getElementById('modalCreateWorkout').classList.add('active');
+    }
+
+    function closeCreateWorkoutModal() {
+      document.getElementById('modalCreateWorkout').classList.remove('active');
+    }
+
+    function selectWorkoutColor(hex, element) {
+      selectedColor = hex;
+      document.querySelectorAll('.color-picker-dot').forEach(dot => dot.classList.remove('active'));
+      element.classList.add('active');
+    }
+
+    function toggleDayChip(chipEl, dayName) {
+      chipEl.classList.toggle('active');
+      if (chipEl.classList.contains('active')) {
+        if (!selectedDays.includes(dayName)) selectedDays.push(dayName);
+      } else {
+        selectedDays = selectedDays.filter(d => d !== dayName);
+      }
+    }
+
+    function addQuickExercise() {
+      const input = document.getElementById('quickExerciseName');
+      const name = input.value.trim();
+      if (!name) {
+        alert('Informe o nome do exercício para adicionar ao treino.');
+        return;
+      }
+      newWorkoutExercises.push({
+        id: 'ex_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        nome: name,
+        series: 4,
+        reps: '10-12'
+      });
+      input.value = '';
+      renderNewWorkoutExercisesList();
+    }
+
+    function removeExerciseFromNewWorkout(index) {
+      newWorkoutExercises.splice(index, 1);
+      renderNewWorkoutExercisesList();
+    }
+
+    function renderNewWorkoutExercisesList() {
+      const container = document.getElementById('selectedExercisesList');
+      if (newWorkoutExercises.length === 0) {
+        container.innerHTML = `<div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px; border: 1px dashed var(--divider); border-radius: 10px;">
+          Nenhum exercício adicionado ainda. Digite o nome acima e clique em + Adicionar.
+        </div>`;
+        return;
+      }
+      container.innerHTML = newWorkoutExercises.map((ex, idx) => `
+        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--divider);">
+          <div>
+            <div style="font-size: 13px; font-weight: 700; color: white;">${ex.nome}</div>
+            <div style="font-size: 11px; color: var(--text-grey);">${ex.series} séries x ${ex.reps} reps</div>
+          </div>
+          <button onclick="removeExerciseFromNewWorkout(${idx})" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 16px;">🗑️</button>
+        </div>
+      `).join('');
+    }
+
+    async function saveNewWorkout() {
+      const nameInput = document.getElementById('newWorkoutName');
+      const descInput = document.getElementById('newWorkoutDesc');
+      const name = nameInput.value.trim();
+
+      if (!name) {
+        alert('Por favor, digite o nome do treino (ex: Treino C — Pernas & Ombros).');
+        return;
+      }
+
+      const workoutId = 'treino_' + Date.now();
+      const countEx = newWorkoutExercises.length || 4;
+
+      const newWorkout = {
+        id: workoutId,
+        nome: name,
+        descricao: descInput.value.trim(),
+        diasSemana: selectedDays,
+        corHex: selectedColor,
+        exerciciosCount: countEx,
+        criadoEm: new Date().toISOString()
+      };
+
+      // 1. Salvar no localStorage
+      let saved = [];
+      try {
+        saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
+      } catch (e) {}
+      saved.push(newWorkout);
+      localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(saved));
+
+      // 2. Sincronizar com Supabase se online
+      if (_supabase) {
+        try {
+          await _supabase.from('treinos').upsert({
+            id: workoutId,
+            nome: name,
+            descricao: descInput.value.trim(),
+            dias_semana: JSON.stringify(selectedDays),
+            cor_hex: selectedColor
+          });
+          console.log('[Supabase] Treino salvo no banco online:', name);
+        } catch (e) {
+          console.log('[Supabase] Aviso: Treino mantido offline (sem conexão):', e);
+        }
+      }
+
+      // 3. Renderizar o novo Card de Treino na UI
+      renderWorkoutCardUI(newWorkout);
+      closeCreateWorkoutModal();
+      alert(`🎉 Treino "${name}" criado com sucesso!`);
+    }
+
+    function renderWorkoutCardUI(w) {
+      const container = document.getElementById('workoutListContainer');
+      const daysStr = Array.isArray(w.diasSemana) && w.diasSemana.length > 0 ? w.diasSemana.join(' • ') : 'Dias flexíveis';
+      const count = w.exerciciosCount || 4;
+
+      const cardHtml = `
+        <div class="card" id="card_${w.id}" style="border-left: 5px solid ${w.corHex || '#1E88E5'}; animation: fadeIn 0.3s ease-in-out;">
+          <div style="display: flex; justify-content: space-between;">
+            <h4 style="font-size: 16px; font-weight: 800;">${w.nome}</h4>
+            <span style="color: var(--error-red); cursor: pointer; font-size: 14px;" onclick="deleteWorkoutCard(this, '${w.id}')">🗑️</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">${daysStr}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+            <span style="font-size: 12px; color: var(--accent-cyan);">${count} exercícios</span>
+            <button onclick="startActiveWorkout('${w.nome}')" class="btn btn-success" style="width: auto; padding: 8px 16px; font-size: 12px;">INICIAR</button>
+          </div>
+        </div>
+      `;
+      container.insertAdjacentHTML('afterbegin', cardHtml);
+    }
+
+    function deleteWorkoutCard(el, workoutIdOrName) {
+      if (confirm('Deseja realmente excluir este treino?')) {
+        const card = el.closest('.card');
+        if (card) card.remove();
+
+        try {
+          let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
+          saved = saved.filter(w => w.id !== workoutIdOrName && w.nome !== workoutIdOrName);
+          localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(saved));
+        } catch (e) {}
+      }
+    }
+
+    // Carregar treinos criados anteriormente ao abrir a página
+    window.addEventListener('load', () => {
+      try {
+        let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
+        saved.forEach(w => renderWorkoutCardUI(w));
+      } catch (e) {}
+    });
   </script>
 </body>
 </html>
