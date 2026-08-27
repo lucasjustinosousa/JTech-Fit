@@ -173,24 +173,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   ListTile(
                     leading: const Icon(Icons.fitness_center, color: JTechTheme.successGreen),
-                    title: const Text('Biblioteca ExerciseDB V1', style: TextStyle(color: Colors.white)),
+                    title: const Text('Biblioteca de Exercícios', style: TextStyle(color: Colors.white)),
                     subtitle: Text(
-                      '${repo.exercicios.length} exercícios armazenados offline\nÚltima atualização: Hoje às ${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}',
+                      '${repo.exercicios.length} exercícios nativos disponíveis offline\nStatus: 100% Sincronizado',
                       style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11),
                     ),
                     trailing: TextButton(
                       onPressed: () async {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Sincronizando todos os 1.500+ exercícios da ExerciseDB...')),
-                        );
-                        await repo.forçarAtualizacaoExerciseDb();
+                        await repo.carregarDados();
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Biblioteca atualizada com sucesso! Total: ${repo.exercicios.length} exercícios.')),
+                            SnackBar(content: Text('Biblioteca recarregada! Total: ${repo.exercicios.length} exercícios.')),
                           );
                         }
                       },
-                      child: const Text('ATUALIZAR', style: TextStyle(color: JTechTheme.accentCyan, fontWeight: FontWeight.bold)),
+                      child: const Text('RECARREGAR', style: TextStyle(color: JTechTheme.accentCyan, fontWeight: FontWeight.bold)),
                     ),
                   ),
                   const Divider(height: 1, color: JTechTheme.dividerColor),

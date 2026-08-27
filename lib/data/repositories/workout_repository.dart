@@ -43,33 +43,8 @@ class WorkoutRepository extends ChangeNotifier {
 
   Future<void> carregarDados() async {
     try {
-      // 1. Carregar exercicios base prioritários do LocalDatabase
-      final baseExercises = await LocalDatabase.instance.getExercicios();
-
-      // 2. Carregar exercicios salvos localmente no SQLite / ExerciseDB
-      var extraExercises = await ExerciseLocalDatabase.instance.getLocalExercises();
-      
-      // Se banco local estiver vazio, carregar da ExerciseDB V1
-      if (extraExercises.isEmpty) {
-        final dbService = ExerciseDbService();
-        final fetched = await dbService.fetchAllExercisesPaginated();
-        if (fetched.isNotEmpty) {
-          await ExerciseLocalDatabase.instance.saveExercisesBatch(fetched);
-          extraExercises = await ExerciseLocalDatabase.instance.getLocalExercises();
-        }
-      }
-
-      final Map<String, Exercicio> mapUnicos = {};
-      for (var ex in baseExercises) {
-        mapUnicos[ex.nome.toLowerCase().trim()] = ex;
-      }
-      for (var ex in extraExercises) {
-        final key = ex.nome.toLowerCase().trim();
-        if (!mapUnicos.containsKey(key)) {
-          mapUnicos[key] = ex;
-        }
-      }
-      _exercicios = mapUnicos.values.toList();
+      // Carregar exercícios da biblioteca local
+      _exercicios = await LocalDatabase.instance.getExercicios();
 
       _treinos = await LocalDatabase.instance.getTreinos(_usuarioAtual?.id ?? 'guest_user_1');
       _historico = await LocalDatabase.instance.getHistoricoSessoes();
@@ -83,38 +58,6 @@ class WorkoutRepository extends ChangeNotifier {
       debugPrint('Erro ao carregar dados locais: $e');
     }
     notifyListeners();
-  }
-
-  Future<void> forçarAtualizacaoExerciseDb() async {
-    try {
-      _isLoading = true;
-      notifyListeners();
-
-      final baseExercises = await LocalDatabase.instance.getExercicios();
-      final dbService = ExerciseDbService();
-      final fetched = await dbService.fetchAllExercisesPaginated();
-      if (fetched.isNotEmpty) {
-        await ExerciseLocalDatabase.instance.saveExercisesBatch(fetched);
-      }
-      final extraExercises = await ExerciseLocalDatabase.instance.getLocalExercises();
-
-      final Map<String, Exercicio> mapUnicos = {};
-      for (var ex in baseExercises) {
-        mapUnicos[ex.nome.toLowerCase().trim()] = ex;
-      }
-      for (var ex in extraExercises) {
-        final key = ex.nome.toLowerCase().trim();
-        if (!mapUnicos.containsKey(key)) {
-          mapUnicos[key] = ex;
-        }
-      }
-      _exercicios = mapUnicos.values.toList();
-    } catch (e) {
-      debugPrint('Erro ao forçar atualização da ExerciseDB: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
   }
 
   Future<void> _seedDefaultTreinos() async {

@@ -576,10 +576,10 @@
           </button>
         </div>
 
-        <!-- BANNER DISCRETO MODO OFFLINE / EXERCISEDB CACHE -->
+        <!-- BANNER DA BIBLIOTECA NATIVA JTECH -->
         <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--divider); margin-bottom: 12px; font-size: 11px; color: var(--accent-cyan);">
-          <span>⚡ 1.500+ Exercícios ExerciseDB V1 com GIFs</span>
-          <span style="display: flex; align-items: center; gap: 4px;">📡 Cache Offline Ativo</span>
+          <span>🏋️‍♂️ Biblioteca Oficial de Exercícios JTech</span>
+          <span style="display: flex; align-items: center; gap: 4px;">⚡ 100% Offline & Rápido</span>
         </div>
 
         <!-- BARRA DE PESQUISA DA BIBLIOTECA -->
@@ -1294,59 +1294,8 @@
     }
 
     // ==========================================
-    // BIBLIOTECA DE EXERCÍCIOS - EXERCISEDB V1 OFICIAL
+    // BIBLIOTECA NATIVA DE EXERCÍCIOS JTECH
     // ==========================================
-    const OFFICIAL_EXERCISED_ENDPOINT = 'https://oss.exercisedb.dev/api/v1/exercises';
-    const PROXY_EXERCISED_ENDPOINT = '/api/exercises';
-    const EXERCISED_MEDIA_BASE = 'https://static.exercisedb.dev/media/';
-
-    const BODYPART_MAP = {
-      'chest': 'Peito',
-      'back': 'Costas',
-      'upper arms': 'Braços',
-      'lower arms': 'Antebraços',
-      'upper legs': 'Pernas',
-      'lower legs': 'Panturrilhas',
-      'shoulders': 'Ombros',
-      'waist': 'Abdômen',
-      'cardio': 'Aeróbico',
-      'neck': 'Pescoço'
-    };
-
-    const EQUIPMENT_MAP = {
-      'barbell': 'Barra',
-      'dumbbell': 'Halteres',
-      'body weight': 'Peso Corporal',
-      'cable': 'Polia',
-      'leverage machine': 'Máquina Alavancada',
-      'smith machine': 'Barra Guiada (Smith)',
-      'kettlebell': 'Kettlebell',
-      'band': 'Elástico',
-      'medicine ball': 'Bola Medicinal',
-      'assisted': 'Assistido'
-    };
-
-    const TARGET_MAP = {
-      'biceps': 'Bíceps',
-      'triceps': 'Tríceps',
-      'abs': 'Abdominais',
-      'delts': 'Deltoides',
-      'latissimus dorsi': 'Dorsais',
-      'pectorals': 'Peitoral',
-      'quads': 'Quadríceps',
-      'hamstrings': 'Posterior de Coxa',
-      'glutes': 'Glúteos',
-      'calves': 'Panturrilhas',
-      'traps': 'Trapézio',
-      'forearms': 'Antebraços',
-      'lats': 'Dorsais',
-      'cardiovascular system': 'Sistema Cardiovascular'
-    };
-
-    function translateTerm(term, map) {
-      if (!term) return 'Geral';
-      const key = String(term).toLowerCase().trim();
-      return map[key] || (term.charAt(0).toUpperCase() + term.slice(1));
     const DEFAULT_BASE_EXERCISES = [
       // Peito
       {
@@ -1828,194 +1777,28 @@
       }
     ];
 
-    let exerciseDbList = [...DEFAULT_BASE_EXERCISES];
+    let exercisesList = [...DEFAULT_BASE_EXERCISES];
     let currentSelectedGroup = 'Todos';
     let onlyFavoritesFilter = false;
     let favoritesSet = new Set(JSON.parse(localStorage.getItem('jtech_fit_fav_exercises') || '[]'));
     let selectedForWorkoutSet = new Set();
     let currentExerciseState = 'SUCESSO';
-    let lastErrorCode = 0;
 
-    async function fetchExerciseDbOfficial(forceRefresh = false) {
-      if (exerciseDbList.length === 0) {
-        exerciseDbList = [...DEFAULT_BASE_EXERCISES];
+    function loadExercisesLibrary() {
+      try {
+        const custom = JSON.parse(localStorage.getItem('jtech_fit_custom_exercises') || '[]');
+        if (Array.isArray(custom) && custom.length > 0) {
+          const map = new Map();
+          DEFAULT_BASE_EXERCISES.forEach(e => map.set(e.exerciseId, e));
+          custom.forEach(e => map.set(e.exerciseId || e.id, e));
+          exercisesList = Array.from(map.values());
+        } else {
+          exercisesList = [...DEFAULT_BASE_EXERCISES];
+        }
+      } catch (e) {
+        exercisesList = [...DEFAULT_BASE_EXERCISES];
       }
       currentExerciseState = 'SUCESSO';
-      renderExercisesLibraryUI();
-
-      // Tentar carregar do cache ou arquivo local em segundo plano
-      syncOfficialApiInBackground();
-    }
-
-    async function syncOfficialApiInBackground() {
-      const fetchedItems = [...DEFAULT_BASE_EXERCISES];
-      const seenIds = new Set(fetchedItems.map(e => e.exerciseId));
-      let gifsCount = 0;
-
-      try {
-        console.log('[ExerciseDB V1] Carregando banco de dados complementar...');
-        
-        let response = await fetch('assets/assets/exercises_db.json').catch(() => null);
-        if (!response || !response.ok) {
-          response = await fetch('assets/exercises_db.json').catch(() => null);
-        }
-        
-        if (response && response.ok) {
-          const data = await response.json();
-          if (Array.isArray(data) && data.length > 0) {
-            console.log(`[ExerciseDB V1] ${data.length} exercícios adicionais disponíveis.`);
-
-            for (const item of data) {
-              const exId = String(item.exerciseId || item.id || '');
-              const name = String(item.name || 'Exercício');
-              let gifUrl = item.gifUrl || '';
-
-              if (!gifUrl && exId) {
-                gifUrl = `${EXERCISED_MEDIA_BASE}${exId}.gif`;
-              }
-              if (gifUrl) gifsCount++;
-
-              const rawBodyPart = Array.isArray(item.bodyParts) && item.bodyParts.length > 0 ? item.bodyParts[0] : (item.bodyPart || '');
-              const rawEquip = Array.isArray(item.equipments) && item.equipments.length > 0 ? item.equipments[0] : (item.equipment || '');
-              const rawTarget = Array.isArray(item.targetMuscles) && item.targetMuscles.length > 0 ? item.targetMuscles[0] : (item.target || '');
-              const rawSec = Array.isArray(item.secondaryMuscles) ? item.secondaryMuscles.join(', ') : '';
-              const rawInst = Array.isArray(item.instructions) ? item.instructions.join('\n') : (item.instructions || '');
-
-              if (!seenIds.has(exId)) {
-                seenIds.add(exId);
-                fetchedItems.push({
-                  exerciseId: exId,
-                  id: exId,
-                  name: name,
-                  nome: name,
-                  gifUrl: gifUrl,
-                  bodyParts: item.bodyParts || [rawBodyPart],
-                  equipments: item.equipments || [rawEquip],
-                  targetMuscles: item.targetMuscles || [rawTarget],
-                  secondaryMuscles: item.secondaryMuscles || [],
-                  instructions: item.instructions || [rawInst],
-                  grupoMuscular: translateTerm(rawBodyPart, BODYPART_MAP),
-                  equipamento: translateTerm(rawEquip, EQUIPMENT_MAP),
-                  musculoPrincipal: translateTerm(rawTarget, TARGET_MAP),
-                  musculosSecundarios: rawSec,
-                  instrucoes: rawInst
-                });
-              }
-            }
-
-            exerciseDbList = [...fetchedItems];
-            currentExerciseState = 'SUCESSO';
-            try {
-              localStorage.setItem('jtech_fit_exercisedb_cache', JSON.stringify(fetchedItems));
-            } catch (e) {}
-            renderExercisesLibraryUI();
-            return;
-          }
-        }
-      } catch (err) {
-        console.warn('[ExerciseDB V1] Carregamento local mantido com exercícios base:', err);
-      }
-
-      // Fallback: Busca online com paginação 'after'
-      console.log('[ExerciseDB V1] Iniciando sincronização online com a API oficial...');
-      let after = null;
-      let hasNextPage = true;
-      let pageCount = 0;
-
-      while (hasNextPage && pageCount < 60) {
-        pageCount++;
-        let endpointUrl = `${OFFICIAL_EXERCISED_ENDPOINT}?limit=25`;
-        if (after) {
-          endpointUrl += `&after=${encodeURIComponent(after)}`;
-        }
-
-        let response = null;
-        let attempts = 0;
-
-        while (attempts < 3 && !response) {
-          attempts++;
-          try {
-            let res = await fetch(endpointUrl).catch(() => null);
-            if (res && res.ok) {
-              response = res;
-            } else {
-              if (attempts < 3) await new Promise(r => setTimeout(r, 1000));
-            }
-          } catch (e) {
-            if (attempts < 3) await new Promise(r => setTimeout(r, 1000));
-          }
-        }
-
-        if (!response) break;
-
-        try {
-          const json = await response.json();
-          const isSuccess = json.success === true;
-          const meta = json.meta || {};
-          const data = Array.isArray(json.data) ? json.data : [];
-
-          hasNextPage = meta.hasNextPage === true;
-          after = meta.nextCursor || null;
-
-          if (isSuccess && data.length > 0) {
-            for (const item of data) {
-              const exId = String(item.exerciseId || item.id || '');
-              const name = String(item.name || 'Exercício');
-              let gifUrl = item.gifUrl || '';
-
-              if (!gifUrl && exId) {
-                gifUrl = `${EXERCISED_MEDIA_BASE}${exId}.gif`;
-              }
-              if (gifUrl) gifsCount++;
-
-              const rawBodyPart = Array.isArray(item.bodyParts) && item.bodyParts.length > 0 ? item.bodyParts[0] : (item.bodyPart || '');
-              const rawEquip = Array.isArray(item.equipments) && item.equipments.length > 0 ? item.equipments[0] : (item.equipment || '');
-              const rawTarget = Array.isArray(item.targetMuscles) && item.targetMuscles.length > 0 ? item.targetMuscles[0] : (item.target || '');
-              const rawSec = Array.isArray(item.secondaryMuscles) ? item.secondaryMuscles.join(', ') : '';
-              const rawInst = Array.isArray(item.instructions) ? item.instructions.join('\n') : (item.instructions || '');
-
-              if (!seenIds.has(exId)) {
-                seenIds.add(exId);
-                fetchedItems.push({
-                  exerciseId: exId,
-                  id: exId,
-                  name: name,
-                  nome: name,
-                  gifUrl: gifUrl,
-                  bodyParts: item.bodyParts || [rawBodyPart],
-                  equipments: item.equipments || [rawEquip],
-                  targetMuscles: item.targetMuscles || [rawTarget],
-                  secondaryMuscles: item.secondaryMuscles || [],
-                  instructions: item.instructions || [rawInst],
-                  grupoMuscular: translateTerm(rawBodyPart, BODYPART_MAP),
-                  equipamento: translateTerm(rawEquip, EQUIPMENT_MAP),
-                  musculoPrincipal: translateTerm(rawTarget, TARGET_MAP),
-                  musculosSecundarios: rawSec,
-                  instrucoes: rawInst
-                });
-              }
-            }
-
-            exerciseDbList = [...fetchedItems];
-            currentExerciseState = 'SUCESSO';
-            try {
-              localStorage.setItem('jtech_fit_exercisedb_cache', JSON.stringify(fetchedItems));
-            } catch (e) {}
-            renderExercisesLibraryUI();
-          } else {
-            hasNextPage = false;
-          }
-        } catch (e) {
-          hasNextPage = false;
-        }
-      }
-
-      if (fetchedItems.length > 0) {
-        exerciseDbList = fetchedItems;
-        currentExerciseState = 'SUCESSO';
-      } else if (exerciseDbList.length === 0) {
-        currentExerciseState = 'ERRO';
-      }
       renderExercisesLibraryUI();
     }
 
@@ -2023,33 +1806,10 @@
       const container = document.getElementById('exerciseListContainer');
       if (!container) return;
 
-      if (currentExerciseState === 'CARREGANDO') {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 40px 16px; color: var(--text-grey);">
-            <div style="font-size: 32px; animation: spin 1s infinite linear; display: inline-block;">⏳</div>
-            <div style="font-weight: 700; font-size: 15px; color: white; margin-top: 12px;">Carregando exercícios...</div>
-            <div style="font-size: 12px; margin-top: 4px; color: var(--accent-cyan);">Sincronizando com a ExerciseDB V1 Oficial</div>
-          </div>
-        `;
-        return;
-      }
-
-      if (currentExerciseState === 'ERRO') {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 30px 16px; color: var(--error-red); background: var(--card-dark); border-radius: 12px; border: 1px solid rgba(244,67,54,0.3);">
-            <div style="font-size: 36px; margin-bottom: 8px;">⚠️</div>
-            <div style="font-weight: 800; font-size: 15px; color: white;">Não foi possível carregar a biblioteca</div>
-            <div style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">Código do erro: ${lastErrorCode || 'Conexão ou CORS'}. Tente novamente.</div>
-            <button onclick="fetchExerciseDbOfficial(true)" class="btn btn-outline" style="width: auto; margin-top: 16px; padding: 8px 16px; font-size: 12px;">🔄 Tentar Novamente</button>
-          </div>
-        `;
-        return;
-      }
-
       const searchInput = document.getElementById('exerciseSearchInput');
       const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
 
-      const filtered = exerciseDbList.filter(ex => {
+      const filtered = exercisesList.filter(ex => {
         const matchesQuery = !query ||
           ex.name.toLowerCase().includes(query) ||
           ex.grupoMuscular.toLowerCase().includes(query) ||
@@ -2065,7 +1825,7 @@
       // Atualizar contador no topo
       const statsBadge = document.getElementById('exerciseStatsBadge');
       if (statsBadge) {
-        statsBadge.innerText = `${filtered.length} de ${exerciseDbList.length} exercícios`;
+        statsBadge.innerText = `${filtered.length} de ${exercisesList.length} exercícios`;
       }
 
       if (filtered.length === 0) {
@@ -2179,7 +1939,7 @@
     }
 
     function openExerciseDetailModal(exerciseId) {
-      const ex = exerciseDbList.find(e => e.exerciseId === exerciseId || e.id === exerciseId);
+      const ex = exercisesList.find(e => e.exerciseId === exerciseId || e.id === exerciseId);
       if (!ex) return;
 
       alert(`🏋️‍♂️ ${ex.name}\n\n🎯 Músculo: ${ex.grupoMuscular} (${ex.musculoPrincipal})\n🏋️ Equipamento: ${ex.equipamento}\n\n💡 Instruções:\n${ex.instrucoes}`);
@@ -2193,7 +1953,7 @@
       } catch (e) {}
 
       loadHistoryFromStorage();
-      fetchExerciseDbOfficial(false);
+      loadExercisesLibrary();
     });
   </script>
 </body>

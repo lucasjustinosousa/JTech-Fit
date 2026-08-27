@@ -38,14 +38,6 @@
   ],
   "rewrites": [
     {
-      "source": "/api/exercises",
-      "destination": "https://oss.exercisedb.dev/api/v1/exercises"
-    },
-    {
-      "source": "/api/exercises/(.*)",
-      "destination": "https://oss.exercisedb.dev/api/v1/exercises/$1"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
