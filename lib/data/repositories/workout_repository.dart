@@ -43,23 +43,33 @@ class WorkoutRepository extends ChangeNotifier {
 
   Future<void> carregarDados() async {
     try {
-      // 1. Carregar exercicios salvos localmente no SQLite
-      _exercicios = await ExerciseLocalDatabase.instance.getLocalExercises();
+      // 1. Carregar exercicios base prioritários do LocalDatabase
+      final baseExercises = await LocalDatabase.instance.getExercicios();
+
+      // 2. Carregar exercicios salvos localmente no SQLite / ExerciseDB
+      var extraExercises = await ExerciseLocalDatabase.instance.getLocalExercises();
       
       // Se banco local estiver vazio, carregar da ExerciseDB V1
-      if (_exercicios.isEmpty) {
+      if (extraExercises.isEmpty) {
         final dbService = ExerciseDbService();
         final fetched = await dbService.fetchAllExercisesPaginated();
         if (fetched.isNotEmpty) {
           await ExerciseLocalDatabase.instance.saveExercisesBatch(fetched);
-          _exercicios = await ExerciseLocalDatabase.instance.getLocalExercises();
+          extraExercises = await ExerciseLocalDatabase.instance.getLocalExercises();
         }
       }
 
-      // Fallback secundario se ainda assim estiver vazio
-      if (_exercicios.isEmpty) {
-        _exercicios = await LocalDatabase.instance.getExercicios();
+      final Map<String, Exercicio> mapUnicos = {};
+      for (var ex in baseExercises) {
+        mapUnicos[ex.nome.toLowerCase().trim()] = ex;
       }
+      for (var ex in extraExercises) {
+        final key = ex.nome.toLowerCase().trim();
+        if (!mapUnicos.containsKey(key)) {
+          mapUnicos[key] = ex;
+        }
+      }
+      _exercicios = mapUnicos.values.toList();
 
       _treinos = await LocalDatabase.instance.getTreinos(_usuarioAtual?.id ?? 'guest_user_1');
       _historico = await LocalDatabase.instance.getHistoricoSessoes();
@@ -80,12 +90,25 @@ class WorkoutRepository extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
+      final baseExercises = await LocalDatabase.instance.getExercicios();
       final dbService = ExerciseDbService();
       final fetched = await dbService.fetchAllExercisesPaginated();
       if (fetched.isNotEmpty) {
         await ExerciseLocalDatabase.instance.saveExercisesBatch(fetched);
-        _exercicios = await ExerciseLocalDatabase.instance.getLocalExercises();
       }
+      final extraExercises = await ExerciseLocalDatabase.instance.getLocalExercises();
+
+      final Map<String, Exercicio> mapUnicos = {};
+      for (var ex in baseExercises) {
+        mapUnicos[ex.nome.toLowerCase().trim()] = ex;
+      }
+      for (var ex in extraExercises) {
+        final key = ex.nome.toLowerCase().trim();
+        if (!mapUnicos.containsKey(key)) {
+          mapUnicos[key] = ex;
+        }
+      }
+      _exercicios = mapUnicos.values.toList();
     } catch (e) {
       debugPrint('Erro ao forçar atualização da ExerciseDB: $e');
     } finally {

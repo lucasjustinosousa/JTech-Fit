@@ -1347,48 +1347,513 @@
       if (!term) return 'Geral';
       const key = String(term).toLowerCase().trim();
       return map[key] || (term.charAt(0).toUpperCase() + term.slice(1));
-    }
+    const DEFAULT_BASE_EXERCISES = [
+      // Peito
+      {
+        exerciseId: 'base_peito_1',
+        id: 'base_peito_1',
+        name: 'Supino Reto com Barra',
+        nome: 'Supino Reto com Barra',
+        grupoMuscular: 'Peito',
+        equipamento: 'Barra e Banco Reto',
+        musculoPrincipal: 'Peitoral Maior',
+        musculosSecundarios: 'Tríceps, Deltoide Anterior',
+        instrucoes: '1. Deite-se no banco com os olhos alinhados à barra.\n2. Segure a barra um pouco além da largura dos ombros.\n3. Desça a barra de forma controlada até o meio do peito.\n4. Empurre com força estendendo os braços sem travar os cotovelos.',
+        gifUrl: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=600&q=80',
+        bodyParts: ['Peito'],
+        equipments: ['Barra'],
+        targetMuscles: ['Peitoral']
+      },
+      {
+        exerciseId: 'base_peito_2',
+        id: 'base_peito_2',
+        name: 'Supino Inclinado com Halteres',
+        nome: 'Supino Inclinado com Halteres',
+        grupoMuscular: 'Peito',
+        equipamento: 'Halteres e Banco Inclinado',
+        musculoPrincipal: 'Peitoral Superior',
+        musculosSecundarios: 'Deltoide Anterior, Tríceps',
+        instrucoes: '1. Ajuste o banco em ângulo de 30º a 45º.\n2. Posicione os halteres acima do peito com palmas voltadas para a frente.\n3. Desça os halteres flexionando os cotovelos até a linha dos ombros.\n4. Empurre para cima aproximando os halteres no topo.',
+        gifUrl: '',
+        bodyParts: ['Peito'],
+        equipments: ['Halteres'],
+        targetMuscles: ['Peitoral']
+      },
+      {
+        exerciseId: 'base_peito_3',
+        id: 'base_peito_3',
+        name: 'Crucifixo no Crossover (Polia Alta)',
+        nome: 'Crucifixo no Crossover (Polia Alta)',
+        grupoMuscular: 'Peito',
+        equipamento: 'Polia / Crossover',
+        musculoPrincipal: 'Peitoral Inferior e Médio',
+        musculosSecundarios: 'Deltoide Anterior',
+        instrucoes: '1. Ajuste as roldanas na parte alta do crossover.\n2. Dê um passo à frente mantendo o tronco levemente inclinado.\n3. Com os cotovelos levemente flexionados, junte as mãos à frente do quadril.\n4. Retorne controlando o peso.',
+        gifUrl: '',
+        bodyParts: ['Peito'],
+        equipments: ['Polia (Cabo)'],
+        targetMuscles: ['Peitoral']
+      },
+      {
+        exerciseId: 'base_peito_4',
+        id: 'base_peito_4',
+        name: 'Peck Deck / Voador',
+        nome: 'Peck Deck / Voador',
+        grupoMuscular: 'Peito',
+        equipamento: 'Máquina Voador',
+        musculoPrincipal: 'Peitoral Médio',
+        musculosSecundarios: 'Deltoide Anterior',
+        instrucoes: '1. Ajuste o banco para que as manoplas fiquem na altura do peitoral.\n2. Mantenha as costas firmes no encosto.\n3. Junte os braços à frente contraindo o peito.\n4. Retorne devagar alongando as fibras.',
+        gifUrl: '',
+        bodyParts: ['Peito'],
+        equipments: ['Máquina Alavancada'],
+        targetMuscles: ['Peitoral']
+      },
+      {
+        exerciseId: 'base_peito_5',
+        id: 'base_peito_5',
+        name: 'Flexão de Braços',
+        nome: 'Flexão de Braços',
+        grupoMuscular: 'Peito',
+        equipamento: 'Peso Corporal',
+        musculoPrincipal: 'Peitoral Geral',
+        musculosSecundarios: 'Tríceps, Core',
+        instrucoes: '1. Apoie as mãos no chão um pouco além da largura dos ombros.\n2. Mantenha o corpo em linha reta e abdômen contraído.\n3. Desça o peito próximo ao chão flexionando os cotovelos.\n4. Empurre o chão até voltar à posição inicial.',
+        gifUrl: '',
+        bodyParts: ['Peito'],
+        equipments: ['Peso Corporal'],
+        targetMuscles: ['Peitoral']
+      },
 
-    let exerciseDbList = [];
+      // Costas
+      {
+        exerciseId: 'base_costas_1',
+        id: 'base_costas_1',
+        name: 'Puxada Frontal na Polia',
+        nome: 'Puxada Frontal na Polia',
+        grupoMuscular: 'Costas',
+        equipamento: 'Polia Alta',
+        musculoPrincipal: 'Grande Dorsal',
+        musculosSecundarios: 'Bíceps, Antebraço, Trapézio',
+        instrucoes: '1. Sente-se no aparelho e ajuste o apoio de coxas.\n2. Segure a barra aberta com pegada pronada.\n3. Puxe a barra em direção ao peitoral superior estufando o tórax.\n4. Suba a barra de forma controlada.',
+        gifUrl: '',
+        bodyParts: ['Costas'],
+        equipments: ['Polia (Cabo)'],
+        targetMuscles: ['Costas']
+      },
+      {
+        exerciseId: 'base_costas_2',
+        id: 'base_costas_2',
+        name: 'Remada Curvada com Barra',
+        nome: 'Remada Curvada com Barra',
+        grupoMuscular: 'Costas',
+        equipamento: 'Barra',
+        musculoPrincipal: 'Dorsal e Romboides',
+        musculosSecundarios: 'Bíceps, Eretores da Espinha',
+        instrucoes: '1. Incline o tronco a cerca de 45º mantendo as costas retas e joelhos flexionados.\n2. Segure a barra com pegada pronada ou supinada.\n3. Puxe a barra em direção ao abdômen/umbigo.\n4. Abaixe a barra com controle.',
+        gifUrl: '',
+        bodyParts: ['Costas'],
+        equipments: ['Barra'],
+        targetMuscles: ['Costas']
+      },
+      {
+        exerciseId: 'base_costas_3',
+        id: 'base_costas_3',
+        name: 'Remada Unilateral com Halter (Serrote)',
+        nome: 'Remada Unilateral com Halter (Serrote)',
+        grupoMuscular: 'Costas',
+        equipamento: 'Halteres e Banco',
+        musculoPrincipal: 'Grande Dorsal',
+        musculosSecundarios: 'Bíceps, Deltoide Posterior',
+        instrucoes: '1. Apoie um joelho e uma mão no banco plano.\n2. Segure o halter com a mão livre e puxe na direção do quadril.\n3. Mantenha a coluna neutra e cotovelo rente ao tronco.',
+        gifUrl: '',
+        bodyParts: ['Costas'],
+        equipments: ['Halteres'],
+        targetMuscles: ['Costas']
+      },
+      {
+        exerciseId: 'base_costas_4',
+        id: 'base_costas_4',
+        name: 'Puxada Articulada',
+        nome: 'Puxada Articulada',
+        grupoMuscular: 'Costas',
+        equipamento: 'Máquina Articulada',
+        musculoPrincipal: 'Dorsal',
+        musculosSecundarios: 'Bíceps, Trapézio',
+        instrucoes: '1. Ajuste a altura do assento.\n2. Puxe as manoplas para baixo e para trás aproximando as escápulas.\n3. Retorne alongando os dorsais.',
+        gifUrl: '',
+        bodyParts: ['Costas'],
+        equipments: ['Máquina Alavancada'],
+        targetMuscles: ['Costas']
+      },
+      {
+        exerciseId: 'base_costas_5',
+        id: 'base_costas_5',
+        name: 'Barra Fixa (Pull-up)',
+        nome: 'Barra Fixa (Pull-up)',
+        grupoMuscular: 'Costas',
+        equipamento: 'Peso Corporal / Barra Fixa',
+        musculoPrincipal: 'Grande Dorsal',
+        musculosSecundarios: 'Bíceps, Antebraço',
+        instrucoes: '1. Pendure-se na barra fixa com pegada pronada aberta.\n2. Puxe o corpo para cima até o queixo ultrapassar a barra.\n3. Desça controlando o peso do corpo.',
+        gifUrl: '',
+        bodyParts: ['Costas'],
+        equipments: ['Peso Corporal'],
+        targetMuscles: ['Costas']
+      },
+
+      // Pernas
+      {
+        exerciseId: 'base_pernas_1',
+        id: 'base_pernas_1',
+        name: 'Agachamento Livre com Barra',
+        nome: 'Agachamento Livre com Barra',
+        grupoMuscular: 'Pernas',
+        equipamento: 'Barra e Rack',
+        musculoPrincipal: 'Quadríceps e Glúteos',
+        musculosSecundarios: 'Isquiotibiais, Lombar, Panturrilhas',
+        instrucoes: '1. Apoie a barra no trapézio com pés na largura dos ombros.\n2. Agache flexionando joelhos e quadril como se fosse sentar.\n3. Desça até 90 graus e empurre o chão pelos calcanhares.',
+        gifUrl: '',
+        bodyParts: ['Pernas'],
+        equipments: ['Barra'],
+        targetMuscles: ['Quadríceps']
+      },
+      {
+        exerciseId: 'base_pernas_2',
+        id: 'base_pernas_2',
+        name: 'Leg Press 45º',
+        nome: 'Leg Press 45º',
+        grupoMuscular: 'Pernas',
+        equipamento: 'Máquina Leg Press',
+        musculoPrincipal: 'Quadríceps e Glúteos',
+        musculosSecundarios: 'Isquiotibiais',
+        instrucoes: '1. Apoie os pés na plataforma na largura do quadril.\n2. Destrave a máquina e desça o peso até formar 90º nos joelhos.\n3. Empurre sem travar totalmente os joelhos.',
+        gifUrl: '',
+        bodyParts: ['Pernas'],
+        equipments: ['Máquina Alavancada'],
+        targetMuscles: ['Quadríceps']
+      },
+      {
+        exerciseId: 'base_pernas_3',
+        id: 'base_pernas_3',
+        name: 'Cadeira Extensora',
+        nome: 'Cadeira Extensora',
+        grupoMuscular: 'Pernas',
+        equipamento: 'Máquina Extensora',
+        musculoPrincipal: 'Quadríceps',
+        musculosSecundarios: 'Reto Femoral',
+        instrucoes: '1. Ajuste o encosto e o rolo na altura dos tornozelos.\n2. Estenda as pernas para cima contraindo os quadríceps no topo.\n3. Desça devagar segurando a descida.',
+        gifUrl: '',
+        bodyParts: ['Pernas'],
+        equipments: ['Máquina Alavancada'],
+        targetMuscles: ['Quadríceps']
+      },
+      {
+        exerciseId: 'base_pernas_4',
+        id: 'base_pernas_4',
+        name: 'Mesa Flexora',
+        nome: 'Mesa Flexora',
+        grupoMuscular: 'Pernas',
+        equipamento: 'Máquina Flexora',
+        musculoPrincipal: 'Isquiotibiais (Posterior de Coxa)',
+        musculosSecundarios: 'Glúteos, Panturrilhas',
+        instrucoes: '1. Deite-se de bruços com o rolo logo acima dos calcanhares.\n2. Flexione os joelhos puxando o rolo em direção aos glúteos.\n3. Retorne de forma suave.',
+        gifUrl: '',
+        bodyParts: ['Pernas'],
+        equipments: ['Máquina Alavancada'],
+        targetMuscles: ['Isquiotibiais']
+      },
+      {
+        exerciseId: 'base_pernas_5',
+        id: 'base_pernas_5',
+        name: 'Stiff com Halteres / Barra',
+        nome: 'Stiff com Halteres / Barra',
+        grupoMuscular: 'Pernas',
+        equipamento: 'Barra / Halteres',
+        musculoPrincipal: 'Isquiotibiais e Glúteos',
+        musculosSecundarios: 'Lombar',
+        instrucoes: '1. Fique em pé com pés paralelos e joelhos levemente destravados.\n2. Incline o quadril para trás descendo a barra rente às pernas.\n3. Sinta o alongamento dos posteriores e suba contraindo os glúteos.',
+        gifUrl: '',
+        bodyParts: ['Pernas'],
+        equipments: ['Halteres', 'Barra'],
+        targetMuscles: ['Isquiotibiais']
+      },
+      {
+        exerciseId: 'base_pernas_6',
+        id: 'base_pernas_6',
+        name: 'Elevação de Gêmeos (Panturrilha)',
+        nome: 'Elevação de Gêmeos (Panturrilha)',
+        grupoMuscular: 'Pernas',
+        equipamento: 'Máquina ou Degrau',
+        musculoPrincipal: 'Gastrocnêmio e Sóleo',
+        musculosSecundarios: 'Tornozelos',
+        instrucoes: '1. Apoie a ponta dos pés no degrau com calcanhares livres.\n2. Eleve o corpo ao máximo nas pontas dos pés.\n3. Pause 1 segundo no topo e desça alongando bem.',
+        gifUrl: '',
+        bodyParts: ['Pernas'],
+        equipments: ['Peso Corporal', 'Máquina Alavancada'],
+        targetMuscles: ['Panturrilhas']
+      },
+
+      // Ombros
+      {
+        exerciseId: 'base_ombros_1',
+        id: 'base_ombros_1',
+        name: 'Desenvolvimento com Halteres',
+        nome: 'Desenvolvimento com Halteres',
+        grupoMuscular: 'Ombros',
+        equipamento: 'Halteres e Banco',
+        musculoPrincipal: 'Deltoide Anterior e Lateral',
+        musculosSecundarios: 'Tríceps, Trapézio',
+        instrucoes: '1. Sentado com as costas apoiadas, segure os halteres na altura das orelhas.\n2. Empurre os halteres para cima até estender os braços.\n3. Desça controlando o movimento até a linha das orelhas.',
+        gifUrl: '',
+        bodyParts: ['Ombros'],
+        equipments: ['Halteres'],
+        targetMuscles: ['Deltoides']
+      },
+      {
+        exerciseId: 'base_ombros_2',
+        id: 'base_ombros_2',
+        name: 'Elevação Lateral com Halteres',
+        nome: 'Elevação Lateral com Halteres',
+        grupoMuscular: 'Ombros',
+        equipamento: 'Halteres',
+        musculoPrincipal: 'Deltoide Lateral',
+        musculosSecundarios: 'Trapézio',
+        instrucoes: '1. Em pé com tronco firme e cotovelos semidobrados.\n2. Eleve os halteres lateralmente até a altura dos ombros.\n3. Pause no topo e desça devagar sem impulsos.',
+        gifUrl: '',
+        bodyParts: ['Ombros'],
+        equipments: ['Halteres'],
+        targetMuscles: ['Deltoides']
+      },
+      {
+        exerciseId: 'base_ombros_3',
+        id: 'base_ombros_3',
+        name: 'Elevação Frontal',
+        nome: 'Elevação Frontal',
+        grupoMuscular: 'Ombros',
+        equipamento: 'Halteres ou Polia',
+        musculoPrincipal: 'Deltoide Anterior',
+        musculosSecundarios: 'Peitoral Superior',
+        instrucoes: '1. Segure os halteres à frente das coxas.\n2. Eleve à frente até a altura dos olhos.\n3. Desça suavemente mantendo a postura.',
+        gifUrl: '',
+        bodyParts: ['Ombros'],
+        equipments: ['Halteres'],
+        targetMuscles: ['Deltoides']
+      },
+      {
+        exerciseId: 'base_ombros_4',
+        id: 'base_ombros_4',
+        name: 'Crucifixo Invertido',
+        nome: 'Crucifixo Invertido',
+        grupoMuscular: 'Ombros',
+        equipamento: 'Halteres ou Peck Deck',
+        musculoPrincipal: 'Deltoide Posterior',
+        musculosSecundarios: 'Romboides, Trapézio',
+        instrucoes: '1. Incline o tronco à frente ou sente no Peck Deck invertido.\n2. Abra os braços para trás focando na parte traseira dos ombros.\n3. Retorne suavemente.',
+        gifUrl: '',
+        bodyParts: ['Ombros'],
+        equipments: ['Halteres', 'Máquina Alavancada'],
+        targetMuscles: ['Deltoides']
+      },
+
+      // Bíceps
+      {
+        exerciseId: 'base_biceps_1',
+        id: 'base_biceps_1',
+        name: 'Rosca Direta com Barra W',
+        nome: 'Rosca Direta com Barra W',
+        grupoMuscular: 'Bíceps',
+        equipamento: 'Barra W',
+        musculoPrincipal: 'Bíceps Braquial',
+        musculosSecundarios: 'Braquiorradial, Antebraço',
+        instrucoes: '1. Segure a barra W na largura dos ombros.\n2. Mantenha os cotovelos fixos junto ao tronco.\n3. Flexione os cotovelos subindo a barra e contraindo os bíceps.\n4. Desça de forma controlada.',
+        gifUrl: '',
+        bodyParts: ['Bíceps'],
+        equipments: ['Barra'],
+        targetMuscles: ['Bíceps']
+      },
+      {
+        exerciseId: 'base_biceps_2',
+        id: 'base_biceps_2',
+        name: 'Rosca Martelo com Halteres',
+        nome: 'Rosca Martelo com Halteres',
+        grupoMuscular: 'Bíceps',
+        equipamento: 'Halteres',
+        musculoPrincipal: 'Braquial e Braquiorradial',
+        musculosSecundarios: 'Bíceps, Antebraço',
+        instrucoes: '1. Segure os halteres com palmas voltadas uma para a outra.\n2. Eleve os pesos flexionando os cotovelos sem girar os punhos.\n3. Desça controlando o movimento.',
+        gifUrl: '',
+        bodyParts: ['Bíceps'],
+        equipments: ['Halteres'],
+        targetMuscles: ['Bíceps']
+      },
+      {
+        exerciseId: 'base_biceps_3',
+        id: 'base_biceps_3',
+        name: 'Rosca Concentrada',
+        nome: 'Rosca Concentrada',
+        grupoMuscular: 'Bíceps',
+        equipamento: 'Halter e Banco',
+        musculoPrincipal: 'Pico do Bíceps',
+        musculosSecundarios: 'Braquial',
+        instrucoes: '1. Sentado no banco, apoie o cotovelo na parte interna da coxa.\n2. Erga o halter flexionando o bíceps ao máximo.\n3. Desça alongando completamente o músculo.',
+        gifUrl: '',
+        bodyParts: ['Bíceps'],
+        equipments: ['Halteres'],
+        targetMuscles: ['Bíceps']
+      },
+      {
+        exerciseId: 'base_biceps_4',
+        id: 'base_biceps_4',
+        name: 'Rosca Scott na Polia',
+        nome: 'Rosca Scott na Polia',
+        grupoMuscular: 'Bíceps',
+        equipamento: 'Banco Scott e Polia',
+        musculoPrincipal: 'Bíceps',
+        musculosSecundarios: 'Braquial, Antebraço',
+        instrucoes: '1. Apoie os braços no banco Scott segurando a barra da polia.\n2. Flexione os cotovelos isolando totalmente os bíceps.\n3. Estenda os braços controlando o peso.',
+        gifUrl: '',
+        bodyParts: ['Bíceps'],
+        equipments: ['Polia (Cabo)'],
+        targetMuscles: ['Bíceps']
+      },
+
+      // Tríceps
+      {
+        exerciseId: 'base_triceps_1',
+        id: 'base_triceps_1',
+        name: 'Tríceps Pulley na Corda',
+        nome: 'Tríceps Pulley na Corda',
+        grupoMuscular: 'Tríceps',
+        equipamento: 'Polia Alta e Corda',
+        musculoPrincipal: 'Tríceps (Cabeça Lateral e Medial)',
+        musculosSecundarios: 'Antebraço',
+        instrucoes: '1. Segure a corda na polia alta com cotovelos colados ao corpo.\n2. Empurre para baixo estendendo os braços e abrindo a corda no final.\n3. Retorne flexionando até cerca de 90 graus.',
+        gifUrl: '',
+        bodyParts: ['Tríceps'],
+        equipments: ['Polia (Cabo)'],
+        targetMuscles: ['Tríceps']
+      },
+      {
+        exerciseId: 'base_triceps_2',
+        id: 'base_triceps_2',
+        name: 'Tríceps Testa com Barra W',
+        nome: 'Tríceps Testa com Barra W',
+        grupoMuscular: 'Tríceps',
+        equipamento: 'Barra W e Banco Reto',
+        musculoPrincipal: 'Tríceps (Cabeça Longa)',
+        musculosSecundarios: 'Deltoides',
+        instrucoes: '1. Deitado no banco reto, segure a barra W com braços estendidos.\n2. Flexione apenas os cotovelos descendo a barra até a testa.\n3. Estenda os braços empurrando para cima.',
+        gifUrl: '',
+        bodyParts: ['Tríceps'],
+        equipments: ['Barra'],
+        targetMuscles: ['Tríceps']
+      },
+      {
+        exerciseId: 'base_triceps_3',
+        id: 'base_triceps_3',
+        name: 'Tríceps Coice com Halter',
+        nome: 'Tríceps Coice com Halter',
+        grupoMuscular: 'Tríceps',
+        equipamento: 'Halteres e Banco',
+        musculoPrincipal: 'Tríceps',
+        musculosSecundarios: 'Deltoide Posterior',
+        instrucoes: '1. Apoie o joelho no banco com tronco paralelo ao chão.\n2. Mantenha o cotovelo alto e estenda o antebraço para trás.\n3. Contraia o tríceps e retorne devagar.',
+        gifUrl: '',
+        bodyParts: ['Tríceps'],
+        equipments: ['Halteres'],
+        targetMuscles: ['Tríceps']
+      },
+      {
+        exerciseId: 'base_triceps_4',
+        id: 'base_triceps_4',
+        name: 'Mergulho no Banco (Dips)',
+        nome: 'Mergulho no Banco (Dips)',
+        grupoMuscular: 'Tríceps',
+        equipamento: 'Banco ou Paralelas',
+        musculoPrincipal: 'Tríceps',
+        musculosSecundarios: 'Peitoral, Deltoide Anterior',
+        instrucoes: '1. Apoie as mãos na borda de um banco com pernas estendidas à frente.\n2. Desça o quadril flexionando os cotovelos até 90 graus.\n3. Empurre com as palmas voltando à posição inicial.',
+        gifUrl: '',
+        bodyParts: ['Tríceps'],
+        equipments: ['Peso Corporal'],
+        targetMuscles: ['Tríceps']
+      },
+
+      // Abdômen & Core
+      {
+        exerciseId: 'base_abdom_1',
+        id: 'base_abdom_1',
+        name: 'Abdominal Infra no Solo / Elevação de Pernas',
+        nome: 'Abdominal Infra no Solo / Elevação de Pernas',
+        grupoMuscular: 'Abdômen',
+        equipamento: 'Peso Corporal',
+        musculoPrincipal: 'Abdômen Inferior',
+        musculosSecundarios: 'Flexores do Quadril',
+        instrucoes: '1. Deite-se de costas com mãos sob o quadril.\n2. Eleve as pernas retas ou semiflexionadas até a vertical.\n3. Desça as pernas devagar sem arquear a lombar.',
+        gifUrl: '',
+        bodyParts: ['Abdômen'],
+        equipments: ['Peso Corporal'],
+        targetMuscles: ['Abdômen']
+      },
+      {
+        exerciseId: 'base_abdom_2',
+        id: 'base_abdom_2',
+        name: 'Prancha Ventral Isométrica',
+        nome: 'Prancha Ventral Isométrica',
+        grupoMuscular: 'Abdômen',
+        equipamento: 'Peso Corporal',
+        musculoPrincipal: 'Transverso do Abdômen e Core',
+        musculosSecundarios: 'Glúteos, Ombros, Lombar',
+        instrucoes: '1. Apoie os antebraços e pontas dos pés no chão.\n2. Mantenha o corpo alinhado da cabeça aos calcanhares.\n3. Contraia o abdômen sustentando a posição.',
+        gifUrl: '',
+        bodyParts: ['Abdômen'],
+        equipments: ['Peso Corporal'],
+        targetMuscles: ['Core']
+      },
+      {
+        exerciseId: 'base_abdom_3',
+        id: 'base_abdom_3',
+        name: 'Abdominal Supra na Polia / Solo',
+        nome: 'Abdominal Supra na Polia / Solo',
+        grupoMuscular: 'Abdômen',
+        equipamento: 'Peso Corporal ou Polia',
+        musculoPrincipal: 'Reto Abdominal (Porção Superior)',
+        musculosSecundarios: 'Oblíquos',
+        instrucoes: '1. Deitado no chão ou ajoelhado na polia com a corda.\n2. Flexione a coluna aproximando as costelas do quadril.\n3. Expire o ar no topo e retorne devagar.',
+        gifUrl: '',
+        bodyParts: ['Abdômen'],
+        equipments: ['Peso Corporal', 'Polia (Cabo)'],
+        targetMuscles: ['Abdômen']
+      }
+    ];
+
+    let exerciseDbList = [...DEFAULT_BASE_EXERCISES];
     let currentSelectedGroup = 'Todos';
     let onlyFavoritesFilter = false;
     let favoritesSet = new Set(JSON.parse(localStorage.getItem('jtech_fit_fav_exercises') || '[]'));
     let selectedForWorkoutSet = new Set();
-    let currentExerciseState = 'CARREGANDO'; // 'CARREGANDO', 'SUCESSO', 'LISTA_VAZIA', 'ERRO'
+    let currentExerciseState = 'SUCESSO';
     let lastErrorCode = 0;
 
     async function fetchExerciseDbOfficial(forceRefresh = false) {
-      currentExerciseState = 'CARREGANDO';
+      if (exerciseDbList.length === 0) {
+        exerciseDbList = [...DEFAULT_BASE_EXERCISES];
+      }
+      currentExerciseState = 'SUCESSO';
       renderExercisesLibraryUI();
 
-      // 1. Tentar carregar do cache local primeiro
-      if (!forceRefresh) {
-        try {
-          const cached = localStorage.getItem('jtech_fit_exercisedb_cache');
-          if (cached) {
-            const parsed = JSON.parse(cached);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              exerciseDbList = parsed;
-              currentExerciseState = 'SUCESSO';
-              renderExercisesLibraryUI();
-              // Atualizar em segundo plano
-              syncOfficialApiInBackground();
-              return;
-            }
-          }
-        } catch (e) {}
-      }
-
-      await syncOfficialApiInBackground();
+      // Tentar carregar do cache ou arquivo local em segundo plano
+      syncOfficialApiInBackground();
     }
 
     async function syncOfficialApiInBackground() {
-      const fetchedItems = [];
-      const seenIds = new Set();
+      const fetchedItems = [...DEFAULT_BASE_EXERCISES];
+      const seenIds = new Set(fetchedItems.map(e => e.exerciseId));
       let gifsCount = 0;
 
       try {
-        console.log('[ExerciseDB V1] Tentando carregar banco de dados local...');
+        console.log('[ExerciseDB V1] Carregando banco de dados complementar...');
         
         let response = await fetch('assets/assets/exercises_db.json').catch(() => null);
         if (!response || !response.ok) {
@@ -1398,7 +1863,7 @@
         if (response && response.ok) {
           const data = await response.json();
           if (Array.isArray(data) && data.length > 0) {
-            console.log(`[ExerciseDB V1] Banco de dados local carregado com ${data.length} exercícios.`);
+            console.log(`[ExerciseDB V1] ${data.length} exercícios adicionais disponíveis.`);
 
             for (const item of data) {
               const exId = String(item.exerciseId || item.id || '');
@@ -1448,7 +1913,7 @@
           }
         }
       } catch (err) {
-        console.warn('[ExerciseDB V1] Aviso no carregamento local:', err);
+        console.warn('[ExerciseDB V1] Carregamento local mantido com exercícios base:', err);
       }
 
       // Fallback: Busca online com paginação 'after'
@@ -1618,11 +2083,15 @@
       container.innerHTML = filtered.map(ex => {
         const isFav = favoritesSet.has(ex.exerciseId);
         const isChecked = selectedForWorkoutSet.has(ex.exerciseId);
+        const icon = getMuscleGroupIcon(ex.grupoMuscular);
 
         return `
           <div class="card" style="border-left: 4px solid var(--accent-cyan); display: flex; gap: 12px; align-items: center; padding: 12px;">
-            <div style="width: 70px; height: 70px; background: #000; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider);">
-              <img src="${ex.gifUrl}" alt="${ex.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.onerror=null; this.src='https://via.placeholder.com/70/111827/00D2FF?text=GIF';">
+            <div style="width: 70px; height: 70px; background: #11141a; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider); position: relative;">
+              ${ex.gifUrl ? `<img src="${ex.gifUrl}" alt="${ex.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+              <div style="display: ${ex.gifUrl ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 26px;">
+                ${icon}
+              </div>
             </div>
 
             <div style="flex: 1; min-width: 0;">
@@ -1636,10 +2105,22 @@
               </div>
             </div>
 
-            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleSelectForWorkout('${ex.exerciseId}', this)" style="width: 20px; height: 20px; accent-color: var(--success-green); cursor: pointer; flex-shrink: 0;">
+            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleSelectForWorkout('${ex.exerciseId}', this)" style="width: 20px; height: 20px; accent-color: var(--success-green); cursor: pointer; flex-shrink: 0;" title="Selecionar para treino">
           </div>
         `;
       }).join('');
+    }
+
+    function getMuscleGroupIcon(grupo) {
+      const g = (grupo || '').toLowerCase();
+      if (g.includes('peito')) return '🏋️‍♂️';
+      if (g.includes('costa')) return '🚣';
+      if (g.includes('perna') || g.includes('coxa') || g.includes('panturrilha')) return '🦵';
+      if (g.includes('ombro') || g.includes('deltoide')) return '🛡️';
+      if (g.includes('bíceps') || g.includes('biceps')) return '💪';
+      if (g.includes('tríceps') || g.includes('triceps')) return '⚡';
+      if (g.includes('abd') || g.includes('core')) return '🧘';
+      return '🏋️';
     }
 
     function resetExerciseFilters() {
