@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'exercise_translation_service.dart';
 
@@ -19,97 +20,53 @@ class ExerciseDbService {
     return all;
   }
 
-  /// Realiza a busca paginada por cursor da ExerciseDB V1 oficial (sem RapidAPI)
+  /// Realiza a busca dos exercícios a partir do arquivo JSON local (assets/exercises_db.json)
   Future<List<Map<String, dynamic>>> fetchAllExercisesPaginated({
     Function(int current, int total)? onProgress,
   }) async {
     final List<Map<String, dynamic>> allResults = [];
     final Set<String> seenIds = {};
 
-    String? currentCursor;
-    bool hasNextPage = true;
-    int apiTotal = 1500;
-    int totalReceived = 0;
-    int totalGifsAvailable = 0;
-
-    while (hasNextPage) {
-      String url = '$_officialEndpoint?limit=50';
-      if (currentCursor != null && currentCursor.isNotEmpty) {
-        url = '$_officialEndpoint?limit=50&cursor=$currentCursor';
-      }
-
-      http.Response? response;
-      int attempts = 0;
-
-      while (attempts < 3 && response == null) {
-        attempts++;
-        try {
-          debugPrint('[ExerciseDb V1] Consultando Endpoint (tentativa $attempts): $url');
-          final res = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
-
-          if (res.statusCode >= 200 && res.statusCode <= 299) {
-            response = res;
-          } else {
-            debugPrint('[ExerciseDb V1] Status HTTP ${res.statusCode} na tentativa $attempts');
-            if (attempts < 3) await Future.delayed(const Duration(milliseconds: 800));
-          }
-        } catch (e) {
-          debugPrint('[ExerciseDb V1] Falha de conexão na requisição $url (tentativa $attempts): $e');
-          if (attempts < 3) await Future.delayed(const Duration(milliseconds: 800));
+    try {
+      debugPrint('[ExerciseDb V1] Carregando banco de dados local assets/exercises_db.json');
+      final String jsonString = await rootBundle.loadString('assets/exercises_db.json');
+      final List<dynamic> data = jsonDecode(jsonString);
+      
+      debugPrint('[ExerciseDb V1] Total carregado do arquivo: ${data.length}');
+      
+      int processed = 0;
+      int totalGifsAvailable = 0;
+      
+      for (var item in data) {
+        processed++;
+        final mapped = _mapOfficialExerciseData(item as Map<String, dynamic>);
+        final String exId = mapped['exercise_db_id'] ?? '';
+        
+        if (mapped['gif_url'] != null && (mapped['gif_url'] as String).isNotEmpty) {
+          totalGifsAvailable++;
+        }
+        
+        if (!seenIds.contains(exId)) {
+          seenIds.add(exId);
+          allResults.add(mapped);
+        }
+        
+        // Simula progresso visual no app a cada 100 itens processados
+        if (onProgress != null && processed % 100 == 0) {
+          onProgress(processed, data.length);
+          await Future.delayed(const Duration(milliseconds: 10)); 
         }
       }
-
-      if (response == null) {
-        debugPrint('[ExerciseDb V1] Não foi possível obter a página após 3 tentativas. Finalizando busca com os dados já carregados.');
-        break;
+      
+      if (onProgress != null) {
+        onProgress(data.length, data.length);
       }
-
-      try {
-        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-
-        final bool isSuccess = jsonResponse['success'] == true;
-        final Map<String, dynamic>? meta = jsonResponse['meta'];
-        final List<dynamic>? data = jsonResponse['data'];
-
-        if (meta != null) {
-          apiTotal = meta['total'] ?? apiTotal;
-          hasNextPage = meta['hasNextPage'] == true;
-          currentCursor = meta['nextCursor']?.toString();
-
-          debugPrint('[ExerciseDb V1] Meta -> Total: $apiTotal | hasNextPage: $hasNextPage | nextCursor: $currentCursor');
-        } else {
-          hasNextPage = false;
-        }
-
-        if (isSuccess && data != null && data.isNotEmpty) {
-          debugPrint('[ExerciseDb V1] Exercícios recebidos nesta página: ${data.length}');
-
-          for (var item in data) {
-            totalReceived++;
-            final mapped = _mapOfficialExerciseData(item as Map<String, dynamic>);
-            final String exId = mapped['exercise_db_id'] ?? '';
-
-            if (mapped['gif_url'] != null && (mapped['gif_url'] as String).isNotEmpty) {
-              totalGifsAvailable++;
-            }
-
-            if (!seenIds.contains(exId)) {
-              seenIds.add(exId);
-              allResults.add(mapped);
-            }
-          }
-
-          if (onProgress != null) onProgress(allResults.length, apiTotal);
-        } else {
-          hasNextPage = false;
-        }
-      } catch (e) {
-        debugPrint('[ExerciseDb V1] Erro de parsing JSON: $e');
-        hasNextPage = false;
-      }
+      
+      debugPrint('Integração ExerciseDB concluída: ${allResults.length} de ${data.length} exercícios carregados e $totalGifsAvailable GIFs disponíveis.');
+      
+    } catch (e) {
+      debugPrint('[ExerciseDb V1] Erro ao carregar arquivo local: $e');
     }
-
-    debugPrint('Integração ExerciseDB concluída: ${allResults.length} de $apiTotal exercícios carregados e $totalGifsAvailable GIFs disponíveis.');
 
     return allResults;
   }
