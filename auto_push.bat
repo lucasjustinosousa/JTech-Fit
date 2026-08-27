@@ -9,7 +9,7 @@ set MSG=%~1
 if "%MSG%"=="" (
     set /p MSG="Digite a mensagem do commit (ou pressione ENTER para mensagem padrao): "
 )
-if "%MSG%"=="" set MSG="update: alteracoes no aplicativo JTech Fit"
+if "%MSG%"=="" set MSG=update: alteracoes no aplicativo JTech Fit
 
 echo 1. Adicionando arquivos modificados...
 git add .
