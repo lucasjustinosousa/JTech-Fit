@@ -1451,13 +1451,11 @@
           } catch (e) {}
           renderExercisesLibraryUI();
           } else {
-            hasNextPage = false;
+            console.warn('[ExerciseDB V1] JSON não é um array válido ou está vazio.');
           }
         } catch (err) {
           console.error('[ExerciseDB V1] Exceção durante parsing da resposta:', err);
-          hasNextPage = false;
         }
-      }
 
       if (fetchedItems.length > 0) {
         exerciseDbList = fetchedItems;
@@ -1465,7 +1463,7 @@
         try {
           localStorage.setItem('jtech_fit_exercisedb_cache', JSON.stringify(fetchedItems));
         } catch (e) {}
-        console.log(`Integração ExerciseDB concluída: ${fetchedItems.length} de ${apiTotal} exercícios carregados e ${gifsCount} GIFs disponíveis.`);
+        console.log(`Integração ExerciseDB concluída: ${fetchedItems.length} exercícios carregados e ${gifsCount} GIFs disponíveis.`);
       } else if (exerciseDbList.length === 0) {
         currentExerciseState = 'ERRO';
       }
