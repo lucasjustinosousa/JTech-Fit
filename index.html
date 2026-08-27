@@ -829,6 +829,59 @@
     </div>
   </div>
 
+  <!-- MODAL DE DETALHES DO EXERCÍCIO COM GIF AMPLIADO -->
+  <div id="modalExerciseDetail" class="modal-overlay" onclick="handleDetailModalOverlayClick(event)">
+    <div class="modal-card" style="max-width: 480px; padding: 20px; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+        <div style="flex: 1; padding-right: 10px;">
+          <span id="detailExBadge" class="badge badge-accent" style="margin-bottom: 6px; display: inline-block;">Peito</span>
+          <h3 id="detailExTitle" style="font-size: 18px; font-weight: 800; color: white; line-height: 1.3;">Supino Reto com Barra</h3>
+        </div>
+        <button onclick="closeExerciseDetailModal()" style="background: rgba(255,255,255,0.08); border: none; color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; flex-shrink: 0; transition: background 0.2s;">✕</button>
+      </div>
+
+      <!-- CONTAINER DO GIF AMPLIADO -->
+      <div id="detailGifContainer" style="width: 100%; height: 280px; background: #080a0f; border-radius: 14px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; border: 1px solid var(--divider); box-shadow: 0 10px 30px rgba(0,0,0,0.6); margin-bottom: 16px;">
+        <img id="detailGifImg" src="" alt="Exercício" style="width: 100%; height: 100%; object-fit: contain; display: block;" onerror="this.style.display='none'; document.getElementById('detailFallbackIcon').style.display='flex';">
+        <div id="detailFallbackIcon" style="display: none; flex-direction: column; align-items: center; justify-content: center; font-size: 54px;">
+          🏋️‍♂️
+        </div>
+      </div>
+
+      <!-- INFORMAÇÕES DE MÚSCULOS E EQUIPAMENTO -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+        <div style="background: var(--card-dark); border: 1px solid var(--divider); padding: 10px 12px; border-radius: 10px;">
+          <div style="font-size: 10px; color: var(--text-grey); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Equipamento</div>
+          <div id="detailExEquip" style="font-size: 13px; font-weight: 700; color: white; margin-top: 2px;">Barra</div>
+        </div>
+        <div style="background: var(--card-dark); border: 1px solid var(--divider); padding: 10px 12px; border-radius: 10px;">
+          <div style="font-size: 10px; color: var(--text-grey); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Músculo Alvo</div>
+          <div id="detailExTarget" style="font-size: 13px; font-weight: 700; color: var(--accent-cyan); margin-top: 2px;">Peitoral Maior</div>
+        </div>
+      </div>
+
+      <!-- INSTRUÇÕES E EXECUÇÃO -->
+      <div style="background: var(--card-dark); border: 1px solid var(--divider); padding: 14px; border-radius: 12px; margin-bottom: 16px;">
+        <div style="font-size: 12px; font-weight: 800; color: white; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+          <span>💡</span> Instruções de Execução
+        </div>
+        <div id="detailExInstructions" style="font-size: 12px; color: var(--text-grey); line-height: 1.6; white-space: pre-line;">
+          1. Deite-se no banco com os olhos alinhados à barra.
+        </div>
+      </div>
+
+      <!-- BOTÕES DE AÇÃO -->
+      <div style="display: flex; gap: 10px;">
+        <button id="detailBtnFav" onclick="toggleFavoriteFromDetail()" class="btn btn-outline" style="flex: 1; padding: 10px; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span id="detailFavIcon">⭐</span> Favoritar
+        </button>
+        <button onclick="closeExerciseDetailModal()" class="btn btn-success" style="flex: 1.2; padding: 10px; font-size: 13px;">
+          FECHAR
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Inicialização do Supabase JS Client
     const SUPABASE_URL = 'https://gplgywrvejefulsjpkax.supabase.co';
@@ -1846,26 +1899,31 @@
         const icon = getMuscleGroupIcon(ex.grupoMuscular);
 
         return `
-          <div class="card" style="border-left: 4px solid var(--accent-cyan); display: flex; gap: 12px; align-items: center; padding: 12px;">
-            <div style="width: 70px; height: 70px; background: #11141a; border-radius: 10px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider); position: relative;">
+          <div class="card exercise-item-card" onclick="openExerciseDetailModal('${ex.exerciseId}')" style="border-left: 4px solid var(--accent-cyan); display: flex; gap: 14px; align-items: center; padding: 12px 14px; cursor: pointer; transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(0,210,255,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
+            
+            <!-- Thumbnail GIF Clicável com Efeito Visual -->
+            <div style="width: 76px; height: 76px; background: #080a0f; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider); position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.4);">
               ${ex.gifUrl ? `<img src="${ex.gifUrl}" alt="${ex.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
-              <div style="display: ${ex.gifUrl ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 26px;">
+              <div style="display: ${ex.gifUrl ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 28px;">
                 ${icon}
               </div>
+              <div style="position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.75); border-radius: 4px; padding: 1px 5px; font-size: 8px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 0.5px;">GIF</div>
             </div>
 
+            <!-- Informações do Exercício -->
             <div style="flex: 1; min-width: 0;">
-              <h4 style="font-size: 14px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ex.name}</h4>
-              <p style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">
+              <h4 style="font-size: 14px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${ex.name}</h4>
+              <p style="font-size: 11px; color: var(--text-grey); margin: 0;">
                 <strong style="color: var(--accent-cyan);">${ex.grupoMuscular}</strong> • ${ex.equipamento}
               </p>
               <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
-                <button onclick="openExerciseDetailModal('${ex.exerciseId}')" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px;">🔍 Ver exercício</button>
-                <button onclick="toggleFavoriteExercise('${ex.exerciseId}', this)" style="background: none; border: none; font-size: 18px; cursor: pointer;">${isFav ? '⭐' : '☆'}</button>
+                <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; background: rgba(0,210,255,0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(0,210,255,0.2);">🔍 Ver GIF ampliado</span>
+                <button onclick="event.stopPropagation(); toggleFavoriteExercise('${ex.exerciseId}', this)" style="background: none; border: none; font-size: 18px; cursor: pointer; padding: 2px 6px;" title="Favoritar">${isFav ? '⭐' : '☆'}</button>
               </div>
             </div>
 
-            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleSelectForWorkout('${ex.exerciseId}', this)" style="width: 20px; height: 20px; accent-color: var(--success-green); cursor: pointer; flex-shrink: 0;" title="Selecionar para treino">
+            <!-- Seleção para treino -->
+            <input type="checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleSelectForWorkout('${ex.exerciseId}', this)" style="width: 22px; height: 22px; accent-color: var(--success-green); cursor: pointer; flex-shrink: 0;" title="Selecionar para treino">
           </div>
         `;
       }).join('');
@@ -1938,11 +1996,76 @@
       }
     }
 
+    let currentDetailExerciseId = null;
+
     function openExerciseDetailModal(exerciseId) {
       const ex = exercisesList.find(e => e.exerciseId === exerciseId || e.id === exerciseId);
       if (!ex) return;
 
-      alert(`🏋️‍♂️ ${ex.name}\n\n🎯 Músculo: ${ex.grupoMuscular} (${ex.musculoPrincipal})\n🏋️ Equipamento: ${ex.equipamento}\n\n💡 Instruções:\n${ex.instrucoes}`);
+      currentDetailExerciseId = ex.exerciseId;
+
+      document.getElementById('detailExBadge').innerText = ex.grupoMuscular || 'Geral';
+      document.getElementById('detailExTitle').innerText = ex.name || 'Exercício';
+      document.getElementById('detailExEquip').innerText = ex.equipamento || 'Livre / Aparelho';
+      document.getElementById('detailExTarget').innerText = ex.musculoPrincipal || ex.grupoMuscular || 'Geral';
+      document.getElementById('detailExInstructions').innerText = ex.instrucoes || 'Execute o movimento com controle e amplitude total.';
+
+      const img = document.getElementById('detailGifImg');
+      const fallback = document.getElementById('detailFallbackIcon');
+      
+      if (ex.gifUrl) {
+        img.src = ex.gifUrl;
+        img.style.display = 'block';
+        fallback.style.display = 'none';
+      } else {
+        img.src = '';
+        img.style.display = 'none';
+        fallback.style.display = 'flex';
+        fallback.innerText = getMuscleGroupIcon(ex.grupoMuscular);
+      }
+
+      updateDetailFavButton();
+      document.getElementById('modalExerciseDetail').classList.add('active');
+    }
+
+    function closeExerciseDetailModal() {
+      const modal = document.getElementById('modalExerciseDetail');
+      if (modal) modal.classList.remove('active');
+      const img = document.getElementById('detailGifImg');
+      if (img) img.src = '';
+    }
+
+    function handleDetailModalOverlayClick(e) {
+      if (e.target && e.target.id === 'modalExerciseDetail') {
+        closeExerciseDetailModal();
+      }
+    }
+
+    function toggleFavoriteFromDetail() {
+      if (!currentDetailExerciseId) return;
+      if (favoritesSet.has(currentDetailExerciseId)) {
+        favoritesSet.delete(currentDetailExerciseId);
+      } else {
+        favoritesSet.add(currentDetailExerciseId);
+      }
+      localStorage.setItem('jtech_fit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
+      updateDetailFavButton();
+      renderExercisesLibraryUI();
+    }
+
+    function updateDetailFavButton() {
+      const isFav = favoritesSet.has(currentDetailExerciseId);
+      const btn = document.getElementById('detailBtnFav');
+      if (!btn) return;
+      if (isFav) {
+        btn.style.color = 'gold';
+        btn.style.borderColor = 'gold';
+        btn.innerHTML = '<span id="detailFavIcon">★</span> Favorito';
+      } else {
+        btn.style.color = 'white';
+        btn.style.borderColor = 'var(--divider)';
+        btn.innerHTML = '<span id="detailFavIcon">☆</span> Favoritar';
+      }
     }
 
     // Carregar treinos criados anteriormente, histórico e biblioteca ao abrir a página

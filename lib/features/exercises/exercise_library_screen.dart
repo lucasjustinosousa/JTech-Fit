@@ -135,11 +135,32 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                         child: ExpansionTile(
                           iconColor: JTechTheme.accentCyan,
                           collapsedIconColor: JTechTheme.textGrey,
-                          leading: CircleAvatar(
-                            backgroundColor: JTechTheme.primaryBlue.withOpacity(0.2),
-                            child: Icon(
-                              _getGroupIcon(ex.grupoMuscular),
-                              color: JTechTheme.primaryBlue,
+                          leading: GestureDetector(
+                            onTap: () => _mostrarDemonstrativoMidia(context, ex),
+                            child: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: JTechTheme.dividerColor),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(9),
+                                child: (ex.gifUrl.isNotEmpty || ex.imagemUrl.isNotEmpty)
+                                    ? Image.network(
+                                        ex.gifUrl.isNotEmpty ? ex.gifUrl : ex.imagemUrl,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) => Icon(
+                                          _getGroupIcon(ex.grupoMuscular),
+                                          color: JTechTheme.primaryBlue,
+                                        ),
+                                      )
+                                    : Icon(
+                                        _getGroupIcon(ex.grupoMuscular),
+                                        color: JTechTheme.primaryBlue,
+                                      ),
+                              ),
                             ),
                           ),
                           title: Row(
@@ -206,9 +227,9 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                             onPressed: () {
                                               _mostrarDemonstrativoMidia(context, ex);
                                             },
-                                            style: OutlinedButton.styleFrom(side: const BorderSide(color: JTechTheme.primaryBlue)),
-                                            icon: const Icon(Icons.play_circle_fill, color: JTechTheme.primaryBlue),
-                                            label: const Text('VÍDEO DEMONSTRATIVO', style: TextStyle(color: JTechTheme.primaryBlue)),
+                                            style: OutlinedButton.styleFrom(side: const BorderSide(color: JTechTheme.accentCyan)),
+                                            icon: const Icon(Icons.zoom_in, color: JTechTheme.accentCyan),
+                                            label: const Text('VER GIF AMPLIADO', style: TextStyle(color: JTechTheme.accentCyan, fontWeight: FontWeight.bold)),
                                           ),
                                         ),
                                     ],
@@ -239,8 +260,11 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
   }
 
   void _mostrarDemonstrativoMidia(BuildContext context, Exercicio ex) {
+    final mediaUrl = ex.gifUrl.isNotEmpty ? ex.gifUrl : (ex.imagemUrl.isNotEmpty ? ex.imagemUrl : ex.videoUrl);
+
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: JTechTheme.cardDark,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => Padding(
@@ -249,37 +273,60 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAlignment.start,
           children: [
-            Text(ex.nome, style: const TextStyle(color: JTechTheme.textWhite, fontSize: 18, fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    ex.nome,
+                    style: const TextStyle(color: JTechTheme.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: JTechTheme.textGrey),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+              ],
+            ),
             const SizedBox(height: 8),
             Container(
-              height: 180,
+              height: 250,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.black,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: JTechTheme.dividerColor),
               ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  const Icon(Icons.play_circle_outline, color: JTechTheme.accentCyan, size: 64),
-                  Positioned(
-                    bottom: 12,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(8)),
-                      child: const Text('Demonstração 3D / Vídeo Licenciado', style: TextStyle(color: Colors.white, fontSize: 11)),
-                    ),
-                  ),
-                ],
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: mediaUrl.isNotEmpty
+                    ? Image.network(
+                        mediaUrl,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Center(
+                          child: Icon(_getGroupIcon(ex.grupoMuscular), color: JTechTheme.accentCyan, size: 64),
+                        ),
+                      )
+                    : Center(
+                        child: Icon(_getGroupIcon(ex.grupoMuscular), color: JTechTheme.accentCyan, size: 64),
+                      ),
               ),
             ),
             const SizedBox(height: 14),
-            Text(ex.instrucoes, style: const TextStyle(color: JTechTheme.textGrey, fontSize: 13)),
-            const SizedBox(height: 14),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('FECHAR'),
+            Text(
+              '${ex.grupoMuscular} • ${ex.equipamento}',
+              style: const TextStyle(color: JTechTheme.accentCyan, fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+            const SizedBox(height: 6),
+            Text(ex.instrucoes, style: const TextStyle(color: JTechTheme.textGrey, fontSize: 13, height: 1.4)),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: ElevatedButton.styleFrom(backgroundColor: JTechTheme.primaryBlue),
+                child: const Text('FECHAR'),
+              ),
             ),
           ],
         ),
