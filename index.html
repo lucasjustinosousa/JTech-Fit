@@ -1385,41 +1385,51 @@
     async function syncOfficialApiInBackground() {
       let cursor = null;
       let hasNextPage = true;
-      const fetchedItems = [];
-      const seenIds = new Set();
+      const fetchedItems = exerciseDbList.length > 0 ? [...exerciseDbList] : [];
+      const seenIds = new Set(fetchedItems.map(item => item.exerciseId || item.id));
 
       let apiTotal = 1500;
       let gifsCount = 0;
       let totalReceived = 0;
 
       while (hasNextPage) {
-        let endpointUrl = OFFICIAL_EXERCISED_ENDPOINT;
+        let endpointUrl = `${OFFICIAL_EXERCISED_ENDPOINT}?limit=50`;
         if (cursor) {
-          endpointUrl = `${OFFICIAL_EXERCISED_ENDPOINT}?cursor=${encodeURIComponent(cursor)}`;
+          endpointUrl = `${OFFICIAL_EXERCISED_ENDPOINT}?limit=50&cursor=${encodeURIComponent(cursor)}`;
+        }
+
+        let response = null;
+        let attempts = 0;
+
+        while (attempts < 3 && !response) {
+          attempts++;
+          try {
+            console.log(`[ExerciseDB V1] Consultando (tentativa ${attempts}):`, endpointUrl);
+            let res = await fetch(endpointUrl).catch(() => null);
+
+            if (!res || !res.ok) {
+              let proxyUrl = `${PROXY_EXERCISED_ENDPOINT}?limit=50`;
+              if (cursor) proxyUrl = `${PROXY_EXERCISED_ENDPOINT}?limit=50&cursor=${encodeURIComponent(cursor)}`;
+              console.log(`[ExerciseDB V1] Fallback Proxy Vercel (tentativa ${attempts}):`, proxyUrl);
+              res = await fetch(proxyUrl).catch(() => null);
+            }
+
+            if (res && res.ok) {
+              response = res;
+            } else {
+              if (attempts < 3) await new Promise(r => setTimeout(r, 600));
+            }
+          } catch (e) {
+            if (attempts < 3) await new Promise(r => setTimeout(r, 600));
+          }
+        }
+
+        if (!response) {
+          console.warn('[ExerciseDB V1] Falha ao obter página após 3 tentativas. Mantendo itens já carregados.');
+          break;
         }
 
         try {
-          console.log('[ExerciseDB V1] Consultando Endpoint:', endpointUrl);
-          let response = await fetch(endpointUrl).catch(() => null);
-
-          // Fallback para rota proxy Vercel caso haja bloqueio CORS no navegador
-          if (!response || !response.ok) {
-            let proxyUrl = PROXY_EXERCISED_ENDPOINT;
-            if (cursor) proxyUrl = `${PROXY_EXERCISED_ENDPOINT}?cursor=${encodeURIComponent(cursor)}`;
-            console.log('[ExerciseDB V1] Ativando fallback Proxy Vercel:', proxyUrl);
-            response = await fetch(proxyUrl).catch(() => null);
-          }
-
-          if (!response || !response.ok) {
-            lastErrorCode = response ? response.status : 500;
-            console.error('[ExerciseDB V1] Erro HTTP:', lastErrorCode);
-            if (fetchedItems.length === 0 && exerciseDbList.length === 0) {
-              currentExerciseState = 'ERRO';
-              renderExercisesLibraryUI();
-            }
-            return;
-          }
-
           const json = await response.json();
           console.log('[ExerciseDB V1] HTTP Status:', response.status);
           console.log('[ExerciseDB V1] Meta:', json.meta);
@@ -1465,7 +1475,6 @@
                   targetMuscles: item.targetMuscles || [rawTarget],
                   secondaryMuscles: item.secondaryMuscles || [],
                   instructions: item.instructions || [rawInst],
-                  // Formato interno traduzido
                   grupoMuscular: translateTerm(rawBodyPart, BODYPART_MAP),
                   equipamento: translateTerm(rawEquip, EQUIPMENT_MAP),
                   musculoPrincipal: translateTerm(rawTarget, TARGET_MAP),
@@ -1474,11 +1483,19 @@
                 });
               }
             }
+
+            // Atualização progressiva da UI e LocalStorage
+            exerciseDbList = [...fetchedItems];
+            currentExerciseState = 'SUCESSO';
+            try {
+              localStorage.setItem('jtech_fit_exercisedb_cache', JSON.stringify(fetchedItems));
+            } catch (e) {}
+            renderExercisesLibraryUI();
           } else {
             hasNextPage = false;
           }
         } catch (err) {
-          console.error('[ExerciseDB V1] Exceção durante requisição:', err);
+          console.error('[ExerciseDB V1] Exceção durante parsing da resposta:', err);
           hasNextPage = false;
         }
       }
@@ -1489,7 +1506,6 @@
         try {
           localStorage.setItem('jtech_fit_exercisedb_cache', JSON.stringify(fetchedItems));
         } catch (e) {}
-
         console.log(`Integração ExerciseDB concluída: ${fetchedItems.length} de ${apiTotal} exercícios carregados e ${gifsCount} GIFs disponíveis.`);
       } else if (exerciseDbList.length === 0) {
         currentExerciseState = 'ERRO';

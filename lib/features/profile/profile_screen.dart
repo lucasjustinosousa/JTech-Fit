@@ -181,9 +181,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     trailing: TextButton(
                       onPressed: () async {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Sincronizando todas as páginas da ExerciseDB...')),
+                          const SnackBar(content: Text('Sincronizando todos os 1.500+ exercícios da ExerciseDB...')),
                         );
-                        await repo.carregarDados();
+                        await repo.forçarAtualizacaoExerciseDb();
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Biblioteca atualizada com sucesso! Total: ${repo.exercicios.length} exercícios.')),

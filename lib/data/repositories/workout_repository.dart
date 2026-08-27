@@ -46,10 +46,10 @@ class WorkoutRepository extends ChangeNotifier {
       // 1. Carregar exercicios salvos localmente no SQLite
       _exercicios = await ExerciseLocalDatabase.instance.getLocalExercises();
       
-      // Se banco local estiver vazio, carregar da ExerciseDB/Mirror
+      // Se banco local estiver vazio, carregar da ExerciseDB V1
       if (_exercicios.isEmpty) {
         final dbService = ExerciseDbService();
-        final fetched = await dbService.fetchExercises(limit: 150);
+        final fetched = await dbService.fetchAllExercisesPaginated();
         if (fetched.isNotEmpty) {
           await ExerciseLocalDatabase.instance.saveExercisesBatch(fetched);
           _exercicios = await ExerciseLocalDatabase.instance.getLocalExercises();
@@ -73,6 +73,25 @@ class WorkoutRepository extends ChangeNotifier {
       debugPrint('Erro ao carregar dados locais: $e');
     }
     notifyListeners();
+  }
+
+  Future<void> forçarAtualizacaoExerciseDb() async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final dbService = ExerciseDbService();
+      final fetched = await dbService.fetchAllExercisesPaginated();
+      if (fetched.isNotEmpty) {
+        await ExerciseLocalDatabase.instance.saveExercisesBatch(fetched);
+        _exercicios = await ExerciseLocalDatabase.instance.getLocalExercises();
+      }
+    } catch (e) {
+      debugPrint('Erro ao forçar atualização da ExerciseDB: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> _seedDefaultTreinos() async {

@@ -7,6 +7,18 @@ class ExerciseDbService {
   static const String _officialEndpoint = 'https://oss.exercisedb.dev/api/v1/exercises';
   static const String _mediaBaseUrl = 'https://static.exercisedb.dev/media/';
 
+  /// Método de compatibilidade para buscar exercícios com limite opcional
+  Future<List<Map<String, dynamic>>> fetchExercises({
+    int limit = 1500,
+    Function(int current, int total)? onProgress,
+  }) async {
+    final all = await fetchAllExercisesPaginated(onProgress: onProgress);
+    if (limit > 0 && all.length > limit) {
+      return all.sublist(0, limit);
+    }
+    return all;
+  }
+
   /// Realiza a busca paginada por cursor da ExerciseDB V1 oficial (sem RapidAPI)
   Future<List<Map<String, dynamic>>> fetchAllExercisesPaginated({
     Function(int current, int total)? onProgress,
@@ -21,62 +33,78 @@ class ExerciseDbService {
     int totalGifsAvailable = 0;
 
     while (hasNextPage) {
-      String url = _officialEndpoint;
+      String url = '$_officialEndpoint?limit=50';
       if (currentCursor != null && currentCursor.isNotEmpty) {
-        url = '$_officialEndpoint?cursor=$currentCursor';
+        url = '$_officialEndpoint?limit=50&cursor=$currentCursor';
+      }
+
+      http.Response? response;
+      int attempts = 0;
+
+      while (attempts < 3 && response == null) {
+        attempts++;
+        try {
+          debugPrint('[ExerciseDb V1] Consultando Endpoint (tentativa $attempts): $url');
+          final res = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
+
+          if (res.statusCode >= 200 && res.statusCode <= 299) {
+            response = res;
+          } else {
+            debugPrint('[ExerciseDb V1] Status HTTP ${res.statusCode} na tentativa $attempts');
+            if (attempts < 3) await Future.delayed(const Duration(milliseconds: 800));
+          }
+        } catch (e) {
+          debugPrint('[ExerciseDb V1] Falha de conexão na requisição $url (tentativa $attempts): $e');
+          if (attempts < 3) await Future.delayed(const Duration(milliseconds: 800));
+        }
+      }
+
+      if (response == null) {
+        debugPrint('[ExerciseDb V1] Não foi possível obter a página após 3 tentativas. Finalizando busca com os dados já carregados.');
+        break;
       }
 
       try {
-        debugPrint('[ExerciseDb V1] Consultando Endpoint Oficial: $url');
-        final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 12));
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
-        debugPrint('[ExerciseDb V1] Status HTTP: ${response.statusCode}');
+        final bool isSuccess = jsonResponse['success'] == true;
+        final Map<String, dynamic>? meta = jsonResponse['meta'];
+        final List<dynamic>? data = jsonResponse['data'];
 
-        if (response.statusCode >= 200 && response.statusCode <= 299) {
-          final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        if (meta != null) {
+          apiTotal = meta['total'] ?? apiTotal;
+          hasNextPage = meta['hasNextPage'] == true;
+          currentCursor = meta['nextCursor']?.toString();
 
-          final bool isSuccess = jsonResponse['success'] == true;
-          final Map<String, dynamic>? meta = jsonResponse['meta'];
-          final List<dynamic>? data = jsonResponse['data'];
+          debugPrint('[ExerciseDb V1] Meta -> Total: $apiTotal | hasNextPage: $hasNextPage | nextCursor: $currentCursor');
+        } else {
+          hasNextPage = false;
+        }
 
-          if (meta != null) {
-            apiTotal = meta['total'] ?? apiTotal;
-            hasNextPage = meta['hasNextPage'] == true;
-            currentCursor = meta['nextCursor']?.toString();
+        if (isSuccess && data != null && data.isNotEmpty) {
+          debugPrint('[ExerciseDb V1] Exercícios recebidos nesta página: ${data.length}');
 
-            debugPrint('[ExerciseDb V1] Meta -> Total: $apiTotal | hasNextPage: $hasNextPage | nextCursor: $currentCursor');
-          } else {
-            hasNextPage = false;
-          }
+          for (var item in data) {
+            totalReceived++;
+            final mapped = _mapOfficialExerciseData(item as Map<String, dynamic>);
+            final String exId = mapped['exercise_db_id'] ?? '';
 
-          if (isSuccess && data != null && data.isNotEmpty) {
-            debugPrint('[ExerciseDb V1] Exercícios recebidos nesta página: ${data.length}');
-
-            for (var item in data) {
-              totalReceived++;
-              final mapped = _mapOfficialExerciseData(item as Map<String, dynamic>);
-              final String exId = mapped['exercise_db_id'] ?? '';
-
-              if (mapped['gif_url'] != null && (mapped['gif_url'] as String).isNotEmpty) {
-                totalGifsAvailable++;
-              }
-
-              if (!seenIds.contains(exId)) {
-                seenIds.add(exId);
-                allResults.add(mapped);
-              }
+            if (mapped['gif_url'] != null && (mapped['gif_url'] as String).isNotEmpty) {
+              totalGifsAvailable++;
             }
 
-            if (onProgress != null) onProgress(allResults.length, apiTotal);
-          } else {
-            hasNextPage = false;
+            if (!seenIds.contains(exId)) {
+              seenIds.add(exId);
+              allResults.add(mapped);
+            }
           }
+
+          if (onProgress != null) onProgress(allResults.length, apiTotal);
         } else {
-          debugPrint('[ExerciseDb V1] Erro HTTP ${response.statusCode} na chamada $url');
           hasNextPage = false;
         }
       } catch (e) {
-        debugPrint('[ExerciseDb V1] Falha de conexão na requisição $url: $e');
+        debugPrint('[ExerciseDb V1] Erro de parsing JSON: $e');
         hasNextPage = false;
       }
     }
