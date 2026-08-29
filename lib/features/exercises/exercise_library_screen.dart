@@ -216,10 +216,83 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                           ),
                           children: [
                             Padding(
-                              padding: const EdgeInsets.all(16),
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  // VISUALIZADOR DE GIF EMBUTIDO NA MESMA TELA
+                                  GestureDetector(
+                                    onTap: () => _mostrarGifExpandido(context, ex),
+                                    child: Container(
+                                      height: 220,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF060709),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4), width: 1.2),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.6),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(15),
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            ((ex.gifUrl != null && ex.gifUrl!.isNotEmpty) || (ex.imagemUrl != null && ex.imagemUrl!.isNotEmpty))
+                                                ? Image.network(
+                                                    (ex.gifUrl != null && ex.gifUrl!.isNotEmpty) ? ex.gifUrl! : ex.imagemUrl!,
+                                                    fit: BoxFit.contain,
+                                                    width: double.infinity,
+                                                    height: 220,
+                                                    errorBuilder: (context, error, stackTrace) => Center(
+                                                      child: Column(
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          Icon(_getGroupIcon(ex.grupoMuscular), color: JTechTheme.accentCyan, size: 54),
+                                                          const SizedBox(height: 8),
+                                                          const Text('Demonstração indisponível', style: TextStyle(color: JTechTheme.textGrey, fontSize: 11)),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Center(
+                                                    child: Icon(_getGroupIcon(ex.grupoMuscular), color: JTechTheme.accentCyan, size: 54),
+                                                  ),
+
+                                            // Badge no GIF
+                                            Positioned(
+                                              top: 8,
+                                              right: 8,
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black.withOpacity(0.8),
+                                                  borderRadius: BorderRadius.circular(6),
+                                                  border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.6)),
+                                                ),
+                                                child: const Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Icon(Icons.zoom_in, color: JTechTheme.accentCyan, size: 12),
+                                                    SizedBox(width: 4),
+                                                    Text('TOQUE P/ ZOOM 3D', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 9, fontWeight: FontWeight.bold)),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 14),
+
                                   if (ex.musculosAuxiliares.isNotEmpty) ...[
                                     Text('Músculos auxiliares: ${ex.musculosAuxiliares}',
                                         style: const TextStyle(color: JTechTheme.accentCyan, fontSize: 12)),

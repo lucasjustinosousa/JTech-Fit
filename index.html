@@ -1943,10 +1943,61 @@
         return;
       }
 
+    const expandedCardsSet = new Set();
+
+    function toggleCardExpansion(id, event) {
+      if (event) event.stopPropagation();
+      if (expandedCardsSet.has(id)) {
+        expandedCardsSet.delete(id);
+      } else {
+        expandedCardsSet.add(id);
+      }
+      renderExercisesLibraryUI();
+    }
+
+    function renderExercisesLibraryUI() {
+      const container = document.getElementById('exerciseListContainer');
+      if (!container) return;
+
+      const searchInput = document.getElementById('exerciseSearchInput');
+      const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+
+      const filtered = exercisesList.filter(ex => {
+        const matchesQuery = !query ||
+          ex.name.toLowerCase().includes(query) ||
+          ex.grupoMuscular.toLowerCase().includes(query) ||
+          ex.equipamento.toLowerCase().includes(query) ||
+          ex.musculoPrincipal.toLowerCase().includes(query);
+
+        const matchesGroup = currentSelectedGroup === 'Todos' || ex.grupoMuscular.toLowerCase() === currentSelectedGroup.toLowerCase();
+        const matchesFav = !onlyFavoritesFilter || favoritesSet.has(ex.exerciseId);
+
+        return matchesQuery && matchesGroup && matchesFav;
+      });
+
+      // Atualizar contador no topo
+      const statsBadge = document.getElementById('exerciseStatsBadge');
+      if (statsBadge) {
+        statsBadge.innerText = `${filtered.length} de ${exercisesList.length} exercícios`;
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 35px 16px; color: var(--text-grey);">
+            <div style="font-size: 36px; margin-bottom: 8px;">🔍</div>
+            <div style="font-weight: 700; font-size: 15px; color: white;">Nenhum exercício encontrado</div>
+            <div style="font-size: 12px; margin-top: 4px; margin-bottom: 14px;">Tente limpar a pesquisa ou os filtros de grupo muscular.</div>
+            <button onclick="resetExerciseFilters()" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 12px;">Limpar Filtros</button>
+          </div>
+        `;
+        return;
+      }
+
       container.innerHTML = filtered.map(ex => {
         const id = ex.exerciseId || ex.id || '';
         const isFav = favoritesSet.has(id);
         const isChecked = selectedForWorkoutSet.has(id);
+        const isExpanded = expandedCardsSet.has(id);
         const icon = getMuscleGroupIcon(ex.grupoMuscular);
         const gif = ex.gifUrl || ex.gif_url || ex.gif || '';
         const safeName = (ex.name || ex.nome || 'Exercício').replace(/'/g, "\\'");
@@ -1956,32 +2007,136 @@
         const safeSubtitle = `${safeGroup} • ${safeEquip}`;
 
         return `
-          <div class="card exercise-item-card" onclick="openExerciseDetailModal('${id}')" style="border-left: 4px solid var(--accent-cyan); display: flex; gap: 14px; align-items: center; padding: 12px 14px; cursor: pointer; transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(0,210,255,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
+          <div class="card exercise-item-card" style="border-left: 4px solid var(--accent-cyan); padding: 14px; margin-bottom: 12px; transition: all 0.25s ease;">
             
-            <!-- Thumbnail GIF Clicável com Efeito Visual -->
-            <div onclick="event.stopPropagation(); openOnlyGifModal('${gif}', '${safeName}', '${safeSubtitle}')" style="width: 76px; height: 76px; background: #080a0f; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider); position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer;" title="Clique para abrir o GIF de ${ex.name}">
-              ${gif ? `<img src="${gif}" alt="${ex.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
-              <div style="display: ${gif ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 28px;">
-                ${icon}
+            <!-- Linha Principal do Card (Clicável para expandir) -->
+            <div onclick="toggleCardExpansion('${id}', event)" style="display: flex; gap: 14px; align-items: center; cursor: pointer;">
+              
+              <!-- Thumbnail GIF Clicável com Efeito Visual -->
+              <div onclick="event.stopPropagation(); openOnlyGifModal('${gif}', '${safeName}', '${safeSubtitle}')" style="width: 64px; height: 64px; background: #080a0f; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider); position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer;" title="Clique para abrir Pop-up do GIF">
+                ${gif ? `<img src="${gif}" alt="${ex.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                <div style="display: ${gif ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 24px;">
+                  ${icon}
+                </div>
+                <div style="position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.85); border-radius: 4px; padding: 1px 4px; font-size: 8px; font-weight: 800; color: var(--accent-cyan);">GIF 🔍</div>
               </div>
-              <div style="position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.75); border-radius: 4px; padding: 1px 5px; font-size: 8px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 0.5px;">GIF</div>
+
+              <!-- Informações do Exercício -->
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="font-size: 14px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${ex.name}</h4>
+                <p style="font-size: 11px; color: var(--text-grey); margin: 0;">
+                  <strong style="color: var(--accent-cyan);">${ex.grupoMuscular}</strong> • ${ex.equipamento}
+                </p>
+                <div style="display: flex; gap: 8px; margin-top: 6px; align-items: center;">
+                  <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                    ${isExpanded ? '▲ Recolher' : '▼ Expandir GIF'}
+                  </span>
+                  <button onclick="event.stopPropagation(); toggleFavoriteExercise('${id}', this)" style="background: none; border: none; font-size: 17px; cursor: pointer; padding: 0 4px;" title="Favoritar">${isFav ? '⭐' : '☆'}</button>
+                </div>
+              </div>
+
+              <!-- Seleção para treino -->
+              <input type="checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleSelectForWorkout('${id}', this)" style="width: 22px; height: 22px; accent-color: var(--success-green); cursor: pointer; flex-shrink: 0;" title="Selecionar para treino">
             </div>
 
-            <!-- Informações do Exercício -->
-            <div style="flex: 1; min-width: 0;">
-              <h4 style="font-size: 14px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${ex.name}</h4>
-              <p style="font-size: 11px; color: var(--text-grey); margin: 0;">
-                <strong style="color: var(--accent-cyan);">${ex.grupoMuscular}</strong> • ${ex.equipamento}
-              </p>
-              <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
-                <button onclick="event.stopPropagation(); openOnlyGifModal('${gif}', '${safeName}', '${safeSubtitle}')" style="font-size: 11px; color: var(--accent-cyan); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; background: rgba(0,210,255,0.1); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(0,210,255,0.3); cursor: pointer;" title="Abrir visualização do GIF">🔍 Ver GIF ampliado</button>
-                <button onclick="event.stopPropagation(); toggleFavoriteExercise('${id}', this)" style="background: none; border: none; font-size: 18px; cursor: pointer; padding: 2px 6px;" title="Favoritar">${isFav ? '⭐' : '☆'}</button>
-              </div>
-            </div>
+            <!-- GAVETA EXPANSÍVEL DO GIF NA MESMA TELA -->
+            ${isExpanded ? `
+              <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--divider); animation: fadeIn 0.2s ease-in-out;">
+                
+                <!-- Visor Ampliado do GIF -->
+                <div style="width: 100%; height: 280px; background: #000; border-radius: 14px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1.5px solid rgba(0,210,255,0.4); position: relative; box-shadow: 0 6px 20px rgba(0,0,0,0.8);">
+                  ${gif ? `
+                    <img src="${gif}" alt="${ex.name}" style="width: 100%; height: 100%; object-fit: contain; display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  ` : ''}
+                  <div style="display: ${gif ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: var(--text-grey);">
+                    <div style="font-size: 40px; margin-bottom: 6px;">🏋️‍♂️</div>
+                    <div style="font-size: 12px; font-weight: 700; color: white;">Demonstração em GIF indisponível</div>
+                  </div>
 
-            <!-- Seleção para treino -->
-            <input type="checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleSelectForWorkout('${id}', this)" style="width: 22px; height: 22px; accent-color: var(--success-green); cursor: pointer; flex-shrink: 0;" title="Selecionar para treino">
+                  <div style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.8); border: 1px solid rgba(0,210,255,0.5); border-radius: 6px; padding: 2px 7px; font-size: 9px; font-weight: 800; color: var(--accent-cyan);">
+                    ● 3D LOOP
+                  </div>
+                </div>
+
+                <!-- Botões de Ação Dentro do Card Expandido -->
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                  <button onclick="openOnlyGifModal('${gif}', '${safeName}', '${safeSubtitle}')" class="btn btn-outline" style="flex: 1; padding: 8px; font-size: 12px; border-color: var(--accent-cyan); color: var(--accent-cyan);">
+                    🔍 Pop-up com Zoom 3D
+                  </button>
+                  <button onclick="openExerciseDetailModal('${id}')" class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 12px;">
+                    📖 Instruções Completas
+                  </button>
+                </div>
+              </div>
+            ` : ''}
+
           </div>
+        `;
+      }).join('');
+    }
+
+    function getMuscleGroupIcon(grupo) {
+      const g = (grupo || '').toLowerCase();
+      if (g.includes('peito')) return '🏋️‍♂️';
+      if (g.includes('costa')) return '🚣';
+      if (g.includes('perna') || g.includes('coxa') || g.includes('panturrilha')) return '🦵';
+      if (g.includes('ombro') || g.includes('deltoide')) return '🛡️';
+      if (g.includes('bíceps') || g.includes('biceps')) return '💪';
+      if (g.includes('tríceps') || g.includes('triceps')) return '⚡';
+      if (g.includes('abd') || g.includes('core')) return '🧘';
+      return '🏋️';
+    }
+
+    function resetExerciseFilters() {
+      const searchInput = document.getElementById('exerciseSearchInput');
+      if (searchInput) searchInput.value = '';
+      currentSelectedGroup = 'Todos';
+      onlyFavoritesFilter = false;
+      document.querySelectorAll('#exerciseGroupChips .chip').forEach(c => c.classList.remove('active'));
+      const firstChip = document.querySelector('#exerciseGroupChips .chip');
+      if (firstChip) firstChip.classList.add('active');
+      renderExercisesLibraryUI();
+    }
+
+    function filterExerciseGroup(groupName, chipElement) {
+      currentSelectedGroup = groupName;
+      document.querySelectorAll('#exerciseGroupChips .chip').forEach(c => c.classList.remove('active'));
+      if (chipElement) chipElement.classList.add('active');
+      renderExercisesLibraryUI();
+    }
+
+    function filterExercisesLibrary() {
+      renderExercisesLibraryUI();
+    }
+
+    function toggleOnlyFavoritesFilter() {
+      onlyFavoritesFilter = !onlyFavoritesFilter;
+      const btn = document.getElementById('btnFavFilter');
+      if (onlyFavoritesFilter) {
+        btn.style.color = 'gold';
+        btn.style.borderColor = 'gold';
+        btn.innerText = '★ Exibindo Favoritos';
+      } else {
+        btn.style.color = 'var(--text-grey)';
+        btn.style.borderColor = 'var(--divider)';
+        btn.innerText = '⭐ Apenas Favoritos';
+      }
+      renderExercisesLibraryUI();
+    }
+
+    function toggleFavoriteExercise(id, btnElement) {
+      if (favoritesSet.has(id)) {
+        favoritesSet.delete(id);
+      } else {
+        favoritesSet.add(id);
+      }
+      localStorage.setItem('jtech_fit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
+      renderExercisesLibraryUI();
+    }
+
+    function toggleSelectForWorkout(id, checkboxEl) {
+      if (checkboxEl.checked) {
+        selectedForWorkoutSet.add(id);
         `;
       }).join('');
     }
