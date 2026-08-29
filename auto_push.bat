@@ -1,25 +1,34 @@
 @echo off
+chcp 65001 > nul
 title JTech Fit - Auto Commit ^& Deploy Vercel
 echo ========================================================
-echo   JTech Fit - Sincronizacao automatica Git ^& Vercel
+echo   JTech Fit - Sincronizacao Automatica Git ^& Vercel
 echo ========================================================
 echo.
 
 set MSG=%~1
-if "%MSG%"=="" (
-    set /p MSG="Digite a mensagem do commit (ou pressione ENTER para mensagem padrao): "
-)
-if "%MSG%"=="" set MSG=update: alteracoes no aplicativo JTech Fit
+if "%MSG%"=="" set MSG=feat: pop-up expansivo de GIF com zoom 3D e atualizacoes no app
 
-echo 1. Adicionando arquivos modificados...
+echo [1/3] Adicionando arquivos modificados (git add)...
 git add .
 
-echo 2. Criando commit...
+echo [2/3] Criando commit local (git commit)...
 git commit -m "%MSG%"
 
-echo 3. Enviando para o GitHub e Vercel (Auto Deploy)...
+echo [3/3] Enviando para o GitHub e Vercel (git push)...
 git push origin main
 
-echo ========================================================
-echo   SUCESSO! Alteracoes enviadas para o GitHub e Vercel.
-echo ========================================================
+echo.
+if %ERRORLEVEL% EQU 0 (
+    echo ========================================================
+    echo   [SUCESSO] Alterações enviadas para o GitHub e Vercel!
+    echo ========================================================
+) else (
+    echo ========================================================
+    echo   [ATENÇÃO] Se for o primeiro envio, confirme o login
+    echo   na janela do navegador / GitHub.
+    echo ========================================================
+)
+echo.
+echo Pressione qualquer tecla para fechar esta janela...
+pause > nul
