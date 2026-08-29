@@ -932,7 +932,17 @@
     let activeWorkoutSeconds = 0;
 
     function switchTab(screenId, navElement) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove        renderExercisesLibraryUI();
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(screenId);
+      if (target) target.classList.add('active');
+
+      if (navElement) {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        navElement.classList.add('active');
+      }
+
+      if (screenId === 'screenExercises') {
+        renderExercisesLibraryUI();
       } else if (screenId === 'screenWorkouts') {
         renderAllWorkoutsUI();
       }
