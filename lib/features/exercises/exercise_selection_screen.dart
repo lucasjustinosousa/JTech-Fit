@@ -4,6 +4,7 @@ import '../../core/theme/jtech_theme.dart';
 import '../../data/repositories/workout_repository.dart';
 import '../../data/models/models.dart';
 import 'exercise_details_screen.dart';
+import 'exercise_gif_dialog.dart';
 
 class ExerciseSelectionScreen extends StatefulWidget {
   const ExerciseSelectionScreen({super.key});
@@ -209,21 +210,34 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                             '${ex.grupoMuscular} • Equipamento: ${ex.equipamento}',
                             style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11),
                           ),
-                          secondary: IconButton(
-                            icon: const Icon(Icons.info_outline, color: JTechTheme.accentCyan),
-                            onPressed: () async {
-                              final res = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => ExerciseDetailsScreen(exercicio: ex, modoSelecao: true),
-                                ),
-                              );
-                              if (res == 'select') {
-                                setState(() => _selectedExerciseIds.add(ex.id));
-                              } else if (res == 'toggle_fav') {
-                                repo.toggleFavorito(ex.id);
-                              }
-                            },
+                          secondary: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.zoom_in, color: JTechTheme.accentCyan, size: 22),
+                                tooltip: 'Expandir GIF',
+                                onPressed: () {
+                                  ExerciseGifDialog.show(context, exercicio: ex, modoSelecao: false);
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.info_outline, color: JTechTheme.textGrey, size: 20),
+                                tooltip: 'Detalhes completos',
+                                onPressed: () async {
+                                  final res = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ExerciseDetailsScreen(exercicio: ex, modoSelecao: true),
+                                    ),
+                                  );
+                                  if (res == 'select') {
+                                    setState(() => _selectedExerciseIds.add(ex.id));
+                                  } else if (res == 'toggle_fav') {
+                                    repo.toggleFavorito(ex.id);
+                                  }
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       );

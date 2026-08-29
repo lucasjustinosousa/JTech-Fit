@@ -4,6 +4,7 @@ import '../../core/theme/jtech_theme.dart';
 import '../../data/repositories/workout_repository.dart';
 import '../../data/models/models.dart';
 import 'custom_exercise_dialog.dart';
+import 'exercise_gif_dialog.dart';
 
 class ExerciseLibraryScreen extends StatefulWidget {
   final bool modoSelecao; // se chamado para selecionar em um treino
@@ -136,31 +137,55 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                           iconColor: JTechTheme.accentCyan,
                           collapsedIconColor: JTechTheme.textGrey,
                           leading: GestureDetector(
-                            onTap: () => _mostrarDemonstrativoMidia(context, ex),
-                            child: Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: JTechTheme.dividerColor),
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(9),
-                                child: (ex.gifUrl.isNotEmpty || ex.imagemUrl.isNotEmpty)
-                                    ? Image.network(
-                                        ex.gifUrl.isNotEmpty ? ex.gifUrl : ex.imagemUrl,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) => Icon(
-                                          _getGroupIcon(ex.grupoMuscular),
-                                          color: JTechTheme.primaryBlue,
-                                        ),
-                                      )
-                                    : Icon(
-                                        _getGroupIcon(ex.grupoMuscular),
-                                        color: JTechTheme.primaryBlue,
+                            onTap: () => _mostrarGifExpandido(context, ex),
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width: 54,
+                                  height: 54,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.5),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
                                       ),
-                              ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(11),
+                                    child: ((ex.gifUrl != null && ex.gifUrl!.isNotEmpty) || (ex.imagemUrl != null && ex.imagemUrl!.isNotEmpty))
+                                        ? Image.network(
+                                            (ex.gifUrl != null && ex.gifUrl!.isNotEmpty) ? ex.gifUrl! : ex.imagemUrl!,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (context, error, stackTrace) => Icon(
+                                              _getGroupIcon(ex.grupoMuscular),
+                                              color: JTechTheme.primaryBlue,
+                                            ),
+                                          )
+                                        : Icon(
+                                            _getGroupIcon(ex.grupoMuscular),
+                                            color: JTechTheme.primaryBlue,
+                                          ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 2,
+                                  right: 2,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.8),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.6), width: 0.5),
+                                    ),
+                                    child: const Icon(Icons.zoom_in, color: JTechTheme.accentCyan, size: 10),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           title: Row(
@@ -193,7 +218,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                             Padding(
                               padding: const EdgeInsets.all(16),
                               child: Column(
-                                crossAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   if (ex.musculosAuxiliares.isNotEmpty) ...[
                                     Text('Músculos auxiliares: ${ex.musculosAuxiliares}',
@@ -212,26 +237,48 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                   const SizedBox(height: 14),
                                   Row(
                                     children: [
-                                      if (widget.modoSelecao)
-                                        Expanded(
-                                          child: ElevatedButton.icon(
-                                            onPressed: () => Navigator.pop(context, ex),
-                                            style: ElevatedButton.styleFrom(backgroundColor: JTechTheme.successGreen),
-                                            icon: const Icon(Icons.add_circle_outline),
-                                            label: const Text('ADICIONAR AO TREINO'),
-                                          ),
-                                        )
-                                      else
+                                      if (widget.modoSelecao) ...[
                                         Expanded(
                                           child: OutlinedButton.icon(
-                                            onPressed: () {
-                                              _mostrarDemonstrativoMidia(context, ex);
-                                            },
-                                            style: OutlinedButton.styleFrom(side: const BorderSide(color: JTechTheme.accentCyan)),
-                                            icon: const Icon(Icons.zoom_in, color: JTechTheme.accentCyan),
-                                            label: const Text('VER GIF AMPLIADO', style: TextStyle(color: JTechTheme.accentCyan, fontWeight: FontWeight.bold)),
+                                            onPressed: () => _mostrarGifExpandido(context, ex),
+                                            style: OutlinedButton.styleFrom(
+                                              side: const BorderSide(color: JTechTheme.accentCyan),
+                                              padding: const EdgeInsets.symmetric(vertical: 12),
+                                            ),
+                                            icon: const Icon(Icons.zoom_in, color: JTechTheme.accentCyan, size: 18),
+                                            label: const Text('EXPANDIR GIF', style: TextStyle(color: JTechTheme.accentCyan, fontWeight: FontWeight.bold, fontSize: 12)),
                                           ),
                                         ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          flex: 2,
+                                          child: ElevatedButton.icon(
+                                            onPressed: () => Navigator.pop(context, ex),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: JTechTheme.successGreen,
+                                              padding: const EdgeInsets.symmetric(vertical: 12),
+                                            ),
+                                            icon: const Icon(Icons.add_circle_outline, size: 18),
+                                            label: const Text('ADICIONAR AO TREINO', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                          ),
+                                        ),
+                                      ] else ...[
+                                        Expanded(
+                                          child: ElevatedButton.icon(
+                                            onPressed: () => _mostrarGifExpandido(context, ex),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: JTechTheme.cardDark,
+                                              side: const BorderSide(color: JTechTheme.accentCyan, width: 1.2),
+                                              padding: const EdgeInsets.symmetric(vertical: 12),
+                                            ),
+                                            icon: const Icon(Icons.fullscreen_rounded, color: JTechTheme.accentCyan),
+                                            label: const Text(
+                                              'VER GIF EXPANDIDO (ZOOM 3D)',
+                                              style: TextStyle(color: JTechTheme.accentCyan, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.3),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ],
                                   ),
                                 ],
@@ -249,88 +296,26 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
   }
 
   IconData _getGroupIcon(String grupo) {
-    switch (grupo) {
-      case 'Peito': return Icons.fitness_center;
-      case 'Costas': return Icons.accessibility_new;
-      case 'Pernas': return Icons.directions_run;
-      case 'Ombros': return Icons.sports_gymnastics;
-      case 'Bíceps': case 'Tríceps': return Icons.sports_kabaddi;
-      default: return Icons.fitness_center;
-    }
+    final g = grupo.toLowerCase();
+    if (g.contains('peito')) return Icons.fitness_center;
+    if (g.contains('costa')) return Icons.accessibility_new;
+    if (g.contains('perna') || g.contains('coxa') || g.contains('panturrilha')) return Icons.directions_run;
+    if (g.contains('ombro') || g.contains('deltoide')) return Icons.sports_gymnastics;
+    if (g.contains('bíceps') || g.contains('biceps')) return Icons.sports_kabaddi;
+    if (g.contains('tríceps') || g.contains('triceps')) return Icons.flash_on;
+    if (g.contains('abd') || g.contains('core')) return Icons.self_improvement;
+    return Icons.fitness_center;
   }
 
-  void _mostrarDemonstrativoMidia(BuildContext context, Exercicio ex) {
-    final mediaUrl = ex.gifUrl.isNotEmpty ? ex.gifUrl : (ex.imagemUrl.isNotEmpty ? ex.imagemUrl : ex.videoUrl);
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: JTechTheme.cardDark,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    ex.nome,
-                    style: const TextStyle(color: JTechTheme.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: JTechTheme.textGrey),
-                  onPressed: () => Navigator.pop(ctx),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Container(
-              height: 250,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: JTechTheme.dividerColor),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: mediaUrl.isNotEmpty
-                    ? Image.network(
-                        mediaUrl,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => Center(
-                          child: Icon(_getGroupIcon(ex.grupoMuscular), color: JTechTheme.accentCyan, size: 64),
-                        ),
-                      )
-                    : Center(
-                        child: Icon(_getGroupIcon(ex.grupoMuscular), color: JTechTheme.accentCyan, size: 64),
-                      ),
-              ),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              '${ex.grupoMuscular} • ${ex.equipamento}',
-              style: const TextStyle(color: JTechTheme.accentCyan, fontWeight: FontWeight.bold, fontSize: 13),
-            ),
-            const SizedBox(height: 6),
-            Text(ex.instrucoes, style: const TextStyle(color: JTechTheme.textGrey, fontSize: 13, height: 1.4)),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(ctx),
-                style: ElevatedButton.styleFrom(backgroundColor: JTechTheme.primaryBlue),
-                child: const Text('FECHAR'),
-              ),
-            ),
-          ],
-        ),
-      ),
+  void _mostrarGifExpandido(BuildContext context, Exercicio ex) async {
+    final resultado = await ExerciseGifDialog.show(
+      context,
+      exercicio: ex,
+      modoSelecao: widget.modoSelecao,
     );
+
+    if (resultado != null && widget.modoSelecao && mounted) {
+      Navigator.pop(context, resultado);
+    }
   }
 }

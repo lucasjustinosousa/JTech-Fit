@@ -882,6 +882,56 @@
     </div>
   </div>
 
+  <!-- MODAL EXCLUSIVO PARA EXIBIR O GIF AMPLIADO / EXPANDIDO -->
+  <div id="modalOnlyGif" class="modal-overlay" onclick="closeOnlyGifModal(event)">
+    <div class="modal-card" style="max-width: 540px; width: 94%; padding: 18px; text-align: left; background: #0c0e14; border: 1.5px solid var(--accent-cyan); box-shadow: 0 0 35px rgba(0,210,255,0.3); border-radius: 24px;">
+      
+      <!-- Cabeçalho do Pop-up -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--divider); padding-bottom: 10px;">
+        <div style="min-width: 0; flex: 1;">
+          <h3 id="onlyGifTitle" style="font-size: 17px; font-weight: 800; color: white; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Animação do Exercício</h3>
+          <div id="onlyGifSubtitle" style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Visualização ampliada em tempo real</div>
+        </div>
+        <button onclick="closeOnlyGifModal()" style="background: rgba(255,255,255,0.08); border: none; color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; flex-shrink: 0; margin-left: 8px;">✕</button>
+      </div>
+
+      <!-- Container do GIF com Zoom e Efeito Visual -->
+      <div id="onlyGifContainer" style="width: 100%; height: 340px; max-height: 50vh; background: #000; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid var(--divider); position: relative; cursor: zoom-in;" ondblclick="toggleGifZoom()" title="Duplo clique para ampliar ou resetar zoom">
+        <img id="onlyGifImg" src="" alt="GIF Exercício" style="width: 100%; height: 100%; object-fit: contain; display: block; transition: transform 0.25s ease; transform-origin: center center;" onerror="this.style.display='none'; document.getElementById('onlyGifFallback').style.display='flex';">
+        
+        <div id="onlyGifFallback" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: var(--text-grey);">
+          <div style="font-size: 54px; margin-bottom: 8px;">🏋️‍♂️</div>
+          <div style="font-size: 13px; font-weight: 700; color: white;">Demonstração em GIF indisponível</div>
+        </div>
+
+        <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); border: 1px solid rgba(0,210,255,0.6); border-radius: 8px; padding: 3px 8px; font-size: 10px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 0.5px;">
+          ● GIF 3D
+        </div>
+
+        <div id="onlyGifZoomBadge" style="position: absolute; top: 10px; left: 10px; background: rgba(30,136,229,0.85); border-radius: 6px; padding: 2px 7px; font-size: 10px; font-weight: 700; color: white; display: none;">
+          Zoom: 1.0x
+        </div>
+      </div>
+
+      <!-- Barra de Ferramentas de Zoom -->
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); border-radius: 10px; padding: 8px 12px; margin-top: 10px; border: 1px solid var(--divider);">
+        <span style="font-size: 11px; color: var(--text-grey); display: flex; align-items: center; gap: 4px;">
+          🔍 Duplo clique ou use os botões para dar zoom:
+        </span>
+        <div style="display: flex; gap: 6px;">
+          <button onclick="adjustGifZoom(-0.5)" style="background: rgba(255,255,255,0.08); border: none; color: white; width: 28px; height: 28px; border-radius: 6px; font-size: 14px; font-weight: 800; cursor: pointer;">-</button>
+          <button onclick="adjustGifZoom(0.5)" style="background: rgba(255,255,255,0.08); border: none; color: white; width: 28px; height: 28px; border-radius: 6px; font-size: 14px; font-weight: 800; cursor: pointer;">+</button>
+          <button onclick="resetGifZoom()" style="background: rgba(0,210,255,0.15); border: 1px solid rgba(0,210,255,0.4); color: var(--accent-cyan); height: 28px; padding: 0 8px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">Reset</button>
+        </div>
+      </div>
+
+      <!-- Botão Fechar -->
+      <button onclick="closeOnlyGifModal()" class="btn btn-primary" style="margin-top: 14px; width: 100%; font-weight: 800; font-size: 14px; border-radius: 12px;">
+        ✓ FECHAR VISUALIZAÇÃO
+      </button>
+    </div>
+  </div>
+
   <script>
     // Inicialização do Supabase JS Client
     const SUPABASE_URL = 'https://gplgywrvejefulsjpkax.supabase.co';
@@ -1894,17 +1944,24 @@
       }
 
       container.innerHTML = filtered.map(ex => {
-        const isFav = favoritesSet.has(ex.exerciseId);
-        const isChecked = selectedForWorkoutSet.has(ex.exerciseId);
+        const id = ex.exerciseId || ex.id || '';
+        const isFav = favoritesSet.has(id);
+        const isChecked = selectedForWorkoutSet.has(id);
         const icon = getMuscleGroupIcon(ex.grupoMuscular);
+        const gif = ex.gifUrl || ex.gif_url || ex.gif || '';
+        const safeName = (ex.name || ex.nome || 'Exercício').replace(/'/g, "\\'");
+
+        const safeGroup = (ex.grupoMuscular || 'Geral').replace(/'/g, "\\'");
+        const safeEquip = (ex.equipamento || 'Nenhum').replace(/'/g, "\\'");
+        const safeSubtitle = `${safeGroup} • ${safeEquip}`;
 
         return `
-          <div class="card exercise-item-card" onclick="openExerciseDetailModal('${ex.exerciseId}')" style="border-left: 4px solid var(--accent-cyan); display: flex; gap: 14px; align-items: center; padding: 12px 14px; cursor: pointer; transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(0,210,255,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
+          <div class="card exercise-item-card" onclick="openExerciseDetailModal('${id}')" style="border-left: 4px solid var(--accent-cyan); display: flex; gap: 14px; align-items: center; padding: 12px 14px; cursor: pointer; transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(0,210,255,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
             
             <!-- Thumbnail GIF Clicável com Efeito Visual -->
-            <div style="width: 76px; height: 76px; background: #080a0f; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider); position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.4);">
-              ${ex.gifUrl ? `<img src="${ex.gifUrl}" alt="${ex.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
-              <div style="display: ${ex.gifUrl ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 28px;">
+            <div onclick="event.stopPropagation(); openOnlyGifModal('${gif}', '${safeName}', '${safeSubtitle}')" style="width: 76px; height: 76px; background: #080a0f; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider); position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer;" title="Clique para abrir o GIF de ${ex.name}">
+              ${gif ? `<img src="${gif}" alt="${ex.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+              <div style="display: ${gif ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 28px;">
                 ${icon}
               </div>
               <div style="position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.75); border-radius: 4px; padding: 1px 5px; font-size: 8px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 0.5px;">GIF</div>
@@ -1917,13 +1974,13 @@
                 <strong style="color: var(--accent-cyan);">${ex.grupoMuscular}</strong> • ${ex.equipamento}
               </p>
               <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
-                <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; background: rgba(0,210,255,0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(0,210,255,0.2);">🔍 Ver GIF ampliado</span>
-                <button onclick="event.stopPropagation(); toggleFavoriteExercise('${ex.exerciseId}', this)" style="background: none; border: none; font-size: 18px; cursor: pointer; padding: 2px 6px;" title="Favoritar">${isFav ? '⭐' : '☆'}</button>
+                <button onclick="event.stopPropagation(); openOnlyGifModal('${gif}', '${safeName}', '${safeSubtitle}')" style="font-size: 11px; color: var(--accent-cyan); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; background: rgba(0,210,255,0.1); padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(0,210,255,0.3); cursor: pointer;" title="Abrir visualização do GIF">🔍 Ver GIF ampliado</button>
+                <button onclick="event.stopPropagation(); toggleFavoriteExercise('${id}', this)" style="background: none; border: none; font-size: 18px; cursor: pointer; padding: 2px 6px;" title="Favoritar">${isFav ? '⭐' : '☆'}</button>
               </div>
             </div>
 
             <!-- Seleção para treino -->
-            <input type="checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleSelectForWorkout('${ex.exerciseId}', this)" style="width: 22px; height: 22px; accent-color: var(--success-green); cursor: pointer; flex-shrink: 0;" title="Selecionar para treino">
+            <input type="checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleSelectForWorkout('${id}', this)" style="width: 22px; height: 22px; accent-color: var(--success-green); cursor: pointer; flex-shrink: 0;" title="Selecionar para treino">
           </div>
         `;
       }).join('');
@@ -1997,15 +2054,101 @@
     }
 
     let currentDetailExerciseId = null;
+    let currentDetailGifUrl = '';
+    let currentDetailTitle = '';
+
+    let currentGifScale = 1.0;
+
+    function openOnlyGifModal(gifUrl, title, subtitle) {
+      if (!gifUrl) {
+        alert('Nenhum GIF de demonstração disponível para este exercício.');
+        return;
+      }
+      const modal = document.getElementById('modalOnlyGif');
+      const img = document.getElementById('onlyGifImg');
+      const fallback = document.getElementById('onlyGifFallback');
+      const titleEl = document.getElementById('onlyGifTitle');
+      const subtitleEl = document.getElementById('onlyGifSubtitle');
+
+      if (titleEl) titleEl.innerText = title || 'Animação do Exercício';
+      if (subtitleEl) subtitleEl.innerText = subtitle || 'Visualização ampliada do movimento';
+      
+      resetGifZoom();
+
+      if (img) {
+        img.src = gifUrl;
+        img.style.display = 'block';
+      }
+      if (fallback) fallback.style.display = 'none';
+
+      if (modal) modal.classList.add('active');
+    }
+
+    function adjustGifZoom(delta) {
+      const img = document.getElementById('onlyGifImg');
+      const badge = document.getElementById('onlyGifZoomBadge');
+      if (!img) return;
+
+      currentGifScale = Math.min(Math.max(currentGifScale + delta, 1.0), 3.5);
+      img.style.transform = `scale(${currentGifScale})`;
+
+      if (badge) {
+        if (currentGifScale > 1.05) {
+          badge.style.display = 'block';
+          badge.innerText = `Zoom: ${currentGifScale.toFixed(1)}x`;
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    }
+
+    function toggleGifZoom() {
+      if (currentGifScale > 1.1) {
+        resetGifZoom();
+      } else {
+        adjustGifZoom(1.0);
+      }
+    }
+
+    function resetGifZoom() {
+      const img = document.getElementById('onlyGifImg');
+      const badge = document.getElementById('onlyGifZoomBadge');
+      currentGifScale = 1.0;
+      if (img) img.style.transform = 'scale(1)';
+      if (badge) badge.style.display = 'none';
+    }
+
+    function closeOnlyGifModal(event) {
+      if (event && event.target && event.target.id !== 'modalOnlyGif' && !event.target.attributes['onclick']?.value?.includes('closeOnlyGifModal')) {
+        return;
+      }
+      const modal = document.getElementById('modalOnlyGif');
+      if (modal) modal.classList.remove('active');
+      const img = document.getElementById('onlyGifImg');
+      if (img) img.src = '';
+      resetGifZoom();
+    }
+
+    let currentDetailSubtitle = '';
+
+    function openOnlyGifModalFromDetail() {
+      if (currentDetailGifUrl) {
+        openOnlyGifModal(currentDetailGifUrl, currentDetailTitle, currentDetailSubtitle);
+      }
+    }
 
     function openExerciseDetailModal(exerciseId) {
-      const ex = exercisesList.find(e => e.exerciseId === exerciseId || e.id === exerciseId);
+      const ex = exercisesList.find(e => (e.exerciseId && e.exerciseId === exerciseId) || (e.id && e.id === exerciseId));
       if (!ex) return;
 
-      currentDetailExerciseId = ex.exerciseId;
+      const exId = ex.exerciseId || ex.id;
+      currentDetailExerciseId = exId;
+      currentDetailGifUrl = ex.gifUrl || ex.gif_url || ex.gif || '';
+      currentDetailTitle = ex.name || ex.nome || 'Exercício';
+      currentDetailSubtitle = `${ex.grupoMuscular || 'Geral'} • ${ex.equipamento || 'Livre / Aparelho'}`;
 
       document.getElementById('detailExBadge').innerText = ex.grupoMuscular || 'Geral';
-      document.getElementById('detailExTitle').innerText = ex.name || 'Exercício';
+      document.getElementById('detailExTitle').innerText = ex.name || ex.nome || 'Exercício';
       document.getElementById('detailExEquip').innerText = ex.equipamento || 'Livre / Aparelho';
       document.getElementById('detailExTarget').innerText = ex.musculoPrincipal || ex.grupoMuscular || 'Geral';
       document.getElementById('detailExInstructions').innerText = ex.instrucoes || 'Execute o movimento com controle e amplitude total.';
@@ -2013,8 +2156,8 @@
       const img = document.getElementById('detailGifImg');
       const fallback = document.getElementById('detailFallbackIcon');
       
-      if (ex.gifUrl) {
-        img.src = ex.gifUrl;
+      if (currentDetailGifUrl) {
+        img.src = currentDetailGifUrl;
         img.style.display = 'block';
         fallback.style.display = 'none';
       } else {
