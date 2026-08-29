@@ -978,11 +978,16 @@
 
     function switchTab(screenId, navElement) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(screenId).classList.add('active');
+      const target = document.getElementById(screenId);
+      if (target) target.classList.add('active');
 
       if (navElement) {
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         navElement.classList.add('active');
+      }
+
+      if (screenId === 'screenExercises') {
+        renderExercisesLibraryUI();
       }
     }
 
@@ -1905,44 +1910,6 @@
       renderExercisesLibraryUI();
     }
 
-    function renderExercisesLibraryUI() {
-      const container = document.getElementById('exerciseListContainer');
-      if (!container) return;
-
-      const searchInput = document.getElementById('exerciseSearchInput');
-      const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
-
-      const filtered = exercisesList.filter(ex => {
-        const matchesQuery = !query ||
-          ex.name.toLowerCase().includes(query) ||
-          ex.grupoMuscular.toLowerCase().includes(query) ||
-          ex.equipamento.toLowerCase().includes(query) ||
-          ex.musculoPrincipal.toLowerCase().includes(query);
-
-        const matchesGroup = currentSelectedGroup === 'Todos' || ex.grupoMuscular.toLowerCase() === currentSelectedGroup.toLowerCase();
-        const matchesFav = !onlyFavoritesFilter || favoritesSet.has(ex.exerciseId);
-
-        return matchesQuery && matchesGroup && matchesFav;
-      });
-
-      // Atualizar contador no topo
-      const statsBadge = document.getElementById('exerciseStatsBadge');
-      if (statsBadge) {
-        statsBadge.innerText = `${filtered.length} de ${exercisesList.length} exercícios`;
-      }
-
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 35px 16px; color: var(--text-grey);">
-            <div style="font-size: 36px; margin-bottom: 8px;">🔍</div>
-            <div style="font-weight: 700; font-size: 15px; color: white;">Nenhum exercício encontrado</div>
-            <div style="font-size: 12px; margin-top: 4px; margin-bottom: 14px;">Tente limpar a pesquisa ou os filtros de grupo muscular.</div>
-            <button onclick="resetExerciseFilters()" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 12px;">Limpar Filtros</button>
-          </div>
-        `;
-        return;
-      }
-
     const expandedCardsSet = new Set();
 
     function toggleCardExpansion(id, event) {
@@ -2071,72 +2038,6 @@
             ` : ''}
 
           </div>
-        `;
-      }).join('');
-    }
-
-    function getMuscleGroupIcon(grupo) {
-      const g = (grupo || '').toLowerCase();
-      if (g.includes('peito')) return '🏋️‍♂️';
-      if (g.includes('costa')) return '🚣';
-      if (g.includes('perna') || g.includes('coxa') || g.includes('panturrilha')) return '🦵';
-      if (g.includes('ombro') || g.includes('deltoide')) return '🛡️';
-      if (g.includes('bíceps') || g.includes('biceps')) return '💪';
-      if (g.includes('tríceps') || g.includes('triceps')) return '⚡';
-      if (g.includes('abd') || g.includes('core')) return '🧘';
-      return '🏋️';
-    }
-
-    function resetExerciseFilters() {
-      const searchInput = document.getElementById('exerciseSearchInput');
-      if (searchInput) searchInput.value = '';
-      currentSelectedGroup = 'Todos';
-      onlyFavoritesFilter = false;
-      document.querySelectorAll('#exerciseGroupChips .chip').forEach(c => c.classList.remove('active'));
-      const firstChip = document.querySelector('#exerciseGroupChips .chip');
-      if (firstChip) firstChip.classList.add('active');
-      renderExercisesLibraryUI();
-    }
-
-    function filterExerciseGroup(groupName, chipElement) {
-      currentSelectedGroup = groupName;
-      document.querySelectorAll('#exerciseGroupChips .chip').forEach(c => c.classList.remove('active'));
-      if (chipElement) chipElement.classList.add('active');
-      renderExercisesLibraryUI();
-    }
-
-    function filterExercisesLibrary() {
-      renderExercisesLibraryUI();
-    }
-
-    function toggleOnlyFavoritesFilter() {
-      onlyFavoritesFilter = !onlyFavoritesFilter;
-      const btn = document.getElementById('btnFavFilter');
-      if (onlyFavoritesFilter) {
-        btn.style.color = 'gold';
-        btn.style.borderColor = 'gold';
-        btn.innerText = '★ Exibindo Favoritos';
-      } else {
-        btn.style.color = 'var(--text-grey)';
-        btn.style.borderColor = 'var(--divider)';
-        btn.innerText = '⭐ Apenas Favoritos';
-      }
-      renderExercisesLibraryUI();
-    }
-
-    function toggleFavoriteExercise(id, btnElement) {
-      if (favoritesSet.has(id)) {
-        favoritesSet.delete(id);
-      } else {
-        favoritesSet.add(id);
-      }
-      localStorage.setItem('jtech_fit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
-      renderExercisesLibraryUI();
-    }
-
-    function toggleSelectForWorkout(id, checkboxEl) {
-      if (checkboxEl.checked) {
-        selectedForWorkoutSet.add(id);
         `;
       }).join('');
     }
