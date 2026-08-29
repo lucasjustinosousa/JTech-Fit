@@ -539,31 +539,8 @@
           <button onclick="openCreateWorkoutModal()" class="btn btn-primary" style="width: auto; padding: 8px 14px; font-size: 12px;">+ Criar Treino</button>
         </div>
 
-        <div id="workoutListContainer">
-          <!-- Cards de treinos renderizados dinamicamente -->
-          <div class="card" style="border-left: 5px solid var(--primary-blue);">
-            <div style="display: flex; justify-content: space-between;">
-              <h4 style="font-size: 16px; font-weight: 800;">Treino A — Peito & Tríceps</h4>
-              <span style="color: var(--text-muted); cursor: pointer;" onclick="deleteWorkoutCard(this, 'Treino A — Peito & Tríceps')">🗑️</span>
-            </div>
-            <p style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">Segunda-feira • Quinta-feira</p>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
-              <span style="font-size: 12px; color: var(--accent-cyan);">4 exercícios</span>
-              <button onclick="startActiveWorkout('Treino A — Peito & Tríceps')" class="btn btn-success" style="width: auto; padding: 8px 16px; font-size: 12px;">INICIAR</button>
-            </div>
-          </div>
-
-          <div class="card" style="border-left: 5px solid var(--accent-cyan);">
-            <div style="display: flex; justify-content: space-between;">
-              <h4 style="font-size: 16px; font-weight: 800;">Treino B — Costas & Bíceps</h4>
-              <span style="color: var(--text-muted); cursor: pointer;" onclick="deleteWorkoutCard(this, 'Treino B — Costas & Bíceps')">🗑️</span>
-            </div>
-            <p style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">Terça-feira • Sexta-feira</p>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
-              <span style="font-size: 12px; color: var(--accent-cyan);">5 exercícios</span>
-              <button onclick="startActiveWorkout('Treino B — Costas & Bíceps')" class="btn btn-success" style="width: auto; padding: 8px 16px; font-size: 12px;">INICIAR</button>
-            </div>
-          </div>
+        <div id="workoutListContainer" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Cards de treinos e seus exercícios montados renderizados dinamicamente via JS -->
         </div>
       </div>
 
@@ -613,43 +590,21 @@
 
       <!-- TELA TREINO EM ANDAMENTO -->
       <div id="screenActiveWorkout" class="screen">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h3 id="activeWorkoutTitle" style="font-size: 16px; font-weight: 800; color: var(--accent-cyan);">Treino A — Peito & Tríceps</h3>
-          <div style="font-size: 16px; font-weight: 900; color: var(--success-green);" id="activeTimer">00:00</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <div style="min-width: 0; flex: 1;">
+            <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase;">Treino em Andamento</span>
+            <h3 id="activeWorkoutTitle" style="font-size: 17px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">Treino A</h3>
+          </div>
+          <div style="font-size: 18px; font-weight: 900; color: var(--success-green); background: rgba(76,175,80,0.15); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(76,175,80,0.3);" id="activeTimer">00:00</div>
         </div>
 
-        <div class="card">
-          <span style="font-size: 11px; color: var(--primary-blue); font-weight: 800;">EXERCÍCIO 1 DE 4</span>
-          <h3 style="font-size: 18px; font-weight: 800; margin-top: 4px;">Supino Reto com Barra</h3>
-          <p style="font-size: 12px; color: var(--text-grey);">4 séries x 10-12 repetições • 60s descanso</p>
+        <!-- Container dinâmico dos exercícios montados no treino ativo -->
+        <div id="activeWorkoutExercisesContainer" style="display: flex; flex-direction: column; gap: 14px;">
+          <!-- Renderizado dinamicamente via JS -->
         </div>
 
-        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px;">Registro de Séries</h4>
-
-        <div class="set-row" id="setRow1">
-          <div class="set-badge">1</div>
-          <div style="flex: 1;">
-            <input type="number" class="form-input" value="40" style="padding: 6px 10px; font-size: 12px;" placeholder="Carga kg">
-          </div>
-          <div style="flex: 1;">
-            <input type="number" class="form-input" value="12" style="padding: 6px 10px; font-size: 12px;" placeholder="Reps">
-          </div>
-          <div class="set-check" onclick="toggleSetDone('setRow1')">✓</div>
-        </div>
-
-        <div class="set-row" id="setRow2">
-          <div class="set-badge">2</div>
-          <div style="flex: 1;">
-            <input type="number" class="form-input" value="40" style="padding: 6px 10px; font-size: 12px;" placeholder="Carga kg">
-          </div>
-          <div style="flex: 1;">
-            <input type="number" class="form-input" value="10" style="padding: 6px 10px; font-size: 12px;" placeholder="Reps">
-          </div>
-          <div class="set-check" onclick="toggleSetDone('setRow2')">✓</div>
-        </div>
-
-        <button onclick="finishActiveWorkout()" class="btn btn-success" style="margin-top: 20px;">
-          FINALIZAR TREINO COMPLETO
+        <button onclick="finishActiveWorkout()" class="btn btn-success" style="margin-top: 20px; width: 100%; font-size: 14px; font-weight: 800; padding: 14px; border-radius: 12px; box-shadow: 0 4px 16px rgba(76,175,80,0.3);">
+          ✓ FINALIZAR TREINO COMPLETO
         </button>
       </div>
 
@@ -977,17 +932,9 @@
     let activeWorkoutSeconds = 0;
 
     function switchTab(screenId, navElement) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      const target = document.getElementById(screenId);
-      if (target) target.classList.add('active');
-
-      if (navElement) {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        navElement.classList.add('active');
-      }
-
-      if (screenId === 'screenExercises') {
-        renderExercisesLibraryUI();
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove        renderExercisesLibraryUI();
+      } else if (screenId === 'screenWorkouts') {
+        renderAllWorkoutsUI();
       }
     }
 
@@ -996,8 +943,252 @@
       document.getElementById('bottomNav').style.display = 'flex';
     }
 
-    function startActiveWorkout(title) {
-      document.getElementById('activeWorkoutTitle').innerText = title;
+    // ==========================================
+    // TREINOS PADRÃO COM EXERCÍCIOS COMPLETOS
+    // ==========================================
+    const DEFAULT_WORKOUT_DIVISIONS = [
+      {
+        id: 'treino_default_a',
+        nome: 'Treino A — Peito & Tríceps',
+        descricao: 'Hipertrofia',
+        diasSemana: ['Segunda-feira', 'Quinta-feira'],
+        corHex: '#1E88E5',
+        exercicios: [
+          { id: 'ex_a1', nome: 'Supino Reto com Barra', series: '4', reps: '10-12', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-bench-press.gif' },
+          { id: 'ex_a2', nome: 'Supino Inclinado com Halteres', series: '3', reps: '10-12', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-incline-bench-press.gif' },
+          { id: 'ex_a3', nome: 'Crucifixo no Crossover (Polia Alta)', series: '3', reps: '12-15', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/cable-middle-fly.gif' },
+          { id: 'ex_a4', nome: 'Tríceps Pulley na Corda', series: '4', reps: '12-15', grupoMuscular: 'Tríceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/cable-one-arm-tricep-pushdown.gif' },
+          { id: 'ex_a5', nome: 'Tríceps Testa com Barra W', series: '3', reps: '10-12', grupoMuscular: 'Tríceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/barbell-reverse-grip-skullcrusher.gif' }
+        ]
+      },
+      {
+        id: 'treino_default_b',
+        nome: 'Treino B — Costas & Bíceps',
+        descricao: 'Hipertrofia',
+        diasSemana: ['Terça-feira', 'Sexta-feira'],
+        corHex: '#00D2FF',
+        exercicios: [
+          { id: 'ex_b1', nome: 'Puxada Frontal na Polia', series: '4', reps: '10-12', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/cable-lat-pulldown.gif' },
+          { id: 'ex_b2', nome: 'Remada Curvada com Barra', series: '4', reps: '8-10', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/barbell-bent-over-row.gif' },
+          { id: 'ex_b3', nome: 'Remada Unilateral com Halter (Serrote)', series: '3', reps: '10-12', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/dumbbell-one-arm-bent-over-row.gif' },
+          { id: 'ex_b4', nome: 'Rosca Direta com Barra W', series: '4', reps: '10-12', grupoMuscular: 'Bíceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/barbell-curl.gif' },
+          { id: 'ex_b5', nome: 'Rosca Martelo com Halteres', series: '3', reps: '12', grupoMuscular: 'Bíceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/dumbbell-hammer-curl.gif' }
+        ]
+      },
+      {
+        id: 'treino_default_c',
+        nome: 'Treino C — Pernas & Ombros',
+        descricao: 'Força & Resistência',
+        diasSemana: ['Quarta-feira', 'Sábado'],
+        corHex: '#4CAF50',
+        exercicios: [
+          { id: 'ex_c1', nome: 'Agachamento Livre com Barra', series: '4', reps: '8-10', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/barbell-squat.gif' },
+          { id: 'ex_c2', nome: 'Leg Press 45º', series: '4', reps: '10-12', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/sled-45-degrees-leg-press.gif' },
+          { id: 'ex_c3', nome: 'Cadeira Extensora', series: '3', reps: '12-15', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/lever-leg-extension.gif' },
+          { id: 'ex_c4', nome: 'Desenvolvimento com Halteres', series: '4', reps: '10-12', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-shoulder-press.gif' },
+          { id: 'ex_c5', nome: 'Elevação Lateral com Halteres', series: '4', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-lateral-raise.gif' }
+        ]
+      }
+    ];
+
+    let allWorkoutsList = [];
+    const expandedWorkoutIds = new Set();
+
+    function loadWorkoutsFromStorage() {
+      try {
+        let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
+        if (Array.isArray(saved) && saved.length > 0) {
+          allWorkoutsList = saved.map(w => {
+            // Se o treino salvo não tiver o array de exercícios, recuperar dos padrões ou definir padrão
+            if (!Array.isArray(w.exercicios) || w.exercicios.length === 0) {
+              const def = DEFAULT_WORKOUT_DIVISIONS.find(d => d.nome.toLowerCase() === (w.nome || '').toLowerCase() || d.id === w.id);
+              if (def) {
+                w.exercicios = def.exercicios;
+              } else {
+                w.exercicios = [
+                  { id: 'ex_gen1', nome: 'Supino Reto com Barra', series: '4', reps: '10-12', grupoMuscular: 'Geral', gifUrl: '' },
+                  { id: 'ex_gen2', nome: 'Puxada Frontal na Polia', series: '4', reps: '10-12', grupoMuscular: 'Geral', gifUrl: '' }
+                ];
+              }
+            }
+            return w;
+          });
+        } else {
+          allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
+          localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+        }
+      } catch (e) {
+        allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
+      }
+      renderAllWorkoutsUI();
+    }
+
+    function toggleWorkoutCardExpand(workoutId, event) {
+      if (event) event.stopPropagation();
+      if (expandedWorkoutIds.has(workoutId)) {
+        expandedWorkoutIds.delete(workoutId);
+      } else {
+        expandedWorkoutIds.add(workoutId);
+      }
+      renderAllWorkoutsUI();
+    }
+
+    function renderAllWorkoutsUI() {
+      const container = document.getElementById('workoutListContainer');
+      if (!container) return;
+
+      if (allWorkoutsList.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 35px 16px; color: var(--text-grey);">
+            <div style="font-size: 36px; margin-bottom: 8px;">🏋️‍♂️</div>
+            <div style="font-weight: 700; font-size: 15px; color: white;">Nenhum treino cadastrado</div>
+            <div style="font-size: 12px; margin-top: 4px; margin-bottom: 14px;">Clique no botão "+ Criar Treino" acima para montar seu primeiro treino.</div>
+            <button onclick="openCreateWorkoutModal()" class="btn btn-primary" style="width: auto; padding: 8px 16px; font-size: 12px;">+ Criar Treino</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = allWorkoutsList.map(w => {
+        const isExpanded = expandedWorkoutIds.has(w.id);
+        const daysStr = Array.isArray(w.diasSemana) && w.diasSemana.length > 0 ? w.diasSemana.join(' • ') : 'Dias flexíveis';
+        const exercises = Array.isArray(w.exercicios) ? w.exercicios : [];
+        const count = exercises.length;
+        const color = w.corHex || '#1E88E5';
+
+        return `
+          <div class="card" id="card_${w.id}" style="border-left: 5px solid ${color}; padding: 16px; animation: fadeIn 0.25s ease-in-out;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="font-size: 16px; font-weight: 800; color: white; margin-bottom: 2px;">${w.nome}</h4>
+                <p style="font-size: 11px; color: var(--text-grey); margin: 0;">${daysStr}</p>
+                ${w.descricao ? `<span style="display: inline-block; background: rgba(0,210,255,0.12); color: var(--accent-cyan); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-top: 6px;">${w.descricao}</span>` : ''}
+              </div>
+              <button onclick="deleteWorkoutCard('${w.id}')" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 16px; padding: 4px;" title="Excluir treino">🗑️</button>
+            </div>
+
+            <!-- Botão para Expandir / Recolher Exercícios Montados -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--divider);">
+              <button onclick="toggleWorkoutCardExpand('${w.id}', event)" style="background: none; border: none; font-size: 12px; font-weight: 700; color: var(--accent-cyan); cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 0;">
+                <span>${isExpanded ? '▲ Ocultar Exercícios' : `▼ Ver Exercícios Montados (${count})`}</span>
+              </button>
+              <button onclick="startActiveWorkout('${w.id}')" class="btn btn-success" style="width: auto; padding: 7px 18px; font-size: 12px; font-weight: 800; border-radius: 8px;">
+                ▶ INICIAR
+              </button>
+            </div>
+
+            <!-- LISTA DE EXERCÍCIOS MONTADOS NESTE TREINO (EXPANSÍVEL) -->
+            ${isExpanded ? `
+              <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px; animation: fadeIn 0.2s ease-in-out;">
+                ${exercises.length === 0 ? `
+                  <div style="font-size: 11px; color: var(--text-grey); padding: 8px; text-align: center;">Nenhum exercício montado neste treino.</div>
+                ` : exercises.map((ex, idx) => {
+                  const icon = getMuscleGroupIcon(ex.grupoMuscular);
+                  const safeName = (ex.nome || 'Exercício').replace(/'/g, "\\'");
+                  const safeSubtitle = `${ex.grupoMuscular || 'Geral'} • ${ex.series || 4} séries x ${ex.reps || '10-12'} reps`;
+                  return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: #080a0f; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--divider);">
+                      <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                        <span style="font-size: 16px;">${icon}</span>
+                        <div style="min-width: 0;">
+                          <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${idx + 1}. ${ex.nome}</div>
+                          <div style="font-size: 11px; color: var(--accent-cyan);">${ex.series || 4} séries • ${ex.reps || '10-12'} reps</div>
+                        </div>
+                      </div>
+                      ${ex.gifUrl ? `
+                        <button onclick="event.stopPropagation(); openOnlyGifModal('${ex.gifUrl}', '${safeName}', '${safeSubtitle}')" style="background: rgba(0,210,255,0.1); border: 1px solid rgba(0,210,255,0.3); color: var(--accent-cyan); font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 6px; cursor: pointer; flex-shrink: 0;">
+                          🔍 GIF
+                        </button>
+                      ` : ''}
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            ` : ''}
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    function deleteWorkoutCard(workoutId) {
+      if (confirm('Deseja realmente excluir este treino?')) {
+        allWorkoutsList = allWorkoutsList.filter(w => w.id !== workoutId && w.nome !== workoutId);
+        localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+        renderAllWorkoutsUI();
+      }
+    }
+
+    // ==========================================
+    // EXECUÇÃO DE TREINO ATIVO DINÂMICO
+    // ==========================================
+    let currentActiveWorkout = null;
+
+    function startActiveWorkout(workoutIdOrName) {
+      const workout = allWorkoutsList.find(w => w.id === workoutIdOrName || w.nome === workoutIdOrName) || {
+        id: 'treino_temp',
+        nome: workoutIdOrName,
+        exercicios: DEFAULT_WORKOUT_DIVISIONS[0].exercicios
+      };
+
+      currentActiveWorkout = workout;
+      document.getElementById('activeWorkoutTitle').innerText = workout.nome;
+      
+      // Renderizar exercícios dinamicamente no treino ativo
+      const container = document.getElementById('activeWorkoutExercisesContainer');
+      if (container) {
+        const exercises = Array.isArray(workout.exercicios) && workout.exercicios.length > 0 ? workout.exercicios : DEFAULT_WORKOUT_DIVISIONS[0].exercicios;
+        
+        container.innerHTML = exercises.map((ex, exIdx) => {
+          const numSeries = parseInt(ex.series) || 4;
+          const safeName = (ex.nome || 'Exercício').replace(/'/g, "\\'");
+          const safeSubtitle = `${ex.grupoMuscular || 'Geral'} • ${ex.series || 4} séries x ${ex.reps || '10-12'} reps`;
+
+          let rowsHtml = '';
+          for (let s = 1; s <= numSeries; s++) {
+            const rowId = `activeSetRow_${exIdx}_${s}`;
+            rowsHtml += `
+              <div class="set-row" id="${rowId}" style="margin-bottom: 6px;">
+                <div class="set-badge">${s}</div>
+                <div style="flex: 1;">
+                  <input type="number" class="form-input" value="30" style="padding: 6px 10px; font-size: 12px;" placeholder="Carga kg">
+                </div>
+                <div style="flex: 1;">
+                  <input type="number" class="form-input" value="12" style="padding: 6px 10px; font-size: 12px;" placeholder="Reps">
+                </div>
+                <div class="set-check" onclick="toggleSetDone('${rowId}')">✓</div>
+              </div>
+            `;
+          }
+
+          return `
+            <div class="card" style="border-left: 4px solid var(--accent-cyan); padding: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <div>
+                  <span style="font-size: 10px; color: var(--primary-blue); font-weight: 800; letter-spacing: 0.5px;">EXERCÍCIO ${exIdx + 1} DE ${exercises.length}</span>
+                  <h3 style="font-size: 16px; font-weight: 800; margin-top: 2px; color: white;">${ex.nome}</h3>
+                  <p style="font-size: 11px; color: var(--text-grey); margin: 0;">${ex.series || 4} séries x ${ex.reps || '10-12'} reps • 60s descanso</p>
+                </div>
+                ${ex.gifUrl ? `
+                  <button onclick="openOnlyGifModal('${ex.gifUrl}', '${safeName}', '${safeSubtitle}')" style="background: rgba(0,210,255,0.12); border: 1px solid rgba(0,210,255,0.3); color: var(--accent-cyan); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; cursor: pointer;">
+                    🔍 GIF 3D
+                  </button>
+                ` : ''}
+              </div>
+
+              <div style="font-size: 11px; font-weight: 700; color: var(--text-grey); margin-bottom: 6px; display: flex; justify-content: space-between;">
+                <span>Série</span>
+                <span style="flex: 1; text-align: center; margin-left: 20px;">Carga (kg)</span>
+                <span style="flex: 1; text-align: center;">Repetições</span>
+                <span style="width: 32px; text-align: center;">Status</span>
+              </div>
+
+              ${rowsHtml}
+            </div>
+          `;
+        }).join('');
+      }
+
       switchTab('screenActiveWorkout');
       activeWorkoutSeconds = 0;
       clearInterval(activeWorkoutInterval);
@@ -1064,6 +1255,7 @@
 
     function toggleSetDone(rowId) {
       const row = document.getElementById(rowId);
+      if (!row) return;
       row.classList.toggle('done');
       if (row.classList.contains('done')) {
         startRestTimer(60);
@@ -1124,11 +1316,34 @@
     let selectedDays = [];
     let newWorkoutExercises = [];
 
+    function populateWorkoutExerciseSelect() {
+      const select = document.getElementById('exerciseSelectDropdown');
+      if (!select) return;
+
+      const groups = {};
+      exercisesList.forEach(ex => {
+        const g = ex.grupoMuscular || 'Geral';
+        if (!groups[g]) groups[g] = [];
+        groups[g].push(ex);
+      });
+
+      let optionsHtml = '<option value="">-- Selecione um Exercício da Biblioteca --</option>';
+      for (const [group, list] of Object.entries(groups)) {
+        optionsHtml += `<optgroup label="${group}">`;
+        list.forEach(ex => {
+          optionsHtml += `<option value="${ex.name || ex.nome}">${ex.name || ex.nome} (${ex.equipamento || 'Geral'})</option>`;
+        });
+        optionsHtml += `</optgroup>`;
+      }
+      optionsHtml += `<optgroup label="Personalizado"><option value="__custom__">✏️ Outro (digitar nome personalizado)...</option></optgroup>`;
+      select.innerHTML = optionsHtml;
+    }
+
     function openCreateWorkoutModal() {
       document.getElementById('newWorkoutName').value = '';
       document.getElementById('newWorkoutDesc').value = '';
-      const dropdown = document.getElementById('exerciseSelectDropdown');
-      if (dropdown) dropdown.value = '';
+      populateWorkoutExerciseSelect();
+      
       const customInput = document.getElementById('customExerciseInput');
       if (customInput) { customInput.value = ''; customInput.style.display = 'none'; }
       const seriesInput = document.getElementById('newExSeries');
@@ -1200,11 +1415,16 @@
       const seriesVal = seriesInput.value.trim() ? seriesInput.value.trim() : '4';
       const repsVal = repsInput.value.trim() ? repsInput.value.trim() : '10-12';
 
+      // Localizar o exercício correspondente na biblioteca para herdar GIF e grupo muscular
+      const matchedEx = exercisesList.find(e => (e.name || e.nome || '').toLowerCase() === exerciseName.toLowerCase()) || {};
+
       newWorkoutExercises.push({
         id: 'ex_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
         nome: exerciseName,
         series: seriesVal,
-        reps: repsVal
+        reps: repsVal,
+        grupoMuscular: matchedEx.grupoMuscular || 'Geral',
+        gifUrl: matchedEx.gifUrl || matchedEx.gif_url || ''
       });
 
       // Reset dos campos de exercício
@@ -1230,15 +1450,21 @@
         </div>`;
         return;
       }
-      container.innerHTML = newWorkoutExercises.map((ex, idx) => `
-        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--divider);">
-          <div>
-            <div style="font-size: 13px; font-weight: 700; color: white;">${ex.nome}</div>
-            <div style="font-size: 11px; color: var(--text-grey);">${ex.series} séries • ${ex.reps} reps</div>
+      container.innerHTML = newWorkoutExercises.map((ex, idx) => {
+        const icon = getMuscleGroupIcon(ex.grupoMuscular);
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--divider);">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+              <span>${icon}</span>
+              <div style="min-width: 0;">
+                <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ex.nome}</div>
+                <div style="font-size: 11px; color: var(--accent-cyan);">${ex.series} séries • ${ex.reps} reps</div>
+              </div>
+            </div>
+            <button onclick="removeExerciseFromNewWorkout(${idx})" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 16px; padding: 2px 6px;">🗑️</button>
           </div>
-          <button onclick="removeExerciseFromNewWorkout(${idx})" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 16px;">🗑️</button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     async function saveNewWorkout() {
@@ -1251,26 +1477,27 @@
         return;
       }
 
+      if (newWorkoutExercises.length === 0) {
+        alert('Por favor, adicione pelo menos um exercício ao treino antes de salvar.');
+        return;
+      }
+
       const workoutId = 'treino_' + Date.now();
-      const countEx = newWorkoutExercises.length || 4;
 
       const newWorkout = {
         id: workoutId,
         nome: name,
         descricao: descInput.value.trim(),
-        diasSemana: selectedDays,
+        diasSemana: [...selectedDays],
         corHex: '#1E88E5',
-        exerciciosCount: countEx,
+        exercicios: [...newWorkoutExercises],
+        exerciciosCount: newWorkoutExercises.length,
         criadoEm: new Date().toISOString()
       };
 
-      // 1. Salvar no localStorage
-      let saved = [];
-      try {
-        saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
-      } catch (e) {}
-      saved.push(newWorkout);
-      localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(saved));
+      // 1. Salvar na lista em memória e no localStorage
+      allWorkoutsList.unshift(newWorkout);
+      localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
 
       // 2. Sincronizar com Supabase se online
       if (_supabase) {
@@ -1280,7 +1507,7 @@
             nome: name,
             descricao: descInput.value.trim(),
             dias_semana: JSON.stringify(selectedDays),
-            cor_hex: selectedColor
+            cor_hex: '#1E88E5'
           });
           console.log('[Supabase] Treino salvo no banco online:', name);
         } catch (e) {
@@ -1288,44 +1515,10 @@
         }
       }
 
-      // 3. Renderizar o novo Card de Treino na UI
-      renderWorkoutCardUI(newWorkout);
+      // 3. Atualizar a UI com o novo treino e seus exercícios montados
+      renderAllWorkoutsUI();
       closeCreateWorkoutModal();
-      alert(`🎉 Treino "${name}" criado com sucesso!`);
-    }
-
-    function renderWorkoutCardUI(w) {
-      const container = document.getElementById('workoutListContainer');
-      const daysStr = Array.isArray(w.diasSemana) && w.diasSemana.length > 0 ? w.diasSemana.join(' • ') : 'Dias flexíveis';
-      const count = w.exerciciosCount || 4;
-
-      const cardHtml = `
-        <div class="card" id="card_${w.id}" style="border-left: 5px solid ${w.corHex || '#1E88E5'}; animation: fadeIn 0.3s ease-in-out;">
-          <div style="display: flex; justify-content: space-between;">
-            <h4 style="font-size: 16px; font-weight: 800;">${w.nome}</h4>
-            <span style="color: var(--error-red); cursor: pointer; font-size: 14px;" onclick="deleteWorkoutCard(this, '${w.id}')">🗑️</span>
-          </div>
-          <p style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">${daysStr}</p>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
-            <span style="font-size: 12px; color: var(--accent-cyan);">${count} exercícios</span>
-            <button onclick="startActiveWorkout('${w.nome}')" class="btn btn-success" style="width: auto; padding: 8px 16px; font-size: 12px;">INICIAR</button>
-          </div>
-        </div>
-      `;
-      container.insertAdjacentHTML('afterbegin', cardHtml);
-    }
-
-    function deleteWorkoutCard(el, workoutIdOrName) {
-      if (confirm('Deseja realmente excluir este treino?')) {
-        const card = el.closest('.card');
-        if (card) card.remove();
-
-        try {
-          let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
-          saved = saved.filter(w => w.id !== workoutIdOrName && w.nome !== workoutIdOrName);
-          localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(saved));
-        } catch (e) {}
-      }
+      alert(`🎉 Treino "${name}" criado com sucesso com ${newWorkoutExercises.length} exercícios montados!`);
     }
 
     function renderHistoryCardUI(item, prepend = false) {
@@ -2269,13 +2462,9 @@
 
     // Carregar treinos criados anteriormente, histórico e biblioteca ao abrir a página
     window.addEventListener('load', () => {
-      try {
-        let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
-        saved.forEach(w => renderWorkoutCardUI(w));
-      } catch (e) {}
-
       loadHistoryFromStorage();
       loadExercisesLibrary();
+      loadWorkoutsFromStorage();
     });
   </script>
 </body>
