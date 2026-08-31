@@ -844,9 +844,9 @@
     </div>
   </div>
 
-  <!-- MODAL EXCLUSIVO PARA EXIBIR O GIF AMPLIADO / EXPANDIDO EM TAMANHO GRANDE COM ZOOM 3D -->
+  <!-- MODAL EXCLUSIVO PARA EXIBIR O GIF AMPLIADO / EXPANDIDO EM TAMANHO GRANDE (REPRODUÇÃO CONTÍNUA FIXA) -->
   <div id="modalOnlyGif" class="modal-overlay" onclick="closeOnlyGifModal(event)" style="z-index: 99999;">
-    <div class="modal-card" onclick="event.stopPropagation()" style="max-width: 540px; width: 95%; padding: 18px; text-align: left; background: #0c0e14; border: 2px solid var(--accent-cyan); box-shadow: 0 0 50px rgba(0,210,255,0.45); border-radius: 24px; position: relative;">
+    <div class="modal-card" onclick="event.stopPropagation()" style="max-width: 520px; width: 95%; padding: 18px; text-align: left; background: #0c0e14; border: 2px solid var(--accent-cyan); box-shadow: 0 0 50px rgba(0,210,255,0.45); border-radius: 24px; position: relative;">
       
       <!-- Cabeçalho do Pop-up -->
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--divider); padding-bottom: 10px;">
@@ -860,15 +860,15 @@
         <button data-close-gif-modal onclick="closeOnlyGifModal()" style="background: rgba(255,255,255,0.1); border: 1px solid var(--divider); color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; flex-shrink: 0; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,50,50,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">✕</button>
       </div>
 
-      <!-- Container do GIF com Altura Maior e Efeito Visual -->
-      <div id="onlyGifContainer" style="width: 100%; height: 340px; max-height: 50vh; background: #000; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1.5px solid rgba(0,210,255,0.3); position: relative; cursor: zoom-in; user-select: none;" title="Toque para alternar zoom (1.8x) ou arraste quando em zoom">
+      <!-- Container do GIF com Altura Maior e Efeito Visual (Fixo e Sempre Passando) -->
+      <div id="onlyGifContainer" style="width: 100%; height: 350px; max-height: 52vh; background: #000; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1.5px solid rgba(0,210,255,0.35); position: relative; user-select: none; box-shadow: inset 0 0 25px rgba(0,0,0,0.8);">
         <!-- Loader Spinner -->
         <div id="onlyGifLoader" style="position: absolute; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 2;">
           <div style="width: 36px; height: 36px; border: 3px solid rgba(0,210,255,0.2); border-top-color: var(--accent-cyan); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
           <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">Carregando animação 3D...</span>
         </div>
 
-        <img id="onlyGifImg" src="" alt="GIF Exercício" onload="handleOnlyGifLoaded(this)" onerror="handleOnlyGifError(this)" style="width: 100%; height: 100%; object-fit: contain; display: block; transform-origin: center center; transition: transform 0.15s ease-out;">
+        <img id="onlyGifImg" src="" alt="GIF Exercício" onload="handleOnlyGifLoaded(this)" onerror="handleOnlyGifError(this)" style="width: 100%; height: 100%; object-fit: contain; display: block;">
         
         <div id="onlyGifFallback" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: var(--text-grey);">
           <div style="font-size: 54px; margin-bottom: 8px;">🏋️‍♂️</div>
@@ -878,46 +878,24 @@
         <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.85); border: 1px solid rgba(0,210,255,0.6); border-radius: 8px; padding: 3px 8px; font-size: 10px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 0.5px; z-index: 3;">
           ● GIF HD 3D
         </div>
-
-        <div id="onlyGifZoomBadge" style="position: absolute; top: 10px; left: 10px; background: rgba(30,136,229,0.9); border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 800; color: white; display: block; z-index: 3; box-shadow: 0 2px 8px rgba(0,0,0,0.5);">
-          100%
-        </div>
-
-        <div id="onlyGifHintPill" style="position: absolute; bottom: 8px; background: rgba(0,0,0,0.75); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 2px 10px; font-size: 10px; color: var(--text-grey); pointer-events: none; z-index: 3;">
-          💡 Toque para zoom (1.8x) • Arraste para mover
-        </div>
-      </div>
-
-      <!-- Barra de Ferramentas de Zoom & Playback -->
-      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); border-radius: 12px; padding: 8px 12px; margin-top: 10px; border: 1px solid var(--divider); gap: 6px; flex-wrap: wrap;">
-        <div style="display: flex; gap: 6px;">
-          <button onclick="adjustGifZoom(-0.4)" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; width: 34px; height: 34px; border-radius: 8px; font-size: 15px; font-weight: 800; cursor: pointer;" title="Diminuir Zoom">🔍−</button>
-          <button onclick="adjustGifZoom(0.4)" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; width: 34px; height: 34px; border-radius: 8px; font-size: 15px; font-weight: 800; cursor: pointer;" title="Aumentar Zoom">🔍＋</button>
-          <button onclick="resetGifZoom()" style="background: rgba(0,210,255,0.12); border: 1px solid rgba(0,210,255,0.35); color: var(--accent-cyan); height: 34px; padding: 0 10px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer;" title="Resetar Zoom para 100%">⟲ 1.0x</button>
-          <button onclick="toggleGifZoom()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; height: 34px; padding: 0 10px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer;" title="Alternar Zoom">⚡ 1.8x</button>
-        </div>
-        <div style="display: flex; gap: 6px;">
-          <button id="btnToggleOnlyGifPlay" onclick="toggleOnlyGifPlayPause()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; height: 34px; padding: 0 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;">⏸ Pausar</button>
-          <button onclick="toggleOnlyGifFullscreen()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; width: 34px; height: 34px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;" title="Tela Cheia">⛶</button>
-        </div>
       </div>
 
       <!-- Informações Rápidas e Instruções -->
-      <div style="background: rgba(22,24,28,0.7); border: 1px solid var(--divider); border-radius: 12px; padding: 10px 12px; margin-top: 10px;">
-        <div style="font-size: 11px; font-weight: 800; color: var(--accent-cyan); margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
+      <div style="background: rgba(22,24,28,0.7); border: 1px solid var(--divider); border-radius: 12px; padding: 12px 14px; margin-top: 12px;">
+        <div style="font-size: 11px; font-weight: 800; color: var(--accent-cyan); margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
           <span>🎯</span> MÚSCULO ALVO: <span id="onlyGifTargetText" style="color: white; font-weight: 700;">Peitoral Maior</span>
         </div>
-        <div id="onlyGifInstructionsText" style="font-size: 11px; color: var(--text-grey); line-height: 1.4; max-height: 65px; overflow-y: auto;">
+        <div id="onlyGifInstructionsText" style="font-size: 12px; color: var(--text-grey); line-height: 1.5; max-height: 80px; overflow-y: auto;">
           Execute o movimento mantendo controle muscular e postura alinhada.
         </div>
       </div>
 
       <!-- Botões de Ação Inferiores -->
-      <div style="display: flex; gap: 8px; margin-top: 12px;">
-        <button id="onlyGifBtnFav" onclick="toggleFavoriteFromOnlyGifModal()" class="btn btn-outline" style="flex: 1; padding: 10px; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+      <div style="display: flex; gap: 8px; margin-top: 14px;">
+        <button id="onlyGifBtnFav" onclick="toggleFavoriteFromOnlyGifModal()" class="btn btn-outline" style="flex: 1; padding: 11px; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px;">
           <span>⭐</span> Favoritar
         </button>
-        <button data-close-gif-modal onclick="closeOnlyGifModal()" class="btn btn-primary" style="flex: 1.5; font-weight: 800; font-size: 13px; border-radius: 12px; padding: 10px;">
+        <button data-close-gif-modal onclick="closeOnlyGifModal()" class="btn btn-primary" style="flex: 1.5; font-weight: 800; font-size: 13px; border-radius: 12px; padding: 11px;">
           ✓ VOLTAR AO TREINO
         </button>
       </div>
@@ -2537,55 +2515,12 @@
         // ==========================================
     // CONTROLE AVANÇADO DO POP-UP EXPANDIDO DE GIF (ZOOM, PAN, FULLSCREEN)
     // ==========================================
-    let currentGifScale = 1.0;
-    let gifPanX = 0;
-    let gifPanY = 0;
+    // ==========================================
+    // CONTROLE DO POP-UP EXPANDIDO DE GIF (REPRODUÇÃO CONTÍNUA FIXA)
+    // ==========================================
     let currentOnlyGifId = null;
     let currentOnlyGifOriginalUrl = '';
-    let isOnlyGifPaused = false;
     let onlyGifMirrorIndex = 0;
-
-    function resetGifZoom() {
-      currentGifScale = 1.0;
-      gifPanX = 0;
-      gifPanY = 0;
-      applyOnlyGifTransform();
-    }
-
-    function adjustGifZoom(delta) {
-      currentGifScale = Math.min(Math.max(currentGifScale + delta, 0.8), 3.5);
-      if (currentGifScale <= 1.05) {
-        gifPanX = 0;
-        gifPanY = 0;
-      }
-      applyOnlyGifTransform();
-    }
-
-    function toggleGifZoom() {
-      if (currentGifScale > 1.2) {
-        resetGifZoom();
-      } else {
-        currentGifScale = 1.8;
-        gifPanX = 0;
-        gifPanY = 0;
-        applyOnlyGifTransform();
-      }
-    }
-
-    function applyOnlyGifTransform() {
-      const img = document.getElementById('onlyGifImg');
-      const container = document.getElementById('onlyGifContainer');
-      const badge = document.getElementById('onlyGifZoomBadge');
-      if (img) {
-        img.style.transform = `scale(${currentGifScale}) translate(${gifPanX / currentGifScale}px, ${gifPanY / currentGifScale}px)`;
-      }
-      if (container) {
-        container.style.cursor = currentGifScale > 1.05 ? 'grab' : 'zoom-in';
-      }
-      if (badge) {
-        badge.innerText = `${Math.round(currentGifScale * 100)}%`;
-      }
-    }
 
     function handleOnlyGifLoaded(imgEl) {
       const loader = document.getElementById('onlyGifLoader');
@@ -2620,49 +2555,6 @@
       if (loader) loader.style.display = 'none';
       if (imgEl) imgEl.style.display = 'none';
       if (fallback) fallback.style.display = 'flex';
-    }
-
-    function toggleOnlyGifPlayPause() {
-      const img = document.getElementById('onlyGifImg');
-      const btn = document.getElementById('btnToggleOnlyGifPlay');
-      if (!img || !img.src) return;
-
-      isOnlyGifPaused = !isOnlyGifPaused;
-      if (isOnlyGifPaused) {
-        try {
-          const canvas = document.createElement('canvas');
-          canvas.width = img.naturalWidth || 300;
-          canvas.height = img.naturalHeight || 300;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          img.dataset.animatedSrc = img.src;
-          img.src = canvas.toDataURL('image/png');
-        } catch (e) {
-          console.log('Pausa canvas indisponível:', e);
-        }
-        if (btn) btn.innerHTML = '▶ Reproduzir';
-      } else {
-        if (img.dataset.animatedSrc) {
-          img.src = img.dataset.animatedSrc;
-        }
-        if (btn) btn.innerHTML = '⏸ Pausar';
-      }
-    }
-
-    function toggleOnlyGifFullscreen() {
-      const container = document.getElementById('onlyGifContainer');
-      if (!container) return;
-      if (!document.fullscreenElement) {
-        if (container.requestFullscreen) {
-          container.requestFullscreen();
-        } else if (container.webkitRequestFullscreen) {
-          container.webkitRequestFullscreen();
-        }
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
-      }
     }
 
     function openOnlyGifModal(targetParam, optionalTitle, optionalSubtitle) {
@@ -2711,7 +2603,6 @@
       
       currentOnlyGifId = (ex && (ex.exerciseId || ex.id)) || exerciseName;
       currentOnlyGifOriginalUrl = targetUrl || (ex && ex.gifUrl) || 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-bench-press.gif';
-      isOnlyGifPaused = false;
       onlyGifMirrorIndex = 0;
 
       // Atualizar Textos e Badges
@@ -2720,22 +2611,18 @@
       const equipEl = document.getElementById('onlyGifEquipBadge');
       const targetTextEl = document.getElementById('onlyGifTargetText');
       const instructionsTextEl = document.getElementById('onlyGifInstructionsText');
-      const playBtn = document.getElementById('btnToggleOnlyGifPlay');
 
       if (titleEl) titleEl.innerText = exerciseName;
       if (badgeEl) badgeEl.innerText = muscleGroup;
       if (equipEl) equipEl.innerText = equip;
       if (targetTextEl) targetTextEl.innerText = targetMuscle;
       if (instructionsTextEl) instructionsTextEl.innerText = instructions;
-      if (playBtn) playBtn.innerHTML = '⏸ Pausar';
 
       // Configurar Imagem do GIF e Loader
       const modal = document.getElementById('modalOnlyGif');
       const img = document.getElementById('onlyGifImg');
       const loader = document.getElementById('onlyGifLoader');
       const fallback = document.getElementById('onlyGifFallback');
-
-      resetGifZoom();
 
       if (currentOnlyGifOriginalUrl) {
         if (img) {
@@ -2777,7 +2664,6 @@
         modal.style.opacity = '0';
         modal.style.visibility = 'hidden';
       }
-      resetGifZoom();
     }
 
     function toggleFavoriteFromOnlyGifModal() {
@@ -2815,83 +2701,8 @@
       closeOnlyGifModal();
     }
 
-    // Configurar listeners de Pan e Zoom no GIF e Atalhos de Teclado
+    // Configurar Atalhos de Teclado (Escape para fechar Modais)
     window.addEventListener('DOMContentLoaded', () => {
-      const container = document.getElementById('onlyGifContainer');
-      if (container) {
-        let isDragging = false;
-        let startX = 0, startY = 0;
-        let moved = false;
-
-        container.addEventListener('mousedown', (e) => {
-          moved = false;
-          if (currentGifScale > 1.05) {
-            isDragging = true;
-            startX = e.clientX - gifPanX;
-            startY = e.clientY - gifPanY;
-            container.style.cursor = 'grabbing';
-          }
-        });
-
-        window.addEventListener('mousemove', (e) => {
-          if (isDragging) {
-            moved = true;
-            gifPanX = e.clientX - startX;
-            gifPanY = e.clientY - startY;
-            applyOnlyGifTransform();
-          }
-        });
-
-        window.addEventListener('mouseup', () => {
-          if (isDragging) {
-            isDragging = false;
-            container.style.cursor = currentGifScale > 1.05 ? 'grab' : 'zoom-in';
-          }
-        });
-
-        // Click no Container para alternar zoom (se não tiver arrastado)
-        container.addEventListener('click', (e) => {
-          if (!moved) {
-            toggleGifZoom();
-          }
-          moved = false;
-        });
-
-        // Touch events para Celular e Tablets
-        container.addEventListener('touchstart', (e) => {
-          moved = false;
-          if (e.touches.length === 1 && currentGifScale > 1.05) {
-            isDragging = true;
-            startX = e.touches[0].clientX - gifPanX;
-            startY = e.touches[0].clientY - gifPanY;
-          }
-        }, { passive: true });
-
-        container.addEventListener('touchmove', (e) => {
-          if (isDragging && e.touches.length === 1) {
-            moved = true;
-            gifPanX = e.touches[0].clientX - startX;
-            gifPanY = e.touches[0].clientY - startY;
-            applyOnlyGifTransform();
-          }
-        }, { passive: true });
-
-        container.addEventListener('touchend', () => {
-          isDragging = false;
-        });
-
-        // Wheel Zoom com Roda do Mouse
-        container.addEventListener('wheel', (e) => {
-          e.preventDefault();
-          if (e.deltaY < 0) {
-            adjustGifZoom(0.25);
-          } else {
-            adjustGifZoom(-0.25);
-          }
-        }, { passive: false });
-      }
-
-      // Tecla Escape para fechar Modais
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           closeOnlyGifModal();
