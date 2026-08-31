@@ -837,53 +837,84 @@
     </div>
   </div>
 
-  <!-- MODAL EXCLUSIVO PARA EXIBIR O GIF AMPLIADO / EXPANDIDO EM TAMANHO GRANDE -->
+  <!-- MODAL EXCLUSIVO PARA EXIBIR O GIF AMPLIADO / EXPANDIDO EM TAMANHO GRANDE COM ZOOM 3D -->
   <div id="modalOnlyGif" class="modal-overlay" onclick="closeOnlyGifModal(event)" style="z-index: 99999;">
-    <div class="modal-card" onclick="event.stopPropagation()" style="max-width: 600px; width: 95%; padding: 20px; text-align: left; background: #0c0e14; border: 2px solid var(--accent-cyan); box-shadow: 0 0 45px rgba(0,210,255,0.4); border-radius: 24px; position: relative;">
+    <div class="modal-card" onclick="event.stopPropagation()" style="max-width: 540px; width: 95%; padding: 18px; text-align: left; background: #0c0e14; border: 2px solid var(--accent-cyan); box-shadow: 0 0 50px rgba(0,210,255,0.45); border-radius: 24px; position: relative;">
       
       <!-- Cabeçalho do Pop-up -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--divider); padding-bottom: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--divider); padding-bottom: 10px;">
         <div style="min-width: 0; flex: 1; padding-right: 10px;">
-          <h3 id="onlyGifTitle" style="font-size: 18px; font-weight: 800; color: white; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Animação do Exercício</h3>
-          <div id="onlyGifSubtitle" style="font-size: 12px; color: var(--accent-cyan); margin-top: 3px;">Visualização ampliada em alta definição</div>
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+            <span id="onlyGifBadge" style="font-size: 10px; font-weight: 800; color: var(--accent-cyan); background: rgba(0,210,255,0.15); padding: 2px 8px; border-radius: 6px; text-transform: uppercase;">PEITO</span>
+            <span id="onlyGifEquipBadge" style="font-size: 10px; color: var(--text-grey); background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 6px;">Barra</span>
+          </div>
+          <h3 id="onlyGifTitle" style="font-size: 17px; font-weight: 900; color: white; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Supino Reto com Barra</h3>
         </div>
-        <button data-close-gif-modal onclick="closeOnlyGifModal()" style="background: rgba(255,255,255,0.1); border: 1px solid var(--divider); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; flex-shrink: 0;">✕</button>
+        <button data-close-gif-modal onclick="closeOnlyGifModal()" style="background: rgba(255,255,255,0.1); border: 1px solid var(--divider); color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; flex-shrink: 0; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,50,50,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">✕</button>
       </div>
 
       <!-- Container do GIF com Altura Maior e Efeito Visual -->
-      <div id="onlyGifContainer" style="width: 100%; height: 380px; max-height: 55vh; background: #000; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid var(--divider); position: relative; cursor: zoom-in;" ondblclick="toggleGifZoom()" title="Duplo clique para ampliar ou resetar zoom">
-        <img id="onlyGifImg" src="" alt="GIF Exercício" style="width: 100%; height: 100%; object-fit: contain; display: block; transition: transform 0.25s ease; transform-origin: center center;" onerror="this.style.display='none'; document.getElementById('onlyGifFallback').style.display='flex';">
+      <div id="onlyGifContainer" style="width: 100%; height: 340px; max-height: 50vh; background: #000; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1.5px solid rgba(0,210,255,0.3); position: relative; cursor: zoom-in; user-select: none;" title="Toque para alternar zoom (1.8x) ou arraste quando em zoom">
+        <!-- Loader Spinner -->
+        <div id="onlyGifLoader" style="position: absolute; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 2;">
+          <div style="width: 36px; height: 36px; border: 3px solid rgba(0,210,255,0.2); border-top-color: var(--accent-cyan); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+          <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">Carregando animação 3D...</span>
+        </div>
+
+        <img id="onlyGifImg" src="" alt="GIF Exercício" onload="handleOnlyGifLoaded(this)" onerror="handleOnlyGifError(this)" style="width: 100%; height: 100%; object-fit: contain; display: block; transform-origin: center center; transition: transform 0.15s ease-out;">
         
         <div id="onlyGifFallback" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: var(--text-grey);">
           <div style="font-size: 54px; margin-bottom: 8px;">🏋️‍♂️</div>
           <div style="font-size: 14px; font-weight: 700; color: white;">Demonstração em GIF indisponível</div>
         </div>
 
-        <div style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.85); border: 1px solid rgba(0,210,255,0.7); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 0.5px;">
-          ● GIF 3D
+        <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.85); border: 1px solid rgba(0,210,255,0.6); border-radius: 8px; padding: 3px 8px; font-size: 10px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 0.5px; z-index: 3;">
+          ● GIF HD 3D
         </div>
 
-        <div id="onlyGifZoomBadge" style="position: absolute; top: 12px; left: 12px; background: rgba(30,136,229,0.9); border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 700; color: white; display: none;">
-          Zoom: 1.0x
+        <div id="onlyGifZoomBadge" style="position: absolute; top: 10px; left: 10px; background: rgba(30,136,229,0.9); border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 800; color: white; display: block; z-index: 3; box-shadow: 0 2px 8px rgba(0,0,0,0.5);">
+          100%
         </div>
-      </div>
 
-      <!-- Barra de Ferramentas de Zoom -->
-      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); border-radius: 12px; padding: 10px 14px; margin-top: 14px; border: 1px solid var(--divider);">
-        <span style="font-size: 12px; color: var(--text-grey); display: flex; align-items: center; gap: 6px;">
-          <span>🔍</span> Duplo toque ou botões para zoom:
-        </span>
-        <div style="display: flex; gap: 8px;">
-          <button onclick="adjustGifZoom(-0.5)" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; width: 32px; height: 32px; border-radius: 8px; font-size: 16px; font-weight: 800; cursor: pointer;">-</button>
-          <button onclick="adjustGifZoom(0.5)" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; width: 32px; height: 32px; border-radius: 8px; font-size: 16px; font-weight: 800; cursor: pointer;">+</button>
-          <button onclick="resetGifZoom()" style="background: rgba(0,210,255,0.15); border: 1px solid rgba(0,210,255,0.4); color: var(--accent-cyan); height: 32px; padding: 0 12px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer;">Reset</button>
+        <div id="onlyGifHintPill" style="position: absolute; bottom: 8px; background: rgba(0,0,0,0.75); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 2px 10px; font-size: 10px; color: var(--text-grey); pointer-events: none; z-index: 3;">
+          💡 Toque para zoom (1.8x) • Arraste para mover
         </div>
       </div>
 
-      <!-- Botão Fechar -->
-      <button data-close-gif-modal onclick="closeOnlyGifModal()" class="btn btn-primary" style="margin-top: 14px; width: 100%; font-weight: 800; font-size: 14px; border-radius: 12px; padding: 12px;">
-        ✓ FECHAR VISUALIZAÇÃO
-      </button>
+      <!-- Barra de Ferramentas de Zoom & Playback -->
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); border-radius: 12px; padding: 8px 12px; margin-top: 10px; border: 1px solid var(--divider); gap: 6px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 6px;">
+          <button onclick="adjustGifZoom(-0.4)" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; width: 34px; height: 34px; border-radius: 8px; font-size: 15px; font-weight: 800; cursor: pointer;" title="Diminuir Zoom">🔍−</button>
+          <button onclick="adjustGifZoom(0.4)" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; width: 34px; height: 34px; border-radius: 8px; font-size: 15px; font-weight: 800; cursor: pointer;" title="Aumentar Zoom">🔍＋</button>
+          <button onclick="resetGifZoom()" style="background: rgba(0,210,255,0.12); border: 1px solid rgba(0,210,255,0.35); color: var(--accent-cyan); height: 34px; padding: 0 10px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer;" title="Resetar Zoom para 100%">⟲ 1.0x</button>
+          <button onclick="toggleGifZoom()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; height: 34px; padding: 0 10px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer;" title="Alternar Zoom">⚡ 1.8x</button>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          <button id="btnToggleOnlyGifPlay" onclick="toggleOnlyGifPlayPause()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; height: 34px; padding: 0 10px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer;">⏸ Pausar</button>
+          <button onclick="toggleOnlyGifFullscreen()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; width: 34px; height: 34px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;" title="Tela Cheia">⛶</button>
+        </div>
+      </div>
+
+      <!-- Informações Rápidas e Instruções -->
+      <div style="background: rgba(22,24,28,0.7); border: 1px solid var(--divider); border-radius: 12px; padding: 10px 12px; margin-top: 10px;">
+        <div style="font-size: 11px; font-weight: 800; color: var(--accent-cyan); margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
+          <span>🎯</span> MÚSCULO ALVO: <span id="onlyGifTargetText" style="color: white; font-weight: 700;">Peitoral Maior</span>
+        </div>
+        <div id="onlyGifInstructionsText" style="font-size: 11px; color: var(--text-grey); line-height: 1.4; max-height: 65px; overflow-y: auto;">
+          Execute o movimento mantendo controle muscular e postura alinhada.
+        </div>
+      </div>
+
+      <!-- Botões de Ação Inferiores -->
+      <div style="display: flex; gap: 8px; margin-top: 12px;">
+        <button id="onlyGifBtnFav" onclick="toggleFavoriteFromOnlyGifModal()" class="btn btn-outline" style="flex: 1; padding: 10px; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span>⭐</span> Favoritar
+        </button>
+        <button data-close-gif-modal onclick="closeOnlyGifModal()" class="btn btn-primary" style="flex: 1.5; font-weight: 800; font-size: 13px; border-radius: 12px; padding: 10px;">
+          ✓ VOLTAR AO TREINO
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -951,841 +982,6 @@
     function loginUser() {
       switchTab('screenHome');
       document.getElementById('bottomNav').style.display = 'flex';
-    }
-
-    // ==========================================
-    // TREINOS PADRÃO COM EXERCÍCIOS COMPLETOS (4 DIVISÕES)
-    // ==========================================
-    const DEFAULT_WORKOUT_DIVISIONS = [
-      {
-        id: 'treino_default_a',
-        nome: 'Treino A — Peito & Tríceps',
-        descricao: 'Hipertrofia',
-        diasSemana: ['Segunda-feira', 'Quinta-feira'],
-        corHex: '#1E88E5',
-        exercicios: [
-          { id: 'ex_a1', nome: 'Supino Reto com Barra', series: '4', reps: '10-12', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-bench-press.gif' },
-          { id: 'ex_a2', nome: 'Supino Inclinado com Halteres', series: '3', reps: '10-12', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-incline-bench-press.gif' },
-          { id: 'ex_a3', nome: 'Crucifixo no Crossover (Polia Alta)', series: '3', reps: '12-15', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/cable-middle-fly.gif' },
-          { id: 'ex_a4', nome: 'Tríceps Pulley na Corda', series: '4', reps: '12-15', grupoMuscular: 'Tríceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/cable-one-arm-tricep-pushdown.gif' },
-          { id: 'ex_a5', nome: 'Tríceps Testa com Barra W', series: '3', reps: '10-12', grupoMuscular: 'Tríceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/barbell-reverse-grip-skullcrusher.gif' }
-        ]
-      },
-      {
-        id: 'treino_default_b',
-        nome: 'Treino B — Costas & Bíceps',
-        descricao: 'Hipertrofia',
-        diasSemana: ['Terça-feira', 'Sexta-feira'],
-        corHex: '#00D2FF',
-        exercicios: [
-          { id: 'ex_b1', nome: 'Puxada Frontal na Polia', series: '4', reps: '10-12', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/cable-lat-pulldown.gif' },
-          { id: 'ex_b2', nome: 'Remada Curvada com Barra', series: '4', reps: '8-10', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/barbell-bent-over-row.gif' },
-          { id: 'ex_b3', nome: 'Remada Unilateral com Halter (Serrote)', series: '3', reps: '10-12', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/dumbbell-one-arm-bent-over-row.gif' },
-          { id: 'ex_b4', nome: 'Rosca Direta com Barra W', series: '4', reps: '10-12', grupoMuscular: 'Bíceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/barbell-curl.gif' },
-          { id: 'ex_b5', nome: 'Rosca Martelo com Halteres', series: '3', reps: '12', grupoMuscular: 'Bíceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/dumbbell-hammer-curl.gif' }
-        ]
-      },
-      {
-        id: 'treino_default_c',
-        nome: 'Treino C — Pernas & Panturrilhas',
-        descricao: 'Força & Resistência',
-        diasSemana: ['Quarta-feira', 'Sábado'],
-        corHex: '#4CAF50',
-        exercicios: [
-          { id: 'ex_c1', nome: 'Agachamento Livre com Barra', series: '4', reps: '8-10', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/barbell-squat.gif' },
-          { id: 'ex_c2', nome: 'Leg Press 45º', series: '4', reps: '10-12', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/sled-45-degrees-leg-press.gif' },
-          { id: 'ex_c3', nome: 'Cadeira Extensora', series: '3', reps: '12-15', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/lever-leg-extension.gif' },
-          { id: 'ex_c4', nome: 'Mesa Flexora', series: '3', reps: '12-15', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/lever-lying-leg-curl.gif' },
-          { id: 'ex_c5', nome: 'Panturrilha Sentado', series: '4', reps: '15-20', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/lever-seated-calf-raise.gif' }
-        ]
-      },
-      {
-        id: 'treino_default_d',
-        nome: 'Treino D — Ombros, Trapézio & Abdômen',
-        descricao: 'Definição & Core',
-        diasSemana: ['Sexta-feira'],
-        corHex: '#FF9800',
-        exercicios: [
-          { id: 'ex_d1', nome: 'Desenvolvimento com Halteres', series: '4', reps: '10-12', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-shoulder-press.gif' },
-          { id: 'ex_d2', nome: 'Elevação Lateral com Halteres', series: '4', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-lateral-raise.gif' },
-          { id: 'ex_d3', nome: 'Crucifixo Inverso com Halteres', series: '3', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-rear-lateral-raise.gif' },
-          { id: 'ex_d4', nome: 'Encolhimento com Halteres', series: '4', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/dumbbell-shrug.gif' },
-          { id: 'ex_d5', nome: 'Prancha Ventral Isométrica', series: '3', reps: '60s', grupoMuscular: 'Abdômen', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/abs/bodyweight-incline-side-plank.gif' }
-        ]
-      }
-    ];
-
-    let allWorkoutsList = [];
-    const expandedWorkoutIds = new Set();
-
-    async function loadWorkoutsFromStorage() {
-      // 1. Carregar treinos locais e garantir que os padrões existam
-      try {
-        let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
-        const map = new Map();
-        
-        // Colocar primeiro os padrões A, B, C, D
-        DEFAULT_WORKOUT_DIVISIONS.forEach(def => map.set(def.id, { ...def }));
-
-        // Mesclar com os salvos localmente
-        if (Array.isArray(saved)) {
-          saved.forEach(w => {
-            if (!Array.isArray(w.exercicios) || w.exercicios.length === 0) {
-              const def = DEFAULT_WORKOUT_DIVISIONS.find(d => d.nome.toLowerCase() === (w.nome || '').toLowerCase() || d.id === w.id);
-              if (def) w.exercicios = def.exercicios;
-            }
-            map.set(w.id, w);
-          });
-        }
-
-        allWorkoutsList = Array.from(map.values());
-        localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
-      } catch (e) {
-        allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
-      }
-      renderAllWorkoutsUI();
-
-      // 2. Buscar treinos no Supabase (Nuvem / Sincronizados com Mobile)
-      if (_supabase) {
-        try {
-          const { data, error } = await _supabase
-            .from('treinos')
-            .select('*')
-            .order('criado_em', { ascending: false });
-
-          if (!error && Array.isArray(data)) {
-            const onlineWorkouts = data.map(row => {
-              let exList = [];
-              if (row.exercicios) {
-                let parsedEx = row.exercicios;
-                if (typeof parsedEx === 'string') {
-                  try { parsedEx = JSON.parse(parsedEx); } catch (_) {}
-                }
-                if (Array.isArray(parsedEx)) {
-                  exList = parsedEx.map((e, idx) => ({
-                    id: e.id || `ex_${row.id}_${idx}`,
-                    nome: e.nome || e.name || 'Exercício',
-                    series: e.series || '4',
-                    reps: e.reps || '10-12',
-                    grupoMuscular: e.grupoMuscular || e.grupo_muscular || 'Geral',
-                    gifUrl: e.gifUrl || e.gif_url || ''
-                  }));
-                }
-              }
-              let days = [];
-              if (row.dias_semana) {
-                let rawDays = row.dias_semana;
-                if (typeof rawDays === 'string') {
-                  try { rawDays = JSON.parse(rawDays); } catch (_) {}
-                }
-                if (Array.isArray(rawDays)) days = rawDays;
-              }
-
-              return {
-                id: row.id,
-                nome: row.nome || 'Treino',
-                descricao: row.descricao || '',
-                diasSemana: days,
-                corHex: row.cor_hex || '#1E88E5',
-                exercicios: exList,
-                exerciciosCount: exList.length,
-                criadoEm: row.criado_em || new Date().toISOString()
-              };
-            });
-
-            // Enviar para o Supabase quaisquer treinos locais que ainda não estejam na nuvem
-            const onlineIds = new Set(onlineWorkouts.map(w => w.id));
-            for (const localW of allWorkoutsList) {
-              if (!onlineIds.has(localW.id)) {
-                try {
-                  await _supabase.from('treinos').upsert({
-                    id: localW.id,
-                    nome: localW.nome,
-                    descricao: localW.descricao || '',
-                    dias_semana: localW.diasSemana || [],
-                    cor_hex: localW.corHex || '#1E88E5',
-                    exercicios: localW.exercicios || [],
-                    criado_em: localW.criadoEm || new Date().toISOString()
-                  });
-                } catch (_) {}
-              }
-            }
-
-            // Mesclar treinos da nuvem com locais
-            const mapById = new Map();
-            allWorkoutsList.forEach(w => mapById.set(w.id, w));
-            onlineWorkouts.forEach(w => mapById.set(w.id, w));
-            allWorkoutsList = Array.from(mapById.values());
-
-            localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
-            renderAllWorkoutsUI();
-            console.log(`[Supabase] Total consolidado: ${allWorkoutsList.length} treinos sincronizados.`);
-          }
-        } catch (e) {
-          console.log('[Supabase] Erro ao sincronizar treinos da nuvem:', e);
-        }
-
-        // Subscrição em Tempo Real: Atualiza a lista automaticamente se o Mobile criar/excluir treinos
-        if (!_supabaseRealtimeSubscribed) {
-          _supabaseRealtimeSubscribed = true;
-          try {
-            _supabase
-              .channel('realtime_treinos_web')
-              .on('postgres_changes', { event: '*', schema: 'public', table: 'treinos' }, () => {
-                console.log('[Supabase Realtime] Mudança detectada nos treinos! Recarregando...');
-                loadWorkoutsFromStorage();
-              })
-              .subscribe();
-          } catch (_) {}
-        }
-      }
-    }
-
-    let _supabaseRealtimeSubscribed = false;
-
-    function toggleWorkoutCardExpand(workoutId, event) {
-      if (event) event.stopPropagation();
-      if (expandedWorkoutIds.has(workoutId)) {
-        expandedWorkoutIds.delete(workoutId);
-      } else {
-        expandedWorkoutIds.add(workoutId);
-      }
-      renderAllWorkoutsUI();
-    }
-
-    function renderAllWorkoutsUI() {
-      const container = document.getElementById('workoutListContainer');
-      if (!container) return;
-
-      if (allWorkoutsList.length === 0) {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 35px 16px; color: var(--text-grey);">
-            <div style="font-size: 36px; margin-bottom: 8px;">🏋️‍♂️</div>
-            <div style="font-weight: 700; font-size: 15px; color: white;">Nenhum treino cadastrado</div>
-            <div style="font-size: 12px; margin-top: 4px; margin-bottom: 14px;">Clique no botão "+ Criar Treino" acima para montar seu primeiro treino.</div>
-            <button onclick="openCreateWorkoutModal()" class="btn btn-primary" style="width: auto; padding: 8px 16px; font-size: 12px;">+ Criar Treino</button>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = allWorkoutsList.map(w => {
-        const isExpanded = expandedWorkoutIds.has(w.id);
-        const daysStr = Array.isArray(w.diasSemana) && w.diasSemana.length > 0 ? w.diasSemana.join(' • ') : 'Dias flexíveis';
-        const exercises = Array.isArray(w.exercicios) ? w.exercicios : [];
-        const count = exercises.length;
-        const color = w.corHex || '#1E88E5';
-
-        return `
-          <div class="card" id="card_${w.id}" style="border-left: 5px solid ${color}; padding: 16px; animation: fadeIn 0.25s ease-in-out;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div style="flex: 1; min-width: 0;">
-                <h4 style="font-size: 16px; font-weight: 800; color: white; margin-bottom: 2px;">${w.nome}</h4>
-                <p style="font-size: 11px; color: var(--text-grey); margin: 0;">${daysStr}</p>
-                ${w.descricao ? `<span style="display: inline-block; background: rgba(0,210,255,0.12); color: var(--accent-cyan); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-top: 6px;">${w.descricao}</span>` : ''}
-              </div>
-              <button onclick="deleteWorkoutCard('${w.id}')" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 16px; padding: 4px;" title="Excluir treino">🗑️</button>
-            </div>
-
-            <!-- Botão para Expandir / Recolher Exercícios Montados -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--divider);">
-              <button onclick="toggleWorkoutCardExpand('${w.id}', event)" style="background: none; border: none; font-size: 12px; font-weight: 700; color: var(--accent-cyan); cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 0;">
-                <span>${isExpanded ? '▲ Ocultar Exercícios' : `▼ Ver Exercícios Montados (${count})`}</span>
-              </button>
-              <button onclick="startActiveWorkout('${w.id}')" class="btn btn-success" style="width: auto; padding: 7px 18px; font-size: 12px; font-weight: 800; border-radius: 8px;">
-                ▶ INICIAR
-              </button>
-            </div>
-
-            <!-- LISTA DE EXERCÍCIOS MONTADOS NESTE TREINO (EXPANSÍVEL) -->
-            ${isExpanded ? `
-              <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px; animation: fadeIn 0.2s ease-in-out;">
-                ${exercises.length === 0 ? `
-                  <div style="font-size: 11px; color: var(--text-grey); padding: 8px; text-align: center;">Nenhum exercício montado neste treino.</div>
-                ` : exercises.map((ex, idx) => {
-                  const icon = getMuscleGroupIcon(ex.grupoMuscular);
-                  const safeName = (ex.nome || 'Exercício').replace(/'/g, "\\'");
-                  const safeSubtitle = `${ex.grupoMuscular || 'Geral'} • ${ex.series || 4} séries x ${ex.reps || '10-12'} reps`;
-
-                  let gifUrl = ex.gifUrl || ex.gif_url || '';
-                  if (!gifUrl) {
-                    const match = DEFAULT_BASE_EXERCISES.find(b => (b.nome || b.name || '').toLowerCase() === (ex.nome || '').toLowerCase()) ||
-                                  exercisesList.find(e => (e.nome || e.name || '').toLowerCase() === (ex.nome || '').toLowerCase());
-                    if (match) {
-                      gifUrl = match.gifUrl || match.gif_url || '';
-                    }
-                  }
-
-                  return `
-                    <div onclick="event.stopPropagation(); openOnlyGifModal('${gifUrl}', '${safeName}', '${safeSubtitle}')" style="display: flex; justify-content: space-between; align-items: center; background: #080a0f; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--divider); cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#10141e'" onmouseout="this.style.background='#080a0f'">
-                      <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                        <span style="font-size: 16px;">${icon}</span>
-                        <div style="min-width: 0;">
-                          <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${idx + 1}. ${ex.nome}</div>
-                          <div style="font-size: 11px; color: var(--accent-cyan);">${ex.series || 4} séries • ${ex.reps || '10-12'} reps</div>
-                        </div>
-                      </div>
-                      ${gifUrl ? `
-                        <button onclick="event.stopPropagation(); openOnlyGifModal('${gifUrl}', '${safeName}', '${safeSubtitle}')" style="background: rgba(0,210,255,0.12); border: 1px solid rgba(0,210,255,0.4); color: var(--accent-cyan); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; cursor: pointer; flex-shrink: 0;">
-                          🔍 GIF 3D
-                        </button>
-                      ` : ''}
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            ` : ''}
-
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function deleteWorkoutCard(workoutId) {
-      if (confirm('Deseja realmente excluir este treino?')) {
-        allWorkoutsList = allWorkoutsList.filter(w => w.id !== workoutId && w.nome !== workoutId);
-        localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
-        renderAllWorkoutsUI();
-
-        if (_supabase) {
-          try {
-            await _supabase.from('treinos').delete().eq('id', workoutId);
-            console.log('[Supabase] Treino excluído na nuvem:', workoutId);
-          } catch (e) {
-            console.log('[Supabase] Erro ao excluir treino na nuvem:', e);
-          }
-        }
-      }
-    }
-
-    // ==========================================
-    // EXECUÇÃO DE TREINO ATIVO DINÂMICO
-    // ==========================================
-    let currentActiveWorkout = null;
-
-    function startActiveWorkout(workoutIdOrName) {
-      const workout = allWorkoutsList.find(w => w.id === workoutIdOrName || w.nome === workoutIdOrName) || {
-        id: 'treino_temp',
-        nome: workoutIdOrName,
-        exercicios: DEFAULT_WORKOUT_DIVISIONS[0].exercicios
-      };
-
-      currentActiveWorkout = workout;
-      document.getElementById('activeWorkoutTitle').innerText = workout.nome;
-      
-      // Renderizar exercícios dinamicamente no treino ativo
-      const container = document.getElementById('activeWorkoutExercisesContainer');
-      if (container) {
-        const exercises = Array.isArray(workout.exercicios) && workout.exercicios.length > 0 ? workout.exercicios : DEFAULT_WORKOUT_DIVISIONS[0].exercicios;
-        
-        container.innerHTML = exercises.map((ex, exIdx) => {
-          const numSeries = parseInt(ex.series) || 4;
-          const safeName = (ex.nome || 'Exercício').replace(/'/g, "\\'");
-          const safeSubtitle = `${ex.grupoMuscular || 'Geral'} • ${ex.series || 4} séries x ${ex.reps || '10-12'} reps`;
-
-          // Garantir resolução do GIFUrl pela biblioteca se não estiver no objeto
-          let gifUrl = ex.gifUrl || ex.gif_url || '';
-          if (!gifUrl) {
-            const match = DEFAULT_BASE_EXERCISES.find(b => (b.nome || b.name || '').toLowerCase() === (ex.nome || '').toLowerCase()) ||
-                          exercisesList.find(e => (e.nome || e.name || '').toLowerCase() === (ex.nome || '').toLowerCase());
-            if (match) {
-              gifUrl = match.gifUrl || match.gif_url || '';
-            }
-          }
-
-          let rowsHtml = '';
-          for (let s = 1; s <= numSeries; s++) {
-            const rowId = `activeSetRow_${exIdx}_${s}`;
-            rowsHtml += `
-              <div class="set-row" id="${rowId}" style="margin-bottom: 6px;">
-                <div class="set-badge">${s}</div>
-                <div style="flex: 1;">
-                  <input type="number" class="form-input" value="30" style="padding: 6px 10px; font-size: 12px;" placeholder="Carga kg">
-                </div>
-                <div style="flex: 1;">
-                  <input type="number" class="form-input" value="12" style="padding: 6px 10px; font-size: 12px;" placeholder="Reps">
-                </div>
-                <div class="set-check" onclick="toggleSetDone('${rowId}')">✓</div>
-              </div>
-            `;
-          }
-
-          return `
-            <div class="card" style="border-left: 4px solid var(--accent-cyan); padding: 14px; margin-bottom: 12px;">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                <div>
-                  <span style="font-size: 10px; color: var(--primary-blue); font-weight: 800; letter-spacing: 0.5px;">EXERCÍCIO ${exIdx + 1} DE ${exercises.length}</span>
-                  <h3 style="font-size: 16px; font-weight: 800; margin-top: 2px; color: white;">${ex.nome}</h3>
-                  <p style="font-size: 11px; color: var(--text-grey); margin: 0;">${ex.series || 4} séries x ${ex.reps || '10-12'} reps • 60s descanso</p>
-                </div>
-                ${gifUrl ? `
-                  <button onclick="openOnlyGifModal('${gifUrl}', '${safeName}', '${safeSubtitle}')" style="background: rgba(0,210,255,0.12); border: 1px solid rgba(0,210,255,0.3); color: var(--accent-cyan); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; cursor: pointer;">
-                    🔍 GIF 3D
-                  </button>
-                ` : ''}
-              </div>
-
-              ${gifUrl ? `
-                <!-- BANNER EXPANSÍVEL DE DEMONSTRAÇÃO DO GIF -->
-                <div onclick="openOnlyGifModal('${gifUrl}', '${safeName}', '${safeSubtitle}')" style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,210,255,0.06); border: 1px dashed rgba(0,210,255,0.3); padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,210,255,0.12)'" onmouseout="this.style.background='rgba(0,210,255,0.06)'">
-                  <div style="display: flex; align-items: center; gap: 10px;">
-                    <div style="width: 44px; height: 44px; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,210,255,0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                      <img src="${gifUrl}" style="width: 100%; height: 100%; object-fit: contain;">
-                    </div>
-                    <div>
-                      <div style="font-size: 12px; font-weight: 800; color: var(--accent-cyan); display: flex; align-items: center; gap: 4px;">
-                        <span>🔍</span> TOQUE PARA AMPLIAR GIF
-                      </div>
-                      <div style="font-size: 10px; color: var(--text-grey);">Ver animação com zoom em tela cheia</div>
-                    </div>
-                  </div>
-                  <span style="color: var(--accent-cyan); font-size: 14px; font-weight: 800;">↗</span>
-                </div>
-              ` : ''}
-
-              <div style="font-size: 11px; font-weight: 700; color: var(--text-grey); margin-bottom: 6px; display: flex; justify-content: space-between;">
-                <span>Série</span>
-                <span style="flex: 1; text-align: center; margin-left: 20px;">Carga (kg)</span>
-                <span style="flex: 1; text-align: center;">Repetições</span>
-                <span style="width: 32px; text-align: center;">Status</span>
-              </div>
-
-              ${rowsHtml}
-            </div>
-          `;
-        }).join('');
-      }
-
-      switchTab('screenActiveWorkout');
-      activeWorkoutSeconds = 0;
-      clearInterval(activeWorkoutInterval);
-      activeWorkoutInterval = setInterval(() => {
-        activeWorkoutSeconds++;
-        let m = String(Math.floor(activeWorkoutSeconds / 60)).padStart(2, '0');
-        let s = String(activeWorkoutSeconds % 60).padStart(2, '0');
-        document.getElementById('activeTimer').innerText = `${m}:${s}`;
-      }, 1000);
-    }
-
-    async function finishActiveWorkout() {
-      clearInterval(activeWorkoutInterval);
-
-      const title = document.getElementById('activeWorkoutTitle').innerText || 'Treino Realizado';
-      const duracao = Math.max(1, Math.floor(activeWorkoutSeconds / 60));
-      const now = new Date();
-      const dataFormatada = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-
-      const historyItem = {
-        id: 'sessao_' + Date.now(),
-        nomeTreino: title,
-        duracaoMinutos: duracao,
-        data: dataFormatada,
-        inicioIso: new Date(now.getTime() - activeWorkoutSeconds * 1000).toISOString(),
-        fimIso: now.toISOString(),
-        concluido: true
-      };
-
-      // 1. Salvar no localStorage
-      let historyList = [];
-      try {
-        historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
-      } catch (e) {}
-      historyList.unshift(historyItem);
-      localStorage.setItem('jtech_fit_history', JSON.stringify(historyList));
-
-      // 2. Sincronizar com Supabase se online
-      if (_supabase) {
-        try {
-          await _supabase.from('sessoes_de_treino').upsert({
-            id: historyItem.id,
-            nome_treino: title,
-            inicio: historyItem.inicioIso,
-            fim: historyItem.fimIso,
-            concluido: true
-          });
-          console.log('[Supabase] Sessão de treino salva no histórico online:', title);
-        } catch (e) {
-          console.log('[Supabase] Aviso: Histórico mantido offline (sem conexão):', e);
-        }
-      }
-
-      // 3. Renderizar o card no topo do histórico
-      renderHistoryCardUI(historyItem, true);
-
-      // Reset dos contadores
-      activeWorkoutSeconds = 0;
-      document.getElementById('activeTimer').innerText = '00:00';
-
-      alert(`🏆 Treino "${title}" finalizado com sucesso em ${duracao} min!\nSalvo no histórico e sincronizado.`);
-      switchTab('screenHistory', document.querySelectorAll('.nav-item')[3]);
-    }
-
-    function toggleSetDone(rowId) {
-      const row = document.getElementById(rowId);
-      if (!row) return;
-      row.classList.toggle('done');
-      if (row.classList.contains('done')) {
-        startRestTimer(60);
-      }
-    }
-
-    function startRestTimer(seconds) {
-      restTimeRemaining = seconds;
-      document.getElementById('restTimerBar').classList.add('active');
-      updateRestUI();
-
-      clearInterval(restTimerInterval);
-      restTimerInterval = setInterval(() => {
-        restTimeRemaining--;
-        if (restTimeRemaining <= 0) {
-          clearInterval(restTimerInterval);
-          playAudioBeep();
-          alert('🔔 Tempo de Descanso Concluído! Inicie sua próxima série.');
-          document.getElementById('restTimerBar').classList.remove('active');
-        }
-        updateRestUI();
-      }, 1000);
-    }
-
-    function updateRestUI() {
-      let m = String(Math.floor(restTimeRemaining / 60)).padStart(2, '0');
-      let s = String(restTimeRemaining % 60).padStart(2, '0');
-      document.getElementById('restTimerText').innerText = `${m}:${s}`;
-      let fillPct = (restTimeRemaining / 60) * 100;
-      document.getElementById('restProgressFill').style.width = `${fillPct}%`;
-    }
-
-    function adjustRestTimer(seconds) {
-      restTimeRemaining = Math.max(0, restTimeRemaining + seconds);
-      updateRestUI();
-    }
-
-    function skipRestTimer() {
-      clearInterval(restTimerInterval);
-      document.getElementById('restTimerBar').classList.remove('active');
-    }
-
-    function playAudioBeep() {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        osc.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.4);
-      } catch (e) {}
-    }
-
-    // ==========================================
-    // CRIADOR DE TREINOS - LÓGICA E SINCRONIZAÇÃO
-    // ==========================================
-    let selectedDays = [];
-    let newWorkoutExercises = [];
-
-    function populateWorkoutExerciseSelect() {
-      const select = document.getElementById('exerciseSelectDropdown');
-      if (!select) return;
-
-      const groups = {};
-      exercisesList.forEach(ex => {
-        const g = ex.grupoMuscular || 'Geral';
-        if (!groups[g]) groups[g] = [];
-        groups[g].push(ex);
-      });
-
-      let optionsHtml = '<option value="">-- Selecione um Exercício da Biblioteca --</option>';
-      for (const [group, list] of Object.entries(groups)) {
-        optionsHtml += `<optgroup label="${group}">`;
-        list.forEach(ex => {
-          optionsHtml += `<option value="${ex.name || ex.nome}">${ex.name || ex.nome} (${ex.equipamento || 'Geral'})</option>`;
-        });
-        optionsHtml += `</optgroup>`;
-      }
-      optionsHtml += `<optgroup label="Personalizado"><option value="__custom__">✏️ Outro (digitar nome personalizado)...</option></optgroup>`;
-      select.innerHTML = optionsHtml;
-    }
-
-    function openCreateWorkoutModal() {
-      document.getElementById('newWorkoutName').value = '';
-      document.getElementById('newWorkoutDesc').value = '';
-      populateWorkoutExerciseSelect();
-      
-      const customInput = document.getElementById('customExerciseInput');
-      if (customInput) { customInput.value = ''; customInput.style.display = 'none'; }
-      const seriesInput = document.getElementById('newExSeries');
-      if (seriesInput) seriesInput.value = '';
-      const repsInput = document.getElementById('newExReps');
-      if (repsInput) repsInput.value = '';
-
-      selectedDays = [];
-      newWorkoutExercises = [];
-      document.querySelectorAll('#modalCreateWorkout .chip').forEach(c => c.classList.remove('active'));
-      renderNewWorkoutExercisesList();
-      document.getElementById('modalCreateWorkout').classList.add('active');
-    }
-
-    function closeCreateWorkoutModal() {
-      document.getElementById('modalCreateWorkout').classList.remove('active');
-    }
-
-    function selectFocusChip(chipEl, focusName) {
-      document.querySelectorAll('#modalCreateWorkout .focus-chip').forEach(c => {
-        if (c !== chipEl) c.classList.remove('active');
-      });
-      chipEl.classList.toggle('active');
-      const input = document.getElementById('newWorkoutDesc');
-      if (chipEl.classList.contains('active')) {
-        input.value = focusName;
-      } else {
-        if (input.value === focusName) input.value = '';
-      }
-    }
-
-    function toggleDayChip(chipEl, dayName) {
-      chipEl.classList.toggle('active');
-      if (chipEl.classList.contains('active')) {
-        if (!selectedDays.includes(dayName)) selectedDays.push(dayName);
-      } else {
-        selectedDays = selectedDays.filter(d => d !== dayName);
-      }
-    }
-
-    function handleExerciseSelectChange(selectEl) {
-      const customInput = document.getElementById('customExerciseInput');
-      if (selectEl.value === '__custom__') {
-        customInput.style.display = 'block';
-        customInput.focus();
-      } else {
-        customInput.style.display = 'none';
-      }
-    }
-
-    function addSelectedExerciseToWorkout() {
-      const dropdown = document.getElementById('exerciseSelectDropdown');
-      const customInput = document.getElementById('customExerciseInput');
-      const seriesInput = document.getElementById('newExSeries');
-      const repsInput = document.getElementById('newExReps');
-
-      let exerciseName = '';
-      if (dropdown.value === '__custom__') {
-        exerciseName = customInput.value.trim();
-      } else {
-        exerciseName = dropdown.value.trim();
-      }
-
-      if (!exerciseName) {
-        alert('Por favor, selecione um exercício da biblioteca ou digite o nome personalizado.');
-        return;
-      }
-
-      const seriesVal = seriesInput.value.trim() ? seriesInput.value.trim() : '4';
-      const repsVal = repsInput.value.trim() ? repsInput.value.trim() : '10-12';
-
-      // Localizar o exercício correspondente na biblioteca para herdar GIF e grupo muscular
-      const matchedEx = exercisesList.find(e => (e.name || e.nome || '').toLowerCase() === exerciseName.toLowerCase()) || {};
-
-      newWorkoutExercises.push({
-        id: 'ex_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-        nome: exerciseName,
-        series: seriesVal,
-        reps: repsVal,
-        grupoMuscular: matchedEx.grupoMuscular || 'Geral',
-        gifUrl: matchedEx.gifUrl || matchedEx.gif_url || ''
-      });
-
-      // Reset dos campos de exercício
-      dropdown.value = '';
-      customInput.value = '';
-      customInput.style.display = 'none';
-      seriesInput.value = '';
-      repsInput.value = '';
-
-      renderNewWorkoutExercisesList();
-    }
-
-    function removeExerciseFromNewWorkout(index) {
-      newWorkoutExercises.splice(index, 1);
-      renderNewWorkoutExercisesList();
-    }
-
-    function renderNewWorkoutExercisesList() {
-      const container = document.getElementById('selectedExercisesList');
-      if (newWorkoutExercises.length === 0) {
-        container.innerHTML = `<div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px; border: 1px dashed var(--divider); border-radius: 10px;">
-          Nenhum exercício adicionado ainda. Escolha no seletor acima e clique em + Adicionar.
-        </div>`;
-        return;
-      }
-      container.innerHTML = newWorkoutExercises.map((ex, idx) => {
-        const icon = getMuscleGroupIcon(ex.grupoMuscular);
-        return `
-          <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--divider);">
-            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-              <span>${icon}</span>
-              <div style="min-width: 0;">
-                <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ex.nome}</div>
-                <div style="font-size: 11px; color: var(--accent-cyan);">${ex.series} séries • ${ex.reps} reps</div>
-              </div>
-            </div>
-            <button onclick="removeExerciseFromNewWorkout(${idx})" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 16px; padding: 2px 6px;">🗑️</button>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function saveNewWorkout() {
-      const nameInput = document.getElementById('newWorkoutName');
-      const descInput = document.getElementById('newWorkoutDesc');
-      const name = nameInput.value.trim();
-
-      if (!name) {
-        alert('Por favor, digite o nome do treino (ex: Treino C — Pernas & Ombros).');
-        return;
-      }
-
-      if (newWorkoutExercises.length === 0) {
-        alert('Por favor, adicione pelo menos um exercício ao treino antes de salvar.');
-        return;
-      }
-
-      const workoutId = 'treino_' + Date.now();
-
-      const newWorkout = {
-        id: workoutId,
-        nome: name,
-        descricao: descInput.value.trim(),
-        diasSemana: [...selectedDays],
-        corHex: '#1E88E5',
-        exercicios: [...newWorkoutExercises],
-        exerciciosCount: newWorkoutExercises.length,
-        criadoEm: new Date().toISOString()
-      };
-
-      // 1. Salvar na lista em memória e no localStorage
-      allWorkoutsList.unshift(newWorkout);
-      localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
-
-      // 2. Sincronizar com Supabase se online
-      if (_supabase) {
-        try {
-          const payload = {
-            id: workoutId,
-            nome: name,
-            descricao: descInput.value.trim(),
-            dias_semana: selectedDays,
-            cor_hex: '#1E88E5',
-            exercicios: newWorkoutExercises.map(e => ({
-              id: e.id,
-              nome: e.nome,
-              series: e.series,
-              reps: e.reps,
-              grupoMuscular: e.grupoMuscular || 'Geral',
-              gifUrl: e.gifUrl || ''
-            })),
-            criado_em: new Date().toISOString()
-          };
-
-          await _supabase.from('treinos').upsert(payload);
-
-          // Sincronizar também com a tabela relacional exercicios_do_treino
-          const exRows = newWorkoutExercises.map((ex, idx) => ({
-            id: ex.id || `ex_${workoutId}_${idx}`,
-            treino_id: workoutId,
-            exercicio_id: ex.id || `ex_${idx}`,
-            ordem: idx + 1,
-            quantidade_series: parseInt(ex.series) || 4,
-            repeticoes: ex.reps || '10-12',
-            carga_inicial: 0.0,
-            descanso_segundos: 60
-          }));
-          try {
-            await _supabase.from('exercicios_do_treino').upsert(exRows);
-          } catch (_) {}
-
-          console.log('[Supabase] Treino e exercícios salvos na nuvem com sucesso:', name);
-        } catch (e) {
-          console.log('[Supabase] Aviso: Treino mantido offline (sem conexão):', e);
-        }
-      }
-
-      // 3. Atualizar a UI com o novo treino e seus exercícios montados
-      renderAllWorkoutsUI();
-      closeCreateWorkoutModal();
-      alert(`🎉 Treino "${name}" criado com sucesso com ${newWorkoutExercises.length} exercícios montados!`);
-    }
-
-    function renderHistoryCardUI(item, prepend = false) {
-      const container = document.getElementById('historyListContainer');
-      if (!container) return;
-
-      const emptyEl = container.querySelector('.empty-history-msg');
-      if (emptyEl) emptyEl.remove();
-
-      const cardHtml = `
-        <div class="card" id="history_${item.id}" style="border-left: 4px solid var(--success-green); animation: fadeIn 0.3s ease-in-out;">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-              <h4 style="font-size: 15px; font-weight: 700; color: white;">${item.nomeTreino}</h4>
-              <p style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">
-                📅 ${item.data || 'Hoje'} • ⏱ Duração: ${item.duracaoMinutos || 1} min
-              </p>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="color: var(--success-green); font-weight: 800; font-size: 11px; background: rgba(76,175,80,0.15); padding: 4px 8px; border-radius: 6px;">✓ Concluído</span>
-              <button onclick="deleteHistoryItem('${item.id}')" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 14px;">🗑️</button>
-            </div>
-          </div>
-        </div>
-      `;
-
-      if (prepend) {
-        container.insertAdjacentHTML('afterbegin', cardHtml);
-      } else {
-        container.insertAdjacentHTML('beforeend', cardHtml);
-      }
-    }
-
-    function loadHistoryFromStorage() {
-      const container = document.getElementById('historyListContainer');
-      if (!container) return;
-
-      container.innerHTML = '';
-      let historyList = [];
-      try {
-        historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
-      } catch (e) {}
-
-      if (historyList.length === 0) {
-        container.innerHTML = `
-          <div class="empty-history-msg" style="text-align: center; padding: 30px 16px; color: var(--text-grey);">
-            <div style="font-size: 32px; margin-bottom: 8px;">📊</div>
-            <div style="font-weight: 700; font-size: 14px; color: white;">Nenhum treino no histórico ainda</div>
-            <div style="font-size: 12px; margin-top: 4px;">Inicie e finalize um treino para acompanhar o seu progresso aqui!</div>
-          </div>
-        `;
-        return;
-      }
-
-      historyList.forEach(item => renderHistoryCardUI(item, false));
-    }
-
-    function deleteHistoryItem(id) {
-      if (confirm('Deseja excluir este registro do histórico?')) {
-        const card = document.getElementById(`history_${id}`);
-        if (card) card.remove();
-
-        try {
-          let historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
-          historyList = historyList.filter(h => h.id !== id);
-          localStorage.setItem('jtech_fit_history', JSON.stringify(historyList));
-        } catch (e) {}
-
-        const container = document.getElementById('historyListContainer');
-        if (container && container.children.length === 0) {
-          loadHistoryFromStorage();
-        }
-      }
     }
 
     // ==========================================
@@ -2273,6 +1469,841 @@
     ];
 
     let exercisesList = [...DEFAULT_BASE_EXERCISES];
+
+    // ==========================================
+    // TREINOS PADRÃO COM EXERCÍCIOS COMPLETOS (4 DIVISÕES)
+    // ==========================================
+    const DEFAULT_WORKOUT_DIVISIONS = [
+      {
+        id: 'treino_default_a',
+        nome: 'Treino A — Peito & Tríceps',
+        descricao: 'Hipertrofia',
+        diasSemana: ['Segunda-feira', 'Quinta-feira'],
+        corHex: '#1E88E5',
+        exercicios: [
+          { id: 'ex_a1', nome: 'Supino Reto com Barra', series: '4', reps: '10-12', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-bench-press.gif' },
+          { id: 'ex_a2', nome: 'Supino Inclinado com Halteres', series: '3', reps: '10-12', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-incline-bench-press.gif' },
+          { id: 'ex_a3', nome: 'Crucifixo no Crossover (Polia Alta)', series: '3', reps: '12-15', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/cable-middle-fly.gif' },
+          { id: 'ex_a4', nome: 'Tríceps Pulley na Corda', series: '4', reps: '12-15', grupoMuscular: 'Tríceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/cable-one-arm-tricep-pushdown.gif' },
+          { id: 'ex_a5', nome: 'Tríceps Testa com Barra W', series: '3', reps: '10-12', grupoMuscular: 'Tríceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/barbell-reverse-grip-skullcrusher.gif' }
+        ]
+      },
+      {
+        id: 'treino_default_b',
+        nome: 'Treino B — Costas & Bíceps',
+        descricao: 'Hipertrofia',
+        diasSemana: ['Terça-feira', 'Sexta-feira'],
+        corHex: '#00D2FF',
+        exercicios: [
+          { id: 'ex_b1', nome: 'Puxada Frontal na Polia', series: '4', reps: '10-12', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/cable-lat-pulldown.gif' },
+          { id: 'ex_b2', nome: 'Remada Curvada com Barra', series: '4', reps: '8-10', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/barbell-bent-over-row.gif' },
+          { id: 'ex_b3', nome: 'Remada Unilateral com Halter (Serrote)', series: '3', reps: '10-12', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/dumbbell-one-arm-bent-over-row.gif' },
+          { id: 'ex_b4', nome: 'Rosca Direta com Barra W', series: '4', reps: '10-12', grupoMuscular: 'Bíceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/barbell-curl.gif' },
+          { id: 'ex_b5', nome: 'Rosca Martelo com Halteres', series: '3', reps: '12', grupoMuscular: 'Bíceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/dumbbell-hammer-curl.gif' }
+        ]
+      },
+      {
+        id: 'treino_default_c',
+        nome: 'Treino C — Pernas & Panturrilhas',
+        descricao: 'Força & Resistência',
+        diasSemana: ['Quarta-feira', 'Sábado'],
+        corHex: '#4CAF50',
+        exercicios: [
+          { id: 'ex_c1', nome: 'Agachamento Livre com Barra', series: '4', reps: '8-10', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/barbell-squat.gif' },
+          { id: 'ex_c2', nome: 'Leg Press 45º', series: '4', reps: '10-12', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/sled-45-degrees-leg-press.gif' },
+          { id: 'ex_c3', nome: 'Cadeira Extensora', series: '3', reps: '12-15', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/lever-leg-extension.gif' },
+          { id: 'ex_c4', nome: 'Mesa Flexora', series: '3', reps: '12-15', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/lever-lying-leg-curl.gif' },
+          { id: 'ex_c5', nome: 'Panturrilha Sentado', series: '4', reps: '15-20', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/lever-seated-calf-raise.gif' }
+        ]
+      },
+      {
+        id: 'treino_default_d',
+        nome: 'Treino D — Ombros, Trapézio & Abdômen',
+        descricao: 'Definição & Core',
+        diasSemana: ['Sexta-feira'],
+        corHex: '#FF9800',
+        exercicios: [
+          { id: 'ex_d1', nome: 'Desenvolvimento com Halteres', series: '4', reps: '10-12', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-shoulder-press.gif' },
+          { id: 'ex_d2', nome: 'Elevação Lateral com Halteres', series: '4', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-lateral-raise.gif' },
+          { id: 'ex_d3', nome: 'Crucifixo Inverso com Halteres', series: '3', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-rear-lateral-raise.gif' },
+          { id: 'ex_d4', nome: 'Encolhimento com Halteres', series: '4', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/dumbbell-shrug.gif' },
+          { id: 'ex_d5', nome: 'Prancha Ventral Isométrica', series: '3', reps: '60s', grupoMuscular: 'Abdômen', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/abs/bodyweight-incline-side-plank.gif' }
+        ]
+      }
+    ];
+
+    let allWorkoutsList = [];
+    const expandedWorkoutIds = new Set();
+
+    async function loadWorkoutsFromStorage() {
+      // 1. Carregar treinos locais e garantir que os padrões existam
+      try {
+        let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
+        const map = new Map();
+        
+        // Colocar primeiro os padrões A, B, C, D
+        DEFAULT_WORKOUT_DIVISIONS.forEach(def => map.set(def.id, { ...def }));
+
+        // Mesclar com os salvos localmente
+        if (Array.isArray(saved)) {
+          saved.forEach(w => {
+            if (!Array.isArray(w.exercicios) || w.exercicios.length === 0) {
+              const def = DEFAULT_WORKOUT_DIVISIONS.find(d => d.nome.toLowerCase() === (w.nome || '').toLowerCase() || d.id === w.id);
+              if (def) w.exercicios = def.exercicios;
+            }
+            map.set(w.id, w);
+          });
+        }
+
+        allWorkoutsList = Array.from(map.values());
+        localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+      } catch (e) {
+        allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
+      }
+      renderAllWorkoutsUI();
+
+      // 2. Buscar treinos no Supabase (Nuvem / Sincronizados com Mobile)
+      if (_supabase) {
+        try {
+          const { data, error } = await _supabase
+            .from('treinos')
+            .select('*')
+            .order('criado_em', { ascending: false });
+
+          if (!error && Array.isArray(data)) {
+            const onlineWorkouts = data.map(row => {
+              let exList = [];
+              if (row.exercicios) {
+                let parsedEx = row.exercicios;
+                if (typeof parsedEx === 'string') {
+                  try { parsedEx = JSON.parse(parsedEx); } catch (_) {}
+                }
+                if (Array.isArray(parsedEx)) {
+                  exList = parsedEx.map((e, idx) => ({
+                    id: e.id || `ex_${row.id}_${idx}`,
+                    nome: e.nome || e.name || 'Exercício',
+                    series: e.series || '4',
+                    reps: e.reps || '10-12',
+                    grupoMuscular: e.grupoMuscular || e.grupo_muscular || 'Geral',
+                    gifUrl: e.gifUrl || e.gif_url || ''
+                  }));
+                }
+              }
+              let days = [];
+              if (row.dias_semana) {
+                let rawDays = row.dias_semana;
+                if (typeof rawDays === 'string') {
+                  try { rawDays = JSON.parse(rawDays); } catch (_) {}
+                }
+                if (Array.isArray(rawDays)) days = rawDays;
+              }
+
+              return {
+                id: row.id,
+                nome: row.nome || 'Treino',
+                descricao: row.descricao || '',
+                diasSemana: days,
+                corHex: row.cor_hex || '#1E88E5',
+                exercicios: exList,
+                exerciciosCount: exList.length,
+                criadoEm: row.criado_em || new Date().toISOString()
+              };
+            });
+
+            // Enviar para o Supabase quaisquer treinos locais que ainda não estejam na nuvem
+            const onlineIds = new Set(onlineWorkouts.map(w => w.id));
+            for (const localW of allWorkoutsList) {
+              if (!onlineIds.has(localW.id)) {
+                try {
+                  await _supabase.from('treinos').upsert({
+                    id: localW.id,
+                    nome: localW.nome,
+                    descricao: localW.descricao || '',
+                    dias_semana: localW.diasSemana || [],
+                    cor_hex: localW.corHex || '#1E88E5',
+                    exercicios: localW.exercicios || [],
+                    criado_em: localW.criadoEm || new Date().toISOString()
+                  });
+                } catch (_) {}
+              }
+            }
+
+            // Mesclar treinos da nuvem com locais
+            const mapById = new Map();
+            allWorkoutsList.forEach(w => mapById.set(w.id, w));
+            onlineWorkouts.forEach(w => mapById.set(w.id, w));
+            allWorkoutsList = Array.from(mapById.values());
+
+            localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+            renderAllWorkoutsUI();
+            console.log(`[Supabase] Total consolidado: ${allWorkoutsList.length} treinos sincronizados.`);
+          }
+        } catch (e) {
+          console.log('[Supabase] Erro ao sincronizar treinos da nuvem:', e);
+        }
+
+        // Subscrição em Tempo Real: Atualiza a lista automaticamente se o Mobile criar/excluir treinos
+        if (!_supabaseRealtimeSubscribed) {
+          _supabaseRealtimeSubscribed = true;
+          try {
+            _supabase
+              .channel('realtime_treinos_web')
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'treinos' }, () => {
+                console.log('[Supabase Realtime] Mudança detectada nos treinos! Recarregando...');
+                loadWorkoutsFromStorage();
+              })
+              .subscribe();
+          } catch (_) {}
+        }
+      }
+    }
+
+    let _supabaseRealtimeSubscribed = false;
+
+    function toggleWorkoutCardExpand(workoutId, event) {
+      if (event) event.stopPropagation();
+      if (expandedWorkoutIds.has(workoutId)) {
+        expandedWorkoutIds.delete(workoutId);
+      } else {
+        expandedWorkoutIds.add(workoutId);
+      }
+      renderAllWorkoutsUI();
+    }
+
+    function renderAllWorkoutsUI() {
+      const container = document.getElementById('workoutListContainer');
+      if (!container) return;
+
+      if (allWorkoutsList.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 35px 16px; color: var(--text-grey);">
+            <div style="font-size: 36px; margin-bottom: 8px;">🏋️‍♂️</div>
+            <div style="font-weight: 700; font-size: 15px; color: white;">Nenhum treino cadastrado</div>
+            <div style="font-size: 12px; margin-top: 4px; margin-bottom: 14px;">Clique no botão "+ Criar Treino" acima para montar seu primeiro treino.</div>
+            <button onclick="openCreateWorkoutModal()" class="btn btn-primary" style="width: auto; padding: 8px 16px; font-size: 12px;">+ Criar Treino</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = allWorkoutsList.map(w => {
+        const isExpanded = expandedWorkoutIds.has(w.id);
+        const daysStr = Array.isArray(w.diasSemana) && w.diasSemana.length > 0 ? w.diasSemana.join(' • ') : 'Dias flexíveis';
+        const exercises = Array.isArray(w.exercicios) ? w.exercicios : [];
+        const count = exercises.length;
+        const color = w.corHex || '#1E88E5';
+
+        return `
+          <div class="card" id="card_${w.id}" style="border-left: 5px solid ${color}; padding: 16px; animation: fadeIn 0.25s ease-in-out;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="font-size: 16px; font-weight: 800; color: white; margin-bottom: 2px;">${w.nome}</h4>
+                <p style="font-size: 11px; color: var(--text-grey); margin: 0;">${daysStr}</p>
+                ${w.descricao ? `<span style="display: inline-block; background: rgba(0,210,255,0.12); color: var(--accent-cyan); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-top: 6px;">${w.descricao}</span>` : ''}
+              </div>
+              <button onclick="deleteWorkoutCard('${w.id}')" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 16px; padding: 4px;" title="Excluir treino">🗑️</button>
+            </div>
+
+            <!-- Botão para Expandir / Recolher Exercícios Montados -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--divider);">
+              <button onclick="toggleWorkoutCardExpand('${w.id}', event)" style="background: none; border: none; font-size: 12px; font-weight: 700; color: var(--accent-cyan); cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 0;">
+                <span>${isExpanded ? '▲ Ocultar Exercícios' : `▼ Ver Exercícios Montados (${count})`}</span>
+              </button>
+              <button onclick="startActiveWorkout('${w.id}')" class="btn btn-success" style="width: auto; padding: 7px 18px; font-size: 12px; font-weight: 800; border-radius: 8px;">
+                ▶ INICIAR
+              </button>
+            </div>
+
+            <!-- LISTA DE EXERCÍCIOS MONTADOS NESTE TREINO (EXPANSÍVEL) -->
+            ${isExpanded ? `
+              <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px; animation: fadeIn 0.2s ease-in-out;">
+                ${exercises.length === 0 ? `
+                  <div style="font-size: 11px; color: var(--text-grey); padding: 8px; text-align: center;">Nenhum exercício montado neste treino.</div>
+                ` : exercises.map((ex, idx) => {
+                  const icon = getMuscleGroupIcon(ex.grupoMuscular);
+                  const safeName = (ex.nome || 'Exercício').replace(/'/g, "\\'");
+                  const safeSubtitle = `${ex.grupoMuscular || 'Geral'} • ${ex.series || 4} séries x ${ex.reps || '10-12'} reps`;
+
+                  let gifUrl = ex.gifUrl || ex.gif_url || '';
+                  if (!gifUrl) {
+                    const match = DEFAULT_BASE_EXERCISES.find(b => (b.nome || b.name || '').toLowerCase() === (ex.nome || '').toLowerCase()) ||
+                                  exercisesList.find(e => (e.nome || e.name || '').toLowerCase() === (ex.nome || '').toLowerCase());
+                    if (match) {
+                      gifUrl = match.gifUrl || match.gif_url || '';
+                    }
+                  }
+
+                  return `
+                    <div onclick="event.stopPropagation(); openOnlyGifModal('${safeName}')" style="display: flex; justify-content: space-between; align-items: center; background: #080a0f; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--divider); cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#10141e'" onmouseout="this.style.background='#080a0f'" title="Toque para ver animação ampliada com zoom 3D">
+                      <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                        <span style="font-size: 16px;">${icon}</span>
+                        <div style="min-width: 0;">
+                          <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${idx + 1}. ${ex.nome}</div>
+                          <div style="font-size: 11px; color: var(--accent-cyan);">${ex.series || 4} séries • ${ex.reps || '10-12'} reps</div>
+                        </div>
+                      </div>
+                      <button onclick="event.stopPropagation(); openOnlyGifModal('${safeName}')" style="background: rgba(0,210,255,0.12); border: 1px solid rgba(0,210,255,0.4); color: var(--accent-cyan); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; cursor: pointer; flex-shrink: 0;">
+                        🔍 GIF 3D
+                      </button>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            ` : ''}
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function deleteWorkoutCard(workoutId) {
+      if (confirm('Deseja realmente excluir este treino?')) {
+        allWorkoutsList = allWorkoutsList.filter(w => w.id !== workoutId && w.nome !== workoutId);
+        localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+        renderAllWorkoutsUI();
+
+        if (_supabase) {
+          try {
+            await _supabase.from('treinos').delete().eq('id', workoutId);
+            console.log('[Supabase] Treino excluído na nuvem:', workoutId);
+          } catch (e) {
+            console.log('[Supabase] Erro ao excluir treino na nuvem:', e);
+          }
+        }
+      }
+    }
+
+    // ==========================================
+    // EXECUÇÃO DE TREINO ATIVO DINÂMICO
+    // ==========================================
+    let currentActiveWorkout = null;
+
+    function startActiveWorkout(workoutIdOrName) {
+      const workout = allWorkoutsList.find(w => w.id === workoutIdOrName || w.nome === workoutIdOrName) || {
+        id: 'treino_temp',
+        nome: workoutIdOrName,
+        exercicios: DEFAULT_WORKOUT_DIVISIONS[0].exercicios
+      };
+
+      currentActiveWorkout = workout;
+      document.getElementById('activeWorkoutTitle').innerText = workout.nome;
+      
+      // Renderizar exercícios dinamicamente no treino ativo
+      const container = document.getElementById('activeWorkoutExercisesContainer');
+      if (container) {
+        const exercises = Array.isArray(workout.exercicios) && workout.exercicios.length > 0 ? workout.exercicios : DEFAULT_WORKOUT_DIVISIONS[0].exercicios;
+        
+        container.innerHTML = exercises.map((ex, exIdx) => {
+          const numSeries = parseInt(ex.series) || 4;
+          const safeName = (ex.nome || 'Exercício').replace(/'/g, "\\'");
+          const safeSubtitle = `${ex.grupoMuscular || 'Geral'} • ${ex.series || 4} séries x ${ex.reps || '10-12'} reps`;
+
+          // Garantir resolução do GIFUrl pela biblioteca se não estiver no objeto
+          let gifUrl = ex.gifUrl || ex.gif_url || '';
+          if (!gifUrl) {
+            const match = DEFAULT_BASE_EXERCISES.find(b => (b.nome || b.name || '').toLowerCase() === (ex.nome || '').toLowerCase()) ||
+                          exercisesList.find(e => (e.nome || e.name || '').toLowerCase() === (ex.nome || '').toLowerCase());
+            if (match) {
+              gifUrl = match.gifUrl || match.gif_url || '';
+            }
+          }
+          if (!gifUrl) {
+            gifUrl = 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-bench-press.gif';
+          }
+
+          let rowsHtml = '';
+          for (let s = 1; s <= numSeries; s++) {
+            const rowId = `activeSetRow_${exIdx}_${s}`;
+            rowsHtml += `
+              <div class="set-row" id="${rowId}" style="margin-bottom: 6px;">
+                <div class="set-badge">${s}</div>
+                <div style="flex: 1;">
+                  <input type="number" class="form-input" value="30" style="padding: 6px 10px; font-size: 12px;" placeholder="Carga kg">
+                </div>
+                <div style="flex: 1;">
+                  <input type="number" class="form-input" value="12" style="padding: 6px 10px; font-size: 12px;" placeholder="Reps">
+                </div>
+                <div class="set-check" onclick="toggleSetDone('${rowId}')">✓</div>
+              </div>
+            `;
+          }
+
+          return `
+            <div class="card" style="border-left: 4px solid var(--accent-cyan); padding: 14px; margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <div>
+                  <span style="font-size: 10px; color: var(--primary-blue); font-weight: 800; letter-spacing: 0.5px;">EXERCÍCIO ${exIdx + 1} DE ${exercises.length}</span>
+                  <h3 style="font-size: 16px; font-weight: 800; margin-top: 2px; color: white;">${ex.nome}</h3>
+                  <p style="font-size: 11px; color: var(--text-grey); margin: 0;">${ex.series || 4} séries x ${ex.reps || '10-12'} reps • 60s descanso</p>
+                </div>
+                <button onclick="openOnlyGifModal('${safeName}')" style="background: rgba(0,210,255,0.12); border: 1px solid rgba(0,210,255,0.35); color: var(--accent-cyan); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; cursor: pointer;">
+                  🔍 GIF 3D
+                </button>
+              </div>
+
+              <!-- BANNER EXPANSÍVEL DE DEMONSTRAÇÃO DO GIF (CLIQUE PARA ABRIR O POP-UP AMPLIADO COM ZOOM) -->
+              <div onclick="openOnlyGifModal('${safeName}')" style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,210,255,0.08); border: 1.5px dashed rgba(0,210,255,0.4); padding: 10px 14px; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(0,210,255,0.15)'; this.style.borderColor='var(--accent-cyan)'" onmouseout="this.style.background='rgba(0,210,255,0.08)'; this.style.borderColor='rgba(0,210,255,0.4)'" title="Toque para abrir a animação ampliada em tela cheia com zoom 3D">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 48px; height: 48px; background: #000; border-radius: 10px; overflow: hidden; border: 1.5px solid rgba(0,210,255,0.5); display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+                    <img src="${gifUrl}" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.src='https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-bench-press.gif'">
+                    <div style="position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.85); border-radius: 4px; padding: 1px 4px; font-size: 7px; font-weight: 900; color: var(--accent-cyan);">GIF</div>
+                  </div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 800; color: var(--accent-cyan); display: flex; align-items: center; gap: 5px; letter-spacing: 0.3px;">
+                      <span>🔍</span> TOQUE PARA AMPLIAR GIF
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Ver animação com zoom em tela cheia</div>
+                  </div>
+                </div>
+                <span style="color: var(--accent-cyan); font-size: 18px; font-weight: 900;">↗</span>
+              </div>
+
+              <div style="font-size: 11px; font-weight: 700; color: var(--text-grey); margin-bottom: 6px; display: flex; justify-content: space-between;">
+                <span>Série</span>
+                <span style="flex: 1; text-align: center; margin-left: 20px;">Carga (kg)</span>
+                <span style="flex: 1; text-align: center;">Repetições</span>
+                <span style="width: 32px; text-align: center;">Status</span>
+              </div>
+
+              ${rowsHtml}
+            </div>
+          `;
+        }).join('');
+      }
+
+      switchTab('screenActiveWorkout');
+      activeWorkoutSeconds = 0;
+      clearInterval(activeWorkoutInterval);
+      activeWorkoutInterval = setInterval(() => {
+        activeWorkoutSeconds++;
+        let m = String(Math.floor(activeWorkoutSeconds / 60)).padStart(2, '0');
+        let s = String(activeWorkoutSeconds % 60).padStart(2, '0');
+        document.getElementById('activeTimer').innerText = `${m}:${s}`;
+      }, 1000);
+    }
+
+    async function finishActiveWorkout() {
+      clearInterval(activeWorkoutInterval);
+
+      const title = document.getElementById('activeWorkoutTitle').innerText || 'Treino Realizado';
+      const duracao = Math.max(1, Math.floor(activeWorkoutSeconds / 60));
+      const now = new Date();
+      const dataFormatada = now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      const historyItem = {
+        id: 'sessao_' + Date.now(),
+        nomeTreino: title,
+        duracaoMinutos: duracao,
+        data: dataFormatada,
+        inicioIso: new Date(now.getTime() - activeWorkoutSeconds * 1000).toISOString(),
+        fimIso: now.toISOString(),
+        concluido: true
+      };
+
+      // 1. Salvar no localStorage
+      let historyList = [];
+      try {
+        historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
+      } catch (e) {}
+      historyList.unshift(historyItem);
+      localStorage.setItem('jtech_fit_history', JSON.stringify(historyList));
+
+      // 2. Sincronizar com Supabase se online
+      if (_supabase) {
+        try {
+          await _supabase.from('sessoes_de_treino').upsert({
+            id: historyItem.id,
+            nome_treino: title,
+            inicio: historyItem.inicioIso,
+            fim: historyItem.fimIso,
+            concluido: true
+          });
+          console.log('[Supabase] Sessão de treino salva no histórico online:', title);
+        } catch (e) {
+          console.log('[Supabase] Aviso: Histórico mantido offline (sem conexão):', e);
+        }
+      }
+
+      // 3. Renderizar o card no topo do histórico
+      renderHistoryCardUI(historyItem, true);
+
+      // Reset dos contadores
+      activeWorkoutSeconds = 0;
+      document.getElementById('activeTimer').innerText = '00:00';
+
+      alert(`🏆 Treino "${title}" finalizado com sucesso em ${duracao} min!\nSalvo no histórico e sincronizado.`);
+      switchTab('screenHistory', document.querySelectorAll('.nav-item')[3]);
+    }
+
+    function toggleSetDone(rowId) {
+      const row = document.getElementById(rowId);
+      if (!row) return;
+      row.classList.toggle('done');
+      if (row.classList.contains('done')) {
+        startRestTimer(60);
+      }
+    }
+
+    function startRestTimer(seconds) {
+      restTimeRemaining = seconds;
+      document.getElementById('restTimerBar').classList.add('active');
+      updateRestUI();
+
+      clearInterval(restTimerInterval);
+      restTimerInterval = setInterval(() => {
+        restTimeRemaining--;
+        if (restTimeRemaining <= 0) {
+          clearInterval(restTimerInterval);
+          playAudioBeep();
+          alert('🔔 Tempo de Descanso Concluído! Inicie sua próxima série.');
+          document.getElementById('restTimerBar').classList.remove('active');
+        }
+        updateRestUI();
+      }, 1000);
+    }
+
+    function updateRestUI() {
+      let m = String(Math.floor(restTimeRemaining / 60)).padStart(2, '0');
+      let s = String(restTimeRemaining % 60).padStart(2, '0');
+      document.getElementById('restTimerText').innerText = `${m}:${s}`;
+      let fillPct = (restTimeRemaining / 60) * 100;
+      document.getElementById('restProgressFill').style.width = `${fillPct}%`;
+    }
+
+    function adjustRestTimer(seconds) {
+      restTimeRemaining = Math.max(0, restTimeRemaining + seconds);
+      updateRestUI();
+    }
+
+    function skipRestTimer() {
+      clearInterval(restTimerInterval);
+      document.getElementById('restTimerBar').classList.remove('active');
+    }
+
+    function playAudioBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        osc.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+      } catch (e) {}
+    }
+
+    // ==========================================
+    // CRIADOR DE TREINOS - LÓGICA E SINCRONIZAÇÃO
+    // ==========================================
+    let selectedDays = [];
+    let newWorkoutExercises = [];
+
+    function populateWorkoutExerciseSelect() {
+      const select = document.getElementById('exerciseSelectDropdown');
+      if (!select) return;
+
+      const groups = {};
+      exercisesList.forEach(ex => {
+        const g = ex.grupoMuscular || 'Geral';
+        if (!groups[g]) groups[g] = [];
+        groups[g].push(ex);
+      });
+
+      let optionsHtml = '<option value="">-- Selecione um Exercício da Biblioteca --</option>';
+      for (const [group, list] of Object.entries(groups)) {
+        optionsHtml += `<optgroup label="${group}">`;
+        list.forEach(ex => {
+          optionsHtml += `<option value="${ex.name || ex.nome}">${ex.name || ex.nome} (${ex.equipamento || 'Geral'})</option>`;
+        });
+        optionsHtml += `</optgroup>`;
+      }
+      optionsHtml += `<optgroup label="Personalizado"><option value="__custom__">✏️ Outro (digitar nome personalizado)...</option></optgroup>`;
+      select.innerHTML = optionsHtml;
+    }
+
+    function openCreateWorkoutModal() {
+      document.getElementById('newWorkoutName').value = '';
+      document.getElementById('newWorkoutDesc').value = '';
+      populateWorkoutExerciseSelect();
+      
+      const customInput = document.getElementById('customExerciseInput');
+      if (customInput) { customInput.value = ''; customInput.style.display = 'none'; }
+      const seriesInput = document.getElementById('newExSeries');
+      if (seriesInput) seriesInput.value = '';
+      const repsInput = document.getElementById('newExReps');
+      if (repsInput) repsInput.value = '';
+
+      selectedDays = [];
+      newWorkoutExercises = [];
+      document.querySelectorAll('#modalCreateWorkout .chip').forEach(c => c.classList.remove('active'));
+      renderNewWorkoutExercisesList();
+      document.getElementById('modalCreateWorkout').classList.add('active');
+    }
+
+    function closeCreateWorkoutModal() {
+      document.getElementById('modalCreateWorkout').classList.remove('active');
+    }
+
+    function selectFocusChip(chipEl, focusName) {
+      document.querySelectorAll('#modalCreateWorkout .focus-chip').forEach(c => {
+        if (c !== chipEl) c.classList.remove('active');
+      });
+      chipEl.classList.toggle('active');
+      const input = document.getElementById('newWorkoutDesc');
+      if (chipEl.classList.contains('active')) {
+        input.value = focusName;
+      } else {
+        if (input.value === focusName) input.value = '';
+      }
+    }
+
+    function toggleDayChip(chipEl, dayName) {
+      chipEl.classList.toggle('active');
+      if (chipEl.classList.contains('active')) {
+        if (!selectedDays.includes(dayName)) selectedDays.push(dayName);
+      } else {
+        selectedDays = selectedDays.filter(d => d !== dayName);
+      }
+    }
+
+    function handleExerciseSelectChange(selectEl) {
+      const customInput = document.getElementById('customExerciseInput');
+      if (selectEl.value === '__custom__') {
+        customInput.style.display = 'block';
+        customInput.focus();
+      } else {
+        customInput.style.display = 'none';
+      }
+    }
+
+    function addSelectedExerciseToWorkout() {
+      const dropdown = document.getElementById('exerciseSelectDropdown');
+      const customInput = document.getElementById('customExerciseInput');
+      const seriesInput = document.getElementById('newExSeries');
+      const repsInput = document.getElementById('newExReps');
+
+      let exerciseName = '';
+      if (dropdown.value === '__custom__') {
+        exerciseName = customInput.value.trim();
+      } else {
+        exerciseName = dropdown.value.trim();
+      }
+
+      if (!exerciseName) {
+        alert('Por favor, selecione um exercício da biblioteca ou digite o nome personalizado.');
+        return;
+      }
+
+      const seriesVal = seriesInput.value.trim() ? seriesInput.value.trim() : '4';
+      const repsVal = repsInput.value.trim() ? repsInput.value.trim() : '10-12';
+
+      // Localizar o exercício correspondente na biblioteca para herdar GIF e grupo muscular
+      const matchedEx = exercisesList.find(e => (e.name || e.nome || '').toLowerCase() === exerciseName.toLowerCase()) || {};
+
+      newWorkoutExercises.push({
+        id: 'ex_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        nome: exerciseName,
+        series: seriesVal,
+        reps: repsVal,
+        grupoMuscular: matchedEx.grupoMuscular || 'Geral',
+        gifUrl: matchedEx.gifUrl || matchedEx.gif_url || ''
+      });
+
+      // Reset dos campos de exercício
+      dropdown.value = '';
+      customInput.value = '';
+      customInput.style.display = 'none';
+      seriesInput.value = '';
+      repsInput.value = '';
+
+      renderNewWorkoutExercisesList();
+    }
+
+    function removeExerciseFromNewWorkout(index) {
+      newWorkoutExercises.splice(index, 1);
+      renderNewWorkoutExercisesList();
+    }
+
+    function renderNewWorkoutExercisesList() {
+      const container = document.getElementById('selectedExercisesList');
+      if (newWorkoutExercises.length === 0) {
+        container.innerHTML = `<div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px; border: 1px dashed var(--divider); border-radius: 10px;">
+          Nenhum exercício adicionado ainda. Escolha no seletor acima e clique em + Adicionar.
+        </div>`;
+        return;
+      }
+      container.innerHTML = newWorkoutExercises.map((ex, idx) => {
+        const icon = getMuscleGroupIcon(ex.grupoMuscular);
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--divider);">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+              <span>${icon}</span>
+              <div style="min-width: 0;">
+                <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ex.nome}</div>
+                <div style="font-size: 11px; color: var(--accent-cyan);">${ex.series} séries • ${ex.reps} reps</div>
+              </div>
+            </div>
+            <button onclick="removeExerciseFromNewWorkout(${idx})" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 16px; padding: 2px 6px;">🗑️</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function saveNewWorkout() {
+      const nameInput = document.getElementById('newWorkoutName');
+      const descInput = document.getElementById('newWorkoutDesc');
+      const name = nameInput.value.trim();
+
+      if (!name) {
+        alert('Por favor, digite o nome do treino (ex: Treino C — Pernas & Ombros).');
+        return;
+      }
+
+      if (newWorkoutExercises.length === 0) {
+        alert('Por favor, adicione pelo menos um exercício ao treino antes de salvar.');
+        return;
+      }
+
+      const workoutId = 'treino_' + Date.now();
+
+      const newWorkout = {
+        id: workoutId,
+        nome: name,
+        descricao: descInput.value.trim(),
+        diasSemana: [...selectedDays],
+        corHex: '#1E88E5',
+        exercicios: [...newWorkoutExercises],
+        exerciciosCount: newWorkoutExercises.length,
+        criadoEm: new Date().toISOString()
+      };
+
+      // 1. Salvar na lista em memória e no localStorage
+      allWorkoutsList.unshift(newWorkout);
+      localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+
+      // 2. Sincronizar com Supabase se online
+      if (_supabase) {
+        try {
+          const payload = {
+            id: workoutId,
+            nome: name,
+            descricao: descInput.value.trim(),
+            dias_semana: selectedDays,
+            cor_hex: '#1E88E5',
+            exercicios: newWorkoutExercises.map(e => ({
+              id: e.id,
+              nome: e.nome,
+              series: e.series,
+              reps: e.reps,
+              grupoMuscular: e.grupoMuscular || 'Geral',
+              gifUrl: e.gifUrl || ''
+            })),
+            criado_em: new Date().toISOString()
+          };
+
+          await _supabase.from('treinos').upsert(payload);
+
+          // Sincronizar também com a tabela relacional exercicios_do_treino
+          const exRows = newWorkoutExercises.map((ex, idx) => ({
+            id: ex.id || `ex_${workoutId}_${idx}`,
+            treino_id: workoutId,
+            exercicio_id: ex.id || `ex_${idx}`,
+            ordem: idx + 1,
+            quantidade_series: parseInt(ex.series) || 4,
+            repeticoes: ex.reps || '10-12',
+            carga_inicial: 0.0,
+            descanso_segundos: 60
+          }));
+          try {
+            await _supabase.from('exercicios_do_treino').upsert(exRows);
+          } catch (_) {}
+
+          console.log('[Supabase] Treino e exercícios salvos na nuvem com sucesso:', name);
+        } catch (e) {
+          console.log('[Supabase] Aviso: Treino mantido offline (sem conexão):', e);
+        }
+      }
+
+      // 3. Atualizar a UI com o novo treino e seus exercícios montados
+      renderAllWorkoutsUI();
+      closeCreateWorkoutModal();
+      alert(`🎉 Treino "${name}" criado com sucesso com ${newWorkoutExercises.length} exercícios montados!`);
+    }
+
+    function renderHistoryCardUI(item, prepend = false) {
+      const container = document.getElementById('historyListContainer');
+      if (!container) return;
+
+      const emptyEl = container.querySelector('.empty-history-msg');
+      if (emptyEl) emptyEl.remove();
+
+      const cardHtml = `
+        <div class="card" id="history_${item.id}" style="border-left: 4px solid var(--success-green); animation: fadeIn 0.3s ease-in-out;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <h4 style="font-size: 15px; font-weight: 700; color: white;">${item.nomeTreino}</h4>
+              <p style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">
+                📅 ${item.data || 'Hoje'} • ⏱ Duração: ${item.duracaoMinutos || 1} min
+              </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: var(--success-green); font-weight: 800; font-size: 11px; background: rgba(76,175,80,0.15); padding: 4px 8px; border-radius: 6px;">✓ Concluído</span>
+              <button onclick="deleteHistoryItem('${item.id}')" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 14px;">🗑️</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      if (prepend) {
+        container.insertAdjacentHTML('afterbegin', cardHtml);
+      } else {
+        container.insertAdjacentHTML('beforeend', cardHtml);
+      }
+    }
+
+    function loadHistoryFromStorage() {
+      const container = document.getElementById('historyListContainer');
+      if (!container) return;
+
+      container.innerHTML = '';
+      let historyList = [];
+      try {
+        historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
+      } catch (e) {}
+
+      if (historyList.length === 0) {
+        container.innerHTML = `
+          <div class="empty-history-msg" style="text-align: center; padding: 30px 16px; color: var(--text-grey);">
+            <div style="font-size: 32px; margin-bottom: 8px;">📊</div>
+            <div style="font-weight: 700; font-size: 14px; color: white;">Nenhum treino no histórico ainda</div>
+            <div style="font-size: 12px; margin-top: 4px;">Inicie e finalize um treino para acompanhar o seu progresso aqui!</div>
+          </div>
+        `;
+        return;
+      }
+
+      historyList.forEach(item => renderHistoryCardUI(item, false));
+    }
+
+    function deleteHistoryItem(id) {
+      if (confirm('Deseja excluir este registro do histórico?')) {
+        const card = document.getElementById(`history_${id}`);
+        if (card) card.remove();
+
+        try {
+          let historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
+          historyList = historyList.filter(h => h.id !== id);
+          localStorage.setItem('jtech_fit_history', JSON.stringify(historyList));
+        } catch (e) {}
+
+        const container = document.getElementById('historyListContainer');
+        if (container && container.children.length === 0) {
+          loadHistoryFromStorage();
+        }
+      }
+    }
+
+    // (DEFAULT_BASE_EXERCISES movido para o topo do script)
     let currentSelectedGroup = 'Todos';
     let onlyFavoritesFilter = false;
     let favoritesSet = new Set(JSON.parse(localStorage.getItem('jtech_fit_fav_exercises') || '[]'));
@@ -2367,7 +2398,7 @@
             <div onclick="toggleCardExpansion('${id}', event)" style="display: flex; gap: 14px; align-items: center; cursor: pointer;">
               
               <!-- Thumbnail GIF Clicável com Efeito Visual -->
-              <div onclick="event.stopPropagation(); openOnlyGifModal('${gif}', '${safeName}', '${safeSubtitle}')" style="width: 64px; height: 64px; background: #080a0f; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider); position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer;" title="Clique para abrir Pop-up do GIF">
+              <div onclick="event.stopPropagation(); openOnlyGifModal('${id}')" style="width: 64px; height: 64px; background: #080a0f; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider); position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer;" title="Clique para abrir Pop-up do GIF">
                 ${gif ? `<img src="${gif}" alt="${ex.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
                 <div style="display: ${gif ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 24px;">
                   ${icon}
@@ -2414,11 +2445,11 @@
 
                 <!-- Botões de Ação Dentro do Card Expandido -->
                 <div style="display: flex; gap: 8px; margin-top: 10px;">
-                  <button onclick="openOnlyGifModal('${gif}', '${safeName}', '${safeSubtitle}')" class="btn btn-outline" style="flex: 1; padding: 8px; font-size: 12px; border-color: var(--accent-cyan); color: var(--accent-cyan);">
+                  <button onclick="openOnlyGifModal('${id}')" class="btn btn-outline" style="flex: 1; padding: 8px; font-size: 12px; border-color: var(--accent-cyan); color: var(--accent-cyan);">
                     🔍 Pop-up com Zoom 3D
                   </button>
-                  <button onclick="openExerciseDetailModal('${id}')" class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 12px;">
-                    📖 Instruções Completas
+                  <button onclick="openOnlyGifModal('${id}')" class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 12px;">
+                    📖 Instruções & Detalhes
                   </button>
                 </div>
               </div>
@@ -2496,80 +2527,228 @@
       }
     }
 
-    let currentDetailExerciseId = null;
-    let currentDetailGifUrl = '';
-    let currentDetailTitle = '';
-
+        // ==========================================
+    // CONTROLE AVANÇADO DO POP-UP EXPANDIDO DE GIF (ZOOM, PAN, FULLSCREEN)
+    // ==========================================
     let currentGifScale = 1.0;
+    let gifPanX = 0;
+    let gifPanY = 0;
+    let currentOnlyGifId = null;
+    let currentOnlyGifOriginalUrl = '';
+    let isOnlyGifPaused = false;
+    let onlyGifMirrorIndex = 0;
 
-    function openOnlyGifModal(gifUrl, title, subtitle) {
-      let resolvedUrl = gifUrl;
-      if (!resolvedUrl && title) {
-        const match = DEFAULT_BASE_EXERCISES.find(b => (b.nome || b.name || '').toLowerCase() === title.toLowerCase()) ||
-                      exercisesList.find(e => (e.nome || e.name || '').toLowerCase() === title.toLowerCase());
-        if (match) resolvedUrl = match.gifUrl || match.gif_url || '';
+    function resetGifZoom() {
+      currentGifScale = 1.0;
+      gifPanX = 0;
+      gifPanY = 0;
+      applyOnlyGifTransform();
+    }
+
+    function adjustGifZoom(delta) {
+      currentGifScale = Math.min(Math.max(currentGifScale + delta, 0.8), 3.5);
+      if (currentGifScale <= 1.05) {
+        gifPanX = 0;
+        gifPanY = 0;
+      }
+      applyOnlyGifTransform();
+    }
+
+    function toggleGifZoom() {
+      if (currentGifScale > 1.2) {
+        resetGifZoom();
+      } else {
+        currentGifScale = 1.8;
+        gifPanX = 0;
+        gifPanY = 0;
+        applyOnlyGifTransform();
+      }
+    }
+
+    function applyOnlyGifTransform() {
+      const img = document.getElementById('onlyGifImg');
+      const container = document.getElementById('onlyGifContainer');
+      const badge = document.getElementById('onlyGifZoomBadge');
+      if (img) {
+        img.style.transform = `scale(${currentGifScale}) translate(${gifPanX / currentGifScale}px, ${gifPanY / currentGifScale}px)`;
+      }
+      if (container) {
+        container.style.cursor = currentGifScale > 1.05 ? 'grab' : 'zoom-in';
+      }
+      if (badge) {
+        badge.innerText = `${Math.round(currentGifScale * 100)}%`;
+      }
+    }
+
+    function handleOnlyGifLoaded(imgEl) {
+      const loader = document.getElementById('onlyGifLoader');
+      const fallback = document.getElementById('onlyGifFallback');
+      if (loader) loader.style.display = 'none';
+      if (fallback) fallback.style.display = 'none';
+      if (imgEl && imgEl.src && imgEl.src !== window.location.href) {
+        imgEl.style.display = 'block';
+      }
+    }
+
+    function handleOnlyGifError(imgEl) {
+      if (!currentOnlyGifOriginalUrl) return;
+
+      const mirrors = [
+        (url) => url.replace('https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/', 'https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/'),
+        (url) => url.replace('https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/', 'https://fastly.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/')
+      ];
+
+      if (onlyGifMirrorIndex < mirrors.length) {
+        const nextUrl = mirrors[onlyGifMirrorIndex](currentOnlyGifOriginalUrl);
+        onlyGifMirrorIndex++;
+        if (imgEl && nextUrl !== imgEl.src) {
+          console.log('[GIF] Tentando CDN alternativo:', nextUrl);
+          imgEl.src = nextUrl;
+          return;
+        }
       }
 
-      if (!resolvedUrl) {
-        alert('Nenhum GIF de demonstração disponível para este exercício.');
-        return;
+      const loader = document.getElementById('onlyGifLoader');
+      const fallback = document.getElementById('onlyGifFallback');
+      if (loader) loader.style.display = 'none';
+      if (imgEl) imgEl.style.display = 'none';
+      if (fallback) fallback.style.display = 'flex';
+    }
+
+    function toggleOnlyGifPlayPause() {
+      const img = document.getElementById('onlyGifImg');
+      const btn = document.getElementById('btnToggleOnlyGifPlay');
+      if (!img || !img.src) return;
+
+      isOnlyGifPaused = !isOnlyGifPaused;
+      if (isOnlyGifPaused) {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || 300;
+          canvas.height = img.naturalHeight || 300;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          img.dataset.animatedSrc = img.src;
+          img.src = canvas.toDataURL('image/png');
+        } catch (e) {
+          console.log('Pausa canvas indisponível:', e);
+        }
+        if (btn) btn.innerHTML = '▶ Reproduzir';
+      } else {
+        if (img.dataset.animatedSrc) {
+          img.src = img.dataset.animatedSrc;
+        }
+        if (btn) btn.innerHTML = '⏸ Pausar';
+      }
+    }
+
+    function toggleOnlyGifFullscreen() {
+      const container = document.getElementById('onlyGifContainer');
+      if (!container) return;
+      if (!document.fullscreenElement) {
+        if (container.requestFullscreen) {
+          container.requestFullscreen();
+        } else if (container.webkitRequestFullscreen) {
+          container.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    function openOnlyGifModal(targetParam, optionalTitle, optionalSubtitle) {
+      let ex = null;
+      let targetUrl = '';
+
+      if (typeof targetParam === 'object' && targetParam !== null) {
+        ex = targetParam;
+        targetUrl = ex.gifUrl || ex.gif_url || '';
+      } else if (typeof targetParam === 'string' && targetParam.trim() !== '') {
+        const query = targetParam.trim().toLowerCase();
+        
+        ex = exercisesList.find(e => 
+          (e.exerciseId && e.exerciseId.toLowerCase() === query) ||
+          (e.id && e.id.toLowerCase() === query) ||
+          (e.name && e.name.toLowerCase() === query) ||
+          (e.nome && e.nome.toLowerCase() === query) ||
+          (e.name && e.name.toLowerCase().includes(query)) ||
+          (e.nome && e.nome.toLowerCase().includes(query))
+        ) || DEFAULT_BASE_EXERCISES.find(e => 
+          (e.name && e.name.toLowerCase() === query) ||
+          (e.nome && e.nome.toLowerCase() === query) ||
+          (e.name && e.name.toLowerCase().includes(query)) ||
+          (e.nome && e.nome.toLowerCase().includes(query))
+        );
+
+        if (ex) {
+          targetUrl = ex.gifUrl || ex.gif_url || '';
+        } else if (targetParam.startsWith('http') || targetParam.includes('.gif') || targetParam.includes('/')) {
+          targetUrl = targetParam;
+        }
       }
 
+      if (!ex && optionalTitle) {
+        const titleQuery = optionalTitle.trim().toLowerCase();
+        ex = exercisesList.find(e => (e.name || e.nome || '').toLowerCase() === titleQuery) ||
+             DEFAULT_BASE_EXERCISES.find(e => (e.name || e.nome || '').toLowerCase() === titleQuery);
+        if (ex && !targetUrl) targetUrl = ex.gifUrl || ex.gif_url || '';
+      }
+
+      const exerciseName = (ex && (ex.name || ex.nome)) || optionalTitle || 'Exercício';
+      const muscleGroup = (ex && (ex.grupoMuscular || ex.musculoPrincipal)) || 'Geral';
+      const equip = (ex && ex.equipamento) || 'Livre / Aparelho';
+      const targetMuscle = (ex && (ex.musculoPrincipal || ex.grupoMuscular)) || 'Geral';
+      const instructions = (ex && ex.instrucoes) || 'Execute o movimento com cadência controlada e amplitude total.';
+      
+      currentOnlyGifId = (ex && (ex.exerciseId || ex.id)) || exerciseName;
+      currentOnlyGifOriginalUrl = targetUrl || (ex && ex.gifUrl) || 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-bench-press.gif';
+      isOnlyGifPaused = false;
+      onlyGifMirrorIndex = 0;
+
+      // Atualizar Textos e Badges
+      const titleEl = document.getElementById('onlyGifTitle');
+      const badgeEl = document.getElementById('onlyGifBadge');
+      const equipEl = document.getElementById('onlyGifEquipBadge');
+      const targetTextEl = document.getElementById('onlyGifTargetText');
+      const instructionsTextEl = document.getElementById('onlyGifInstructionsText');
+      const playBtn = document.getElementById('btnToggleOnlyGifPlay');
+
+      if (titleEl) titleEl.innerText = exerciseName;
+      if (badgeEl) badgeEl.innerText = muscleGroup;
+      if (equipEl) equipEl.innerText = equip;
+      if (targetTextEl) targetTextEl.innerText = targetMuscle;
+      if (instructionsTextEl) instructionsTextEl.innerText = instructions;
+      if (playBtn) playBtn.innerHTML = '⏸ Pausar';
+
+      // Configurar Imagem do GIF e Loader
       const modal = document.getElementById('modalOnlyGif');
       const img = document.getElementById('onlyGifImg');
+      const loader = document.getElementById('onlyGifLoader');
       const fallback = document.getElementById('onlyGifFallback');
-      const titleEl = document.getElementById('onlyGifTitle');
-      const subtitleEl = document.getElementById('onlyGifSubtitle');
 
-      if (titleEl) titleEl.innerText = title || 'Animação do Exercício';
-      if (subtitleEl) subtitleEl.innerText = subtitle || 'Visualização ampliada do movimento';
-      
       resetGifZoom();
 
-      if (img) {
-        img.src = resolvedUrl;
-        img.style.display = 'block';
+      if (currentOnlyGifOriginalUrl) {
+        if (loader) loader.style.display = 'flex';
+        if (img) {
+          img.style.display = 'none';
+          img.src = currentOnlyGifOriginalUrl;
+        }
+        if (fallback) fallback.style.display = 'none';
+      } else {
+        if (loader) loader.style.display = 'none';
+        if (img) img.style.display = 'none';
+        if (fallback) fallback.style.display = 'flex';
       }
-      if (fallback) fallback.style.display = 'none';
+
+      updateOnlyGifFavButton();
 
       if (modal) {
         modal.classList.add('active');
         modal.style.display = 'flex';
       }
-    }
-
-    function adjustGifZoom(delta) {
-      const img = document.getElementById('onlyGifImg');
-      const badge = document.getElementById('onlyGifZoomBadge');
-      if (!img) return;
-
-      currentGifScale = Math.min(Math.max(currentGifScale + delta, 1.0), 3.5);
-      img.style.transform = `scale(${currentGifScale})`;
-
-      if (badge) {
-        if (currentGifScale > 1.05) {
-          badge.style.display = 'block';
-          badge.innerText = `Zoom: ${currentGifScale.toFixed(1)}x`;
-        } else {
-          badge.style.display = 'none';
-        }
-      }
-    }
-
-    function toggleGifZoom() {
-      if (currentGifScale > 1.1) {
-        resetGifZoom();
-      } else {
-        adjustGifZoom(1.0);
-      }
-    }
-
-    function resetGifZoom() {
-      const img = document.getElementById('onlyGifImg');
-      const badge = document.getElementById('onlyGifZoomBadge');
-      currentGifScale = 1.0;
-      if (img) img.style.transform = 'scale(1)';
-      if (badge) badge.style.display = 'none';
     }
 
     function closeOnlyGifModal(event) {
@@ -2588,82 +2767,127 @@
       resetGifZoom();
     }
 
-    let currentDetailSubtitle = '';
-
-    function openOnlyGifModalFromDetail() {
-      if (currentDetailGifUrl) {
-        openOnlyGifModal(currentDetailGifUrl, currentDetailTitle, currentDetailSubtitle);
-      }
-    }
-
-    function openExerciseDetailModal(exerciseId) {
-      const ex = exercisesList.find(e => (e.exerciseId && e.exerciseId === exerciseId) || (e.id && e.id === exerciseId));
-      if (!ex) return;
-
-      const exId = ex.exerciseId || ex.id;
-      currentDetailExerciseId = exId;
-      currentDetailGifUrl = ex.gifUrl || ex.gif_url || ex.gif || '';
-      currentDetailTitle = ex.name || ex.nome || 'Exercício';
-      currentDetailSubtitle = `${ex.grupoMuscular || 'Geral'} • ${ex.equipamento || 'Livre / Aparelho'}`;
-
-      document.getElementById('detailExBadge').innerText = ex.grupoMuscular || 'Geral';
-      document.getElementById('detailExTitle').innerText = ex.name || ex.nome || 'Exercício';
-      document.getElementById('detailExEquip').innerText = ex.equipamento || 'Livre / Aparelho';
-      document.getElementById('detailExTarget').innerText = ex.musculoPrincipal || ex.grupoMuscular || 'Geral';
-      document.getElementById('detailExInstructions').innerText = ex.instrucoes || 'Execute o movimento com controle e amplitude total.';
-
-      const img = document.getElementById('detailGifImg');
-      const fallback = document.getElementById('detailFallbackIcon');
-      
-      if (currentDetailGifUrl) {
-        img.src = currentDetailGifUrl;
-        img.style.display = 'block';
-        fallback.style.display = 'none';
+    function toggleFavoriteFromOnlyGifModal() {
+      if (!currentOnlyGifId) return;
+      if (favoritesSet.has(currentOnlyGifId)) {
+        favoritesSet.delete(currentOnlyGifId);
       } else {
-        img.src = '';
-        img.style.display = 'none';
-        fallback.style.display = 'flex';
-        fallback.innerText = getMuscleGroupIcon(ex.grupoMuscular);
-      }
-
-      updateDetailFavButton();
-      document.getElementById('modalExerciseDetail').classList.add('active');
-    }
-
-    function closeExerciseDetailModal() {
-      const modal = document.getElementById('modalExerciseDetail');
-      if (modal) modal.classList.remove('active');
-      const img = document.getElementById('detailGifImg');
-      if (img) img.src = '';
-    }
-
-    function handleDetailModalOverlayClick(e) {
-      if (e.target && e.target.id === 'modalExerciseDetail') {
-        closeExerciseDetailModal();
-      }
-    }
-
-    function toggleFavoriteFromDetail() {
-      if (!currentDetailExerciseId) return;
-      if (favoritesSet.has(currentDetailExerciseId)) {
-        favoritesSet.delete(currentDetailExerciseId);
-      } else {
-        favoritesSet.add(currentDetailExerciseId);
+        favoritesSet.add(currentOnlyGifId);
       }
       localStorage.setItem('jtech_fit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
-      updateDetailFavButton();
+      updateOnlyGifFavButton();
       renderExercisesLibraryUI();
     }
 
-    function updateDetailFavButton() {
-      const isFav = favoritesSet.has(currentDetailExerciseId);
-      const btn = document.getElementById('detailBtnFav');
+    function updateOnlyGifFavButton() {
+      const isFav = favoritesSet.has(currentOnlyGifId);
+      const btn = document.getElementById('onlyGifBtnFav');
       if (!btn) return;
       if (isFav) {
         btn.style.color = 'gold';
         btn.style.borderColor = 'gold';
-        btn.innerHTML = '<span id="detailFavIcon">★</span> Favorito';
+        btn.innerHTML = '<span>★</span> Favorito';
       } else {
+        btn.style.color = 'white';
+        btn.style.borderColor = 'var(--divider)';
+        btn.innerHTML = '<span>☆</span> Favoritar';
+      }
+    }
+
+    function openExerciseDetailModal(exerciseIdOrName) {
+      openOnlyGifModal(exerciseIdOrName);
+    }
+
+    function closeExerciseDetailModal() {
+      closeOnlyGifModal();
+    }
+
+    // Configurar listeners de Pan e Zoom no GIF e Atalhos de Teclado
+    window.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('onlyGifContainer');
+      if (container) {
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        let moved = false;
+
+        container.addEventListener('mousedown', (e) => {
+          moved = false;
+          if (currentGifScale > 1.05) {
+            isDragging = true;
+            startX = e.clientX - gifPanX;
+            startY = e.clientY - gifPanY;
+            container.style.cursor = 'grabbing';
+          }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+          if (isDragging) {
+            moved = true;
+            gifPanX = e.clientX - startX;
+            gifPanY = e.clientY - startY;
+            applyOnlyGifTransform();
+          }
+        });
+
+        window.addEventListener('mouseup', () => {
+          if (isDragging) {
+            isDragging = false;
+            container.style.cursor = currentGifScale > 1.05 ? 'grab' : 'zoom-in';
+          }
+        });
+
+        // Click no Container para alternar zoom (se não tiver arrastado)
+        container.addEventListener('click', (e) => {
+          if (!moved) {
+            toggleGifZoom();
+          }
+          moved = false;
+        });
+
+        // Touch events para Celular e Tablets
+        container.addEventListener('touchstart', (e) => {
+          moved = false;
+          if (e.touches.length === 1 && currentGifScale > 1.05) {
+            isDragging = true;
+            startX = e.touches[0].clientX - gifPanX;
+            startY = e.touches[0].clientY - gifPanY;
+          }
+        }, { passive: true });
+
+        container.addEventListener('touchmove', (e) => {
+          if (isDragging && e.touches.length === 1) {
+            moved = true;
+            gifPanX = e.touches[0].clientX - startX;
+            gifPanY = e.touches[0].clientY - startY;
+            applyOnlyGifTransform();
+          }
+        }, { passive: true });
+
+        container.addEventListener('touchend', () => {
+          isDragging = false;
+        });
+
+        // Wheel Zoom com Roda do Mouse
+        container.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          if (e.deltaY < 0) {
+            adjustGifZoom(0.25);
+          } else {
+            adjustGifZoom(-0.25);
+          }
+        }, { passive: false });
+      }
+
+      // Tecla Escape para fechar Modais
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeOnlyGifModal();
+          closeCreateWorkoutModal();
+        }
+      });
+    });
+
+else {
         btn.style.color = 'white';
         btn.style.borderColor = 'var(--divider)';
         btn.innerHTML = '<span id="detailFavIcon">☆</span> Favoritar';
