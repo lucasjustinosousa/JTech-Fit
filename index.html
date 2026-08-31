@@ -1004,12 +1004,12 @@
     let allWorkoutsList = [];
     const expandedWorkoutIds = new Set();
 
-    function loadWorkoutsFromStorage() {
+    async function loadWorkoutsFromStorage() {
+      // 1. Carregar local primeiro (offline-first instantâneo)
       try {
         let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
         if (Array.isArray(saved) && saved.length > 0) {
           allWorkoutsList = saved.map(w => {
-            // Se o treino salvo não tiver o array de exercícios, recuperar dos padrões ou definir padrão
             if (!Array.isArray(w.exercicios) || w.exercicios.length === 0) {
               const def = DEFAULT_WORKOUT_DIVISIONS.find(d => d.nome.toLowerCase() === (w.nome || '').toLowerCase() || d.id === w.id);
               if (def) {
@@ -1031,6 +1031,69 @@
         allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
       }
       renderAllWorkoutsUI();
+
+      // 2. Buscar treinos no Supabase (Nuvem / Sincronizados com Mobile)
+      if (_supabase) {
+        try {
+          const { data, error } = await _supabase
+            .from('treinos')
+            .select('*')
+            .order('criado_em', { ascending: false });
+
+          if (!error && Array.isArray(data) && data.length > 0) {
+            const onlineWorkouts = data.map(row => {
+              let exList = [];
+              if (row.exercicios) {
+                let parsedEx = row.exercicios;
+                if (typeof parsedEx === 'string') {
+                  try { parsedEx = JSON.parse(parsedEx); } catch (_) {}
+                }
+                if (Array.isArray(parsedEx)) {
+                  exList = parsedEx.map((e, idx) => ({
+                    id: e.id || `ex_${row.id}_${idx}`,
+                    nome: e.nome || e.name || 'Exercício',
+                    series: e.series || '4',
+                    reps: e.reps || '10-12',
+                    grupoMuscular: e.grupoMuscular || e.grupo_muscular || 'Geral',
+                    gifUrl: e.gifUrl || e.gif_url || ''
+                  }));
+                }
+              }
+              let days = [];
+              if (row.dias_semana) {
+                let rawDays = row.dias_semana;
+                if (typeof rawDays === 'string') {
+                  try { rawDays = JSON.parse(rawDays); } catch (_) {}
+                }
+                if (Array.isArray(rawDays)) days = rawDays;
+              }
+
+              return {
+                id: row.id,
+                nome: row.nome || 'Treino',
+                descricao: row.descricao || '',
+                diasSemana: days,
+                corHex: row.cor_hex || '#1E88E5',
+                exercicios: exList,
+                exerciciosCount: exList.length,
+                criadoEm: row.criado_em || new Date().toISOString()
+              };
+            });
+
+            // Mesclar treinos da nuvem com locais
+            const mapById = new Map();
+            allWorkoutsList.forEach(w => mapById.set(w.id, w));
+            onlineWorkouts.forEach(w => mapById.set(w.id, w));
+            allWorkoutsList = Array.from(mapById.values());
+
+            localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+            renderAllWorkoutsUI();
+            console.log(`[Supabase] ${onlineWorkouts.length} treinos sincronizados da nuvem.`);
+          }
+        } catch (e) {
+          console.log('[Supabase] Erro ao sincronizar treinos da nuvem:', e);
+        }
+      }
     }
 
     function toggleWorkoutCardExpand(workoutId, event) {
@@ -1121,11 +1184,20 @@
       }).join('');
     }
 
-    function deleteWorkoutCard(workoutId) {
+    async function deleteWorkoutCard(workoutId) {
       if (confirm('Deseja realmente excluir este treino?')) {
         allWorkoutsList = allWorkoutsList.filter(w => w.id !== workoutId && w.nome !== workoutId);
         localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
         renderAllWorkoutsUI();
+
+        if (_supabase) {
+          try {
+            await _supabase.from('treinos').delete().eq('id', workoutId);
+            console.log('[Supabase] Treino excluído na nuvem:', workoutId);
+          } catch (e) {
+            console.log('[Supabase] Erro ao excluir treino na nuvem:', e);
+          }
+        }
       }
     }
 
@@ -1512,14 +1584,41 @@
       // 2. Sincronizar com Supabase se online
       if (_supabase) {
         try {
-          await _supabase.from('treinos').upsert({
+          const payload = {
             id: workoutId,
             nome: name,
             descricao: descInput.value.trim(),
-            dias_semana: JSON.stringify(selectedDays),
-            cor_hex: '#1E88E5'
-          });
-          console.log('[Supabase] Treino salvo no banco online:', name);
+            dias_semana: selectedDays,
+            cor_hex: '#1E88E5',
+            exercicios: newWorkoutExercises.map(e => ({
+              id: e.id,
+              nome: e.nome,
+              series: e.series,
+              reps: e.reps,
+              grupoMuscular: e.grupoMuscular || 'Geral',
+              gifUrl: e.gifUrl || ''
+            })),
+            criado_em: new Date().toISOString()
+          };
+
+          await _supabase.from('treinos').upsert(payload);
+
+          // Sincronizar também com a tabela relacional exercicios_do_treino
+          const exRows = newWorkoutExercises.map((ex, idx) => ({
+            id: ex.id || `ex_${workoutId}_${idx}`,
+            treino_id: workoutId,
+            exercicio_id: ex.id || `ex_${idx}`,
+            ordem: idx + 1,
+            quantidade_series: parseInt(ex.series) || 4,
+            repeticoes: ex.reps || '10-12',
+            carga_inicial: 0.0,
+            descanso_segundos: 60
+          }));
+          try {
+            await _supabase.from('exercicios_do_treino').upsert(exRows);
+          } catch (_) {}
+
+          console.log('[Supabase] Treino e exercícios salvos na nuvem com sucesso:', name);
         } catch (e) {
           console.log('[Supabase] Aviso: Treino mantido offline (sem conexão):', e);
         }

@@ -43,11 +43,23 @@ class WorkoutRepository extends ChangeNotifier {
 
   Future<void> carregarDados() async {
     try {
-      // Carregar exercícios da biblioteca local
+      // 1. Carregar exercícios da biblioteca local
       _exercicios = await LocalDatabase.instance.getExercicios();
 
+      // 2. Carregar treinos locais
       _treinos = await LocalDatabase.instance.getTreinos(_usuarioAtual?.id ?? 'guest_user_1');
       _historico = await LocalDatabase.instance.getHistoricoSessoes();
+
+      // 3. Buscar treinos na nuvem (Supabase) criados na Web ou em outros dispositivos
+      if (SupabaseService.instance.isInitialized) {
+        final treinosOnline = await SupabaseService.instance.fetchTreinosOnline();
+        if (treinosOnline.isNotEmpty) {
+          for (var t in treinosOnline) {
+            await LocalDatabase.instance.saveTreino(t);
+          }
+          _treinos = await LocalDatabase.instance.getTreinos(_usuarioAtual?.id ?? 'guest_user_1');
+        }
+      }
 
       // Se nenhum treino cadastrado ainda, gerar treinos padrão de exemplo (A, B, C)
       if (_treinos.isEmpty && _exercicios.isNotEmpty) {
@@ -55,7 +67,7 @@ class WorkoutRepository extends ChangeNotifier {
         _treinos = await LocalDatabase.instance.getTreinos(_usuarioAtual?.id ?? 'guest_user_1');
       }
     } catch (e) {
-      debugPrint('Erro ao carregar dados locais: $e');
+      debugPrint('Erro ao carregar e sincronizar dados: $e');
     }
     notifyListeners();
   }
@@ -148,6 +160,7 @@ class WorkoutRepository extends ChangeNotifier {
 
   Future<void> deletarTreino(String treinoId) async {
     await LocalDatabase.instance.deleteTreino(treinoId);
+    await SupabaseService.instance.deleteTreinoOnline(treinoId);
     await carregarDados();
   }
 
