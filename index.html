@@ -1040,7 +1040,7 @@
             .select('*')
             .order('criado_em', { ascending: false });
 
-          if (!error && Array.isArray(data) && data.length > 0) {
+          if (!error && Array.isArray(data)) {
             const onlineWorkouts = data.map(row => {
               let exList = [];
               if (row.exercicios) {
@@ -1080,6 +1080,24 @@
               };
             });
 
+            // Enviar para o Supabase quaisquer treinos locais que ainda não estejam na nuvem
+            const onlineIds = new Set(onlineWorkouts.map(w => w.id));
+            for (const localW of allWorkoutsList) {
+              if (!onlineIds.has(localW.id)) {
+                try {
+                  await _supabase.from('treinos').upsert({
+                    id: localW.id,
+                    nome: localW.nome,
+                    descricao: localW.descricao || '',
+                    dias_semana: localW.diasSemana || [],
+                    cor_hex: localW.corHex || '#1E88E5',
+                    exercicios: localW.exercicios || [],
+                    criado_em: localW.criadoEm || new Date().toISOString()
+                  });
+                } catch (_) {}
+              }
+            }
+
             // Mesclar treinos da nuvem com locais
             const mapById = new Map();
             allWorkoutsList.forEach(w => mapById.set(w.id, w));
@@ -1088,13 +1106,29 @@
 
             localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
             renderAllWorkoutsUI();
-            console.log(`[Supabase] ${onlineWorkouts.length} treinos sincronizados da nuvem.`);
+            console.log(`[Supabase] Total consolidado: ${allWorkoutsList.length} treinos sincronizados.`);
           }
         } catch (e) {
           console.log('[Supabase] Erro ao sincronizar treinos da nuvem:', e);
         }
+
+        // Subscrição em Tempo Real: Atualiza a lista automaticamente se o Mobile criar/excluir treinos
+        if (!_supabaseRealtimeSubscribed) {
+          _supabaseRealtimeSubscribed = true;
+          try {
+            _supabase
+              .channel('realtime_treinos_web')
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'treinos' }, () => {
+                console.log('[Supabase Realtime] Mudança detectada nos treinos! Recarregando...');
+                loadWorkoutsFromStorage();
+              })
+              .subscribe();
+          } catch (_) {}
+        }
       }
     }
+
+    let _supabaseRealtimeSubscribed = false;
 
     function toggleWorkoutCardExpand(workoutId, event) {
       if (event) event.stopPropagation();
@@ -2574,6 +2608,17 @@
       loadHistoryFromStorage();
       loadExercisesLibrary();
       loadWorkoutsFromStorage();
+    });
+
+    // Recarregar automaticamente ao voltar para a aba do navegador
+    window.addEventListener('focus', () => {
+      loadWorkoutsFromStorage();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        loadWorkoutsFromStorage();
+      }
     });
   </script>
 </body>
