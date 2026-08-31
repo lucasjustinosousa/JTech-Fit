@@ -503,33 +503,58 @@
         </div>
       </div>
 
-      <!-- TELA INICIAL / DASHBOARD -->
+      <!-- TELA INICIAL / DASHBOARD DINÂMICO EM TEMPO REAL -->
       <div id="screenHome" class="screen active">
-        <h3 style="font-size: 20px; font-weight: 800;">Olá, Atleta JTech! 👋</h3>
-        <p style="color: var(--text-grey); font-size: 13px; margin-bottom: 16px;">Bora superar seus limites hoje?</p>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+          <div>
+            <h3 style="font-size: 20px; font-weight: 800; color: white;">Olá, Atleta JTech! 👋</h3>
+            <p style="color: var(--text-grey); font-size: 13px; margin: 2px 0 0 0;">Bora superar seus limites hoje?</p>
+          </div>
+          <button onclick="updateHomeScreenUI()" title="Atualizar dados" style="background: rgba(255,255,255,0.06); border: 1px solid var(--divider); color: var(--text-grey); width: 32px; height: 32px; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">🔄</button>
+        </div>
 
-        <!-- Hero Card -->
-        <div class="hero-card">
-          <span style="font-size: 10px; font-weight: 800; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 10px;">TREINO RECOMENDADO HOJE</span>
-          <h2 style="font-size: 22px; font-weight: 800; margin-top: 8px;">Treino A — Peito & Tríceps</h2>
-          <p style="font-size: 12px; opacity: 0.9; margin-top: 4px;">4 exercícios • ~45 min de duração</p>
-          <button onclick="startActiveWorkout('Treino A — Peito & Tríceps')" class="btn btn-success" style="margin-top: 16px;">
+        <!-- Hero Card Dinâmico -->
+        <div class="hero-card" id="homeHeroCard">
+          <span style="font-size: 10px; font-weight: 800; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 10px; letter-spacing: 0.5px;">TREINO RECOMENDADO HOJE</span>
+          <h2 id="homeHeroTitle" style="font-size: 22px; font-weight: 800; margin-top: 8px; color: white;">Treino A — Peito & Tríceps</h2>
+          <p id="homeHeroSubtitle" style="font-size: 12px; opacity: 0.9; margin-top: 4px;">4 exercícios • ~45 min de duração</p>
+          <button id="homeHeroStartBtn" onclick="startActiveWorkout('Treino A — Peito & Tríceps')" class="btn btn-success" style="margin-top: 16px; box-shadow: 0 4px 16px rgba(76,175,80,0.4);">
             ▶ INICIAR TREINO AGORA
           </button>
         </div>
 
-        <!-- Weekly Summary -->
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-          <div class="card" style="flex: 1; margin: 0;">
-            <div style="font-size: 20px; color: var(--accent-cyan);">📊</div>
-            <div style="font-size: 20px; font-weight: 800; margin-top: 6px;">4 treinos</div>
-            <div style="font-size: 11px; color: var(--text-grey);">Concluídos na semana</div>
+        <!-- Estatísticas da Semana e do Mês (Tempo Real) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+          <div class="card" style="margin: 0; padding: 14px; background: var(--card-dark); border: 1px solid var(--divider); border-radius: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 20px;">📊</span>
+              <span style="font-size: 10px; font-weight: 800; color: var(--accent-cyan); background: rgba(0,210,255,0.12); padding: 2px 6px; border-radius: 4px;">SEMANA</span>
+            </div>
+            <div id="homeWeekCount" style="font-size: 20px; font-weight: 900; margin-top: 8px; color: white;">0 treinos</div>
+            <div id="homeWeekSubtitle" style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Concluídos na semana</div>
           </div>
-          <div class="card" style="flex: 1; margin: 0;">
-            <div style="font-size: 20px; color: var(--success-green);">✅</div>
-            <div style="font-size: 20px; font-weight: 800; margin-top: 6px;">Ontem</div>
-            <div style="font-size: 11px; color: var(--text-grey);">Treino B — Costas</div>
+
+          <div class="card" style="margin: 0; padding: 14px; background: var(--card-dark); border: 1px solid var(--divider); border-radius: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 20px;">📅</span>
+              <span style="font-size: 10px; font-weight: 800; color: #a78bfa; background: rgba(167,139,250,0.12); padding: 2px 6px; border-radius: 4px;">MÊS</span>
+            </div>
+            <div id="homeMonthCount" style="font-size: 20px; font-weight: 900; margin-top: 8px; color: white;">0 treinos</div>
+            <div id="homeMonthSubtitle" style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Total este mês</div>
           </div>
+        </div>
+
+        <!-- Card do Último Treino Concluído em Tempo Real -->
+        <div class="card" id="homeLastWorkoutCard" style="margin: 0 0 16px 0; padding: 14px; border-left: 4px solid var(--success-green); background: var(--card-dark); border-top: 1px solid var(--divider); border-right: 1px solid var(--divider); border-bottom: 1px solid var(--divider); border-radius: 14px; cursor: pointer; transition: all 0.2s;" onclick="switchTab('screenHistory', document.querySelectorAll('.nav-item')[3])" title="Toque para ver histórico completo">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">✅</span>
+              <span style="font-size: 11px; font-weight: 800; color: var(--success-green); letter-spacing: 0.5px; text-transform: uppercase;">ÚLTIMO TREINO CONCLUÍDO</span>
+            </div>
+            <span id="homeLastWorkoutWhen" style="font-size: 11px; font-weight: 700; color: var(--text-grey); background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 6px;">Nenhum ainda</span>
+          </div>
+          <div id="homeLastWorkoutTitle" style="font-size: 16px; font-weight: 800; margin-top: 8px; color: white;">Nenhum treino registrado</div>
+          <div id="homeLastWorkoutInfo" style="font-size: 12px; color: var(--text-grey); margin-top: 2px;">Inicie seu primeiro treino para registrar seu progresso!</div>
         </div>
 
         <div class="safety-banner">
@@ -957,16 +982,21 @@
         navElement.classList.add('active');
       }
 
-      if (screenId === 'screenExercises') {
+      if (screenId === 'screenHome') {
+        updateHomeScreenUI();
+      } else if (screenId === 'screenExercises') {
         renderExercisesLibraryUI();
       } else if (screenId === 'screenWorkouts') {
         renderAllWorkoutsUI();
+      } else if (screenId === 'screenHistory') {
+        loadHistoryFromStorage();
       }
     }
 
     function loginUser() {
       switchTab('screenHome');
       document.getElementById('bottomNav').style.display = 'flex';
+      updateHomeScreenUI();
     }
 
     // ==========================================
@@ -1909,8 +1939,9 @@
         }
       }
 
-      // 3. Renderizar o card no topo do histórico
+      // 3. Renderizar o card no topo do histórico e atualizar tela inicial
       renderHistoryCardUI(historyItem, true);
+      updateHomeScreenUI();
 
       // Reset dos contadores
       activeWorkoutSeconds = 0;
@@ -2285,7 +2316,182 @@
         if (container && container.children.length === 0) {
           loadHistoryFromStorage();
         }
+        updateHomeScreenUI();
       }
+    }
+
+    function clearAllHistory() {
+      if (confirm('Tem certeza que deseja limpar todo o histórico de treinos?')) {
+        localStorage.removeItem('jtech_fit_history');
+        loadHistoryFromStorage();
+        updateHomeScreenUI();
+      }
+    }
+
+    // ==========================================
+    // ATUALIZAÇÃO EM TEMPO REAL DO DASHBOARD / INÍCIO
+    // ==========================================
+    function updateHomeScreenUI() {
+      let historyList = [];
+      try {
+        historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
+      } catch (e) {}
+
+      const now = new Date();
+
+      // 1. Treinos na semana atual (Segunda-feira até Domingo)
+      const currentDayOfWeek = (now.getDay() + 6) % 7; // 0 = Segunda, 6 = Domingo
+      const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - currentDayOfWeek, 0, 0, 0, 0);
+      const endOfWeek = new Date(startOfWeek.getTime() + 7 * 24 * 60 * 60 * 1000 - 1);
+
+      // 2. Treinos no mês atual (1º dia do mês até o último momento do mês)
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+      let weekCount = 0;
+      let monthCount = 0;
+
+      historyList.forEach(item => {
+        let itemDate = null;
+        if (item.fimIso) {
+          itemDate = new Date(item.fimIso);
+        } else if (item.inicioIso) {
+          itemDate = new Date(item.inicioIso);
+        } else if (item.id && item.id.startsWith('sessao_')) {
+          const timestamp = parseInt(item.id.replace('sessao_', ''));
+          if (!isNaN(timestamp)) itemDate = new Date(timestamp);
+        } else if (item.data) {
+          const parts = item.data.split(/[\/\s,:-]+/);
+          if (parts.length >= 3) {
+            const d = parseInt(parts[0]);
+            const m = parseInt(parts[1]) - 1;
+            const y = parseInt(parts[2]);
+            itemDate = new Date(y, m, d);
+          }
+        }
+
+        if (itemDate && !isNaN(itemDate.getTime())) {
+          if (itemDate >= startOfWeek && itemDate <= endOfWeek) {
+            weekCount++;
+          }
+          if (itemDate >= startOfMonth && itemDate <= endOfMonth) {
+            monthCount++;
+          }
+        }
+      });
+
+      // Atualizar elementos da Semana e Mês na Home
+      const weekCountEl = document.getElementById('homeWeekCount');
+      const monthCountEl = document.getElementById('homeMonthCount');
+      const weekSubtitleEl = document.getElementById('homeWeekSubtitle');
+      const monthSubtitleEl = document.getElementById('homeMonthSubtitle');
+
+      if (weekCountEl) {
+        weekCountEl.innerText = `${weekCount} ${weekCount === 1 ? 'treino' : 'treinos'}`;
+      }
+      if (weekSubtitleEl) {
+        weekSubtitleEl.innerText = weekCount === 0 ? 'Nenhum treino ainda' : 'Concluídos na semana';
+      }
+
+      if (monthCountEl) {
+        monthCountEl.innerText = `${monthCount} ${monthCount === 1 ? 'treino' : 'treinos'}`;
+      }
+      if (monthSubtitleEl) {
+        const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        const currentMonthName = monthNames[now.getMonth()];
+        monthSubtitleEl.innerText = `Total em ${currentMonthName}`;
+      }
+
+      // 3. Atualizar Card do Último Treino Concluído
+      const lastWorkout = historyList.length > 0 ? historyList[0] : null;
+      const lastWorkoutWhenEl = document.getElementById('homeLastWorkoutWhen');
+      const lastWorkoutTitleEl = document.getElementById('homeLastWorkoutTitle');
+      const lastWorkoutInfoEl = document.getElementById('homeLastWorkoutInfo');
+      const lastWorkoutCardEl = document.getElementById('homeLastWorkoutCard');
+
+      if (lastWorkout) {
+        let whenText = 'Recentemente';
+        let itemDate = null;
+        if (lastWorkout.fimIso) {
+          itemDate = new Date(lastWorkout.fimIso);
+        } else if (lastWorkout.inicioIso) {
+          itemDate = new Date(lastWorkout.inicioIso);
+        } else if (lastWorkout.id && lastWorkout.id.startsWith('sessao_')) {
+          const timestamp = parseInt(lastWorkout.id.replace('sessao_', ''));
+          if (!isNaN(timestamp)) itemDate = new Date(timestamp);
+        }
+
+        if (itemDate && !isNaN(itemDate.getTime())) {
+          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          const workoutDay = new Date(itemDate.getFullYear(), itemDate.getMonth(), itemDate.getDate());
+          const diffDays = Math.round((today - workoutDay) / (1000 * 60 * 60 * 24));
+          const timeStr = itemDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+          if (diffDays === 0) {
+            whenText = `Hoje às ${timeStr}`;
+          } else if (diffDays === 1) {
+            whenText = `Ontem às ${timeStr}`;
+          } else if (diffDays > 1 && diffDays < 7) {
+            const weekdays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+            whenText = `${weekdays[itemDate.getDay()]} (${diffDays}d atrás)`;
+          } else {
+            whenText = itemDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+          }
+        } else if (lastWorkout.data) {
+          whenText = lastWorkout.data;
+        }
+
+        if (lastWorkoutWhenEl) lastWorkoutWhenEl.innerText = whenText;
+        if (lastWorkoutTitleEl) lastWorkoutTitleEl.innerText = lastWorkout.nomeTreino || 'Treino Concluído';
+        if (lastWorkoutInfoEl) {
+          lastWorkoutInfoEl.innerHTML = `⏱ <strong>${lastWorkout.duracaoMinutos || 1} min</strong> de duração • Concluído com sucesso 🏆`;
+        }
+        if (lastWorkoutCardEl) {
+          lastWorkoutCardEl.style.borderLeftColor = 'var(--success-green)';
+        }
+      } else {
+        if (lastWorkoutWhenEl) lastWorkoutWhenEl.innerText = 'Nenhum ainda';
+        if (lastWorkoutTitleEl) lastWorkoutTitleEl.innerText = 'Nenhum treino registrado';
+        if (lastWorkoutInfoEl) lastWorkoutInfoEl.innerText = 'Inicie seu primeiro treino para registrar seu progresso!';
+        if (lastWorkoutCardEl) {
+          lastWorkoutCardEl.style.borderLeftColor = 'var(--divider)';
+        }
+      }
+
+      // 4. Atualizar Hero Card com Treino Recomendado Hoje
+      updateRecommendedWorkoutHero(lastWorkout);
+    }
+
+    function updateRecommendedWorkoutHero(lastWorkout) {
+      const heroTitleEl = document.getElementById('homeHeroTitle');
+      const heroSubtitleEl = document.getElementById('homeHeroSubtitle');
+      const heroBtnEl = document.getElementById('homeHeroStartBtn');
+
+      if (!heroTitleEl || !heroBtnEl) return;
+
+      const workouts = (Array.isArray(allWorkoutsList) && allWorkoutsList.length > 0) ? allWorkoutsList : DEFAULT_WORKOUT_DIVISIONS;
+      if (!workouts || workouts.length === 0) return;
+
+      let recommended = workouts[0];
+
+      if (lastWorkout && workouts.length > 1) {
+        const lastIdx = workouts.findIndex(w => (w.nome || '').trim().toLowerCase() === (lastWorkout.nomeTreino || '').trim().toLowerCase());
+        if (lastIdx !== -1) {
+          const nextIdx = (lastIdx + 1) % workouts.length;
+          recommended = workouts[nextIdx];
+        }
+      }
+
+      const numEx = (recommended.exercicios && recommended.exercicios.length) || 4;
+      const estimatedDuration = Math.max(30, numEx * 10);
+
+      heroTitleEl.innerText = recommended.nome || 'Treino Recomendado';
+      if (heroSubtitleEl) {
+        heroSubtitleEl.innerText = `${numEx} exercícios • ~${estimatedDuration} min de duração`;
+      }
+
+      const safeWorkoutParam = (recommended.id || recommended.nome).replace(/'/g, "\\'");
+      heroBtnEl.setAttribute('onclick', `startActiveWorkout('${safeWorkoutParam}')`);
     }
 
     // (DEFAULT_BASE_EXERCISES movido para o topo do script)
@@ -2716,16 +2922,19 @@
       loadHistoryFromStorage();
       loadExercisesLibrary();
       loadWorkoutsFromStorage();
+      updateHomeScreenUI();
     });
 
     // Recarregar automaticamente ao voltar para a aba do navegador
     window.addEventListener('focus', () => {
       loadWorkoutsFromStorage();
+      updateHomeScreenUI();
     });
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         loadWorkoutsFromStorage();
+        updateHomeScreenUI();
       }
     });
   </script>
