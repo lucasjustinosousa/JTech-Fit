@@ -260,29 +260,9 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                   ],
                                 ),
                               ),
-                              if (currentExInfo != null)
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(6),
-                                  onTap: () => showGifViewerModal(context, currentExInfo!),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: JTechTheme.accentCyan.withOpacity(0.12),
-                                      borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4)),
-                                    ),
-                                    child: const Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(Icons.search, color: JTechTheme.accentCyan, size: 12),
-                                        SizedBox(width: 4),
-                                        Text('GIF 3D', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 10, fontWeight: FontWeight.bold)),
-                                      ],
-                                    ),
-                                  ),
-                                ),
                             ],
-                                       if (currentExInfo != null && currentExInfo.gifUrl != null && currentExInfo.gifUrl!.isNotEmpty) ...[
+                          ),
+                          if (currentExInfo != null && currentExInfo.gifUrl != null && currentExInfo.gifUrl!.isNotEmpty) ...[
                             const SizedBox(height: 12),
                             // Card Gatilho TOQUE PARA AMPLIAR GIF
                             InkWell(
