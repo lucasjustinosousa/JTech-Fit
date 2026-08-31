@@ -282,17 +282,16 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                   ),
                                 ),
                             ],
-                          ),
-                          if (currentExInfo != null) ...[
+                                       if (currentExInfo != null && currentExInfo.gifUrl != null && currentExInfo.gifUrl!.isNotEmpty) ...[
                             const SizedBox(height: 12),
                             // Card Gatilho TOQUE PARA AMPLIAR GIF
                             InkWell(
-                              onTap: () => showGifViewerModal(context, currentExInfo!),
+                              onTap: () => ExerciseGifDialog.show(context, exercicio: currentExInfo),
                               borderRadius: BorderRadius.circular(12),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                 decoration: BoxDecoration(
-                                  color: JTechTheme.accentCyan.withOpacity(0.06),
+                                  color: JTechTheme.accentCyan.withOpacity(0.08),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
                                     color: JTechTheme.accentCyan.withOpacity(0.4),
@@ -300,46 +299,45 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                 ),
                                 child: Row(
                                   children: [
-                                    if (currentExInfo!.gifUrl != null && currentExInfo!.gifUrl!.isNotEmpty)
-                                      Container(
-                                        width: 50,
-                                        height: 50,
-                                        margin: const EdgeInsets.only(right: 12),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black,
-                                          borderRadius: BorderRadius.circular(10),
-                                          border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4)),
-                                        ),
-                                        child: Stack(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius: BorderRadius.circular(9),
-                                              child: Image.network(
-                                                currentExInfo!.gifUrl!,
-                                                width: 50,
-                                                height: 50,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (_, __, ___) => const Center(
-                                                  child: Icon(Icons.fitness_center, color: JTechTheme.primaryBlue),
-                                                ),
-                                              ),
-                                            ),
-                                            Positioned(
-                                              bottom: 2,
-                                              right: 2,
-                                              child: Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.black.withOpacity(0.85),
-                                                  borderRadius: BorderRadius.circular(3),
-                                                  border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.6), width: 0.5),
-                                                ),
-                                                child: const Text('GIF', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 7, fontWeight: FontWeight.bold)),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                    Container(
+                                      width: 48,
+                                      height: 48,
+                                      margin: const EdgeInsets.only(right: 12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black,
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4)),
                                       ),
+                                      child: Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(9),
+                                            child: Image.network(
+                                              currentExInfo.gifUrl!,
+                                              width: 48,
+                                              height: 48,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) => const Center(
+                                                child: Icon(Icons.fitness_center, color: JTechTheme.primaryBlue),
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            bottom: 2,
+                                            right: 2,
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black.withOpacity(0.85),
+                                                borderRadius: BorderRadius.circular(3),
+                                                border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.6), width: 0.5),
+                                              ),
+                                              child: const Text('GIF', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 7, fontWeight: FontWeight.bold)),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                     const Expanded(
                                       child: Column(
                                         crossAxisAlignment: CrossAlignment.start,
@@ -588,6 +586,110 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  void _mostrarGifAmpliadoModal(BuildContext context, Exercicio? exInfo) {
+    if (exInfo?.gifUrl == null || exInfo!.gifUrl!.isEmpty) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF0C0E14),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: JTechTheme.accentCyan, width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: JTechTheme.accentCyan.withOpacity(0.3),
+                blurRadius: 25,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Cabeçalho do Pop-up
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            exInfo.nome,
+                            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${exInfo.grupoMuscular} • ${exInfo.equipamento}',
+                            style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1, color: JTechTheme.dividerColor),
+
+              // Visualizador do GIF com Zoom Interativo
+              Container(
+                height: 320,
+                width: double.infinity,
+                color: Colors.black,
+                child: InteractiveViewer(
+                  minScale: 1.0,
+                  maxScale: 3.5,
+                  child: Image.network(
+                    exInfo.gifUrl!,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Center(
+                      child: Text('GIF indisponível', style: TextStyle(color: JTechTheme.textGrey)),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Rodapé com Dica e Botão Fechar
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Pinça ou duplo toque p/ zoom',
+                      style: TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: JTechTheme.accentCyan,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      ),
+                      child: const Text('FECHAR', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

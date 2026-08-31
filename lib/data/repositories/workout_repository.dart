@@ -43,19 +43,44 @@ class WorkoutRepository extends ChangeNotifier {
 
   Future<void> carregarDados() async {
     try {
-      // Carregar exercícios da biblioteca local
+      // 1. Carregar exercícios da biblioteca local
       _exercicios = await LocalDatabase.instance.getExercicios();
 
+      // 2. Carregar treinos locais do SQLite
       _treinos = await LocalDatabase.instance.getTreinos(_usuarioAtual?.id ?? 'guest_user_1');
       _historico = await LocalDatabase.instance.getHistoricoSessoes();
 
-      // Se nenhum treino cadastrado ainda, gerar treinos padrão de exemplo (A, B, C)
+      // 3. Se nenhum treino cadastrado ainda localmente, gerar treinos padrão de exemplo (A, B, C)
       if (_treinos.isEmpty && _exercicios.isNotEmpty) {
         await _seedDefaultTreinos();
         _treinos = await LocalDatabase.instance.getTreinos(_usuarioAtual?.id ?? 'guest_user_1');
       }
+
+      // 4. Sincronização Bidirecional completa com a Nuvem (Supabase)
+      if (SupabaseService.instance.isInitialized) {
+        final treinosOnline = await SupabaseService.instance.fetchTreinosOnline();
+        
+        // A) Salvar no SQLite qualquer treino que esteja na nuvem e não no SQLite
+        final localIds = _treinos.map((t) => t.id).toSet();
+        for (var t in treinosOnline) {
+          if (!localIds.contains(t.id)) {
+            await LocalDatabase.instance.saveTreino(t);
+          }
+        }
+
+        // B) Enviar para a nuvem qualquer treino do SQLite que ainda não esteja na nuvem
+        final onlineIds = treinosOnline.map((t) => t.id).toSet();
+        for (var t in _treinos) {
+          if (!onlineIds.contains(t.id)) {
+            await SupabaseService.instance.syncTreino(t);
+          }
+        }
+
+        // Recarregar lista consolidada de treinos
+        _treinos = await LocalDatabase.instance.getTreinos(_usuarioAtual?.id ?? 'guest_user_1');
+      }
     } catch (e) {
-      debugPrint('Erro ao carregar dados locais: $e');
+      debugPrint('Erro ao carregar e sincronizar dados: $e');
     }
     notifyListeners();
   }
@@ -68,49 +93,74 @@ class WorkoutRepository extends ChangeNotifier {
     final pernas = _exercicios.firstWhere((e) => e.grupoMuscular == 'Pernas', orElse: () => _exercicios.first);
 
     final treinoA = Treino(
-      id: _uuid.v4(),
+      id: 'treino_default_a',
       usuarioId: _usuarioAtual!.id,
       nome: 'Treino A — Peito & Tríceps',
-      descricao: 'Foco em peitoral superior, médio e extensores de cotovelo.',
+      descricao: 'Hipertrofia',
       diasSemana: ['Segunda-feira', 'Quinta-feira'],
       corHex: '#1E88E5',
       criadoEm: DateTime.now(),
       exercicios: [
-        ExercicioDoTreino(id: _uuid.v4(), treinoId: 't_a', exercicioId: peito.id, ordem: 1, quantidadeSeries: 4, repeticoes: '10-12', cargaInicial: 30, descansoSegundos: 90, exercicioInfo: peito),
-        ExercicioDoTreino(id: _uuid.v4(), treinoId: 't_a', exercicioId: triceps.id, ordem: 2, quantidadeSeries: 3, repeticoes: '12-15', cargaInicial: 20, descansoSegundos: 60, exercicioInfo: triceps),
+        ExercicioDoTreino(id: 'ex_a1', treinoId: 'treino_default_a', exercicioId: peito.id, ordem: 1, quantidadeSeries: 4, repeticoes: '10-12', cargaInicial: 30, descansoSegundos: 90, exercicioInfo: peito),
+        ExercicioDoTreino(id: 'ex_a2', treinoId: 'treino_default_a', exercicioId: triceps.id, ordem: 2, quantidadeSeries: 3, repeticoes: '12-15', cargaInicial: 20, descansoSegundos: 60, exercicioInfo: triceps),
       ],
     );
 
     final treinoB = Treino(
-      id: _uuid.v4(),
+      id: 'treino_default_b',
       usuarioId: _usuarioAtual!.id,
       nome: 'Treino B — Costas & Bíceps',
-      descricao: 'Foco em dorsal, trapézio e flexores de cotovelo.',
+      descricao: 'Hipertrofia',
       diasSemana: ['Terça-feira', 'Sexta-feira'],
       corHex: '#00D2FF',
       criadoEm: DateTime.now(),
       exercicios: [
-        ExercicioDoTreino(id: _uuid.v4(), treinoId: 't_b', exercicioId: costas.id, ordem: 1, quantidadeSeries: 4, repeticoes: '10-12', cargaInicial: 40, descansoSegundos: 90, exercicioInfo: costas),
-        ExercicioDoTreino(id: _uuid.v4(), treinoId: 't_b', exercicioId: biceps.id, ordem: 2, quantidadeSeries: 3, repeticoes: '10-12', cargaInicial: 12, descansoSegundos: 60, exercicioInfo: biceps),
+        ExercicioDoTreino(id: 'ex_b1', treinoId: 'treino_default_b', exercicioId: costas.id, ordem: 1, quantidadeSeries: 4, repeticoes: '10-12', cargaInicial: 40, descansoSegundos: 90, exercicioInfo: costas),
+        ExercicioDoTreino(id: 'ex_b2', treinoId: 'treino_default_b', exercicioId: biceps.id, ordem: 2, quantidadeSeries: 3, repeticoes: '10-12', cargaInicial: 12, descansoSegundos: 60, exercicioInfo: biceps),
       ],
     );
 
+    final ombros = _exercicios.firstWhere((e) => e.grupoMuscular == 'Ombros', orElse: () => _exercicios.first);
+    final abdomen = _exercicios.firstWhere((e) => e.grupoMuscular == 'Abdômen', orElse: () => _exercicios.first);
+
     final treinoC = Treino(
-      id: _uuid.v4(),
+      id: 'treino_default_c',
       usuarioId: _usuarioAtual!.id,
       nome: 'Treino C — Pernas & Panturrilhas',
-      descricao: 'Desenvolvimento de quadríceps, isquiotibiais e panturrilha.',
+      descricao: 'Força & Resistência',
       diasSemana: ['Quarta-feira', 'Sábado'],
       corHex: '#4CAF50',
       criadoEm: DateTime.now(),
       exercicios: [
-        ExercicioDoTreino(id: _uuid.v4(), treinoId: 't_c', exercicioId: pernas.id, ordem: 1, quantidadeSeries: 4, repeticoes: '8-10', cargaInicial: 60, descansoSegundos: 120, exercicioInfo: pernas),
+        ExercicioDoTreino(id: 'ex_c1', treinoId: 'treino_default_c', exercicioId: pernas.id, ordem: 1, quantidadeSeries: 4, repeticoes: '8-10', cargaInicial: 60, descansoSegundos: 120, exercicioInfo: pernas),
+      ],
+    );
+
+    final treinoD = Treino(
+      id: 'treino_default_d',
+      usuarioId: _usuarioAtual!.id,
+      nome: 'Treino D — Ombros, Trapézio & Abdômen',
+      descricao: 'Definição & Core',
+      diasSemana: ['Sexta-feira'],
+      corHex: '#FF9800',
+      criadoEm: DateTime.now(),
+      exercicios: [
+        ExercicioDoTreino(id: 'ex_d1', treinoId: 'treino_default_d', exercicioId: ombros.id, ordem: 1, quantidadeSeries: 4, repeticoes: '10-12', cargaInicial: 16, descansoSegundos: 60, exercicioInfo: ombros),
+        ExercicioDoTreino(id: 'ex_d2', treinoId: 'treino_default_d', exercicioId: abdomen.id, ordem: 2, quantidadeSeries: 3, repeticoes: '15-20', cargaInicial: 0, descansoSegundos: 45, exercicioInfo: abdomen),
       ],
     );
 
     await LocalDatabase.instance.saveTreino(treinoA);
     await LocalDatabase.instance.saveTreino(treinoB);
     await LocalDatabase.instance.saveTreino(treinoC);
+    await LocalDatabase.instance.saveTreino(treinoD);
+
+    if (SupabaseService.instance.isInitialized) {
+      await SupabaseService.instance.syncTreino(treinoA);
+      await SupabaseService.instance.syncTreino(treinoB);
+      await SupabaseService.instance.syncTreino(treinoC);
+      await SupabaseService.instance.syncTreino(treinoD);
+    }
   }
 
   // Operações de Treinos
@@ -148,6 +198,7 @@ class WorkoutRepository extends ChangeNotifier {
 
   Future<void> deletarTreino(String treinoId) async {
     await LocalDatabase.instance.deleteTreino(treinoId);
+    await SupabaseService.instance.deleteTreinoOnline(treinoId);
     await carregarDados();
   }
 

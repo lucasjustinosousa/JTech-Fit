@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import '../../core/theme/jtech_theme.dart';
 import '../../data/repositories/workout_repository.dart';
 import '../../data/models/models.dart';
-import '../common/gif_viewer_modal.dart';
 import 'exercise_details_screen.dart';
+import 'exercise_gif_dialog.dart';
 
 class ExerciseSelectionScreen extends StatefulWidget {
   const ExerciseSelectionScreen({super.key});
@@ -186,66 +186,18 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
 
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          leading: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(8),
-                              onTap: () {
-                                showGifViewerModal(
-                                  context,
-                                  ex,
-                                  modoSelecao: true,
-                                  onAdd: () {
-                                    setState(() => _selectedExerciseIds.add(ex.id));
-                                  },
-                                );
-                              },
-                              child: Container(
-                                width: 48,
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  color: Colors.black,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: JTechTheme.dividerColor),
-                                ),
-                                child: Stack(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(7),
-                                      child: (ex.gifUrl != null && ex.gifUrl!.isNotEmpty)
-                                          ? Image.network(
-                                              ex.gifUrl!,
-                                              width: 48,
-                                              height: 48,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (_, __, ___) => const Center(
-                                                child: Icon(Icons.fitness_center, color: JTechTheme.primaryBlue, size: 20),
-                                              ),
-                                            )
-                                          : const Center(
-                                              child: Icon(Icons.fitness_center, color: JTechTheme.primaryBlue, size: 20),
-                                            ),
-                                    ),
-                                    Positioned(
-                                      bottom: 1,
-                                      right: 1,
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black.withOpacity(0.85),
-                                          borderRadius: BorderRadius.circular(3),
-                                          border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.5), width: 0.5),
-                                        ),
-                                        child: const Text('GIF ▶', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 7, fontWeight: FontWeight.bold)),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
+                        child: CheckboxListTile(
+                          activeColor: JTechTheme.successGreen,
+                          value: isChecked,
+                          onChanged: (val) {
+                            setState(() {
+                              if (val == true) {
+                                _selectedExerciseIds.add(ex.id);
+                              } else {
+                                _selectedExerciseIds.remove(ex.id);
+                              }
+                            });
+                          },
                           title: Text(
                             ex.nome,
                             style: const TextStyle(
@@ -255,50 +207,38 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                             ),
                           ),
                           subtitle: Text(
-                            '${ex.grupoMuscular} • ${ex.equipamento}',
+                            '${ex.grupoMuscular} • Equipamento: ${ex.equipamento}',
                             style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11),
                           ),
-                          trailing: Row(
+                          secondary: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.info_outline, color: JTechTheme.accentCyan, size: 20),
-                                tooltip: 'Ver detalhes e GIF',
+                                icon: const Icon(Icons.zoom_in, color: JTechTheme.accentCyan, size: 22),
+                                tooltip: 'Expandir GIF',
                                 onPressed: () {
-                                  showGifViewerModal(
-                                    context,
-                                    ex,
-                                    modoSelecao: true,
-                                    onAdd: () {
-                                      setState(() => _selectedExerciseIds.add(ex.id));
-                                    },
-                                  );
+                                  ExerciseGifDialog.show(context, exercicio: ex, modoSelecao: false);
                                 },
                               ),
-                              Checkbox(
-                                activeColor: JTechTheme.successGreen,
-                                value: isChecked,
-                                onChanged: (val) {
-                                  setState(() {
-                                    if (val == true) {
-                                      _selectedExerciseIds.add(ex.id);
-                                    } else {
-                                      _selectedExerciseIds.remove(ex.id);
-                                    }
-                                  });
+                              IconButton(
+                                icon: const Icon(Icons.info_outline, color: JTechTheme.textGrey, size: 20),
+                                tooltip: 'Detalhes completos',
+                                onPressed: () async {
+                                  final res = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ExerciseDetailsScreen(exercicio: ex, modoSelecao: true),
+                                    ),
+                                  );
+                                  if (res == 'select') {
+                                    setState(() => _selectedExerciseIds.add(ex.id));
+                                  } else if (res == 'toggle_fav') {
+                                    repo.toggleFavorito(ex.id);
+                                  }
                                 },
                               ),
                             ],
                           ),
-                          onTap: () {
-                            setState(() {
-                              if (isChecked) {
-                                _selectedExerciseIds.remove(ex.id);
-                              } else {
-                                _selectedExerciseIds.add(ex.id);
-                              }
-                            });
-                          },
                         ),
                       );
                     },

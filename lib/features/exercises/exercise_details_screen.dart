@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/jtech_theme.dart';
 import '../../data/models/models.dart';
+import 'exercise_gif_dialog.dart';
 
 class ExerciseDetailsScreen extends StatefulWidget {
   final Exercicio exercicio;
@@ -43,7 +44,7 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAlignment.start,
           children: [
-            // REPRODUTOR DE GIF COM BOTÃO PLAY / PAUSE
+            // REPRODUTOR DE GIF COM BOTÃO PLAY / PAUSE E EXPANDIR
             Container(
               height: 240,
               width: double.infinity,
@@ -60,7 +61,7 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                       borderRadius: BorderRadius.circular(16),
                       child: GestureDetector(
                         behavior: HitTestBehavior.opaque,
-                        onTap: () => _mostrarGifEmTelaCheia(context, ex),
+                        onTap: () => ExerciseGifDialog.show(context, exercicio: ex, modoSelecao: widget.modoSelecao),
                         child: Image.network(
                           ex.gifUrl!,
                           fit: BoxFit.contain,
@@ -91,10 +92,11 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                               children: [
                                 Icon(Icons.fitness_center, color: JTechTheme.primaryBlue, size: 64),
                                 SizedBox(height: 8),
-                                Text('Demonstração indisponível offline', style: TextStyle(color: JTechTheme.textGrey, fontSize: 12)),
+                                Text('Pré-visualização 3D demonstrativa', style: TextStyle(color: JTechTheme.textGrey, fontSize: 12)),
                               ],
                             ),
                           ),
+                        ),
                         ),
                       ),
                     )
@@ -161,6 +163,32 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                         ),
                       ),
                     ),
+
+                  // Botão de Expandir no canto superior direito
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: InkWell(
+                      onTap: () => ExerciseGifDialog.show(context, exercicio: ex, modoSelecao: widget.modoSelecao),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.75),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.5)),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.zoom_in, color: JTechTheme.accentCyan, size: 14),
+                            SizedBox(width: 4),
+                            Text('AMPLIAR', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 10, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
 
                   // Botão de Play/Pausa no canto inferior direito
                   if (ex.gifUrl != null && ex.gifUrl!.isNotEmpty)

@@ -134,14 +134,60 @@ class WorkoutListScreen extends StatelessWidget {
                             ),
                           )).toList(),
                         ),
-                        const Divider(height: 24, color: JTechTheme.dividerColor),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '${treino.exercicios.length} exercícios cadastrados',
-                              style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12),
+                        const Divider(height: 20, color: JTechTheme.dividerColor),
+                        
+                        // Lista Expansível de Exercícios Montados no Treino
+                        Theme(
+                          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                          child: ExpansionTile(
+                            tilePadding: EdgeInsets.zero,
+                            childrenPadding: EdgeInsets.zero,
+                            title: Text(
+                              '${treino.exercicios.length} exercícios montados',
+                              style: const TextStyle(color: JTechTheme.accentCyan, fontSize: 13, fontWeight: FontWeight.bold),
                             ),
+                            trailing: const Icon(Icons.keyboard_arrow_down, color: JTechTheme.accentCyan),
+                            children: [
+                              const SizedBox(height: 6),
+                              ...treino.exercicios.asMap().entries.map((entry) {
+                                final idx = entry.key;
+                                final exItem = entry.value;
+                                final nome = exItem.exercicioInfo?.nome ?? 'Exercício';
+                                final grupo = exItem.exercicioInfo?.grupoMuscular ?? 'Geral';
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 6),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF090B10),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: JTechTheme.dividerColor),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Text('${idx + 1}.', style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12, fontWeight: FontWeight.bold)),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(nome, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                                            Text('$grupo • ${exItem.quantidadeSeries} séries x ${exItem.repeticoes} reps', style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11)),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                              const SizedBox(height: 10),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
                             ElevatedButton.icon(
                               onPressed: () => onStartWorkout(treino),
                               style: ElevatedButton.styleFrom(

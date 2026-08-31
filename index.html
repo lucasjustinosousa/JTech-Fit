@@ -382,219 +382,12 @@
       color: white;
     }
 
-    /* Bloco de Exercício no Treino Ativo */
-    .active-exercise-card {
-      background: var(--surface-dark);
-      border: 1px solid var(--divider);
-      border-left: 4px solid var(--accent-cyan);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 14px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .active-exercise-card:hover {
-      box-shadow: 0 6px 20px rgba(0, 210, 255, 0.08);
-    }
-    
-    /* Botão Card Gatilho para Ampliar o GIF */
-    .active-gif-expand-trigger {
-      margin-top: 12px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: rgba(0, 210, 255, 0.05);
-      border: 1.5px dashed rgba(0, 210, 255, 0.45);
-      border-radius: 12px;
-      padding: 10px 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    .active-gif-expand-trigger:hover {
-      background: rgba(0, 210, 255, 0.12);
-      border-color: var(--accent-cyan);
-      border-style: solid;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(0, 210, 255, 0.2);
-    }
-    .active-gif-expand-trigger:active {
-      transform: scale(0.98);
-    }
-    .active-gif-thumb {
-      width: 52px;
-      height: 52px;
-      background: #000;
-      border-radius: 10px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      border: 1px solid rgba(0, 210, 255, 0.35);
-      flex-shrink: 0;
-    }
-    .active-gif-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .active-gif-thumb .gif-tag {
-      position: absolute;
-      bottom: 2px;
-      right: 2px;
-      background: rgba(0,0,0,0.85);
-      color: var(--accent-cyan);
-      font-size: 7px;
-      font-weight: 800;
-      padding: 1px 3px;
-      border-radius: 3px;
-      border: 0.5px solid rgba(0, 210, 255, 0.5);
-    }
-    .active-gif-text {
-      flex: 1;
-      min-width: 0;
-    }
-    .active-gif-text .title {
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--accent-cyan);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      letter-spacing: 0.3px;
-    }
-    .active-gif-text .desc {
-      font-size: 11px;
-      color: var(--text-grey);
-      margin-top: 2px;
-    }
-    .active-gif-arrow {
-      font-size: 16px;
-      color: var(--accent-cyan);
-      font-weight: 900;
-      transition: transform 0.2s ease;
-    }
-    .active-gif-expand-trigger:hover .active-gif-arrow {
-      transform: translate(2px, -2px);
-    }
-
-    /* Badge GIF 3D */
-    .badge-gif-3d {
-      background: rgba(0, 210, 255, 0.12);
-      border: 1px solid rgba(0, 210, 255, 0.35);
-      color: var(--accent-cyan);
-      font-size: 10px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 6px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.2s ease;
-    }
-    .badge-gif-3d:hover {
-      background: rgba(0, 210, 255, 0.25);
-      border-color: var(--accent-cyan);
-      transform: scale(1.05);
-    }
-
-    /* Tabela de Séries */
-    .sets-header-row {
-      display: flex;
-      align-items: center;
-      padding: 0 4px 6px;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-    }
-    .set-row-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      background: var(--card-dark);
-      border-radius: 10px;
-      margin-bottom: 6px;
-      border: 1px solid var(--divider);
-      transition: all 0.2s ease;
-    }
-    .set-row-item.done {
-      background: rgba(76, 175, 80, 0.12);
-      border-color: var(--success-green);
-    }
-    .set-num-badge {
-      width: 26px;
-      height: 26px;
-      background: var(--primary-blue);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 800;
-      flex-shrink: 0;
-    }
-    .set-row-item.done .set-num-badge {
-      background: var(--success-green);
-    }
-    .set-check-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      border: 2px solid var(--text-muted);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      color: transparent;
-      background: transparent;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-    .set-row-item.done .set-check-btn {
-      background: var(--success-green);
-      border-color: var(--success-green);
-      color: white;
-    }
-
-    /* Controles do Pop-up do GIF */
-    .gif-ctrl-btn {
-      background: rgba(10, 15, 25, 0.85);
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: white;
-      border-radius: 8px;
-      padding: 5px 9px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.2s ease;
-    }
-    .gif-ctrl-btn:hover {
-      background: rgba(0, 210, 255, 0.2);
-      border-color: var(--accent-cyan);
-      color: var(--accent-cyan);
-      transform: translateY(-1px);
-    }
-    .gif-ctrl-btn:active {
-      transform: translateY(1px);
-    }
-
-    /* Modal Criar Treino & Pop-up de GIF */
+    /* Modal Criar Treino */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.88);
-      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
       z-index: 1000;
       display: none;
       align-items: center;
@@ -608,13 +401,13 @@
     .modal-card {
       background: var(--surface-dark);
       border: 1px solid var(--divider);
-      border-radius: 22px;
+      border-radius: 20px;
       width: 100%;
-      max-width: 480px;
+      max-width: 440px;
       max-height: 90vh;
       overflow-y: auto;
       padding: 20px;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.9);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.9);
     }
     .color-picker-dot {
       width: 32px;
@@ -627,31 +420,6 @@
     .color-picker-dot.active {
       border-color: white;
       transform: scale(1.15);
-    }
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .badge-accent {
-      background: rgba(0, 210, 255, 0.15);
-      color: var(--accent-cyan);
-      border: 1px solid rgba(0, 210, 255, 0.35);
-    }
-    .gif-spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid rgba(0, 210, 255, 0.2);
-      border-top-color: var(--accent-cyan);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -771,31 +539,8 @@
           <button onclick="openCreateWorkoutModal()" class="btn btn-primary" style="width: auto; padding: 8px 14px; font-size: 12px;">+ Criar Treino</button>
         </div>
 
-        <div id="workoutListContainer">
-          <!-- Cards de treinos renderizados dinamicamente -->
-          <div class="card" style="border-left: 5px solid var(--primary-blue);">
-            <div style="display: flex; justify-content: space-between;">
-              <h4 style="font-size: 16px; font-weight: 800;">Treino A — Peito & Tríceps</h4>
-              <span style="color: var(--text-muted); cursor: pointer;" onclick="deleteWorkoutCard(this, 'Treino A — Peito & Tríceps')">🗑️</span>
-            </div>
-            <p style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">Segunda-feira • Quinta-feira</p>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
-              <span style="font-size: 12px; color: var(--accent-cyan);">4 exercícios</span>
-              <button onclick="startActiveWorkout('Treino A — Peito & Tríceps')" class="btn btn-success" style="width: auto; padding: 8px 16px; font-size: 12px;">INICIAR</button>
-            </div>
-          </div>
-
-          <div class="card" style="border-left: 5px solid var(--accent-cyan);">
-            <div style="display: flex; justify-content: space-between;">
-              <h4 style="font-size: 16px; font-weight: 800;">Treino B — Costas & Bíceps</h4>
-              <span style="color: var(--text-muted); cursor: pointer;" onclick="deleteWorkoutCard(this, 'Treino B — Costas & Bíceps')">🗑️</span>
-            </div>
-            <p style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">Terça-feira • Sexta-feira</p>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
-              <span style="font-size: 12px; color: var(--accent-cyan);">5 exercícios</span>
-              <button onclick="startActiveWorkout('Treino B — Costas & Bíceps')" class="btn btn-success" style="width: auto; padding: 8px 16px; font-size: 12px;">INICIAR</button>
-            </div>
-          </div>
+        <div id="workoutListContainer" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Cards de treinos e seus exercícios montados renderizados dinamicamente via JS -->
         </div>
       </div>
 
@@ -846,19 +591,19 @@
       <!-- TELA TREINO EM ANDAMENTO -->
       <div id="screenActiveWorkout" class="screen">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-          <div>
-            <div style="font-size: 11px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 0.5px; text-transform: uppercase;">TREINO EM ANDAMENTO</div>
-            <h3 id="activeWorkoutTitle" style="font-size: 18px; font-weight: 900; color: white; margin-top: 2px;">Treino A — Peito & Tríceps</h3>
+          <div style="min-width: 0; flex: 1;">
+            <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 800; text-transform: uppercase;">Treino em Andamento</span>
+            <h3 id="activeWorkoutTitle" style="font-size: 17px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0;">Treino A</h3>
           </div>
-          <div style="font-size: 18px; font-weight: 900; color: var(--success-green); background: rgba(76,175,80,0.15); padding: 4px 12px; border-radius: 8px; border: 1px solid rgba(76,175,80,0.3);" id="activeTimer">00:00</div>
+          <div style="font-size: 18px; font-weight: 900; color: var(--success-green); background: rgba(76,175,80,0.15); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(76,175,80,0.3);" id="activeTimer">00:00</div>
         </div>
 
-        <!-- Container de Exercícios Ativos Dinâmicos -->
-        <div id="activeExercisesListContainer" style="display: flex; flex-direction: column; gap: 14px;">
-          <!-- Exercícios, gatilhos de ampliação de GIF e séries renderizados via JS -->
+        <!-- Container dinâmico dos exercícios montados no treino ativo -->
+        <div id="activeWorkoutExercisesContainer" style="display: flex; flex-direction: column; gap: 14px;">
+          <!-- Renderizado dinamicamente via JS -->
         </div>
 
-        <button onclick="finishActiveWorkout()" class="btn btn-success" style="margin-top: 20px; padding: 14px; font-size: 14px; font-weight: 800; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(76,175,80,0.3);">
+        <button onclick="finishActiveWorkout()" class="btn btn-success" style="margin-top: 20px; width: 100%; font-size: 14px; font-weight: 800; padding: 14px; border-radius: 12px; box-shadow: 0 4px 16px rgba(76,175,80,0.3);">
           ✓ FINALIZAR TREINO COMPLETO
         </button>
       </div>
@@ -1039,102 +784,106 @@
     </div>
   </div>
 
-  <!-- MODAL DE EXPANSÃO DO GIF & DETALHES DO EXERCÍCIO -->
+  <!-- MODAL DE DETALHES DO EXERCÍCIO COM GIF AMPLIADO -->
   <div id="modalExerciseDetail" class="modal-overlay" onclick="handleDetailModalOverlayClick(event)">
-    <div class="modal-card" style="max-width: 500px; padding: 20px; max-height: 92vh; overflow-y: auto; position: relative;">
-      
-      <!-- Cabeçalho do Modal -->
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px;">
-        <div style="flex: 1;">
-          <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px;">
-            <span id="detailExBadge" class="badge badge-accent">Peito</span>
-            <span id="detailExEquipBadge" class="badge" style="background: rgba(255,255,255,0.08); color: var(--text-grey); border: 1px solid var(--divider);">Barra</span>
-          </div>
-          <h3 id="detailExTitle" style="font-size: 19px; font-weight: 900; color: white; line-height: 1.25;">Supino Reto com Barra</h3>
+    <div class="modal-card" style="max-width: 480px; padding: 20px; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+        <div style="flex: 1; padding-right: 10px;">
+          <span id="detailExBadge" class="badge badge-accent" style="margin-bottom: 6px; display: inline-block;">Peito</span>
+          <h3 id="detailExTitle" style="font-size: 18px; font-weight: 800; color: white; line-height: 1.3;">Supino Reto com Barra</h3>
         </div>
-        <button onclick="closeExerciseDetailModal()" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; flex-shrink: 0; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='scale(1.08)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'; this.style.transform='none'" title="Fechar (Esc)">✕</button>
+        <button onclick="closeExerciseDetailModal()" style="background: rgba(255,255,255,0.08); border: none; color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; flex-shrink: 0; transition: background 0.2s;">✕</button>
       </div>
 
-      <!-- CONTAINER DO GIF AMPLIADO / PLAYER COM ZOOM -->
-      <div id="detailGifContainer" style="width: 100%; height: 300px; background: #06080d; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; border: 1px solid rgba(0, 210, 255, 0.35); box-shadow: 0 12px 35px rgba(0,0,0,0.8), 0 0 20px rgba(0, 210, 255, 0.08); margin-bottom: 14px; user-select: none;">
-        
-        <!-- Loading Spinner -->
-        <div id="detailGifLoader" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; position: absolute; inset: 0; background: #06080d; z-index: 2;">
-          <div class="gif-spinner"></div>
-          <span style="font-size: 12px; color: var(--accent-cyan); font-weight: 700; letter-spacing: 0.5px;">Carregando animação GIF...</span>
-        </div>
-
-        <!-- Wrapper do GIF com Suporte a Zoom & Pan -->
-        <div id="detailGifWrapper" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; cursor: grab;" ondblclick="toggleDoubleTapZoom()" title="Duplo clique para alternar zoom">
-          <img id="detailGifImg" src="" alt="Exercício" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none; z-index: 1; transition: transform 0.2s ease-out; transform-origin: center center;" onload="handleDetailGifLoad(this)" onerror="handleDetailGifError(this)">
-        </div>
-
-        <!-- Fallback caso não haja GIF ou falhe -->
-        <div id="detailFallbackIcon" style="display: none; flex-direction: column; align-items: center; justify-content: center; font-size: 54px; z-index: 1;">
+      <!-- CONTAINER DO GIF AMPLIADO -->
+      <div id="detailGifContainer" style="width: 100%; height: 280px; background: #080a0f; border-radius: 14px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; border: 1px solid var(--divider); box-shadow: 0 10px 30px rgba(0,0,0,0.6); margin-bottom: 16px;">
+        <img id="detailGifImg" src="" alt="Exercício" style="width: 100%; height: 100%; object-fit: contain; display: block;" onerror="this.style.display='none'; document.getElementById('detailFallbackIcon').style.display='flex';">
+        <div id="detailFallbackIcon" style="display: none; flex-direction: column; align-items: center; justify-content: center; font-size: 54px;">
           🏋️‍♂️
-        </div>
-
-        <!-- Badges Superiores no GIF -->
-        <div style="position: absolute; top: 10px; left: 10px; z-index: 3; display: flex; gap: 6px;">
-          <span style="background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); border: 1px solid rgba(0,210,255,0.4); color: var(--accent-cyan); font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.5px;">🎬 HD GIF ANIMADO</span>
-          <span id="detailZoomIndicator" style="background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); border: 1px solid var(--divider); color: white; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 6px;">100%</span>
-        </div>
-
-        <!-- Controles Interativos sobre o GIF -->
-        <div id="detailGifControls" style="position: absolute; bottom: 8px; right: 8px; display: flex; gap: 5px; z-index: 3; flex-wrap: wrap;">
-          <button onclick="changeGifZoom(-0.25)" class="gif-ctrl-btn" title="Diminuir Zoom">🔍 −</button>
-          <button onclick="resetGifZoom()" class="gif-ctrl-btn" title="Resetar Zoom">⟲ 1x</button>
-          <button onclick="changeGifZoom(0.25)" class="gif-ctrl-btn" title="Aumentar Zoom">🔍 ＋</button>
-          <button id="btnTogglePlayGif" onclick="togglePlayPauseGif()" class="gif-ctrl-btn" title="Pausar / Reproduzir">
-            <span id="playPauseIcon">⏸</span> Pausar
-          </button>
-          <button onclick="toggleFullscreenGif()" class="gif-ctrl-btn" style="color: var(--accent-cyan);" title="Expandir em Tela Cheia">
-            ⛶ Tela Cheia
-          </button>
-        </div>
-
-        <!-- Dica de Zoom -->
-        <div style="position: absolute; bottom: 8px; left: 8px; z-index: 3; font-size: 9px; color: rgba(255,255,255,0.65); pointer-events: none; background: rgba(0,0,0,0.65); padding: 2px 6px; border-radius: 4px;">
-          💡 Toque 2x para zoom
         </div>
       </div>
 
       <!-- INFORMAÇÕES DE MÚSCULOS E EQUIPAMENTO -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
         <div style="background: var(--card-dark); border: 1px solid var(--divider); padding: 10px 12px; border-radius: 10px;">
-          <div style="font-size: 10px; color: var(--text-grey); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Músculo Alvo</div>
-          <div id="detailExTarget" style="font-size: 13px; font-weight: 800; color: var(--accent-cyan); margin-top: 2px;">Peitoral Maior</div>
+          <div style="font-size: 10px; color: var(--text-grey); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Equipamento</div>
+          <div id="detailExEquip" style="font-size: 13px; font-weight: 700; color: white; margin-top: 2px;">Barra</div>
         </div>
         <div style="background: var(--card-dark); border: 1px solid var(--divider); padding: 10px 12px; border-radius: 10px;">
-          <div style="font-size: 10px; color: var(--text-grey); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Secundários / Auxiliares</div>
-          <div id="detailExSecondary" style="font-size: 13px; font-weight: 700; color: white; margin-top: 2px;">Tríceps, Deltoide</div>
+          <div style="font-size: 10px; color: var(--text-grey); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Músculo Alvo</div>
+          <div id="detailExTarget" style="font-size: 13px; font-weight: 700; color: var(--accent-cyan); margin-top: 2px;">Peitoral Maior</div>
         </div>
       </div>
 
       <!-- INSTRUÇÕES E EXECUÇÃO -->
-      <div style="background: var(--card-dark); border: 1px solid var(--divider); padding: 12px 14px; border-radius: 12px; margin-bottom: 12px;">
-        <div style="font-size: 12px; font-weight: 800; color: white; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+      <div style="background: var(--card-dark); border: 1px solid var(--divider); padding: 14px; border-radius: 12px; margin-bottom: 16px;">
+        <div style="font-size: 12px; font-weight: 800; color: white; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
           <span>💡</span> Instruções de Execução
         </div>
-        <div id="detailExInstructions" style="font-size: 12px; color: #d0d5dd; line-height: 1.6; white-space: pre-line;">
+        <div id="detailExInstructions" style="font-size: 12px; color: var(--text-grey); line-height: 1.6; white-space: pre-line;">
           1. Deite-se no banco com os olhos alinhados à barra.
         </div>
       </div>
 
-      <!-- CUIDADOS / PREVENÇÃO DE LESÃO -->
-      <div id="detailExCareBox" style="background: rgba(255, 152, 0, 0.08); border: 1px solid rgba(255, 152, 0, 0.25); padding: 10px 12px; border-radius: 10px; margin-bottom: 16px; font-size: 11px; color: #ffb74d; line-height: 1.4;">
-        ⚠️ <strong>Cuidado Postural:</strong> <span id="detailExCareText">Mantenha as escápulas aduzidas e os pés firmes no chão. Evite rebater a carga.</span>
-      </div>
-
       <!-- BOTÕES DE AÇÃO -->
       <div style="display: flex; gap: 10px;">
-        <button id="detailBtnFav" onclick="toggleFavoriteFromDetail()" class="btn btn-outline" style="flex: 1; padding: 11px; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 10px;">
+        <button id="detailBtnFav" onclick="toggleFavoriteFromDetail()" class="btn btn-outline" style="flex: 1; padding: 10px; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px;">
           <span id="detailFavIcon">⭐</span> Favoritar
         </button>
-        <button onclick="closeExerciseDetailModal()" class="btn btn-success" style="flex: 1.3; padding: 11px; font-size: 13px; font-weight: 800; border-radius: 10px;">
-          VOLTAR AO TREINO
+        <button onclick="closeExerciseDetailModal()" class="btn btn-success" style="flex: 1.2; padding: 10px; font-size: 13px;">
+          FECHAR
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL EXCLUSIVO PARA EXIBIR O GIF AMPLIADO / EXPANDIDO EM TAMANHO GRANDE -->
+  <div id="modalOnlyGif" class="modal-overlay" onclick="closeOnlyGifModal(event)" style="z-index: 99999;">
+    <div class="modal-card" onclick="event.stopPropagation()" style="max-width: 600px; width: 95%; padding: 20px; text-align: left; background: #0c0e14; border: 2px solid var(--accent-cyan); box-shadow: 0 0 45px rgba(0,210,255,0.4); border-radius: 24px; position: relative;">
+      
+      <!-- Cabeçalho do Pop-up -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--divider); padding-bottom: 12px;">
+        <div style="min-width: 0; flex: 1; padding-right: 10px;">
+          <h3 id="onlyGifTitle" style="font-size: 18px; font-weight: 800; color: white; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Animação do Exercício</h3>
+          <div id="onlyGifSubtitle" style="font-size: 12px; color: var(--accent-cyan); margin-top: 3px;">Visualização ampliada em alta definição</div>
+        </div>
+        <button data-close-gif-modal onclick="closeOnlyGifModal()" style="background: rgba(255,255,255,0.1); border: 1px solid var(--divider); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; flex-shrink: 0;">✕</button>
+      </div>
+
+      <!-- Container do GIF com Altura Maior e Efeito Visual -->
+      <div id="onlyGifContainer" style="width: 100%; height: 380px; max-height: 55vh; background: #000; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid var(--divider); position: relative; cursor: zoom-in;" ondblclick="toggleGifZoom()" title="Duplo clique para ampliar ou resetar zoom">
+        <img id="onlyGifImg" src="" alt="GIF Exercício" style="width: 100%; height: 100%; object-fit: contain; display: block; transition: transform 0.25s ease; transform-origin: center center;" onerror="this.style.display='none'; document.getElementById('onlyGifFallback').style.display='flex';">
+        
+        <div id="onlyGifFallback" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: var(--text-grey);">
+          <div style="font-size: 54px; margin-bottom: 8px;">🏋️‍♂️</div>
+          <div style="font-size: 14px; font-weight: 700; color: white;">Demonstração em GIF indisponível</div>
+        </div>
+
+        <div style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.85); border: 1px solid rgba(0,210,255,0.7); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 0.5px;">
+          ● GIF 3D
+        </div>
+
+        <div id="onlyGifZoomBadge" style="position: absolute; top: 12px; left: 12px; background: rgba(30,136,229,0.9); border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 700; color: white; display: none;">
+          Zoom: 1.0x
+        </div>
+      </div>
+
+      <!-- Barra de Ferramentas de Zoom -->
+      <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); border-radius: 12px; padding: 10px 14px; margin-top: 14px; border: 1px solid var(--divider);">
+        <span style="font-size: 12px; color: var(--text-grey); display: flex; align-items: center; gap: 6px;">
+          <span>🔍</span> Duplo toque ou botões para zoom:
+        </span>
+        <div style="display: flex; gap: 8px;">
+          <button onclick="adjustGifZoom(-0.5)" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; width: 32px; height: 32px; border-radius: 8px; font-size: 16px; font-weight: 800; cursor: pointer;">-</button>
+          <button onclick="adjustGifZoom(0.5)" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; width: 32px; height: 32px; border-radius: 8px; font-size: 16px; font-weight: 800; cursor: pointer;">+</button>
+          <button onclick="resetGifZoom()" style="background: rgba(0,210,255,0.15); border: 1px solid rgba(0,210,255,0.4); color: var(--accent-cyan); height: 32px; padding: 0 12px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer;">Reset</button>
+        </div>
+      </div>
+
+      <!-- Botão Fechar -->
+      <button data-close-gif-modal onclick="closeOnlyGifModal()" class="btn btn-primary" style="margin-top: 14px; width: 100%; font-weight: 800; font-size: 14px; border-radius: 12px; padding: 12px;">
+        ✓ FECHAR VISUALIZAÇÃO
+      </button>
     </div>
   </div>
 
@@ -1184,11 +933,18 @@
 
     function switchTab(screenId, navElement) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(screenId).classList.add('active');
+      const target = document.getElementById(screenId);
+      if (target) target.classList.add('active');
 
       if (navElement) {
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         navElement.classList.add('active');
+      }
+
+      if (screenId === 'screenExercises') {
+        renderExercisesLibraryUI();
+      } else if (screenId === 'screenWorkouts') {
+        renderAllWorkoutsUI();
       }
     }
 
@@ -1197,42 +953,409 @@
       document.getElementById('bottomNav').style.display = 'flex';
     }
 
-    let currentActiveExerciseName = 'Supino Reto com Barra';
-    let currentActiveExercises = [];
+    // ==========================================
+    // TREINOS PADRÃO COM EXERCÍCIOS COMPLETOS (4 DIVISÕES)
+    // ==========================================
+    const DEFAULT_WORKOUT_DIVISIONS = [
+      {
+        id: 'treino_default_a',
+        nome: 'Treino A — Peito & Tríceps',
+        descricao: 'Hipertrofia',
+        diasSemana: ['Segunda-feira', 'Quinta-feira'],
+        corHex: '#1E88E5',
+        exercicios: [
+          { id: 'ex_a1', nome: 'Supino Reto com Barra', series: '4', reps: '10-12', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-bench-press.gif' },
+          { id: 'ex_a2', nome: 'Supino Inclinado com Halteres', series: '3', reps: '10-12', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-incline-bench-press.gif' },
+          { id: 'ex_a3', nome: 'Crucifixo no Crossover (Polia Alta)', series: '3', reps: '12-15', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/cable-middle-fly.gif' },
+          { id: 'ex_a4', nome: 'Tríceps Pulley na Corda', series: '4', reps: '12-15', grupoMuscular: 'Tríceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/cable-one-arm-tricep-pushdown.gif' },
+          { id: 'ex_a5', nome: 'Tríceps Testa com Barra W', series: '3', reps: '10-12', grupoMuscular: 'Tríceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/barbell-reverse-grip-skullcrusher.gif' }
+        ]
+      },
+      {
+        id: 'treino_default_b',
+        nome: 'Treino B — Costas & Bíceps',
+        descricao: 'Hipertrofia',
+        diasSemana: ['Terça-feira', 'Sexta-feira'],
+        corHex: '#00D2FF',
+        exercicios: [
+          { id: 'ex_b1', nome: 'Puxada Frontal na Polia', series: '4', reps: '10-12', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/cable-lat-pulldown.gif' },
+          { id: 'ex_b2', nome: 'Remada Curvada com Barra', series: '4', reps: '8-10', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/barbell-bent-over-row.gif' },
+          { id: 'ex_b3', nome: 'Remada Unilateral com Halter (Serrote)', series: '3', reps: '10-12', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/dumbbell-one-arm-bent-over-row.gif' },
+          { id: 'ex_b4', nome: 'Rosca Direta com Barra W', series: '4', reps: '10-12', grupoMuscular: 'Bíceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/barbell-curl.gif' },
+          { id: 'ex_b5', nome: 'Rosca Martelo com Halteres', series: '3', reps: '12', grupoMuscular: 'Bíceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/dumbbell-hammer-curl.gif' }
+        ]
+      },
+      {
+        id: 'treino_default_c',
+        nome: 'Treino C — Pernas & Panturrilhas',
+        descricao: 'Força & Resistência',
+        diasSemana: ['Quarta-feira', 'Sábado'],
+        corHex: '#4CAF50',
+        exercicios: [
+          { id: 'ex_c1', nome: 'Agachamento Livre com Barra', series: '4', reps: '8-10', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/barbell-squat.gif' },
+          { id: 'ex_c2', nome: 'Leg Press 45º', series: '4', reps: '10-12', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/sled-45-degrees-leg-press.gif' },
+          { id: 'ex_c3', nome: 'Cadeira Extensora', series: '3', reps: '12-15', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/lever-leg-extension.gif' },
+          { id: 'ex_c4', nome: 'Mesa Flexora', series: '3', reps: '12-15', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/lever-lying-leg-curl.gif' },
+          { id: 'ex_c5', nome: 'Panturrilha Sentado', series: '4', reps: '15-20', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/lever-seated-calf-raise.gif' }
+        ]
+      },
+      {
+        id: 'treino_default_d',
+        nome: 'Treino D — Ombros, Trapézio & Abdômen',
+        descricao: 'Definição & Core',
+        diasSemana: ['Sexta-feira'],
+        corHex: '#FF9800',
+        exercicios: [
+          { id: 'ex_d1', nome: 'Desenvolvimento com Halteres', series: '4', reps: '10-12', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-shoulder-press.gif' },
+          { id: 'ex_d2', nome: 'Elevação Lateral com Halteres', series: '4', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-lateral-raise.gif' },
+          { id: 'ex_d3', nome: 'Crucifixo Inverso com Halteres', series: '3', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-rear-lateral-raise.gif' },
+          { id: 'ex_d4', nome: 'Encolhimento com Halteres', series: '4', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/dumbbell-shrug.gif' },
+          { id: 'ex_d5', nome: 'Prancha Ventral Isométrica', series: '3', reps: '60s', grupoMuscular: 'Abdômen', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/abs/bodyweight-incline-side-plank.gif' }
+        ]
+      }
+    ];
 
-    function startActiveWorkout(title) {
-      document.getElementById('activeWorkoutTitle').innerText = title;
-      
-      // Mapeamento dos exercícios para cada divisão de treino
-      if (title.includes('Costas') || title.includes('Bíceps') || title.includes('Treino B')) {
-        currentActiveExercises = [
-          { ...(exercisesList.find(e => e.exerciseId === 'base_costas_1') || { name: 'Puxada Frontal na Polia', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/lats/cable-lat-pulldown-full-range-of-motion.gif' }), series: 4, reps: '10-12', descanso: 60, carga: 45 },
-          { ...(exercisesList.find(e => e.exerciseId === 'base_costas_2') || { name: 'Remada Curvada com Barra', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/upper-back/barbell-bent-over-row.gif' }), series: 4, reps: '10-12', descanso: 60, carga: 40 },
-          { ...(exercisesList.find(e => e.exerciseId === 'base_costas_3') || { name: 'Remada Unilateral com Halter (Serrote)', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/upper-back/dumbbell-one-arm-bent-over-row.gif' }), series: 3, reps: '10-12', descanso: 60, carga: 22 },
-          { ...(exercisesList.find(e => e.exerciseId === 'base_biceps_1') || { name: 'Rosca Direta com Barra W', grupoMuscular: 'Bíceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/barbell-curl.gif' }), series: 4, reps: '10-12', descanso: 60, carga: 15 },
-          { ...(exercisesList.find(e => e.exerciseId === 'base_biceps_2') || { name: 'Rosca Martelo com Halteres', grupoMuscular: 'Bíceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/cable-hammer-curl-with-rope.gif' }), series: 3, reps: '12', descanso: 60, carga: 14 }
-        ];
-      } else if (title.includes('Perna') || title.includes('Treino C')) {
-        currentActiveExercises = [
-          { ...(exercisesList.find(e => e.exerciseId === 'base_pernas_1') || { name: 'Agachamento Livre com Barra', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/glutes/barbell-full-squat.gif' }), series: 4, reps: '8-10', descanso: 90, carga: 60 },
-          { ...(exercisesList.find(e => e.exerciseId === 'base_pernas_2') || { name: 'Leg Press 45º', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/quads/lever-alternate-leg-press.gif' }), series: 4, reps: '10-12', descanso: 60, carga: 160 },
-          { ...(exercisesList.find(e => e.exerciseId === 'base_pernas_3') || { name: 'Cadeira Extensora', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/quads/lever-leg-extension.gif' }), series: 3, reps: '12-15', descanso: 60, carga: 50 },
-          { ...(exercisesList.find(e => e.exerciseId === 'base_pernas_4') || { name: 'Mesa Flexora', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/hamstrings/lever-lying-leg-curl.gif' }), series: 3, reps: '12', descanso: 60, carga: 40 },
-          { ...(exercisesList.find(e => e.exerciseId === 'base_ombros_1') || { name: 'Desenvolvimento com Halteres', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/delts/barbell-seated-overhead-press.gif' }), series: 4, reps: '10-12', descanso: 60, carga: 18 },
-          { ...(exercisesList.find(e => e.exerciseId === 'base_ombros_2') || { name: 'Elevação Lateral com Halteres', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/delts/dumbbell-lateral-raise.gif' }), series: 4, reps: '12-15', descanso: 45, carga: 10 }
-        ];
+    let allWorkoutsList = [];
+    const expandedWorkoutIds = new Set();
+
+    async function loadWorkoutsFromStorage() {
+      // 1. Carregar treinos locais e garantir que os padrões existam
+      try {
+        let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
+        const map = new Map();
+        
+        // Colocar primeiro os padrões A, B, C, D
+        DEFAULT_WORKOUT_DIVISIONS.forEach(def => map.set(def.id, { ...def }));
+
+        // Mesclar com os salvos localmente
+        if (Array.isArray(saved)) {
+          saved.forEach(w => {
+            if (!Array.isArray(w.exercicios) || w.exercicios.length === 0) {
+              const def = DEFAULT_WORKOUT_DIVISIONS.find(d => d.nome.toLowerCase() === (w.nome || '').toLowerCase() || d.id === w.id);
+              if (def) w.exercicios = def.exercicios;
+            }
+            map.set(w.id, w);
+          });
+        }
+
+        allWorkoutsList = Array.from(map.values());
+        localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+      } catch (e) {
+        allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
+      }
+      renderAllWorkoutsUI();
+
+      // 2. Buscar treinos no Supabase (Nuvem / Sincronizados com Mobile)
+      if (_supabase) {
+        try {
+          const { data, error } = await _supabase
+            .from('treinos')
+            .select('*')
+            .order('criado_em', { ascending: false });
+
+          if (!error && Array.isArray(data)) {
+            const onlineWorkouts = data.map(row => {
+              let exList = [];
+              if (row.exercicios) {
+                let parsedEx = row.exercicios;
+                if (typeof parsedEx === 'string') {
+                  try { parsedEx = JSON.parse(parsedEx); } catch (_) {}
+                }
+                if (Array.isArray(parsedEx)) {
+                  exList = parsedEx.map((e, idx) => ({
+                    id: e.id || `ex_${row.id}_${idx}`,
+                    nome: e.nome || e.name || 'Exercício',
+                    series: e.series || '4',
+                    reps: e.reps || '10-12',
+                    grupoMuscular: e.grupoMuscular || e.grupo_muscular || 'Geral',
+                    gifUrl: e.gifUrl || e.gif_url || ''
+                  }));
+                }
+              }
+              let days = [];
+              if (row.dias_semana) {
+                let rawDays = row.dias_semana;
+                if (typeof rawDays === 'string') {
+                  try { rawDays = JSON.parse(rawDays); } catch (_) {}
+                }
+                if (Array.isArray(rawDays)) days = rawDays;
+              }
+
+              return {
+                id: row.id,
+                nome: row.nome || 'Treino',
+                descricao: row.descricao || '',
+                diasSemana: days,
+                corHex: row.cor_hex || '#1E88E5',
+                exercicios: exList,
+                exerciciosCount: exList.length,
+                criadoEm: row.criado_em || new Date().toISOString()
+              };
+            });
+
+            // Enviar para o Supabase quaisquer treinos locais que ainda não estejam na nuvem
+            const onlineIds = new Set(onlineWorkouts.map(w => w.id));
+            for (const localW of allWorkoutsList) {
+              if (!onlineIds.has(localW.id)) {
+                try {
+                  await _supabase.from('treinos').upsert({
+                    id: localW.id,
+                    nome: localW.nome,
+                    descricao: localW.descricao || '',
+                    dias_semana: localW.diasSemana || [],
+                    cor_hex: localW.corHex || '#1E88E5',
+                    exercicios: localW.exercicios || [],
+                    criado_em: localW.criadoEm || new Date().toISOString()
+                  });
+                } catch (_) {}
+              }
+            }
+
+            // Mesclar treinos da nuvem com locais
+            const mapById = new Map();
+            allWorkoutsList.forEach(w => mapById.set(w.id, w));
+            onlineWorkouts.forEach(w => mapById.set(w.id, w));
+            allWorkoutsList = Array.from(mapById.values());
+
+            localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+            renderAllWorkoutsUI();
+            console.log(`[Supabase] Total consolidado: ${allWorkoutsList.length} treinos sincronizados.`);
+          }
+        } catch (e) {
+          console.log('[Supabase] Erro ao sincronizar treinos da nuvem:', e);
+        }
+
+        // Subscrição em Tempo Real: Atualiza a lista automaticamente se o Mobile criar/excluir treinos
+        if (!_supabaseRealtimeSubscribed) {
+          _supabaseRealtimeSubscribed = true;
+          try {
+            _supabase
+              .channel('realtime_treinos_web')
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'treinos' }, () => {
+                console.log('[Supabase Realtime] Mudança detectada nos treinos! Recarregando...');
+                loadWorkoutsFromStorage();
+              })
+              .subscribe();
+          } catch (_) {}
+        }
+      }
+    }
+
+    let _supabaseRealtimeSubscribed = false;
+
+    function toggleWorkoutCardExpand(workoutId, event) {
+      if (event) event.stopPropagation();
+      if (expandedWorkoutIds.has(workoutId)) {
+        expandedWorkoutIds.delete(workoutId);
       } else {
-        // Treino A Padrão (Peito & Tríceps)
-        currentActiveExercises = [
-          { ...(exercisesList.find(e => e.exerciseId === 'base_peito_1') || { name: 'Supino Reto com Barra', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-bench-press.gif' }), series: 4, reps: '10-12', descanso: 60, carga: 30 },
-          { ...(exercisesList.find(e => e.exerciseId === 'base_peito_2') || { name: 'Supino Inclinado com Halteres', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-incline-bench-press.gif' }), series: 3, reps: '10-12', descanso: 60, carga: 24 },
-          { ...(exercisesList.find(e => e.exerciseId === 'base_peito_3') || { name: 'Crucifixo no Crossover (Polia Alta)', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/cable-middle-fly.gif' }), series: 3, reps: '12-15', descanso: 60, carga: 20 },
-          { ...(exercisesList.find(e => e.exerciseId === 'base_triceps_1') || { name: 'Tríceps Pulley na Corda', grupoMuscular: 'Tríceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/cable-one-arm-tricep-pushdown.gif' }), series: 4, reps: '12-15', descanso: 60, carga: 25 },
-          { ...(exercisesList.find(e => e.exerciseId === 'base_triceps_2') || { name: 'Tríceps Testa com Barra W', grupoMuscular: 'Tríceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/barbell-reverse-grip-skullcrusher.gif' }), series: 3, reps: '10-12', descanso: 60, carga: 15 }
-        ];
+        expandedWorkoutIds.add(workoutId);
+      }
+      renderAllWorkoutsUI();
+    }
+
+    function renderAllWorkoutsUI() {
+      const container = document.getElementById('workoutListContainer');
+      if (!container) return;
+
+      if (allWorkoutsList.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 35px 16px; color: var(--text-grey);">
+            <div style="font-size: 36px; margin-bottom: 8px;">🏋️‍♂️</div>
+            <div style="font-weight: 700; font-size: 15px; color: white;">Nenhum treino cadastrado</div>
+            <div style="font-size: 12px; margin-top: 4px; margin-bottom: 14px;">Clique no botão "+ Criar Treino" acima para montar seu primeiro treino.</div>
+            <button onclick="openCreateWorkoutModal()" class="btn btn-primary" style="width: auto; padding: 8px 16px; font-size: 12px;">+ Criar Treino</button>
+          </div>
+        `;
+        return;
       }
 
-      renderActiveWorkoutUI();
+      container.innerHTML = allWorkoutsList.map(w => {
+        const isExpanded = expandedWorkoutIds.has(w.id);
+        const daysStr = Array.isArray(w.diasSemana) && w.diasSemana.length > 0 ? w.diasSemana.join(' • ') : 'Dias flexíveis';
+        const exercises = Array.isArray(w.exercicios) ? w.exercicios : [];
+        const count = exercises.length;
+        const color = w.corHex || '#1E88E5';
+
+        return `
+          <div class="card" id="card_${w.id}" style="border-left: 5px solid ${color}; padding: 16px; animation: fadeIn 0.25s ease-in-out;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="font-size: 16px; font-weight: 800; color: white; margin-bottom: 2px;">${w.nome}</h4>
+                <p style="font-size: 11px; color: var(--text-grey); margin: 0;">${daysStr}</p>
+                ${w.descricao ? `<span style="display: inline-block; background: rgba(0,210,255,0.12); color: var(--accent-cyan); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-top: 6px;">${w.descricao}</span>` : ''}
+              </div>
+              <button onclick="deleteWorkoutCard('${w.id}')" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 16px; padding: 4px;" title="Excluir treino">🗑️</button>
+            </div>
+
+            <!-- Botão para Expandir / Recolher Exercícios Montados -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--divider);">
+              <button onclick="toggleWorkoutCardExpand('${w.id}', event)" style="background: none; border: none; font-size: 12px; font-weight: 700; color: var(--accent-cyan); cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 0;">
+                <span>${isExpanded ? '▲ Ocultar Exercícios' : `▼ Ver Exercícios Montados (${count})`}</span>
+              </button>
+              <button onclick="startActiveWorkout('${w.id}')" class="btn btn-success" style="width: auto; padding: 7px 18px; font-size: 12px; font-weight: 800; border-radius: 8px;">
+                ▶ INICIAR
+              </button>
+            </div>
+
+            <!-- LISTA DE EXERCÍCIOS MONTADOS NESTE TREINO (EXPANSÍVEL) -->
+            ${isExpanded ? `
+              <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px; animation: fadeIn 0.2s ease-in-out;">
+                ${exercises.length === 0 ? `
+                  <div style="font-size: 11px; color: var(--text-grey); padding: 8px; text-align: center;">Nenhum exercício montado neste treino.</div>
+                ` : exercises.map((ex, idx) => {
+                  const icon = getMuscleGroupIcon(ex.grupoMuscular);
+                  const safeName = (ex.nome || 'Exercício').replace(/'/g, "\\'");
+                  const safeSubtitle = `${ex.grupoMuscular || 'Geral'} • ${ex.series || 4} séries x ${ex.reps || '10-12'} reps`;
+
+                  let gifUrl = ex.gifUrl || ex.gif_url || '';
+                  if (!gifUrl) {
+                    const match = DEFAULT_BASE_EXERCISES.find(b => (b.nome || b.name || '').toLowerCase() === (ex.nome || '').toLowerCase()) ||
+                                  exercisesList.find(e => (e.nome || e.name || '').toLowerCase() === (ex.nome || '').toLowerCase());
+                    if (match) {
+                      gifUrl = match.gifUrl || match.gif_url || '';
+                    }
+                  }
+
+                  return `
+                    <div onclick="event.stopPropagation(); openOnlyGifModal('${gifUrl}', '${safeName}', '${safeSubtitle}')" style="display: flex; justify-content: space-between; align-items: center; background: #080a0f; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--divider); cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#10141e'" onmouseout="this.style.background='#080a0f'">
+                      <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                        <span style="font-size: 16px;">${icon}</span>
+                        <div style="min-width: 0;">
+                          <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${idx + 1}. ${ex.nome}</div>
+                          <div style="font-size: 11px; color: var(--accent-cyan);">${ex.series || 4} séries • ${ex.reps || '10-12'} reps</div>
+                        </div>
+                      </div>
+                      ${gifUrl ? `
+                        <button onclick="event.stopPropagation(); openOnlyGifModal('${gifUrl}', '${safeName}', '${safeSubtitle}')" style="background: rgba(0,210,255,0.12); border: 1px solid rgba(0,210,255,0.4); color: var(--accent-cyan); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; cursor: pointer; flex-shrink: 0;">
+                          🔍 GIF 3D
+                        </button>
+                      ` : ''}
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            ` : ''}
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function deleteWorkoutCard(workoutId) {
+      if (confirm('Deseja realmente excluir este treino?')) {
+        allWorkoutsList = allWorkoutsList.filter(w => w.id !== workoutId && w.nome !== workoutId);
+        localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+        renderAllWorkoutsUI();
+
+        if (_supabase) {
+          try {
+            await _supabase.from('treinos').delete().eq('id', workoutId);
+            console.log('[Supabase] Treino excluído na nuvem:', workoutId);
+          } catch (e) {
+            console.log('[Supabase] Erro ao excluir treino na nuvem:', e);
+          }
+        }
+      }
+    }
+
+    // ==========================================
+    // EXECUÇÃO DE TREINO ATIVO DINÂMICO
+    // ==========================================
+    let currentActiveWorkout = null;
+
+    function startActiveWorkout(workoutIdOrName) {
+      const workout = allWorkoutsList.find(w => w.id === workoutIdOrName || w.nome === workoutIdOrName) || {
+        id: 'treino_temp',
+        nome: workoutIdOrName,
+        exercicios: DEFAULT_WORKOUT_DIVISIONS[0].exercicios
+      };
+
+      currentActiveWorkout = workout;
+      document.getElementById('activeWorkoutTitle').innerText = workout.nome;
+      
+      // Renderizar exercícios dinamicamente no treino ativo
+      const container = document.getElementById('activeWorkoutExercisesContainer');
+      if (container) {
+        const exercises = Array.isArray(workout.exercicios) && workout.exercicios.length > 0 ? workout.exercicios : DEFAULT_WORKOUT_DIVISIONS[0].exercicios;
+        
+        container.innerHTML = exercises.map((ex, exIdx) => {
+          const numSeries = parseInt(ex.series) || 4;
+          const safeName = (ex.nome || 'Exercício').replace(/'/g, "\\'");
+          const safeSubtitle = `${ex.grupoMuscular || 'Geral'} • ${ex.series || 4} séries x ${ex.reps || '10-12'} reps`;
+
+          // Garantir resolução do GIFUrl pela biblioteca se não estiver no objeto
+          let gifUrl = ex.gifUrl || ex.gif_url || '';
+          if (!gifUrl) {
+            const match = DEFAULT_BASE_EXERCISES.find(b => (b.nome || b.name || '').toLowerCase() === (ex.nome || '').toLowerCase()) ||
+                          exercisesList.find(e => (e.nome || e.name || '').toLowerCase() === (ex.nome || '').toLowerCase());
+            if (match) {
+              gifUrl = match.gifUrl || match.gif_url || '';
+            }
+          }
+
+          let rowsHtml = '';
+          for (let s = 1; s <= numSeries; s++) {
+            const rowId = `activeSetRow_${exIdx}_${s}`;
+            rowsHtml += `
+              <div class="set-row" id="${rowId}" style="margin-bottom: 6px;">
+                <div class="set-badge">${s}</div>
+                <div style="flex: 1;">
+                  <input type="number" class="form-input" value="30" style="padding: 6px 10px; font-size: 12px;" placeholder="Carga kg">
+                </div>
+                <div style="flex: 1;">
+                  <input type="number" class="form-input" value="12" style="padding: 6px 10px; font-size: 12px;" placeholder="Reps">
+                </div>
+                <div class="set-check" onclick="toggleSetDone('${rowId}')">✓</div>
+              </div>
+            `;
+          }
+
+          return `
+            <div class="card" style="border-left: 4px solid var(--accent-cyan); padding: 14px; margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                <div>
+                  <span style="font-size: 10px; color: var(--primary-blue); font-weight: 800; letter-spacing: 0.5px;">EXERCÍCIO ${exIdx + 1} DE ${exercises.length}</span>
+                  <h3 style="font-size: 16px; font-weight: 800; margin-top: 2px; color: white;">${ex.nome}</h3>
+                  <p style="font-size: 11px; color: var(--text-grey); margin: 0;">${ex.series || 4} séries x ${ex.reps || '10-12'} reps • 60s descanso</p>
+                </div>
+                ${gifUrl ? `
+                  <button onclick="openOnlyGifModal('${gifUrl}', '${safeName}', '${safeSubtitle}')" style="background: rgba(0,210,255,0.12); border: 1px solid rgba(0,210,255,0.3); color: var(--accent-cyan); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; cursor: pointer;">
+                    🔍 GIF 3D
+                  </button>
+                ` : ''}
+              </div>
+
+              ${gifUrl ? `
+                <!-- BANNER EXPANSÍVEL DE DEMONSTRAÇÃO DO GIF -->
+                <div onclick="openOnlyGifModal('${gifUrl}', '${safeName}', '${safeSubtitle}')" style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,210,255,0.06); border: 1px dashed rgba(0,210,255,0.3); padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,210,255,0.12)'" onmouseout="this.style.background='rgba(0,210,255,0.06)'">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 44px; height: 44px; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,210,255,0.4); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                      <img src="${gifUrl}" style="width: 100%; height: 100%; object-fit: contain;">
+                    </div>
+                    <div>
+                      <div style="font-size: 12px; font-weight: 800; color: var(--accent-cyan); display: flex; align-items: center; gap: 4px;">
+                        <span>🔍</span> TOQUE PARA AMPLIAR GIF
+                      </div>
+                      <div style="font-size: 10px; color: var(--text-grey);">Ver animação com zoom em tela cheia</div>
+                    </div>
+                  </div>
+                  <span style="color: var(--accent-cyan); font-size: 14px; font-weight: 800;">↗</span>
+                </div>
+              ` : ''}
+
+              <div style="font-size: 11px; font-weight: 700; color: var(--text-grey); margin-bottom: 6px; display: flex; justify-content: space-between;">
+                <span>Série</span>
+                <span style="flex: 1; text-align: center; margin-left: 20px;">Carga (kg)</span>
+                <span style="flex: 1; text-align: center;">Repetições</span>
+                <span style="width: 32px; text-align: center;">Status</span>
+              </div>
+
+              ${rowsHtml}
+            </div>
+          `;
+        }).join('');
+      }
+
       switchTab('screenActiveWorkout');
       activeWorkoutSeconds = 0;
       clearInterval(activeWorkoutInterval);
@@ -1242,81 +1365,6 @@
         let s = String(activeWorkoutSeconds % 60).padStart(2, '0');
         document.getElementById('activeTimer').innerText = `${m}:${s}`;
       }, 1000);
-    }
-
-    function renderActiveWorkoutUI() {
-      const container = document.getElementById('activeExercisesListContainer');
-      if (!container) return;
-
-      const total = currentActiveExercises.length;
-      container.innerHTML = currentActiveExercises.map((ex, exIdx) => {
-        const numSeries = ex.series || 4;
-        const repsText = ex.reps || '10-12';
-        const descansoSecs = ex.descanso || 60;
-        const defaultCarga = ex.carga || 30;
-        const defaultReps = parseInt(repsText) || 12;
-        const exIdOrName = ex.exerciseId || ex.id || ex.name || ex.nome;
-        const gifSrc = ex.gifUrl || 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-bench-press.gif';
-
-        let setsHtml = '';
-        for (let s = 1; s <= numSeries; s++) {
-          const rowId = `set_ex_${exIdx}_row_${s}`;
-          setsHtml += `
-            <div class="set-row-item" id="${rowId}">
-              <div class="set-num-badge">${s}</div>
-              <div style="flex: 1.2;">
-                <input type="number" class="form-input" value="${defaultCarga}" style="padding: 7px 10px; font-size: 13px; font-weight: 700; text-align: center;" placeholder="Carga kg">
-              </div>
-              <div style="flex: 1.2;">
-                <input type="number" class="form-input" value="${defaultReps}" style="padding: 7px 10px; font-size: 13px; font-weight: 700; text-align: center;" placeholder="Reps">
-              </div>
-              <button class="set-check-btn" onclick="toggleSetDone('${rowId}', ${descansoSecs})" title="Concluir série">✓</button>
-            </div>
-          `;
-        }
-
-        return `
-          <div class="active-exercise-card">
-            <!-- Cabeçalho do Exercício -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <span style="font-size: 11px; color: var(--primary-blue); font-weight: 800; letter-spacing: 0.5px;">EXERCÍCIO ${exIdx + 1} DE ${total}</span>
-              <button class="badge-gif-3d" onclick="openExerciseDetailModal('${exIdOrName}')" title="Abrir GIF 3D ampliado">
-                <span>🔍</span> GIF 3D
-              </button>
-            </div>
-
-            <!-- Título e Metas -->
-            <h3 style="font-size: 17px; font-weight: 900; color: white; margin-top: 2px;">${ex.name || ex.nome}</h3>
-            <p style="font-size: 12px; color: var(--text-grey); margin-top: 2px;">${numSeries} séries x ${repsText} reps • ${descansoSecs}s descanso</p>
-
-            <!-- Card Gatilho de Expansão do GIF (Clicando em cima abre maior) -->
-            <div class="active-gif-expand-trigger" onclick="openExerciseDetailModal('${exIdOrName}')" title="Toque para abrir a animação ampliada em tela cheia">
-              <div class="active-gif-thumb">
-                <img src="${gifSrc}" alt="${ex.name || ex.nome}" onerror="this.src='https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-bench-press.gif'">
-                <div class="gif-tag">GIF</div>
-              </div>
-              <div class="active-gif-text">
-                <div class="title">🔍 TOQUE PARA AMPLIAR GIF</div>
-                <div class="desc">Ver animação com zoom em tela cheia</div>
-              </div>
-              <div class="active-gif-arrow">↗</div>
-            </div>
-
-            <!-- Cabeçalho das Colunas de Séries -->
-            <div class="sets-header-row">
-              <span style="width: 32px;">Série</span>
-              <span style="flex: 1.2; text-align: center;">Carga (kg)</span>
-              <span style="flex: 1.2; text-align: center;">Repetições</span>
-              <span style="width: 36px; text-align: center;">Status</span>
-            </div>
-
-            <!-- Lista de Séries -->
-            <div class="sets-list-container">
-              ${setsHtml}
-            </div>
-          </div>
-        `;
-      }).join('');
     }
 
     async function finishActiveWorkout() {
@@ -1372,12 +1420,12 @@
       switchTab('screenHistory', document.querySelectorAll('.nav-item')[3]);
     }
 
-    function toggleSetDone(rowId, descansoSecs = 60) {
+    function toggleSetDone(rowId) {
       const row = document.getElementById(rowId);
       if (!row) return;
       row.classList.toggle('done');
       if (row.classList.contains('done')) {
-        startRestTimer(descansoSecs || 60);
+        startRestTimer(60);
       }
     }
 
@@ -1435,11 +1483,34 @@
     let selectedDays = [];
     let newWorkoutExercises = [];
 
+    function populateWorkoutExerciseSelect() {
+      const select = document.getElementById('exerciseSelectDropdown');
+      if (!select) return;
+
+      const groups = {};
+      exercisesList.forEach(ex => {
+        const g = ex.grupoMuscular || 'Geral';
+        if (!groups[g]) groups[g] = [];
+        groups[g].push(ex);
+      });
+
+      let optionsHtml = '<option value="">-- Selecione um Exercício da Biblioteca --</option>';
+      for (const [group, list] of Object.entries(groups)) {
+        optionsHtml += `<optgroup label="${group}">`;
+        list.forEach(ex => {
+          optionsHtml += `<option value="${ex.name || ex.nome}">${ex.name || ex.nome} (${ex.equipamento || 'Geral'})</option>`;
+        });
+        optionsHtml += `</optgroup>`;
+      }
+      optionsHtml += `<optgroup label="Personalizado"><option value="__custom__">✏️ Outro (digitar nome personalizado)...</option></optgroup>`;
+      select.innerHTML = optionsHtml;
+    }
+
     function openCreateWorkoutModal() {
       document.getElementById('newWorkoutName').value = '';
       document.getElementById('newWorkoutDesc').value = '';
-      const dropdown = document.getElementById('exerciseSelectDropdown');
-      if (dropdown) dropdown.value = '';
+      populateWorkoutExerciseSelect();
+      
       const customInput = document.getElementById('customExerciseInput');
       if (customInput) { customInput.value = ''; customInput.style.display = 'none'; }
       const seriesInput = document.getElementById('newExSeries');
@@ -1511,11 +1582,16 @@
       const seriesVal = seriesInput.value.trim() ? seriesInput.value.trim() : '4';
       const repsVal = repsInput.value.trim() ? repsInput.value.trim() : '10-12';
 
+      // Localizar o exercício correspondente na biblioteca para herdar GIF e grupo muscular
+      const matchedEx = exercisesList.find(e => (e.name || e.nome || '').toLowerCase() === exerciseName.toLowerCase()) || {};
+
       newWorkoutExercises.push({
         id: 'ex_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
         nome: exerciseName,
         series: seriesVal,
-        reps: repsVal
+        reps: repsVal,
+        grupoMuscular: matchedEx.grupoMuscular || 'Geral',
+        gifUrl: matchedEx.gifUrl || matchedEx.gif_url || ''
       });
 
       // Reset dos campos de exercício
@@ -1541,17 +1617,21 @@
         </div>`;
         return;
       }
-      container.innerHTML = newWorkoutExercises.map((ex, idx) => `
-        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--divider);">
-          <div onclick="openExerciseDetailModal('${ex.nome}')" style="cursor: pointer; flex: 1;" title="Clique para ver animação GIF">
-            <div style="font-size: 13px; font-weight: 700; color: white; display: flex; align-items: center; gap: 6px;">
-              ${ex.nome} <span style="font-size: 10px; color: var(--accent-cyan); background: rgba(0,210,255,0.1); padding: 1px 6px; border-radius: 4px;">🎬 GIF</span>
+      container.innerHTML = newWorkoutExercises.map((ex, idx) => {
+        const icon = getMuscleGroupIcon(ex.grupoMuscular);
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--divider);">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+              <span>${icon}</span>
+              <div style="min-width: 0;">
+                <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ex.nome}</div>
+                <div style="font-size: 11px; color: var(--accent-cyan);">${ex.series} séries • ${ex.reps} reps</div>
+              </div>
             </div>
-            <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">${ex.series} séries • ${ex.reps} reps</div>
+            <button onclick="removeExerciseFromNewWorkout(${idx})" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 16px; padding: 2px 6px;">🗑️</button>
           </div>
-          <button onclick="event.stopPropagation(); removeExerciseFromNewWorkout(${idx})" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 16px; padding: 4px 8px;" title="Remover exercício">🗑️</button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     async function saveNewWorkout() {
@@ -1564,81 +1644,75 @@
         return;
       }
 
+      if (newWorkoutExercises.length === 0) {
+        alert('Por favor, adicione pelo menos um exercício ao treino antes de salvar.');
+        return;
+      }
+
       const workoutId = 'treino_' + Date.now();
-      const countEx = newWorkoutExercises.length || 4;
 
       const newWorkout = {
         id: workoutId,
         nome: name,
         descricao: descInput.value.trim(),
-        diasSemana: selectedDays,
+        diasSemana: [...selectedDays],
         corHex: '#1E88E5',
-        exerciciosCount: countEx,
+        exercicios: [...newWorkoutExercises],
+        exerciciosCount: newWorkoutExercises.length,
         criadoEm: new Date().toISOString()
       };
 
-      // 1. Salvar no localStorage
-      let saved = [];
-      try {
-        saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
-      } catch (e) {}
-      saved.push(newWorkout);
-      localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(saved));
+      // 1. Salvar na lista em memória e no localStorage
+      allWorkoutsList.unshift(newWorkout);
+      localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
 
       // 2. Sincronizar com Supabase se online
       if (_supabase) {
         try {
-          await _supabase.from('treinos').upsert({
+          const payload = {
             id: workoutId,
             nome: name,
             descricao: descInput.value.trim(),
-            dias_semana: JSON.stringify(selectedDays),
-            cor_hex: selectedColor
-          });
-          console.log('[Supabase] Treino salvo no banco online:', name);
+            dias_semana: selectedDays,
+            cor_hex: '#1E88E5',
+            exercicios: newWorkoutExercises.map(e => ({
+              id: e.id,
+              nome: e.nome,
+              series: e.series,
+              reps: e.reps,
+              grupoMuscular: e.grupoMuscular || 'Geral',
+              gifUrl: e.gifUrl || ''
+            })),
+            criado_em: new Date().toISOString()
+          };
+
+          await _supabase.from('treinos').upsert(payload);
+
+          // Sincronizar também com a tabela relacional exercicios_do_treino
+          const exRows = newWorkoutExercises.map((ex, idx) => ({
+            id: ex.id || `ex_${workoutId}_${idx}`,
+            treino_id: workoutId,
+            exercicio_id: ex.id || `ex_${idx}`,
+            ordem: idx + 1,
+            quantidade_series: parseInt(ex.series) || 4,
+            repeticoes: ex.reps || '10-12',
+            carga_inicial: 0.0,
+            descanso_segundos: 60
+          }));
+          try {
+            await _supabase.from('exercicios_do_treino').upsert(exRows);
+          } catch (_) {}
+
+          console.log('[Supabase] Treino e exercícios salvos na nuvem com sucesso:', name);
         } catch (e) {
           console.log('[Supabase] Aviso: Treino mantido offline (sem conexão):', e);
         }
       }
 
-      // 3. Renderizar o novo Card de Treino na UI
-      renderWorkoutCardUI(newWorkout);
+      // 3. Atualizar a UI com o novo treino e seus exercícios montados
+      renderAllWorkoutsUI();
       closeCreateWorkoutModal();
-      alert(`🎉 Treino "${name}" criado com sucesso!`);
-    }
-
-    function renderWorkoutCardUI(w) {
-      const container = document.getElementById('workoutListContainer');
-      const daysStr = Array.isArray(w.diasSemana) && w.diasSemana.length > 0 ? w.diasSemana.join(' • ') : 'Dias flexíveis';
-      const count = w.exerciciosCount || 4;
-
-      const cardHtml = `
-        <div class="card" id="card_${w.id}" style="border-left: 5px solid ${w.corHex || '#1E88E5'}; animation: fadeIn 0.3s ease-in-out;">
-          <div style="display: flex; justify-content: space-between;">
-            <h4 style="font-size: 16px; font-weight: 800;">${w.nome}</h4>
-            <span style="color: var(--error-red); cursor: pointer; font-size: 14px;" onclick="deleteWorkoutCard(this, '${w.id}')">🗑️</span>
-          </div>
-          <p style="font-size: 12px; color: var(--text-grey); margin-top: 4px;">${daysStr}</p>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
-            <span style="font-size: 12px; color: var(--accent-cyan);">${count} exercícios</span>
-            <button onclick="startActiveWorkout('${w.nome}')" class="btn btn-success" style="width: auto; padding: 8px 16px; font-size: 12px;">INICIAR</button>
-          </div>
-        </div>
-      `;
-      container.insertAdjacentHTML('afterbegin', cardHtml);
-    }
-
-    function deleteWorkoutCard(el, workoutIdOrName) {
-      if (confirm('Deseja realmente excluir este treino?')) {
-        const card = el.closest('.card');
-        if (card) card.remove();
-
-        try {
-          let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
-          saved = saved.filter(w => w.id !== workoutIdOrName && w.nome !== workoutIdOrName);
-          localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(saved));
-        } catch (e) {}
-      }
+      alert(`🎉 Treino "${name}" criado com sucesso com ${newWorkoutExercises.length} exercícios montados!`);
     }
 
     function renderHistoryCardUI(item, prepend = false) {
@@ -2223,6 +2297,18 @@
       renderExercisesLibraryUI();
     }
 
+    const expandedCardsSet = new Set();
+
+    function toggleCardExpansion(id, event) {
+      if (event) event.stopPropagation();
+      if (expandedCardsSet.has(id)) {
+        expandedCardsSet.delete(id);
+      } else {
+        expandedCardsSet.add(id);
+      }
+      renderExercisesLibraryUI();
+    }
+
     function renderExercisesLibraryUI() {
       const container = document.getElementById('exerciseListContainer');
       if (!container) return;
@@ -2262,36 +2348,82 @@
       }
 
       container.innerHTML = filtered.map(ex => {
-        const isFav = favoritesSet.has(ex.exerciseId);
-        const isChecked = selectedForWorkoutSet.has(ex.exerciseId);
+        const id = ex.exerciseId || ex.id || '';
+        const isFav = favoritesSet.has(id);
+        const isChecked = selectedForWorkoutSet.has(id);
+        const isExpanded = expandedCardsSet.has(id);
         const icon = getMuscleGroupIcon(ex.grupoMuscular);
+        const gif = ex.gifUrl || ex.gif_url || ex.gif || '';
+        const safeName = (ex.name || ex.nome || 'Exercício').replace(/'/g, "\\'");
+
+        const safeGroup = (ex.grupoMuscular || 'Geral').replace(/'/g, "\\'");
+        const safeEquip = (ex.equipamento || 'Nenhum').replace(/'/g, "\\'");
+        const safeSubtitle = `${safeGroup} • ${safeEquip}`;
 
         return `
-          <div class="card exercise-item-card" onclick="openExerciseDetailModal('${ex.exerciseId}')" style="border-left: 4px solid var(--accent-cyan); display: flex; gap: 14px; align-items: center; padding: 12px 14px; cursor: pointer; transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(0,210,255,0.15)'" onmouseout="this.style.transform='none'; this.style.boxShadow='none'">
+          <div class="card exercise-item-card" style="border-left: 4px solid var(--accent-cyan); padding: 14px; margin-bottom: 12px; transition: all 0.25s ease;">
             
-            <!-- Thumbnail GIF Clicável com Efeito Visual -->
-            <div style="width: 76px; height: 76px; background: #080a0f; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider); position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.4);">
-              ${ex.gifUrl ? `<img src="${ex.gifUrl}" alt="${ex.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
-              <div style="display: ${ex.gifUrl ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 28px;">
-                ${icon}
+            <!-- Linha Principal do Card (Clicável para expandir) -->
+            <div onclick="toggleCardExpansion('${id}', event)" style="display: flex; gap: 14px; align-items: center; cursor: pointer;">
+              
+              <!-- Thumbnail GIF Clicável com Efeito Visual -->
+              <div onclick="event.stopPropagation(); openOnlyGifModal('${gif}', '${safeName}', '${safeSubtitle}')" style="width: 64px; height: 64px; background: #080a0f; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider); position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer;" title="Clique para abrir Pop-up do GIF">
+                ${gif ? `<img src="${gif}" alt="${ex.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                <div style="display: ${gif ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 24px;">
+                  ${icon}
+                </div>
+                <div style="position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.85); border-radius: 4px; padding: 1px 4px; font-size: 8px; font-weight: 800; color: var(--accent-cyan);">GIF 🔍</div>
               </div>
-              <div style="position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.75); border-radius: 4px; padding: 1px 5px; font-size: 8px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 0.5px;">GIF</div>
+
+              <!-- Informações do Exercício -->
+              <div style="flex: 1; min-width: 0;">
+                <h4 style="font-size: 14px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${ex.name}</h4>
+                <p style="font-size: 11px; color: var(--text-grey); margin: 0;">
+                  <strong style="color: var(--accent-cyan);">${ex.grupoMuscular}</strong> • ${ex.equipamento}
+                </p>
+                <div style="display: flex; gap: 8px; margin-top: 6px; align-items: center;">
+                  <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                    ${isExpanded ? '▲ Recolher' : '▼ Expandir GIF'}
+                  </span>
+                  <button onclick="event.stopPropagation(); toggleFavoriteExercise('${id}', this)" style="background: none; border: none; font-size: 17px; cursor: pointer; padding: 0 4px;" title="Favoritar">${isFav ? '⭐' : '☆'}</button>
+                </div>
+              </div>
+
+              <!-- Seleção para treino -->
+              <input type="checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleSelectForWorkout('${id}', this)" style="width: 22px; height: 22px; accent-color: var(--success-green); cursor: pointer; flex-shrink: 0;" title="Selecionar para treino">
             </div>
 
-            <!-- Informações do Exercício -->
-            <div style="flex: 1; min-width: 0;">
-              <h4 style="font-size: 14px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${ex.name}</h4>
-              <p style="font-size: 11px; color: var(--text-grey); margin: 0;">
-                <strong style="color: var(--accent-cyan);">${ex.grupoMuscular}</strong> • ${ex.equipamento}
-              </p>
-              <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
-                <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; background: rgba(0,210,255,0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(0,210,255,0.2);">🔍 Ver GIF ampliado</span>
-                <button onclick="event.stopPropagation(); toggleFavoriteExercise('${ex.exerciseId}', this)" style="background: none; border: none; font-size: 18px; cursor: pointer; padding: 2px 6px;" title="Favoritar">${isFav ? '⭐' : '☆'}</button>
-              </div>
-            </div>
+            <!-- GAVETA EXPANSÍVEL DO GIF NA MESMA TELA -->
+            ${isExpanded ? `
+              <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--divider); animation: fadeIn 0.2s ease-in-out;">
+                
+                <!-- Visor Ampliado do GIF -->
+                <div style="width: 100%; height: 280px; background: #000; border-radius: 14px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1.5px solid rgba(0,210,255,0.4); position: relative; box-shadow: 0 6px 20px rgba(0,0,0,0.8);">
+                  ${gif ? `
+                    <img src="${gif}" alt="${ex.name}" style="width: 100%; height: 100%; object-fit: contain; display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  ` : ''}
+                  <div style="display: ${gif ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: var(--text-grey);">
+                    <div style="font-size: 40px; margin-bottom: 6px;">🏋️‍♂️</div>
+                    <div style="font-size: 12px; font-weight: 700; color: white;">Demonstração em GIF indisponível</div>
+                  </div>
 
-            <!-- Seleção para treino -->
-            <input type="checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleSelectForWorkout('${ex.exerciseId}', this)" style="width: 22px; height: 22px; accent-color: var(--success-green); cursor: pointer; flex-shrink: 0;" title="Selecionar para treino">
+                  <div style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.8); border: 1px solid rgba(0,210,255,0.5); border-radius: 6px; padding: 2px 7px; font-size: 9px; font-weight: 800; color: var(--accent-cyan);">
+                    ● 3D LOOP
+                  </div>
+                </div>
+
+                <!-- Botões de Ação Dentro do Card Expandido -->
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                  <button onclick="openOnlyGifModal('${gif}', '${safeName}', '${safeSubtitle}')" class="btn btn-outline" style="flex: 1; padding: 8px; font-size: 12px; border-color: var(--accent-cyan); color: var(--accent-cyan);">
+                    🔍 Pop-up com Zoom 3D
+                  </button>
+                  <button onclick="openExerciseDetailModal('${id}')" class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 12px;">
+                    📖 Instruções Completas
+                  </button>
+                </div>
+              </div>
+            ` : ''}
+
           </div>
         `;
       }).join('');
@@ -2365,202 +2497,137 @@
     }
 
     let currentDetailExerciseId = null;
-    let currentGifOriginalUrl = '';
-    let isGifPaused = false;
-    let fallbackMirrorIndex = 0;
-    let currentZoomLevel = 1.0;
-    let panCurrentX = 0, panCurrentY = 0;
+    let currentDetailGifUrl = '';
+    let currentDetailTitle = '';
 
-    function resetGifZoom() {
-      currentZoomLevel = 1.0;
-      panCurrentX = 0;
-      panCurrentY = 0;
-      applyGifTransform();
-    }
+    let currentGifScale = 1.0;
 
-    function changeGifZoom(delta) {
-      currentZoomLevel = Math.max(0.75, Math.min(3.5, currentZoomLevel + delta));
-      if (currentZoomLevel <= 1.05) {
-        panCurrentX = 0;
-        panCurrentY = 0;
+    function openOnlyGifModal(gifUrl, title, subtitle) {
+      let resolvedUrl = gifUrl;
+      if (!resolvedUrl && title) {
+        const match = DEFAULT_BASE_EXERCISES.find(b => (b.nome || b.name || '').toLowerCase() === title.toLowerCase()) ||
+                      exercisesList.find(e => (e.nome || e.name || '').toLowerCase() === title.toLowerCase());
+        if (match) resolvedUrl = match.gifUrl || match.gif_url || '';
       }
-      applyGifTransform();
-    }
 
-    function toggleDoubleTapZoom() {
-      if (currentZoomLevel > 1.2) {
-        resetGifZoom();
-      } else {
-        currentZoomLevel = 1.8;
-        panCurrentX = 0;
-        panCurrentY = 0;
-        applyGifTransform();
+      if (!resolvedUrl) {
+        alert('Nenhum GIF de demonstração disponível para este exercício.');
+        return;
       }
-    }
 
-    function applyGifTransform() {
-      const img = document.getElementById('detailGifImg');
-      const zoomIndicator = document.getElementById('detailZoomIndicator');
-      const wrapper = document.getElementById('detailGifWrapper');
-      if (img) {
-        img.style.transform = `scale(${currentZoomLevel}) translate(${panCurrentX / currentZoomLevel}px, ${panCurrentY / currentZoomLevel}px)`;
-      }
-      if (wrapper) {
-        wrapper.style.cursor = currentZoomLevel > 1.05 ? 'grab' : 'zoom-in';
-      }
-      if (zoomIndicator) {
-        zoomIndicator.innerText = `${Math.round(currentZoomLevel * 100)}%`;
-      }
-    }
+      const modal = document.getElementById('modalOnlyGif');
+      const img = document.getElementById('onlyGifImg');
+      const fallback = document.getElementById('onlyGifFallback');
+      const titleEl = document.getElementById('onlyGifTitle');
+      const subtitleEl = document.getElementById('onlyGifSubtitle');
 
-    function openExerciseDetailModal(exerciseIdOrName) {
-      if (!exerciseIdOrName) return;
-      const term = String(exerciseIdOrName).trim().toLowerCase();
-      const ex = exercisesList.find(e => 
-        (e.exerciseId && e.exerciseId.toLowerCase() === term) || 
-        (e.id && e.id.toLowerCase() === term) ||
-        (e.name && e.name.toLowerCase() === term) ||
-        (e.nome && e.nome.toLowerCase() === term) ||
-        (e.name && e.name.toLowerCase().includes(term)) ||
-        (e.nome && e.nome.toLowerCase().includes(term))
-      ) || exercisesList[0];
-
-      currentDetailExerciseId = ex.exerciseId || ex.id;
-      currentGifOriginalUrl = ex.gifUrl || '';
-      isGifPaused = false;
-      fallbackMirrorIndex = 0;
+      if (titleEl) titleEl.innerText = title || 'Animação do Exercício';
+      if (subtitleEl) subtitleEl.innerText = subtitle || 'Visualização ampliada do movimento';
+      
       resetGifZoom();
 
-      document.getElementById('detailExBadge').innerText = ex.grupoMuscular || 'Geral';
-      const equipBadge = document.getElementById('detailExEquipBadge');
-      if (equipBadge) equipBadge.innerText = ex.equipamento || 'Aparelho';
-      document.getElementById('detailExTitle').innerText = ex.name || ex.nome || 'Exercício';
-      const targetEl = document.getElementById('detailExTarget');
-      if (targetEl) targetEl.innerText = ex.musculoPrincipal || ex.grupoMuscular || 'Geral';
-      const secEl = document.getElementById('detailExSecondary');
-      if (secEl) secEl.innerText = ex.musculosSecundarios || ex.musculosAuxiliares || 'Músculos Estabilizadores';
-      document.getElementById('detailExInstructions').innerText = ex.instrucoes || 'Execute o movimento com controle e amplitude total.';
-      
-      const careText = document.getElementById('detailExCareText');
-      if (careText) {
-        careText.innerText = ex.cuidados || 'Mantenha a postura alinhada, escápulas aduzidas e evite sobrecargas excessivas sem instrução.';
+      if (img) {
+        img.src = resolvedUrl;
+        img.style.display = 'block';
       }
+      if (fallback) fallback.style.display = 'none';
+
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+      }
+    }
+
+    function adjustGifZoom(delta) {
+      const img = document.getElementById('onlyGifImg');
+      const badge = document.getElementById('onlyGifZoomBadge');
+      if (!img) return;
+
+      currentGifScale = Math.min(Math.max(currentGifScale + delta, 1.0), 3.5);
+      img.style.transform = `scale(${currentGifScale})`;
+
+      if (badge) {
+        if (currentGifScale > 1.05) {
+          badge.style.display = 'block';
+          badge.innerText = `Zoom: ${currentGifScale.toFixed(1)}x`;
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    }
+
+    function toggleGifZoom() {
+      if (currentGifScale > 1.1) {
+        resetGifZoom();
+      } else {
+        adjustGifZoom(1.0);
+      }
+    }
+
+    function resetGifZoom() {
+      const img = document.getElementById('onlyGifImg');
+      const badge = document.getElementById('onlyGifZoomBadge');
+      currentGifScale = 1.0;
+      if (img) img.style.transform = 'scale(1)';
+      if (badge) badge.style.display = 'none';
+    }
+
+    function closeOnlyGifModal(event) {
+      if (event) {
+        if (event.target.id !== 'modalOnlyGif' && !event.target.closest('[data-close-gif-modal]')) {
+          return;
+        }
+      }
+      const modal = document.getElementById('modalOnlyGif');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+      }
+      const img = document.getElementById('onlyGifImg');
+      if (img) img.src = '';
+      resetGifZoom();
+    }
+
+    let currentDetailSubtitle = '';
+
+    function openOnlyGifModalFromDetail() {
+      if (currentDetailGifUrl) {
+        openOnlyGifModal(currentDetailGifUrl, currentDetailTitle, currentDetailSubtitle);
+      }
+    }
+
+    function openExerciseDetailModal(exerciseId) {
+      const ex = exercisesList.find(e => (e.exerciseId && e.exerciseId === exerciseId) || (e.id && e.id === exerciseId));
+      if (!ex) return;
+
+      const exId = ex.exerciseId || ex.id;
+      currentDetailExerciseId = exId;
+      currentDetailGifUrl = ex.gifUrl || ex.gif_url || ex.gif || '';
+      currentDetailTitle = ex.name || ex.nome || 'Exercício';
+      currentDetailSubtitle = `${ex.grupoMuscular || 'Geral'} • ${ex.equipamento || 'Livre / Aparelho'}`;
+
+      document.getElementById('detailExBadge').innerText = ex.grupoMuscular || 'Geral';
+      document.getElementById('detailExTitle').innerText = ex.name || ex.nome || 'Exercício';
+      document.getElementById('detailExEquip').innerText = ex.equipamento || 'Livre / Aparelho';
+      document.getElementById('detailExTarget').innerText = ex.musculoPrincipal || ex.grupoMuscular || 'Geral';
+      document.getElementById('detailExInstructions').innerText = ex.instrucoes || 'Execute o movimento com controle e amplitude total.';
 
       const img = document.getElementById('detailGifImg');
       const fallback = document.getElementById('detailFallbackIcon');
-      const loader = document.getElementById('detailGifLoader');
-      const controls = document.getElementById('detailGifControls');
-      const btnToggle = document.getElementById('btnTogglePlayGif');
-
-      if (btnToggle) {
-        btnToggle.innerHTML = '<span id="playPauseIcon">⏸</span> Pausar';
-      }
-
-      if (ex.gifUrl) {
-        loader.style.display = 'flex';
-        img.style.display = 'none';
+      
+      if (currentDetailGifUrl) {
+        img.src = currentDetailGifUrl;
+        img.style.display = 'block';
         fallback.style.display = 'none';
-        if (controls) controls.style.display = 'flex';
-        img.src = ex.gifUrl;
       } else {
-        loader.style.display = 'none';
         img.src = '';
         img.style.display = 'none';
         fallback.style.display = 'flex';
-        fallback.innerHTML = `
-          <div style="font-size: 54px;">${getMuscleGroupIcon(ex.grupoMuscular)}</div>
-          <div style="font-size: 11px; color: var(--text-grey); margin-top: 6px;">Sem animação cadastrada</div>
-        `;
-        if (controls) controls.style.display = 'none';
+        fallback.innerText = getMuscleGroupIcon(ex.grupoMuscular);
       }
 
       updateDetailFavButton();
       document.getElementById('modalExerciseDetail').classList.add('active');
-    }
-
-    function handleDetailGifLoad(imgEl) {
-      const loader = document.getElementById('detailGifLoader');
-      const fallback = document.getElementById('detailFallbackIcon');
-      if (loader) loader.style.display = 'none';
-      if (fallback) fallback.style.display = 'none';
-      if (imgEl && imgEl.src && imgEl.src !== window.location.href) {
-        imgEl.style.display = 'block';
-      }
-    }
-
-    function handleDetailGifError(imgEl) {
-      if (!currentGifOriginalUrl) return;
-
-      const mirrors = [
-        (url) => url.replace('https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/', 'https://raw.githubusercontent.com/JahelCuadrado/ExerciseGymGifsDB/main/'),
-        (url) => url.replace('https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/', 'https://fastly.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/')
-      ];
-
-      if (fallbackMirrorIndex < mirrors.length) {
-        const nextUrl = mirrors[fallbackMirrorIndex](currentGifOriginalUrl);
-        fallbackMirrorIndex++;
-        if (nextUrl !== imgEl.src) {
-          console.log('[GIF] Tentando mirror CDN alternativo:', nextUrl);
-          imgEl.src = nextUrl;
-          return;
-        }
-      }
-
-      const loader = document.getElementById('detailGifLoader');
-      const fallback = document.getElementById('detailFallbackIcon');
-      if (loader) loader.style.display = 'none';
-      if (imgEl) imgEl.style.display = 'none';
-      if (fallback) {
-        fallback.style.display = 'flex';
-        fallback.innerHTML = `
-          <div style="font-size: 48px;">🏋️‍♂️</div>
-          <div style="font-size: 12px; color: var(--accent-cyan); font-weight: 700; margin-top: 6px;">Visualização 3D offline</div>
-          <div style="font-size: 10px; color: var(--text-grey); margin-top: 2px;">GIF temporariamente inacessível</div>
-        `;
-      }
-    }
-
-    function togglePlayPauseGif() {
-      const img = document.getElementById('detailGifImg');
-      const btn = document.getElementById('btnTogglePlayGif');
-      if (!img || !img.src) return;
-
-      isGifPaused = !isGifPaused;
-      if (isGifPaused) {
-        try {
-          const canvas = document.createElement('canvas');
-          canvas.width = img.naturalWidth || 300;
-          canvas.height = img.naturalHeight || 300;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          img.dataset.animatedSrc = img.src;
-          img.src = canvas.toDataURL('image/png');
-        } catch (e) {
-          console.log('Pausa via canvas indisponível:', e);
-        }
-        btn.innerHTML = '<span id="playPauseIcon">▶</span> Reproduzir';
-      } else {
-        if (img.dataset.animatedSrc) {
-          img.src = img.dataset.animatedSrc;
-        }
-        btn.innerHTML = '<span id="playPauseIcon">⏸</span> Pausar';
-      }
-    }
-
-    function toggleFullscreenGif() {
-      const container = document.getElementById('detailGifContainer');
-      if (!container) return;
-      if (!document.fullscreenElement) {
-        if (container.requestFullscreen) {
-          container.requestFullscreen();
-        } else if (container.webkitRequestFullscreen) {
-          container.webkitRequestFullscreen();
-        }
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
-      }
     }
 
     function closeExerciseDetailModal() {
@@ -2568,7 +2635,6 @@
       if (modal) modal.classList.remove('active');
       const img = document.getElementById('detailGifImg');
       if (img) img.src = '';
-      resetGifZoom();
     }
 
     function handleDetailModalOverlayClick(e) {
@@ -2604,75 +2670,22 @@
       }
     }
 
-    // Configurar listeners de Pan e Zoom no GIF e Atalhos de Teclado
-    window.addEventListener('DOMContentLoaded', () => {
-      const wrapper = document.getElementById('detailGifWrapper');
-      if (wrapper) {
-        let isDragging = false;
-        let startX = 0, startY = 0;
-
-        wrapper.addEventListener('mousedown', (e) => {
-          if (currentZoomLevel > 1.05) {
-            isDragging = true;
-            startX = e.clientX - panCurrentX;
-            startY = e.clientY - panCurrentY;
-            wrapper.style.cursor = 'grabbing';
-          }
-        });
-
-        window.addEventListener('mousemove', (e) => {
-          if (isDragging) {
-            panCurrentX = e.clientX - startX;
-            panCurrentY = e.clientY - startY;
-            applyGifTransform();
-          }
-        });
-
-        window.addEventListener('mouseup', () => {
-          isDragging = false;
-          if (wrapper) wrapper.style.cursor = currentZoomLevel > 1.05 ? 'grab' : 'zoom-in';
-        });
-
-        // Touch events
-        wrapper.addEventListener('touchstart', (e) => {
-          if (e.touches.length === 1 && currentZoomLevel > 1.05) {
-            isDragging = true;
-            startX = e.touches[0].clientX - panCurrentX;
-            startY = e.touches[0].clientY - panCurrentY;
-          }
-        }, { passive: true });
-
-        wrapper.addEventListener('touchmove', (e) => {
-          if (isDragging && e.touches.length === 1) {
-            panCurrentX = e.touches[0].clientX - startX;
-            panCurrentY = e.touches[0].clientY - startY;
-            applyGifTransform();
-          }
-        }, { passive: true });
-
-        wrapper.addEventListener('touchend', () => {
-          isDragging = false;
-        });
-      }
-
-      // Tecla Escape fecha modals
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          closeExerciseDetailModal();
-          closeCreateWorkoutModal();
-        }
-      });
-    });
-
     // Carregar treinos criados anteriormente, histórico e biblioteca ao abrir a página
     window.addEventListener('load', () => {
-      try {
-        let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
-        saved.forEach(w => renderWorkoutCardUI(w));
-      } catch (e) {}
-
       loadHistoryFromStorage();
       loadExercisesLibrary();
+      loadWorkoutsFromStorage();
+    });
+
+    // Recarregar automaticamente ao voltar para a aba do navegador
+    window.addEventListener('focus', () => {
+      loadWorkoutsFromStorage();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        loadWorkoutsFromStorage();
+      }
     });
   </script>
 </body>
