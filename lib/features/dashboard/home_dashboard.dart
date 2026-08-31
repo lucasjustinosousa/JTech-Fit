@@ -74,10 +74,37 @@ class HomeDashboard extends StatelessWidget {
                     ),
                   ],
                 ),
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: JTechTheme.primaryBlue,
-                  child: const Icon(Icons.person, color: JTechTheme.textWhite),
+                Row(
+                  children: [
+                    IconButton(
+                      style: IconButton.styleFrom(
+                        backgroundColor: JTechTheme.cardDark,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: const BorderSide(color: JTechTheme.dividerColor),
+                        ),
+                      ),
+                      icon: const Icon(Icons.refresh_rounded, color: JTechTheme.accentCyan, size: 20),
+                      tooltip: 'Atualizar Dados',
+                      onPressed: () async {
+                        await repo.carregarDados();
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('🔄 Dados e treinos sincronizados!'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    const CircleAvatar(
+                      radius: 20,
+                      backgroundColor: JTechTheme.primaryBlue,
+                      child: Icon(Icons.person, color: JTechTheme.textWhite, size: 20),
+                    ),
+                  ],
                 ),
               ],
             ),
