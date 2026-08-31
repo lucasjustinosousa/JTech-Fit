@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../../core/theme/jtech_theme.dart';
 import '../../data/repositories/workout_repository.dart';
 import '../../data/models/models.dart';
+import '../common/gif_viewer_modal.dart';
 import '../exercises/exercise_selection_screen.dart';
 
 class WorkoutBuilderScreen extends StatefulWidget {
@@ -246,13 +247,49 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                           children: [
                             const Icon(Icons.drag_handle, color: JTechTheme.textMuted),
                             const SizedBox(width: 8),
+                            if (exItem.exercicioInfo?.gifUrl != null && exItem.exercicioInfo!.gifUrl!.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: InkWell(
+                                  onTap: () {
+                                    if (exItem.exercicioInfo != null) {
+                                      showGifViewerModal(context, exItem.exercicioInfo!);
+                                    }
+                                  },
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.5)),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(5),
+                                      child: Image.network(
+                                        exItem.exercicioInfo!.gifUrl!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => const Icon(Icons.fitness_center, size: 16, color: JTechTheme.primaryBlue),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             Expanded(
-                              child: Text(
-                                exItem.exercicioInfo?.nome ?? 'Exercício',
-                                style: const TextStyle(
-                                  color: JTechTheme.textWhite,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
+                              child: InkWell(
+                                onTap: () {
+                                  if (exItem.exercicioInfo != null) {
+                                    showGifViewerModal(context, exItem.exercicioInfo!);
+                                  }
+                                },
+                                child: Text(
+                                  exItem.exercicioInfo?.nome ?? 'Exercício',
+                                  style: const TextStyle(
+                                    color: JTechTheme.textWhite,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                  ),
                                 ),
                               ),
                             ),

@@ -196,6 +196,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     title: const Text('Limpar Cache de Imagens / GIFs', style: TextStyle(color: Colors.white)),
                     subtitle: const Text('Fichas e treinos criados continuam salvos intactos.', style: TextStyle(color: JTechTheme.textGrey, fontSize: 11)),
                     onTap: () {
+                      PaintingBinding.instance.imageCache.clear();
+                      PaintingBinding.instance.imageCache.clearLiveImages();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Cache de mídias limpo com sucesso!')),
                       );

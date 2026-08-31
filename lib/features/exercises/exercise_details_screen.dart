@@ -58,47 +58,123 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                   if (ex.gifUrl != null && ex.gifUrl!.isNotEmpty && _isPlayingGif)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.network(
-                        ex.gifUrl!,
-                        fit: BoxFit.contain,
-                        width: double.infinity,
-                        height: 240,
-                        errorBuilder: (_, __, ___) => const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.fitness_center, color: JTechTheme.primaryBlue, size: 64),
-                              SizedBox(height: 8),
-                              Text('Pré-visualização 3D demonstrativa', style: TextStyle(color: JTechTheme.textGrey, fontSize: 12)),
-                            ],
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => _mostrarGifEmTelaCheia(context, ex),
+                        child: Image.network(
+                          ex.gifUrl!,
+                          fit: BoxFit.contain,
+                          width: double.infinity,
+                          height: 240,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            final totalBytes = loadingProgress.expectedTotalBytes;
+                            final loadedBytes = loadingProgress.cumulativeBytesLoaded;
+                            final progress = totalBytes != null ? (loadedBytes / totalBytes) : null;
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(
+                                    value: progress,
+                                    color: JTechTheme.accentCyan,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  const Text('Carregando animação GIF...', style: TextStyle(color: JTechTheme.textGrey, fontSize: 12)),
+                                ],
+                              ),
+                            );
+                          },
+                          errorBuilder: (_, __, ___) => const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.fitness_center, color: JTechTheme.primaryBlue, size: 64),
+                                SizedBox(height: 8),
+                                Text('Demonstração indisponível offline', style: TextStyle(color: JTechTheme.textGrey, fontSize: 12)),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     )
                   else
-                    const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.pause_circle_outline, color: JTechTheme.accentCyan, size: 64),
-                          SizedBox(height: 8),
-                          Text('Animação pausada', style: TextStyle(color: JTechTheme.textGrey, fontSize: 12)),
-                        ],
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        if (ex.gifUrl != null && ex.gifUrl!.isNotEmpty) {
+                          setState(() => _isPlayingGif = true);
+                        }
+                      },
+                      child: Container(
+                        color: Colors.transparent,
+                        child: const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.play_circle_outline, color: JTechTheme.accentCyan, size: 64),
+                              SizedBox(height: 8),
+                              Text('Toque para reproduzir animação', style: TextStyle(color: JTechTheme.textGrey, fontSize: 12)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  // Chip indicador no canto inferior esquerdo
+                  if (ex.gifUrl != null && ex.gifUrl!.isNotEmpty)
+                    Positioned(
+                      bottom: 12,
+                      left: 12,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.75),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4), width: 0.5),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.zoom_in, color: JTechTheme.accentCyan, size: 14),
+                            SizedBox(width: 4),
+                            Text('Toque para zoom / tela cheia', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 10, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  // Botão de tela cheia / zoom no canto superior direito
+                  if (ex.gifUrl != null && ex.gifUrl!.isNotEmpty)
+                    Positioned(
+                      top: 12,
+                      right: 12,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.6),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.fullscreen, color: JTechTheme.accentCyan),
+                          tooltip: 'Expandir GIF',
+                          onPressed: () => _mostrarGifEmTelaCheia(context, ex),
+                        ),
                       ),
                     ),
 
                   // Botão de Play/Pausa no canto inferior direito
-                  Positioned(
-                    bottom: 12,
-                    right: 12,
-                    child: FloatingActionButton.small(
-                      backgroundColor: JTechTheme.primaryBlue,
-                      onPressed: () {
-                        setState(() => _isPlayingGif = !_isPlayingGif);
-                      },
-                      child: Icon(_isPlayingGif ? Icons.pause : Icons.play_arrow, color: Colors.white),
+                  if (ex.gifUrl != null && ex.gifUrl!.isNotEmpty)
+                    Positioned(
+                      bottom: 12,
+                      right: 12,
+                      child: FloatingActionButton.small(
+                        backgroundColor: JTechTheme.primaryBlue,
+                        onPressed: () {
+                          setState(() => _isPlayingGif = !_isPlayingGif);
+                        },
+                        child: Icon(_isPlayingGif ? Icons.pause : Icons.play_arrow, color: Colors.white),
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -205,6 +281,98 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
       child: Text(
         label,
         style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  void _mostrarGifEmTelaCheia(BuildContext context, Exercicio ex) {
+    if (ex.gifUrl == null || ex.gifUrl!.isEmpty) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.black.withOpacity(0.95),
+        insetPadding: const EdgeInsets.all(10),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      ex.nome,
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white70),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.6,
+                  maxWidth: MediaQuery.of(context).size.width,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.black,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: InteractiveViewer(
+                    panEnabled: true,
+                    scaleEnabled: true,
+                    minScale: 0.8,
+                    maxScale: 4.0,
+                    child: Image.network(
+                      ex.gifUrl!,
+                      fit: BoxFit.contain,
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(40),
+                            child: CircularProgressIndicator(color: JTechTheme.accentCyan),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) => const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.broken_image_outlined, color: JTechTheme.warningOrange, size: 48),
+                              SizedBox(height: 8),
+                              Text('Não foi possível carregar o GIF em tela cheia', style: TextStyle(color: JTechTheme.textWhite, fontSize: 12)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  style: ElevatedButton.styleFrom(backgroundColor: JTechTheme.primaryBlue),
+                  child: const Text('FECHAR TELA CHEIA'),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

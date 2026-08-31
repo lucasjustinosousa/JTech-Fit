@@ -22,9 +22,24 @@ class LocalDatabase {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 3,
       onCreate: _createDB,
+      onUpgrade: _onUpgradeDB,
     );
+  }
+
+  Future<void> _onUpgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      try {
+        await db.execute('ALTER TABLE exercicios ADD COLUMN gif_url TEXT;');
+      } catch (e) {
+        // Coluna já pode existir
+      }
+    }
+    if (oldVersion < 3) {
+      // Atualizar gifs nos exercícios padrão existentes
+      await _seedExerciseLibrary(db);
+    }
   }
 
   Future _createDB(Database db, int version) async {
@@ -51,6 +66,7 @@ class LocalDatabase {
         equipamento TEXT NOT NULL,
         instrucoes TEXT NOT NULL,
         cuidados TEXT,
+        gif_url TEXT,
         video_url TEXT,
         imagem_url TEXT,
         personalizado INTEGER DEFAULT 0,
@@ -446,14 +462,18 @@ class LocalDatabase {
     ];
 
     for (var ex in seedExercises) {
-      await db.insert('exercicios', ex.toMap());
+      await db.insert('exercicios', ex.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
     }
   }
 
   // Métodos CRUD para Exercícios
   Future<List<Exercicio>> getExercicios() async {
     final db = await instance.database;
-    final result = await db.query('exercicios', orderBy: 'nome ASC');
+    var result = await db.query('exercicios', orderBy: 'nome ASC');
+    if (result.isEmpty || result.any((r) => r['id'].toString().startsWith('base_') && (r['gif_url'] == null || r['gif_url'].toString().isEmpty))) {
+      await _seedExerciseLibrary(db);
+      result = await db.query('exercicios', orderBy: 'nome ASC');
+    }
     return result.map((json) => Exercicio.fromMap(json)).toList();
   }
 

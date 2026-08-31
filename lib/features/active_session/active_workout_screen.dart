@@ -6,6 +6,8 @@ import '../../core/theme/jtech_theme.dart';
 import '../../core/services/timer_audio_service.dart';
 import '../../data/repositories/workout_repository.dart';
 import '../../data/models/models.dart';
+import '../common/gif_viewer_modal.dart';
+import '../exercises/exercise_details_screen.dart';
 import 'workout_summary_screen.dart';
 
 class ActiveWorkoutScreen extends StatefulWidget {
@@ -216,7 +218,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
-                        crossAlignment.start,
+                        crossAxisAlignment: CrossAlignment.start,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -238,16 +240,139 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            currentExInfo?.nome ?? 'Exercício Sem Nome',
-                            style: const TextStyle(color: JTechTheme.textWhite, fontSize: 20, fontWeight: FontWeight.bold),
+                          const SizedBox(height: 10),
+                          Row(
+                            crossAxisAlignment: CrossAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAlignment.start,
+                                  children: [
+                                    Text(
+                                      currentExInfo?.nome ?? 'Exercício Sem Nome',
+                                      style: const TextStyle(color: JTechTheme.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Metas: ${currentExItem.quantidadeSeries} séries x ${currentExItem.repeticoes} reps • Descanso: ${currentExItem.descansoSegundos}s',
+                                      style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (currentExInfo != null)
+                                InkWell(
+                                  borderRadius: BorderRadius.circular(6),
+                                  onTap: () => showGifViewerModal(context, currentExInfo!),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: JTechTheme.accentCyan.withOpacity(0.12),
+                                      borderRadius: BorderRadius.circular(6),
+                                      border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4)),
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.search, color: JTechTheme.accentCyan, size: 12),
+                                        SizedBox(width: 4),
+                                        Text('GIF 3D', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 10, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Metas: ${currentExItem.quantidadeSeries} séries x ${currentExItem.repeticoes} reps • Descanso: ${currentExItem.descansoSegundos}s',
-                            style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12),
-                          ),
+                          if (currentExInfo != null) ...[
+                            const SizedBox(height: 12),
+                            // Card Gatilho TOQUE PARA AMPLIAR GIF
+                            InkWell(
+                              onTap: () => showGifViewerModal(context, currentExInfo!),
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: JTechTheme.accentCyan.withOpacity(0.06),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: JTechTheme.accentCyan.withOpacity(0.4),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    if (currentExInfo!.gifUrl != null && currentExInfo!.gifUrl!.isNotEmpty)
+                                      Container(
+                                        width: 50,
+                                        height: 50,
+                                        margin: const EdgeInsets.only(right: 12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4)),
+                                        ),
+                                        child: Stack(
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius: BorderRadius.circular(9),
+                                              child: Image.network(
+                                                currentExInfo!.gifUrl!,
+                                                width: 50,
+                                                height: 50,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (_, __, ___) => const Center(
+                                                  child: Icon(Icons.fitness_center, color: JTechTheme.primaryBlue),
+                                                ),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              bottom: 2,
+                                              right: 2,
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black.withOpacity(0.85),
+                                                  borderRadius: BorderRadius.circular(3),
+                                                  border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.6), width: 0.5),
+                                                ),
+                                                child: const Text('GIF', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 7, fontWeight: FontWeight.bold)),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    const Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Icon(Icons.search, color: JTechTheme.accentCyan, size: 14),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                'TOQUE PARA AMPLIAR GIF',
+                                                style: TextStyle(
+                                                  color: JTechTheme.accentCyan,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 12,
+                                                  letterSpacing: 0.3,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 2),
+                                          Text(
+                                            'Ver animação com zoom em tela cheia',
+                                            style: TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Icon(Icons.north_east, color: JTechTheme.accentCyan, size: 18),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),

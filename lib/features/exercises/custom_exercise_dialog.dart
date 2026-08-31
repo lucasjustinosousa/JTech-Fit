@@ -40,6 +40,9 @@ class _CustomExerciseDialogState extends State<CustomExerciseDialog> {
     }
 
     final repo = Provider.of<WorkoutRepository>(context, listen: false);
+    final media = _mediaUrlController.text.trim();
+    final isGif = media.toLowerCase().contains('.gif') || media.toLowerCase().startsWith('http');
+
     final ex = Exercicio(
       id: 'custom_${const Uuid().v4()}',
       nome: _nomeController.text.trim(),
@@ -47,7 +50,8 @@ class _CustomExerciseDialogState extends State<CustomExerciseDialog> {
       equipamento: _equipamento,
       instrucoes: _instrucoesController.text.trim(),
       cuidados: _cuidadosController.text.trim(),
-      videoUrl: _mediaUrlController.text.trim().isNotEmpty ? _mediaUrlController.text.trim() : null,
+      gifUrl: (isGif && media.isNotEmpty) ? media : null,
+      videoUrl: media.isNotEmpty ? media : null,
       personalizado: true,
       usuarioId: repo.usuarioAtual?.id,
     );
