@@ -1064,9 +1064,25 @@
       const target = document.getElementById(screenId);
       if (target) target.classList.add('active');
 
+      const navMap = {
+        'screenHome': 0,
+        'screenWorkouts': 1,
+        'screenExercises': 2,
+        'screenHistory': 3,
+        'screenProfile': 4
+      };
+      const navItems = document.querySelectorAll('.nav-item');
       if (navElement) {
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        navItems.forEach(i => i.classList.remove('active'));
         navElement.classList.add('active');
+      } else if (navMap[screenId] !== undefined && navItems[navMap[screenId]]) {
+        navItems.forEach(i => i.classList.remove('active'));
+        navItems[navMap[screenId]].classList.add('active');
+      }
+
+      // Salvar aba ativa no localStorage
+      if (screenId && screenId !== 'screenAuth') {
+        localStorage.setItem('jtech_fit_active_tab', screenId);
       }
 
       // Gerenciar barra flutuante de treino em andamento
@@ -1083,7 +1099,7 @@
       }
 
       if (screenId === 'screenHome') {
-        updateHomeDashboardUI();
+        updateHomeScreenUI();
       } else if (screenId === 'screenExercises') {
         renderExercisesLibraryUI();
       } else if (screenId === 'screenWorkouts') {
@@ -1818,27 +1834,23 @@
     const expandedWorkoutIds = new Set();
 
     async function loadWorkoutsFromStorage() {
-      // 1. Carregar treinos locais e garantir que os padrões existam
+      // 1. Carregar treinos locais
       try {
-        let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
-        const map = new Map();
-        
-        // Colocar primeiro os padrões A, B, C, D
-        DEFAULT_WORKOUT_DIVISIONS.forEach(def => map.set(def.id, { ...def }));
-
-        // Mesclar com os salvos localmente
-        if (Array.isArray(saved)) {
-          saved.forEach(w => {
-            if (!Array.isArray(w.exercicios) || w.exercicios.length === 0) {
-              const def = DEFAULT_WORKOUT_DIVISIONS.find(d => d.nome.toLowerCase() === (w.nome || '').toLowerCase() || d.id === w.id);
-              if (def) w.exercicios = def.exercicios;
-            }
-            map.set(w.id, w);
-          });
+        const savedRaw = localStorage.getItem('jtech_fit_custom_workouts');
+        if (savedRaw === null) {
+          // Primeira vez abrindo o app: inicializa com os treinos padrão
+          allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
+          localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+        } else {
+          const saved = JSON.parse(savedRaw || '[]');
+          if (Array.isArray(saved) && saved.length > 0) {
+            allWorkoutsList = saved;
+          } else if (Array.isArray(saved) && saved.length === 0 && savedRaw.trim() === '[]') {
+            allWorkoutsList = [];
+          } else {
+            allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
+          }
         }
-
-        allWorkoutsList = Array.from(map.values());
-        localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
       } catch (e) {
         allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
       }
@@ -1852,7 +1864,7 @@
             .select('*')
             .order('criado_em', { ascending: false });
 
-          if (!error && Array.isArray(data)) {
+          if (!error && Array.isArray(data) && data.length > 0) {
             const onlineWorkouts = data.map(row => {
               let exList = [];
               if (row.exercicios) {
@@ -1910,10 +1922,10 @@
               }
             }
 
-            // Mesclar treinos da nuvem com locais
+            // Mesclar treinos com prioridade aos treinos locais
             const mapById = new Map();
-            allWorkoutsList.forEach(w => mapById.set(w.id, w));
             onlineWorkouts.forEach(w => mapById.set(w.id, w));
+            allWorkoutsList.forEach(w => mapById.set(w.id, w));
             allWorkoutsList = Array.from(mapById.values());
 
             localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
@@ -2127,10 +2139,10 @@
             <div class="set-row" id="${rowId}" style="margin-bottom: 6px;">
               <div class="set-badge">${s}</div>
               <div style="flex: 1;">
-                <input type="number" class="form-input" value="30" oninput="saveActiveSessionToStorage()" style="padding: 6px 10px; font-size: 12px;" placeholder="Carga kg">
+                <input type="number" class="form-input" value="30" oninput="saveActiveSessionToStorage()" onchange="saveActiveSessionToStorage()" onblur="saveActiveSessionToStorage()" style="padding: 6px 10px; font-size: 12px;" placeholder="Carga kg">
               </div>
               <div style="flex: 1;">
-                <input type="number" class="form-input" value="12" oninput="saveActiveSessionToStorage()" style="padding: 6px 10px; font-size: 12px;" placeholder="Reps">
+                <input type="number" class="form-input" value="12" oninput="saveActiveSessionToStorage()" onchange="saveActiveSessionToStorage()" onblur="saveActiveSessionToStorage()" style="padding: 6px 10px; font-size: 12px;" placeholder="Reps">
               </div>
               <div class="set-check" onclick="toggleSetDone('${rowId}')">✓</div>
             </div>
@@ -3513,13 +3525,22 @@
       loadHistoryFromStorage();
       loadExercisesLibrary();
       loadWorkoutsFromStorage();
-      restoreActiveSessionFromStorage();
+      const hasActiveWorkout = restoreActiveSessionFromStorage();
       updateHomeScreenUI();
+
+      // Restaurar última aba acessada pelo usuário
+      const savedTab = localStorage.getItem('jtech_fit_active_tab') || 'screenHome';
+      if (hasActiveWorkout && (savedTab === 'screenActiveWorkout' || isWorkoutActive)) {
+        switchTab('screenActiveWorkout');
+      } else if (savedTab && savedTab !== 'screenHome') {
+        switchTab(savedTab);
+      } else {
+        switchTab('screenHome');
+      }
     });
 
-    // Recarregar automaticamente ao voltar para a aba do navegador
+    // Sincronizar dados automaticamente ao voltar para a aba do navegador
     window.addEventListener('focus', () => {
-      loadWorkoutsFromStorage();
       if (!isWorkoutActive) {
         restoreActiveSessionFromStorage();
       }
@@ -3528,7 +3549,6 @@
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        loadWorkoutsFromStorage();
         if (!isWorkoutActive) {
           restoreActiveSessionFromStorage();
         }

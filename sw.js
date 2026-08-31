@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jtech-fit-v1.0.0';
+const CACHE_NAME = 'jtech-fit-v1.0.4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -10,15 +10,16 @@ const ASSETS_TO_CACHE = [
 
 // Instalação do Service Worker e Caching dos Recursos Estáticos
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[ServiceWorker] Pré-cache de arquivos estáticos concluído.');
       return cache.addAll(ASSETS_TO_CACHE);
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
-// Ativação e Limpeza de Caches Antigos
+// Ativação e Limpeza Imediata de Caches Antigos
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -34,13 +35,37 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Intercepção de Requisições Network com Estratégia Híbrida (Stale-While-Revalidate)
+// Intercepção de Requisições: Network-First para HTML/Navegação e Stale-While-Revalidate para Assets
 self.addEventListener('fetch', (event) => {
-  // Ignorar requisições não GET ou extensões do navegador
   if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) {
     return;
   }
 
+  const isHtmlRequest = event.request.mode === 'navigate' || 
+                        (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html')) ||
+                        event.request.url.endsWith('index.html') ||
+                        event.request.url.endsWith('/');
+
+  if (isHtmlRequest) {
+    // Network-First para HTML: sempre busca a versão mais recente da rede, fallback para cache offline
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          console.log('[ServiceWorker] Offline - Servindo HTML do cache');
+          return caches.match('./index.html').then((cached) => cached || caches.match(event.request));
+        })
+    );
+    return;
+  }
+
+  // Stale-While-Revalidate para outros recursos (fontes, scripts, imagens)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request).then((networkResponse) => {
