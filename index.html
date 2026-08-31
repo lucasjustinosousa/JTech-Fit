@@ -895,54 +895,63 @@
     </div>
   </div>
 
-  <!-- MODAL DE DETALHES DO EXERCÍCIO COM GIF AMPLIADO -->
-  <div id="modalExerciseDetail" class="modal-overlay" onclick="handleDetailModalOverlayClick(event)">
-    <div class="modal-card" style="max-width: 480px; padding: 20px; max-height: 90vh; overflow-y: auto;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+  <!-- MODAL DE DETALHES DO EXERCÍCIO COM GIF AMPLIADO E INSTRUÇÕES -->
+  <div id="modalExerciseDetail" class="modal-overlay" onclick="handleDetailModalOverlayClick(event)" style="z-index: 99999;">
+    <div class="modal-card" onclick="event.stopPropagation()" style="max-width: 520px; width: 95%; padding: 20px; max-height: 90vh; overflow-y: auto; background: #0c0e14; border: 2px solid var(--accent-cyan); box-shadow: 0 0 50px rgba(0,210,255,0.35); border-radius: 24px;">
+      
+      <!-- Cabeçalho do Modal -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 1px solid var(--divider); padding-bottom: 12px;">
         <div style="flex: 1; padding-right: 10px;">
-          <span id="detailExBadge" class="badge badge-accent" style="margin-bottom: 6px; display: inline-block;">Peito</span>
-          <h3 id="detailExTitle" style="font-size: 18px; font-weight: 800; color: white; line-height: 1.3;">Supino Reto com Barra</h3>
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <span id="detailExBadge" style="font-size: 10px; font-weight: 800; color: var(--accent-cyan); background: rgba(0,210,255,0.15); padding: 2px 8px; border-radius: 6px; text-transform: uppercase;">Peito</span>
+            <span id="detailExEquipBadge" style="font-size: 10px; color: var(--text-grey); background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 6px;">Barra</span>
+          </div>
+          <h3 id="detailExTitle" style="font-size: 18px; font-weight: 900; color: white; line-height: 1.3; margin: 0;">Supino Reto com Barra</h3>
         </div>
-        <button onclick="closeExerciseDetailModal()" style="background: rgba(255,255,255,0.08); border: none; color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; flex-shrink: 0; transition: background 0.2s;">✕</button>
+        <button data-close-detail-modal onclick="closeExerciseDetailModal()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; flex-shrink: 0; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,50,50,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">✕</button>
       </div>
 
       <!-- CONTAINER DO GIF AMPLIADO -->
-      <div id="detailGifContainer" style="width: 100%; height: 280px; background: #080a0f; border-radius: 14px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; border: 1px solid var(--divider); box-shadow: 0 10px 30px rgba(0,0,0,0.6); margin-bottom: 16px;">
+      <div id="detailGifContainer" style="width: 100%; height: 260px; max-height: 38vh; background: #000; border-radius: 14px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; border: 1.5px solid rgba(0,210,255,0.35); box-shadow: 0 10px 30px rgba(0,0,0,0.6); margin-bottom: 14px;">
         <img id="detailGifImg" src="" alt="Exercício" style="width: 100%; height: 100%; object-fit: contain; display: block;" onerror="this.style.display='none'; document.getElementById('detailFallbackIcon').style.display='flex';">
-        <div id="detailFallbackIcon" style="display: none; flex-direction: column; align-items: center; justify-content: center; font-size: 54px;">
-          🏋️‍♂️
+        <div id="detailFallbackIcon" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: var(--text-grey);">
+          <div style="font-size: 46px; margin-bottom: 6px;">🏋️‍♂️</div>
+          <div style="font-size: 12px; font-weight: 700; color: white;">Demonstração em GIF indisponível</div>
+        </div>
+        <div style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.85); border: 1px solid rgba(0,210,255,0.6); border-radius: 8px; padding: 3px 8px; font-size: 9px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 0.5px;">
+          ● GIF 3D
         </div>
       </div>
 
       <!-- INFORMAÇÕES DE MÚSCULOS E EQUIPAMENTO -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
-        <div style="background: var(--card-dark); border: 1px solid var(--divider); padding: 10px 12px; border-radius: 10px;">
-          <div style="font-size: 10px; color: var(--text-grey); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Equipamento</div>
-          <div id="detailExEquip" style="font-size: 13px; font-weight: 700; color: white; margin-top: 2px;">Barra</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+        <div style="background: rgba(22,24,28,0.8); border: 1px solid var(--divider); padding: 10px 12px; border-radius: 12px;">
+          <div style="font-size: 10px; color: var(--text-grey); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">Equipamento</div>
+          <div id="detailExEquip" style="font-size: 13px; font-weight: 700; color: white; margin-top: 3px;">Barra</div>
         </div>
-        <div style="background: var(--card-dark); border: 1px solid var(--divider); padding: 10px 12px; border-radius: 10px;">
-          <div style="font-size: 10px; color: var(--text-grey); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Músculo Alvo</div>
-          <div id="detailExTarget" style="font-size: 13px; font-weight: 700; color: var(--accent-cyan); margin-top: 2px;">Peitoral Maior</div>
+        <div style="background: rgba(22,24,28,0.8); border: 1px solid var(--divider); padding: 10px 12px; border-radius: 12px;">
+          <div style="font-size: 10px; color: var(--accent-cyan); text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">Músculo Alvo</div>
+          <div id="detailExTarget" style="font-size: 13px; font-weight: 700; color: white; margin-top: 3px;">Peitoral Maior</div>
         </div>
       </div>
 
       <!-- INSTRUÇÕES E EXECUÇÃO -->
-      <div style="background: var(--card-dark); border: 1px solid var(--divider); padding: 14px; border-radius: 12px; margin-bottom: 16px;">
-        <div style="font-size: 12px; font-weight: 800; color: white; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-          <span>💡</span> Instruções de Execução
+      <div style="background: rgba(22,24,28,0.8); border: 1px solid var(--divider); padding: 14px; border-radius: 12px; margin-bottom: 14px;">
+        <div style="font-size: 12px; font-weight: 800; color: var(--accent-cyan); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+          <span>📖</span> Instruções de Execução Passo a Passo
         </div>
-        <div id="detailExInstructions" style="font-size: 12px; color: var(--text-grey); line-height: 1.6; white-space: pre-line;">
+        <div id="detailExInstructions" style="font-size: 12.5px; color: #d0d4dc; line-height: 1.6; white-space: pre-line;">
           1. Deite-se no banco com os olhos alinhados à barra.
         </div>
       </div>
 
       <!-- BOTÕES DE AÇÃO -->
-      <div style="display: flex; gap: 10px;">
-        <button id="detailBtnFav" onclick="toggleFavoriteFromDetail()" class="btn btn-outline" style="flex: 1; padding: 10px; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+      <div style="display: flex; gap: 8px;">
+        <button id="detailBtnFav" onclick="toggleFavoriteFromDetail()" class="btn btn-outline" style="flex: 1; padding: 11px; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px;">
           <span id="detailFavIcon">⭐</span> Favoritar
         </button>
-        <button onclick="closeExerciseDetailModal()" class="btn btn-success" style="flex: 1.2; padding: 10px; font-size: 13px;">
-          FECHAR
+        <button data-close-detail-modal onclick="closeExerciseDetailModal()" class="btn btn-primary" style="flex: 1.4; padding: 11px; font-size: 13px; font-weight: 800; border-radius: 12px;">
+          ✓ FECHAR
         </button>
       </div>
     </div>
@@ -3027,26 +3036,36 @@
         return `
           <div class="card exercise-item-card" style="border-left: 4px solid var(--accent-cyan); padding: 14px; margin-bottom: 12px; transition: all 0.25s ease;">
             
-            <!-- Linha Principal do Card (Clicável para expandir) -->
-            <div onclick="toggleCardExpansion('${id}', event)" style="display: flex; gap: 14px; align-items: center; cursor: pointer;">
+            <!-- Linha Principal do Card -->
+            <div style="display: flex; gap: 14px; align-items: center;">
               
-              <!-- Thumbnail GIF Clicável com Efeito Visual -->
-              <div onclick="event.stopPropagation(); openOnlyGifModal('${id}')" style="width: 64px; height: 64px; background: #080a0f; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--divider); position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer;" title="Clique para abrir Pop-up do GIF">
+              <!-- Thumbnail GIF Clicável: CLIQUE NO GIF EXPANDO O VISOR NO PRÓPRIO CARD -->
+              <div onclick="event.stopPropagation(); toggleCardExpansion('${id}', event)" 
+                   style="width: 64px; height: 64px; background: #080a0f; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1.5px solid ${isExpanded ? 'var(--accent-cyan)' : 'var(--divider)'}; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer; transition: all 0.2s;" 
+                   onmouseover="this.style.borderColor='var(--accent-cyan)'; this.style.transform='scale(1.04)'" 
+                   onmouseout="this.style.borderColor='${isExpanded ? 'var(--accent-cyan)' : 'var(--divider)'}'; this.style.transform='scale(1)'"
+                   title="Toque no GIF para expandir/recolher animação">
                 ${gif ? `<img src="${gif}" alt="${ex.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
                 <div style="display: ${gif ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 24px;">
                   ${icon}
                 </div>
-                <div style="position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.85); border-radius: 4px; padding: 1px 4px; font-size: 8px; font-weight: 800; color: var(--accent-cyan);">GIF 🔍</div>
+                <div style="position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.85); border-radius: 4px; padding: 1px 4px; font-size: 8px; font-weight: 800; color: var(--accent-cyan);">
+                  ${isExpanded ? '▲ GIF' : '▼ GIF'}
+                </div>
               </div>
 
-              <!-- Informações do Exercício -->
-              <div style="flex: 1; min-width: 0;">
-                <h4 style="font-size: 14px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${ex.name}</h4>
+              <!-- Informações do Exercício (CAMPO): CLIQUE NO CAMPO ABRE INSTRUÇÕES & DETALHES -->
+              <div onclick="openExerciseDetailModal('${id}')" style="flex: 1; min-width: 0; cursor: pointer; padding: 2px 0;" title="Toque para ver Instruções e Detalhes">
+                <h4 style="font-size: 14px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; transition: color 0.2s;" onmouseover="this.style.color='var(--accent-cyan)'" onmouseout="this.style.color='white'">${ex.name}</h4>
                 <p style="font-size: 11px; color: var(--text-grey); margin: 0;">
                   <strong style="color: var(--accent-cyan);">${ex.grupoMuscular}</strong> • ${ex.equipamento}
                 </p>
                 <div style="display: flex; gap: 8px; margin-top: 6px; align-items: center;">
-                  <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                  <span onclick="event.stopPropagation(); toggleCardExpansion('${id}', event)" 
+                        style="font-size: 11px; color: var(--accent-cyan); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; background: rgba(0,210,255,0.08); padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(0,210,255,0.25);"
+                        onmouseover="this.style.background='rgba(0,210,255,0.2)'"
+                        onmouseout="this.style.background='rgba(0,210,255,0.08)'"
+                        title="Expandir/Recolher animação do GIF">
                     ${isExpanded ? '▲ Recolher' : '▼ Expandir GIF'}
                   </span>
                   <button onclick="event.stopPropagation(); toggleFavoriteExercise('${id}', this)" style="background: none; border: none; font-size: 17px; cursor: pointer; padding: 0 4px;" title="Favoritar">${isFav ? '⭐' : '☆'}</button>
@@ -3081,7 +3100,7 @@
                   <button onclick="openOnlyGifModal('${id}')" class="btn btn-outline" style="flex: 1; padding: 8px; font-size: 12px; border-color: var(--accent-cyan); color: var(--accent-cyan);">
                     🔍 Pop-up com Zoom 3D
                   </button>
-                  <button onclick="openOnlyGifModal('${id}')" class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 12px;">
+                  <button onclick="openExerciseDetailModal('${id}')" class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 12px;">
                     📖 Instruções & Detalhes
                   </button>
                 </div>
@@ -3341,12 +3360,146 @@
       }
     }
 
-    function openExerciseDetailModal(exerciseIdOrName) {
-      openOnlyGifModal(exerciseIdOrName);
+    // ==========================================
+    // CONTROLE DO MODAL DE INSTRUÇÕES E DETALHES
+    // ==========================================
+    let currentDetailExerciseId = null;
+
+    function openExerciseDetailModal(targetParam, optionalTitle, optionalSubtitle) {
+      let ex = null;
+      let targetUrl = '';
+
+      if (typeof targetParam === 'object' && targetParam !== null) {
+        ex = targetParam;
+        targetUrl = ex.gifUrl || ex.gif_url || '';
+      } else if (typeof targetParam === 'string' && targetParam.trim() !== '') {
+        const query = targetParam.trim().toLowerCase();
+        
+        ex = exercisesList.find(e => 
+          (e.exerciseId && e.exerciseId.toLowerCase() === query) ||
+          (e.id && e.id.toLowerCase() === query) ||
+          (e.name && e.name.toLowerCase() === query) ||
+          (e.nome && e.nome.toLowerCase() === query) ||
+          (e.name && e.name.toLowerCase().includes(query)) ||
+          (e.nome && e.nome.toLowerCase().includes(query))
+        ) || DEFAULT_BASE_EXERCISES.find(e => 
+          (e.exerciseId && e.exerciseId.toLowerCase() === query) ||
+          (e.id && e.id.toLowerCase() === query) ||
+          (e.name && e.name.toLowerCase() === query) ||
+          (e.nome && e.nome.toLowerCase() === query) ||
+          (e.name && e.name.toLowerCase().includes(query)) ||
+          (e.nome && e.nome.toLowerCase().includes(query))
+        );
+
+        if (ex) {
+          targetUrl = ex.gifUrl || ex.gif_url || '';
+        } else if (targetParam.startsWith('http') || targetParam.includes('.gif') || targetParam.includes('/')) {
+          targetUrl = targetParam;
+        }
+      }
+
+      if (!ex && optionalTitle) {
+        const titleQuery = optionalTitle.trim().toLowerCase();
+        ex = exercisesList.find(e => (e.name || e.nome || '').toLowerCase() === titleQuery) ||
+             DEFAULT_BASE_EXERCISES.find(e => (e.name || e.nome || '').toLowerCase() === titleQuery);
+        if (ex && !targetUrl) targetUrl = ex.gifUrl || ex.gif_url || '';
+      }
+
+      const exerciseName = (ex && (ex.name || ex.nome)) || optionalTitle || 'Exercício';
+      const muscleGroup = (ex && (ex.grupoMuscular || ex.musculoPrincipal)) || 'Geral';
+      const equip = (ex && ex.equipamento) || 'Livre / Aparelho';
+      const targetMuscle = (ex && (ex.musculoPrincipal || ex.grupoMuscular)) || 'Geral';
+      const secondaryMuscle = ex && ex.musculosSecundarios ? ` • Secundários: ${ex.musculosSecundarios}` : '';
+      const instructions = (ex && ex.instrucoes) || '1. Mantenha a postura correta e alinhada ao longo de toda a execução.\n2. Execute o movimento com cadência controlada nas fases concêntrica e excêntrica.\n3. Respire de forma ritmada durante a execução.';
+      
+      currentDetailExerciseId = (ex && (ex.exerciseId || ex.id)) || exerciseName;
+      const gifFinalUrl = targetUrl || (ex && ex.gifUrl) || '';
+
+      // Atualizar Textos e Badges
+      const titleEl = document.getElementById('detailExTitle');
+      const badgeEl = document.getElementById('detailExBadge');
+      const equipBadgeEl = document.getElementById('detailExEquipBadge');
+      const equipEl = document.getElementById('detailExEquip');
+      const targetEl = document.getElementById('detailExTarget');
+      const instructionsEl = document.getElementById('detailExInstructions');
+      const imgEl = document.getElementById('detailGifImg');
+      const fallbackEl = document.getElementById('detailFallbackIcon');
+
+      if (titleEl) titleEl.innerText = exerciseName;
+      if (badgeEl) badgeEl.innerText = muscleGroup;
+      if (equipBadgeEl) equipBadgeEl.innerText = equip;
+      if (equipEl) equipEl.innerText = equip;
+      if (targetEl) targetEl.innerText = targetMuscle + secondaryMuscle;
+      if (instructionsEl) instructionsEl.innerText = instructions;
+
+      if (imgEl && fallbackEl) {
+        if (gifFinalUrl) {
+          imgEl.src = gifFinalUrl;
+          imgEl.style.display = 'block';
+          fallbackEl.style.display = 'none';
+        } else {
+          imgEl.style.display = 'none';
+          fallbackEl.style.display = 'flex';
+        }
+      }
+
+      updateDetailFavButton();
+
+      const modal = document.getElementById('modalExerciseDetail');
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.visibility = 'visible';
+      }
     }
 
-    function closeExerciseDetailModal() {
-      closeOnlyGifModal();
+    function closeExerciseDetailModal(event) {
+      if (event) {
+        if (event.target.id !== 'modalExerciseDetail' && !event.target.closest('[data-close-detail-modal]')) {
+          return;
+        }
+      }
+      const modal = document.getElementById('modalExerciseDetail');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
+      }
+    }
+
+    function handleDetailModalOverlayClick(event) {
+      if (event.target.id === 'modalExerciseDetail') {
+        closeExerciseDetailModal();
+      }
+    }
+
+    function toggleFavoriteFromDetail() {
+      if (!currentDetailExerciseId) return;
+      if (favoritesSet.has(currentDetailExerciseId)) {
+        favoritesSet.delete(currentDetailExerciseId);
+      } else {
+        favoritesSet.add(currentDetailExerciseId);
+      }
+      localStorage.setItem('jtech_fit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
+      updateDetailFavButton();
+      renderExercisesLibraryUI();
+    }
+
+    function updateDetailFavButton() {
+      const isFav = favoritesSet.has(currentDetailExerciseId);
+      const btn = document.getElementById('detailBtnFav');
+      if (!btn) return;
+      if (isFav) {
+        btn.style.color = 'gold';
+        btn.style.borderColor = 'gold';
+        btn.innerHTML = '<span id="detailFavIcon">★</span> Favorito';
+      } else {
+        btn.style.color = 'white';
+        btn.style.borderColor = 'var(--divider)';
+        btn.innerHTML = '<span id="detailFavIcon">☆</span> Favoritar';
+      }
     }
 
     // Configurar Atalhos de Teclado (Escape para fechar Modais)
@@ -3354,6 +3507,7 @@
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           closeOnlyGifModal();
+          closeExerciseDetailModal();
           closeCreateWorkoutModal();
         }
       });
