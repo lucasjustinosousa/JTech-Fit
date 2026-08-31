@@ -248,6 +248,59 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                             'Metas: ${currentExItem.quantidadeSeries} séries x ${currentExItem.repeticoes} reps • Descanso: ${currentExItem.descansoSegundos}s',
                             style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12),
                           ),
+                          if (currentExInfo?.gifUrl != null && currentExInfo!.gifUrl!.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            InkWell(
+                              onTap: () => _mostrarGifAmpliadoModal(context, currentExInfo),
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: JTechTheme.accentCyan.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.35)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 44,
+                                      height: 44,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4)),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.network(
+                                          currentExInfo.gifUrl!,
+                                          fit: BoxFit.contain,
+                                          errorBuilder: (_, __, ___) => const Icon(Icons.fitness_center, color: JTechTheme.textGrey),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: const [
+                                          Text(
+                                            '🔍 TOQUE PARA EXPANDIR GIF 3D',
+                                            style: TextStyle(color: JTechTheme.accentCyan, fontSize: 12, fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            'Ver animação em pop-up ampliado com zoom',
+                                            style: TextStyle(color: JTechTheme.textGrey, fontSize: 10),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Icon(Icons.open_in_new, color: JTechTheme.accentCyan, size: 16),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -463,6 +516,110 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  void _mostrarGifAmpliadoModal(BuildContext context, Exercicio? exInfo) {
+    if (exInfo?.gifUrl == null || exInfo!.gifUrl!.isEmpty) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        child: Container(
+          decoration: BoxDecoration(
+            color: const Color(0xFF0C0E14),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: JTechTheme.accentCyan, width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: JTechTheme.accentCyan.withOpacity(0.3),
+                blurRadius: 25,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Cabeçalho do Pop-up
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            exInfo.nome,
+                            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${exInfo.grupoMuscular} • ${exInfo.equipamento}',
+                            style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1, color: JTechTheme.dividerColor),
+
+              // Visualizador do GIF com Zoom Interativo
+              Container(
+                height: 320,
+                width: double.infinity,
+                color: Colors.black,
+                child: InteractiveViewer(
+                  minScale: 1.0,
+                  maxScale: 3.5,
+                  child: Image.network(
+                    exInfo.gifUrl!,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Center(
+                      child: Text('GIF indisponível', style: TextStyle(color: JTechTheme.textGrey)),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Rodapé com Dica e Botão Fechar
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Pinça ou duplo toque p/ zoom',
+                      style: TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(ctx).pop(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: JTechTheme.accentCyan,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      ),
+                      child: const Text('FECHAR', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
