@@ -954,7 +954,7 @@
     }
 
     // ==========================================
-    // TREINOS PADRÃO COM EXERCÍCIOS COMPLETOS
+    // TREINOS PADRÃO COM EXERCÍCIOS COMPLETOS (4 DIVISÕES)
     // ==========================================
     const DEFAULT_WORKOUT_DIVISIONS = [
       {
@@ -987,7 +987,7 @@
       },
       {
         id: 'treino_default_c',
-        nome: 'Treino C — Pernas & Ombros',
+        nome: 'Treino C — Pernas & Panturrilhas',
         descricao: 'Força & Resistência',
         diasSemana: ['Quarta-feira', 'Sábado'],
         corHex: '#4CAF50',
@@ -995,8 +995,22 @@
           { id: 'ex_c1', nome: 'Agachamento Livre com Barra', series: '4', reps: '8-10', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/barbell-squat.gif' },
           { id: 'ex_c2', nome: 'Leg Press 45º', series: '4', reps: '10-12', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/sled-45-degrees-leg-press.gif' },
           { id: 'ex_c3', nome: 'Cadeira Extensora', series: '3', reps: '12-15', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/lever-leg-extension.gif' },
-          { id: 'ex_c4', nome: 'Desenvolvimento com Halteres', series: '4', reps: '10-12', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-shoulder-press.gif' },
-          { id: 'ex_c5', nome: 'Elevação Lateral com Halteres', series: '4', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-lateral-raise.gif' }
+          { id: 'ex_c4', nome: 'Mesa Flexora', series: '3', reps: '12-15', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/lever-lying-leg-curl.gif' },
+          { id: 'ex_c5', nome: 'Panturrilha Sentado', series: '4', reps: '15-20', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/legs/lever-seated-calf-raise.gif' }
+        ]
+      },
+      {
+        id: 'treino_default_d',
+        nome: 'Treino D — Ombros, Trapézio & Abdômen',
+        descricao: 'Definição & Core',
+        diasSemana: ['Sexta-feira'],
+        corHex: '#FF9800',
+        exercicios: [
+          { id: 'ex_d1', nome: 'Desenvolvimento com Halteres', series: '4', reps: '10-12', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-shoulder-press.gif' },
+          { id: 'ex_d2', nome: 'Elevação Lateral com Halteres', series: '4', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-lateral-raise.gif' },
+          { id: 'ex_d3', nome: 'Crucifixo Inverso com Halteres', series: '3', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/shoulders/dumbbell-rear-lateral-raise.gif' },
+          { id: 'ex_d4', nome: 'Encolhimento com Halteres', series: '4', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/back/dumbbell-shrug.gif' },
+          { id: 'ex_d5', nome: 'Prancha Ventral Isométrica', series: '3', reps: '60s', grupoMuscular: 'Abdômen', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/abs/bodyweight-incline-side-plank.gif' }
         ]
       }
     ];
@@ -1005,28 +1019,27 @@
     const expandedWorkoutIds = new Set();
 
     async function loadWorkoutsFromStorage() {
-      // 1. Carregar local primeiro (offline-first instantâneo)
+      // 1. Carregar treinos locais e garantir que os padrões existam
       try {
         let saved = JSON.parse(localStorage.getItem('jtech_fit_custom_workouts') || '[]');
-        if (Array.isArray(saved) && saved.length > 0) {
-          allWorkoutsList = saved.map(w => {
+        const map = new Map();
+        
+        // Colocar primeiro os padrões A, B, C, D
+        DEFAULT_WORKOUT_DIVISIONS.forEach(def => map.set(def.id, { ...def }));
+
+        // Mesclar com os salvos localmente
+        if (Array.isArray(saved)) {
+          saved.forEach(w => {
             if (!Array.isArray(w.exercicios) || w.exercicios.length === 0) {
               const def = DEFAULT_WORKOUT_DIVISIONS.find(d => d.nome.toLowerCase() === (w.nome || '').toLowerCase() || d.id === w.id);
-              if (def) {
-                w.exercicios = def.exercicios;
-              } else {
-                w.exercicios = [
-                  { id: 'ex_gen1', nome: 'Supino Reto com Barra', series: '4', reps: '10-12', grupoMuscular: 'Geral', gifUrl: '' },
-                  { id: 'ex_gen2', nome: 'Puxada Frontal na Polia', series: '4', reps: '10-12', grupoMuscular: 'Geral', gifUrl: '' }
-                ];
-              }
+              if (def) w.exercicios = def.exercicios;
             }
-            return w;
+            map.set(w.id, w);
           });
-        } else {
-          allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
-          localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
         }
+
+        allWorkoutsList = Array.from(map.values());
+        localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
       } catch (e) {
         allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
       }

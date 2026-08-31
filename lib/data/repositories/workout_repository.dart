@@ -120,10 +120,13 @@ class WorkoutRepository extends ChangeNotifier {
       ],
     );
 
+    final ombros = _exercicios.firstWhere((e) => e.grupoMuscular == 'Ombros', orElse: () => _exercicios.first);
+    final abdomen = _exercicios.firstWhere((e) => e.grupoMuscular == 'Abdômen', orElse: () => _exercicios.first);
+
     final treinoC = Treino(
       id: 'treino_default_c',
       usuarioId: _usuarioAtual!.id,
-      nome: 'Treino C — Pernas & Ombros',
+      nome: 'Treino C — Pernas & Panturrilhas',
       descricao: 'Força & Resistência',
       diasSemana: ['Quarta-feira', 'Sábado'],
       corHex: '#4CAF50',
@@ -133,14 +136,30 @@ class WorkoutRepository extends ChangeNotifier {
       ],
     );
 
+    final treinoD = Treino(
+      id: 'treino_default_d',
+      usuarioId: _usuarioAtual!.id,
+      nome: 'Treino D — Ombros, Trapézio & Abdômen',
+      descricao: 'Definição & Core',
+      diasSemana: ['Sexta-feira'],
+      corHex: '#FF9800',
+      criadoEm: DateTime.now(),
+      exercicios: [
+        ExercicioDoTreino(id: 'ex_d1', treinoId: 'treino_default_d', exercicioId: ombros.id, ordem: 1, quantidadeSeries: 4, repeticoes: '10-12', cargaInicial: 16, descansoSegundos: 60, exercicioInfo: ombros),
+        ExercicioDoTreino(id: 'ex_d2', treinoId: 'treino_default_d', exercicioId: abdomen.id, ordem: 2, quantidadeSeries: 3, repeticoes: '15-20', cargaInicial: 0, descansoSegundos: 45, exercicioInfo: abdomen),
+      ],
+    );
+
     await LocalDatabase.instance.saveTreino(treinoA);
     await LocalDatabase.instance.saveTreino(treinoB);
     await LocalDatabase.instance.saveTreino(treinoC);
+    await LocalDatabase.instance.saveTreino(treinoD);
 
     if (SupabaseService.instance.isInitialized) {
       await SupabaseService.instance.syncTreino(treinoA);
       await SupabaseService.instance.syncTreino(treinoB);
       await SupabaseService.instance.syncTreino(treinoC);
+      await SupabaseService.instance.syncTreino(treinoD);
     }
   }
 
