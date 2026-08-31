@@ -318,16 +318,16 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                         ],
                                       ),
                                     ),
-                                    const Expanded(
+                                    Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Row(
                                             children: [
-                                              Icon(Icons.search, color: JTechTheme.accentCyan, size: 14),
+                                              Icon(Icons.menu_book, color: JTechTheme.accentCyan, size: 14),
                                               SizedBox(width: 4),
                                               Text(
-                                                'TOQUE PARA AMPLIAR GIF',
+                                                'INSTRUÇÕES E GIF',
                                                 style: TextStyle(
                                                   color: JTechTheme.accentCyan,
                                                   fontWeight: FontWeight.bold,
@@ -339,7 +339,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                           ),
                                           SizedBox(height: 2),
                                           Text(
-                                            'Ver animação com zoom em tela cheia',
+                                            'Ver animação 3D e guia de execução',
                                             style: TextStyle(color: JTechTheme.textGrey, fontSize: 11),
                                           ),
                                         ],
