@@ -556,10 +556,9 @@
         </div>
       </div>
 
-      <!-- TELA INICIAL / DASHBOARD DINÂMICO EM TEMPO REAL -->
       <div id="screenHome" class="screen active">
         <div style="margin-bottom: 16px;">
-          <h3 style="font-size: 20px; font-weight: 800; color: white;">Olá, Atleta JTech! 👋</h3>
+          <h3 id="homeUserGreeting" style="font-size: 20px; font-weight: 800; color: white;">Olá, Atleta JTech! 👋</h3>
           <p style="color: var(--text-grey); font-size: 13px; margin: 2px 0 0 0;">Bora superar seus limites hoje?</p>
         </div>
 
@@ -738,6 +737,31 @@
           <div style="display: flex; justify-content: space-between; padding: 8px 0;">
             <span>ID do Usuário</span>
             <span id="profileUserIdDisplay" style="color: var(--text-grey); font-family: monospace; font-size: 11px;">guest_user_1</span>
+          </div>
+        </div>
+
+        <!-- PAINEL DE CONTROLE DO ADMINISTRADOR (EXCLUSIVO PARA ATLETA@JTECHFIT.COM) -->
+        <div id="adminPanelCard" class="card" style="display: none; border-left: 4px solid #ffd700; background: #161a24; margin-bottom: 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">👑</span>
+              <h4 style="font-size: 14px; font-weight: 800; color: #ffd700; margin: 0;">Painel de Controle Admin</h4>
+            </div>
+            <span style="font-size: 9px; font-weight: 800; background: rgba(255,215,0,0.15); color: #ffd700; padding: 2px 6px; border-radius: 6px; border: 1px solid rgba(255,215,0,0.3);">ROOT ACCESS</span>
+          </div>
+
+          <p style="font-size: 11px; color: var(--text-grey); margin-bottom: 12px;">Ferramentas exclusivas do administrador para sincronização e publicação global.</p>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button onclick="adminPublishDefaultWorkouts()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; border-color: #ffd700; color: #ffd700; font-weight: 700; text-align: left; display: flex; align-items: center; gap: 8px;">
+              <span>☁️</span> Publicar Treinos Oficiais para Todos
+            </button>
+            <button onclick="adminResetOfficialLibrary()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; border-color: var(--accent-cyan); color: var(--accent-cyan); font-weight: 700; text-align: left; display: flex; align-items: center; gap: 8px;">
+              <span>🔄</span> Restaurar Biblioteca Oficial de Exercícios
+            </button>
+            <button onclick="adminExportGlobalBackup()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; border-color: var(--text-grey); color: white; font-weight: 700; text-align: left; display: flex; align-items: center; gap: 8px;">
+              <span>💾</span> Exportar Backup JSON Completo
+            </button>
           </div>
         </div>
 
@@ -1210,14 +1234,20 @@
       return 'atleta@jtechfit.com';
     }
 
+    function isCurrentUserAdmin() {
+      const email = getEffectiveUserEmail().toLowerCase().trim();
+      return email === 'atleta@jtechfit.com' || (currentAuthUser && currentAuthUser.user_metadata && currentAuthUser.user_metadata.role === 'admin');
+    }
+
     function updateProfileUI() {
       const email = getEffectiveUserEmail();
+      const isAdmin = isCurrentUserAdmin();
       const name = (currentAuthUser && currentAuthUser.user_metadata && currentAuthUser.user_metadata.nome) ||
-                   email.split('@')[0] || 'Atleta JTech';
+                   (isAdmin ? 'Administrador JTech' : (email.split('@')[0] || 'Atleta JTech'));
       const uid = getEffectiveUserId();
 
       const nameEl = document.getElementById('profileUserName');
-      if (nameEl) nameEl.innerText = name;
+      if (nameEl) nameEl.innerText = isAdmin ? `${name} 👑` : name;
 
       const emailEl = document.getElementById('profileUserEmail');
       if (emailEl) emailEl.innerText = email;
@@ -1227,16 +1257,95 @@
 
       const badgeEl = document.getElementById('profileUserBadge');
       if (badgeEl) {
-        if (uid === 'guest_user_1') {
+        if (isAdmin) {
+          badgeEl.innerText = '👑 Administrador Master';
+          badgeEl.style.background = 'rgba(255,215,0,0.18)';
+          badgeEl.style.color = '#ffd700';
+          badgeEl.style.border = '1px solid rgba(255,215,0,0.4)';
+        } else if (uid === 'guest_user_1') {
           badgeEl.innerText = 'Modo Convidado';
           badgeEl.style.background = 'rgba(255,152,0,0.15)';
           badgeEl.style.color = 'var(--warning-orange)';
+          badgeEl.style.border = 'none';
         } else {
           badgeEl.innerText = 'Conta Sincronizada ☁️';
           badgeEl.style.background = 'rgba(0,210,255,0.15)';
           badgeEl.style.color = 'var(--accent-cyan)';
+          badgeEl.style.border = 'none';
         }
       }
+
+      // Exibir ou ocultar o painel exclusivo de admin
+      const adminPanel = document.getElementById('adminPanelCard');
+      if (adminPanel) {
+        adminPanel.style.display = isAdmin ? 'block' : 'none';
+      }
+    }
+
+    async function adminPublishDefaultWorkouts() {
+      if (!isCurrentUserAdmin()) {
+        alert('Acesso restrito a administradores.');
+        return;
+      }
+      if (confirm('Deseja publicar e sincronizar os 4 Treinos Oficiais (A, B, C, D) para a nuvem?')) {
+        showToastNotification('☁️ Publicando treinos oficiais no Supabase...');
+        if (_supabase) {
+          try {
+            const uid = getEffectiveUserId();
+            for (const t of DEFAULT_WORKOUT_DIVISIONS) {
+              await _supabase.from('treinos').upsert({
+                id: t.id,
+                usuario_id: uid,
+                nome: t.nome,
+                descricao: t.descricao || '',
+                dias_semana: t.diasSemana || [],
+                cor_hex: t.corHex || '#1E88E5',
+                exercicios: t.exercicios || [],
+                criado_em: new Date().toISOString()
+              });
+            }
+            showToastNotification('✅ Treinos oficiais publicados na nuvem com sucesso!');
+            await loadWorkoutsFromStorage();
+          } catch (e) {
+            console.error('[Admin Publish Error]:', e);
+            alert('Erro ao publicar treinos oficiais: ' + e.message);
+          }
+        }
+      }
+    }
+
+    async function adminResetOfficialLibrary() {
+      if (!isCurrentUserAdmin()) {
+        alert('Acesso restrito a administradores.');
+        return;
+      }
+      if (confirm('Deseja restaurar todos os exercícios padrão da biblioteca com seus GIFs 3D oficiais?')) {
+        exercisesList = [...DEFAULT_BASE_EXERCISES];
+        localStorage.setItem('jtech_fit_exercises_library', JSON.stringify(exercisesList));
+        renderExercisesLibraryUI();
+        showToastNotification('✅ Biblioteca oficial restaurada com sucesso!');
+      }
+    }
+
+    function adminExportGlobalBackup() {
+      const backupData = {
+        app: 'JTech Fit',
+        version: '1.1.0',
+        exportedAt: new Date().toISOString(),
+        user: currentAuthUser || { email: getEffectiveUserEmail(), role: 'admin' },
+        workouts: allWorkoutsList,
+        history: JSON.parse(localStorage.getItem('jtech_fit_history') || '[]'),
+        exercises: exercisesList
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `jtech_fit_backup_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToastNotification('💾 Backup exportado com sucesso!');
     }
 
     async function handleAuthAction(mode) {
@@ -3017,6 +3126,18 @@
     // ATUALIZAÇÃO EM TEMPO REAL DO DASHBOARD / INÍCIO
     // ==========================================
     function updateHomeScreenUI() {
+      // 0. Atualizar Saudação do Usuário / Admin
+      const greetingEl = document.getElementById('homeUserGreeting');
+      if (greetingEl) {
+        if (isCurrentUserAdmin()) {
+          greetingEl.innerHTML = 'Olá, Administrador JTech! 👑';
+        } else {
+          const email = getEffectiveUserEmail();
+          const name = (currentAuthUser && currentAuthUser.user_metadata && currentAuthUser.user_metadata.nome) || (email ? email.split('@')[0] : 'Atleta JTech');
+          greetingEl.innerHTML = `Olá, ${name}! 👋`;
+        }
+      }
+
       let historyList = [];
       try {
         historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
