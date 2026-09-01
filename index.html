@@ -525,34 +525,73 @@
         </button>
       </div>
 
-      <!-- TELA DE ABERTURA / AUTH -->
+      <!-- TELA DE ABERTURA / AUTH COM ABAS ENTRAR / CRIAR CONTA -->
       <div id="screenAuth" class="screen">
-        <div style="text-align: center; padding: 30px 10px;">
-          <div style="width: 80px; height: 80px; background: var(--primary-blue); border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 40px;">
+        <div style="text-align: center; padding: 20px 10px 14px;">
+          <div style="width: 76px; height: 76px; background: var(--primary-blue); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 38px; box-shadow: 0 8px 24px rgba(30,136,229,0.35);">
             🏋️‍♂️
           </div>
-          <h2 style="font-size: 26px; font-weight: 900;">JTECH <span style="color: var(--accent-cyan);">FIT</span></h2>
-          <p style="color: var(--text-grey); font-size: 14px; margin-top: 4px;">Seu Treino sob Controle Absoluto (PWA)</p>
+          <h2 style="font-size: 26px; font-weight: 900; letter-spacing: -0.5px;">JTECH <span style="color: var(--accent-cyan);">FIT</span></h2>
+          <p style="color: var(--text-grey); font-size: 13px; margin-top: 2px;">Seu Treino sob Controle Absoluto (Cloud Sync)</p>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">E-mail</label>
-          <input type="email" id="authEmailInput" class="form-input" placeholder="seuemail@exemplo.com" value="atleta@jtechfit.com">
+        <!-- SELETOR DE ABAS (ENTRAR / CRIAR CONTA) -->
+        <div style="display: flex; background: #161a24; border-radius: 12px; padding: 4px; margin-bottom: 16px; border: 1px solid var(--divider);">
+          <button id="authTabLoginBtn" onclick="switchAuthMode('login')" style="flex: 1; padding: 10px; border-radius: 9px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; background: var(--primary-blue); color: white; transition: all 0.2s;">
+            🔑 Entrar
+          </button>
+          <button id="authTabRegisterBtn" onclick="switchAuthMode('register')" style="flex: 1; padding: 10px; border-radius: 9px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; background: transparent; color: var(--text-grey); transition: all 0.2s;">
+            ✨ Criar Conta
+          </button>
         </div>
-        <div class="form-group">
-          <label class="form-label">Senha</label>
-          <input type="password" id="authPasswordInput" class="form-input" value="123456" placeholder="Sua senha de acesso">
+
+        <!-- FORMULÁRIO DE LOGIN -->
+        <div id="authLoginFormContainer">
+          <div class="form-group">
+            <label class="form-label">E-mail</label>
+            <input type="email" id="authEmailInput" class="form-input" placeholder="seuemail@exemplo.com" value="atleta@jtechfit.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Senha</label>
+            <input type="password" id="authPasswordInput" class="form-input" value="123456" placeholder="Sua senha de acesso">
+          </div>
+
+          <div id="authLoginErrorMessage" style="color: #ff5252; background: rgba(255,82,82,0.15); border: 1px solid rgba(255,82,82,0.3); border-radius: 8px; padding: 10px; font-size: 12px; margin-bottom: 12px; display: none; text-align: center; font-weight: 600;"></div>
+
+          <button id="authLoginBtn" onclick="handleAuthAction('login')" class="btn btn-primary" style="margin-top: 4px; font-weight: 800;">ENTRAR</button>
+          <button onclick="switchAuthMode('register')" class="btn btn-outline" style="margin-top: 10px;">Não tem uma conta? Cadastre-se</button>
         </div>
 
-        <div id="authErrorMessage" style="color: #ff5252; background: rgba(255,82,82,0.15); border: 1px solid rgba(255,82,82,0.3); border-radius: 8px; padding: 10px; font-size: 12px; margin-bottom: 12px; display: none; text-align: center; font-weight: 600;"></div>
+        <!-- FORMULÁRIO DE CADASTRO (NOVA CONTA) -->
+        <div id="authRegisterFormContainer" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Nome Completo ou Apelido</label>
+            <input type="text" id="authRegisterNameInput" class="form-input" placeholder="Ex: Lucas Justino">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Seu E-mail</label>
+            <input type="email" id="authRegisterEmailInput" class="form-input" placeholder="seuemail@gmail.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Criar Senha (mín. 6 dígitos)</label>
+            <input type="password" id="authRegisterPasswordInput" class="form-input" placeholder="Sua senha segura">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmar Senha</label>
+            <input type="password" id="authRegisterConfirmPasswordInput" class="form-input" placeholder="Repita a senha">
+          </div>
 
-        <button id="authLoginBtn" onclick="handleAuthAction('login')" class="btn btn-primary" style="margin-top: 6px;">ENTRAR</button>
-        <button id="authRegisterBtn" onclick="handleAuthAction('register')" class="btn btn-outline" style="margin-top: 10px;">CRIAR MINHA CONTA</button>
-        <button onclick="handleAuthAction('guest')" class="btn btn-text" style="margin-top: 10px;">Continuar sem cadastro (Modo Convidado)</button>
+          <div id="authRegisterErrorMessage" style="color: #ff5252; background: rgba(255,82,82,0.15); border: 1px solid rgba(255,82,82,0.3); border-radius: 8px; padding: 10px; font-size: 12px; margin-bottom: 12px; display: none; text-align: center; font-weight: 600;"></div>
 
-        <div class="safety-banner">
-          <div>⚠️</div>
-          <p><strong>Aviso Importante:</strong> O JTech Fit sincroniza seus treinos na nuvem entre múltiplos dispositivos automaticamente.</p>
+          <button id="authRegisterBtn" onclick="handleAuthAction('register')" class="btn btn-success" style="margin-top: 4px; font-weight: 800; background: linear-gradient(135deg, #00d2ff 0%, #1E88E5 100%);">CRIAR MINHA CONTA</button>
+          <button onclick="switchAuthMode('login')" class="btn btn-outline" style="margin-top: 10px;">Já possui conta? Fazer Login</button>
+        </div>
+
+        <button onclick="handleAuthAction('guest')" class="btn btn-text" style="margin-top: 12px; font-size: 12px; color: var(--text-grey);">Continuar sem cadastro (Modo Convidado)</button>
+
+        <div class="safety-banner" style="margin-top: 16px;">
+          <div>☁️</div>
+          <p><strong>Sincronização Nuvem:</strong> Seus treinos e histórico ficam salvos e vinculados à sua conta em todos os seus aparelhos.</p>
         </div>
       </div>
 
@@ -1348,17 +1387,47 @@
       showToastNotification('💾 Backup exportado com sucesso!');
     }
 
+    function switchAuthMode(mode) {
+      const loginTab = document.getElementById('authTabLoginBtn');
+      const registerTab = document.getElementById('authTabRegisterBtn');
+      const loginForm = document.getElementById('authLoginFormContainer');
+      const registerForm = document.getElementById('authRegisterFormContainer');
+
+      const loginErr = document.getElementById('authLoginErrorMessage');
+      const regErr = document.getElementById('authRegisterErrorMessage');
+      if (loginErr) loginErr.style.display = 'none';
+      if (regErr) regErr.style.display = 'none';
+
+      if (mode === 'register') {
+        if (loginTab) {
+          loginTab.style.background = 'transparent';
+          loginTab.style.color = 'var(--text-grey)';
+        }
+        if (registerTab) {
+          registerTab.style.background = 'var(--primary-blue)';
+          registerTab.style.color = 'white';
+        }
+        if (loginForm) loginForm.style.display = 'none';
+        if (registerForm) registerForm.style.display = 'block';
+      } else {
+        if (loginTab) {
+          loginTab.style.background = 'var(--primary-blue)';
+          loginTab.style.color = 'white';
+        }
+        if (registerTab) {
+          registerTab.style.background = 'transparent';
+          registerTab.style.color = 'var(--text-grey)';
+        }
+        if (loginForm) loginForm.style.display = 'block';
+        if (registerForm) registerForm.style.display = 'none';
+      }
+    }
+
     async function handleAuthAction(mode) {
-      const errEl = document.getElementById('authErrorMessage');
-      if (errEl) errEl.style.display = 'none';
-
-      const emailInput = document.getElementById('authEmailInput');
-      const passInput = document.getElementById('authPasswordInput');
-      const loginBtn = document.getElementById('authLoginBtn');
-      const registerBtn = document.getElementById('authRegisterBtn');
-
-      const email = (emailInput ? emailInput.value : '').trim();
-      const password = (passInput ? passInput.value : '').trim();
+      const loginErrEl = document.getElementById('authLoginErrorMessage');
+      const regErrEl = document.getElementById('authRegisterErrorMessage');
+      if (loginErrEl) loginErrEl.style.display = 'none';
+      if (regErrEl) regErrEl.style.display = 'none';
 
       if (mode === 'guest') {
         currentAuthUser = {
@@ -1379,72 +1448,191 @@
         return;
       }
 
+      if (mode === 'register') {
+        const nameInput = document.getElementById('authRegisterNameInput');
+        const emailInput = document.getElementById('authRegisterEmailInput');
+        const passInput = document.getElementById('authRegisterPasswordInput');
+        const confirmInput = document.getElementById('authRegisterConfirmPasswordInput');
+        const registerBtn = document.getElementById('authRegisterBtn');
+
+        const name = (nameInput ? nameInput.value : '').trim();
+        const email = (emailInput ? emailInput.value : '').trim();
+        const pass = (passInput ? passInput.value : '').trim();
+        const confirmPass = (confirmInput ? confirmInput.value : '').trim();
+
+        if (!name) {
+          if (regErrEl) {
+            regErrEl.innerText = 'Por favor, informe seu nome ou apelido.';
+            regErrEl.style.display = 'block';
+          }
+          return;
+        }
+
+        if (!email || !email.includes('@')) {
+          if (regErrEl) {
+            regErrEl.innerText = 'Por favor, informe um endereço de e-mail válido.';
+            regErrEl.style.display = 'block';
+          }
+          return;
+        }
+
+        if (pass.length < 6) {
+          if (regErrEl) {
+            regErrEl.innerText = 'A senha deve ter no mínimo 6 caracteres.';
+            regErrEl.style.display = 'block';
+          }
+          return;
+        }
+
+        if (pass !== confirmPass) {
+          if (regErrEl) {
+            regErrEl.innerText = 'As senhas não coincidem. Verifique e tente novamente.';
+            regErrEl.style.display = 'block';
+          }
+          return;
+        }
+
+        if (registerBtn) {
+          registerBtn.disabled = true;
+          registerBtn.innerText = 'Criando sua conta...';
+        }
+
+        try {
+          // Limpar dados de contas anteriores para iniciar conta limpa
+          localStorage.removeItem('jtech_fit_history');
+          localStorage.removeItem('jtech_fit_active_session');
+
+          const isAdmin = (email.toLowerCase() === 'atleta@jtechfit.com');
+          const newUid = isAdmin 
+            ? 'admin_atleta_master' 
+            : 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+
+          currentAuthUser = {
+            id: newUid,
+            email: email,
+            user_metadata: {
+              nome: name,
+              role: isAdmin ? 'admin' : 'athlete'
+            }
+          };
+
+          const userInfo = {
+            id: newUid,
+            email: email,
+            nome: name,
+            role: isAdmin ? 'admin' : 'athlete'
+          };
+          localStorage.setItem('jtech_fit_user', JSON.stringify(userInfo));
+
+          // 1. Criar perfil na tabela 'usuarios'
+          if (_supabase) {
+            try {
+              await _supabase.from('usuarios').upsert({
+                id: newUid,
+                nome: name,
+                email: email,
+                criado_em: new Date().toISOString()
+              });
+            } catch (_) {}
+          }
+
+          // 2. Inicializar a conta com a divisão padrão oficial vinculada a este novo atleta
+          allWorkoutsList = DEFAULT_WORKOUT_DIVISIONS.map((t, idx) => ({
+            id: `treino_${newUid}_${idx + 1}`,
+            usuario_id: newUid,
+            nome: t.nome,
+            descricao: t.descricao || '',
+            diasSemana: [...t.diasSemana],
+            corHex: t.corHex || '#1E88E5',
+            exercicios: [...t.exercicios],
+            exerciciosCount: t.exercicios.length,
+            criadoEm: new Date().toISOString()
+          }));
+          localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+
+          // 3. Salvar treinos no Supabase para este novo atleta
+          if (_supabase) {
+            for (const localW of allWorkoutsList) {
+              try {
+                await _supabase.from('treinos').upsert({
+                  id: localW.id,
+                  usuario_id: newUid,
+                  nome: localW.nome,
+                  descricao: localW.descricao || '',
+                  dias_semana: localW.diasSemana || [],
+                  cor_hex: localW.corHex || '#1E88E5',
+                  exercicios: localW.exercicios || [],
+                  criado_em: localW.criadoEm || new Date().toISOString()
+                });
+              } catch (_) {}
+            }
+          }
+
+          document.getElementById('bottomNav').style.display = 'flex';
+          updateProfileUI();
+          switchTab('screenHome');
+          renderAllWorkoutsUI();
+
+          showToastNotification(`🎉 Bem-vindo(a), ${name}! Sua conta foi criada com sucesso.`);
+        } catch (err) {
+          console.error('[Register Error]:', err);
+          if (regErrEl) {
+            regErrEl.innerText = err.message || 'Erro ao criar conta. Tente novamente.';
+            regErrEl.style.display = 'block';
+          }
+        } finally {
+          if (registerBtn) {
+            registerBtn.disabled = false;
+            registerBtn.innerText = 'CRIAR MINHA CONTA';
+          }
+        }
+        return;
+      }
+
+      // Modo LOGIN
+      const emailInput = document.getElementById('authEmailInput');
+      const passInput = document.getElementById('authPasswordInput');
+      const loginBtn = document.getElementById('authLoginBtn');
+
+      const email = (emailInput ? emailInput.value : '').trim();
+      const password = (passInput ? passInput.value : '').trim();
+
       if (!email || !password) {
-        if (errEl) {
-          errEl.innerText = 'Por favor, preencha o e-mail e a senha.';
-          errEl.style.display = 'block';
+        if (loginErrEl) {
+          loginErrEl.innerText = 'Por favor, preencha o e-mail e a senha.';
+          loginErrEl.style.display = 'block';
         }
         return;
       }
 
       if (password.length < 6) {
-        if (errEl) {
-          errEl.innerText = 'A senha deve ter no mínimo 6 caracteres.';
-          errEl.style.display = 'block';
+        if (loginErrEl) {
+          loginErrEl.innerText = 'A senha deve ter no mínimo 6 caracteres.';
+          loginErrEl.style.display = 'block';
         }
         return;
       }
 
-      if (loginBtn) loginBtn.disabled = true;
-      if (registerBtn) registerBtn.disabled = true;
+      if (loginBtn) {
+        loginBtn.disabled = true;
+        loginBtn.innerText = 'Conectando...';
+      }
 
       try {
         currentAuthUser = null;
 
         if (_supabase) {
-          if (mode === 'login') {
-            if (loginBtn) loginBtn.innerText = 'Conectando...';
-            try {
-              const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-              if (!error && data && data.user) {
-                currentAuthUser = data.user;
-              } else if (error) {
-                console.log('[Supabase Auth Info]:', error.message);
-                if (!error.message.includes('rate limit')) {
-                  try {
-                    const suRes = await _supabase.auth.signUp({
-                      email,
-                      password,
-                      options: { data: { nome: email === 'atleta@jtechfit.com' ? 'Administrador JTech' : email.split('@')[0] } }
-                    });
-                    if (!suRes.error && suRes.data && suRes.data.user) {
-                      currentAuthUser = suRes.data.user;
-                    }
-                  } catch (_) {}
-                }
-              }
-            } catch (e) {
-              console.log('[Supabase Auth Sign-In]:', e);
+          try {
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+            if (!error && data && data.user) {
+              currentAuthUser = data.user;
             }
-          } else if (mode === 'register') {
-            if (registerBtn) registerBtn.innerText = 'Criando conta...';
-            try {
-              const { data, error } = await _supabase.auth.signUp({
-                email,
-                password,
-                options: { data: { nome: email === 'atleta@jtechfit.com' ? 'Administrador JTech' : email.split('@')[0] } }
-              });
-              if (!error && data && data.user) {
-                currentAuthUser = data.user;
-              }
-            } catch (_) {}
-          }
+          } catch (_) {}
         }
 
-        // Se o Supabase Auth atingir limite de envio de e-mails ou rate limit,
-        // criamos uma identidade determinística segura vinculada à conta para nunca travar o login
         if (!currentAuthUser) {
-          const deterministicId = email === 'atleta@jtechfit.com' 
+          const isAdmin = (email.toLowerCase() === 'atleta@jtechfit.com');
+          const deterministicId = isAdmin 
             ? 'admin_atleta_master' 
             : 'user_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
 
@@ -1452,13 +1640,13 @@
             id: deterministicId,
             email: email,
             user_metadata: {
-              nome: email === 'atleta@jtechfit.com' ? 'Administrador JTech' : email.split('@')[0],
-              role: email === 'atleta@jtechfit.com' ? 'admin' : 'athlete'
+              nome: isAdmin ? 'Administrador JTech' : email.split('@')[0],
+              role: isAdmin ? 'admin' : 'athlete'
             }
           };
         }
 
-        const isAdmin = (email === 'atleta@jtechfit.com') || (currentAuthUser.user_metadata && currentAuthUser.user_metadata.role === 'admin');
+        const isAdmin = (email.toLowerCase() === 'atleta@jtechfit.com') || (currentAuthUser.user_metadata && currentAuthUser.user_metadata.role === 'admin');
         const userInfo = {
           id: currentAuthUser.id,
           email: currentAuthUser.email || email,
@@ -1467,7 +1655,6 @@
         };
         localStorage.setItem('jtech_fit_user', JSON.stringify(userInfo));
 
-        // Sincronizar na tabela 'usuarios' do Supabase
         if (_supabase) {
           try {
             await _supabase.from('usuarios').upsert({
@@ -1487,19 +1674,15 @@
         showToastNotification(successMsg);
         await refreshAppData();
       } catch (err) {
-        console.error('[Auth Error]:', err);
-        if (errEl) {
-          errEl.innerText = err.message || 'Erro ao conectar. Tente novamente.';
-          errEl.style.display = 'block';
+        console.error('[Login Error]:', err);
+        if (loginErrEl) {
+          loginErrEl.innerText = err.message || 'Erro ao conectar. Verifique seus dados.';
+          loginErrEl.style.display = 'block';
         }
       } finally {
         if (loginBtn) {
           loginBtn.disabled = false;
           loginBtn.innerText = 'ENTRAR';
-        }
-        if (registerBtn) {
-          registerBtn.disabled = false;
-          registerBtn.innerText = 'CRIAR MINHA CONTA';
         }
       }
     }
