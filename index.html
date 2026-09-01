@@ -1162,11 +1162,9 @@
       showToastNotification('🔄 Sincronizando dados e treinos...');
 
       try {
-        loadHistoryFromStorage();
-        updateHomeDashboardUI();
+        await loadHistoryFromStorage();
         await loadWorkoutsFromStorage();
-        loadHistoryFromStorage();
-        updateHomeDashboardUI();
+        updateHomeScreenUI();
         showToastNotification('✅ Dados e treinos sincronizados!');
       } catch (err) {
         console.error('[Refresh] Erro ao atualizar:', err);
@@ -1175,111 +1173,13 @@
     }
 
     function updateHomeDashboardUI() {
-      let historyList = [];
-      try {
-        historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
-      } catch (e) {}
-
-      const now = new Date();
-      
-      const currentDay = now.getDay();
-      const diffToMonday = (currentDay === 0 ? -6 : 1) - currentDay;
-      const startOfWeek = new Date(now);
-      startOfWeek.setDate(now.getDate() + diffToMonday);
-      startOfWeek.setHours(0, 0, 0, 0);
-
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-      const monthName = monthNames[now.getMonth()];
-
-      let weeklyCount = 0;
-      let monthlyCount = 0;
-
-      historyList.forEach(item => {
-        let itemDate = item.timestamp ? new Date(item.timestamp) : null;
-        if (!itemDate || isNaN(itemDate.getTime())) {
-          if (item.data) {
-            const parts = item.data.split('/');
-            if (parts.length >= 3) {
-              const day = parseInt(parts[0]);
-              const month = parseInt(parts[1]) - 1;
-              const year = parseInt(parts[2].split(' ')[0]);
-              itemDate = new Date(year, month, day);
-            }
-          }
-        }
-
-        if (itemDate && !isNaN(itemDate.getTime())) {
-          if (itemDate >= startOfWeek) {
-            weeklyCount++;
-          }
-          if (itemDate >= startOfMonth) {
-            monthlyCount++;
-          }
-        }
-      });
-
-      const elWeeklyCount = document.getElementById('homeWeeklyCount');
-      const elWeeklySub = document.getElementById('homeWeeklySub');
-      if (elWeeklyCount) elWeeklyCount.textContent = `${weeklyCount} ${weeklyCount === 1 ? 'treino' : 'treinos'}`;
-      if (elWeeklySub) elWeeklySub.textContent = weeklyCount > 0 ? `${weeklyCount} ${weeklyCount === 1 ? 'treino concluído' : 'treinos concluídos'}` : 'Nenhum treino ainda';
-
-      const elMonthlyCount = document.getElementById('homeMonthlyCount');
-      const elMonthlySub = document.getElementById('homeMonthlySub');
-      if (elMonthlyCount) elMonthlyCount.textContent = `${monthlyCount} ${monthlyCount === 1 ? 'treino' : 'treinos'}`;
-      if (elMonthlySub) elMonthlySub.textContent = `Total em ${monthName}`;
-
-      const elLastBadge = document.getElementById('homeLastWorkoutBadge');
-      const elLastTitle = document.getElementById('homeLastWorkoutTitle');
-      const elLastSub = document.getElementById('homeLastWorkoutSub');
-
-      if (historyList.length > 0) {
-        const lastItem = historyList[0];
-        if (elLastBadge) elLastBadge.textContent = lastItem.data || 'Recente';
-        if (elLastTitle) elLastTitle.textContent = lastItem.nomeTreino || 'Treino Concluído';
-        if (elLastSub) elLastSub.textContent = `⏱ Duração: ${lastItem.duracaoMinutos || 1} min • Finalizado com sucesso`;
-      } else {
-        if (elLastBadge) elLastBadge.textContent = 'Nenhum ainda';
-        if (elLastTitle) elLastTitle.textContent = 'Nenhum treino registrado';
-        if (elLastSub) elLastSub.textContent = 'Inicie seu primeiro treino para registrar seu progresso!';
-      }
-
-      const elHeroTitle = document.getElementById('homeHeroTitle');
-      const elHeroSubtitle = document.getElementById('homeHeroSubtitle');
-      const elHeroBtn = document.getElementById('homeHeroBtn');
-
-      if (Array.isArray(allWorkoutsList) && allWorkoutsList.length > 0) {
-        const dayNames = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-        const todayName = dayNames[now.getDay()];
-
-        let recWorkout = allWorkoutsList.find(w => Array.isArray(w.diasSemana) && w.diasSemana.includes(todayName));
-        if (!recWorkout) {
-          recWorkout = allWorkoutsList[0];
-        }
-
-        const exCount = (recWorkout.exercicios || []).length;
-        const estTime = exCount > 0 ? exCount * 10 : 45;
-
-        if (elHeroTitle) elHeroTitle.textContent = recWorkout.nome;
-        if (elHeroSubtitle) elHeroSubtitle.textContent = `${exCount} exercícios • ~${estTime} min de duração`;
-        if (elHeroBtn) {
-          elHeroBtn.textContent = '▶ INICIAR TREINO AGORA';
-          elHeroBtn.onclick = () => startActiveWorkout(recWorkout.id);
-        }
-      } else {
-        if (elHeroTitle) elHeroTitle.textContent = 'Selecione ou Crie um Treino';
-        if (elHeroSubtitle) elHeroSubtitle.textContent = 'Nenhum treino cadastrado na sua conta';
-        if (elHeroBtn) {
-          elHeroBtn.textContent = '+ CRIAR PRIMEIRO TREINO';
-          elHeroBtn.onclick = () => openCreateWorkoutModal();
-        }
-      }
+      updateHomeScreenUI();
     }
 
     function loginUser() {
       switchTab('screenHome');
       document.getElementById('bottomNav').style.display = 'flex';
-      updateHomeDashboardUI();
+      updateHomeScreenUI();
     }
 
     // ==========================================
@@ -2345,6 +2245,7 @@
         data: dataFormatada,
         inicioIso: new Date(now.getTime() - activeWorkoutSeconds * 1000).toISOString(),
         fimIso: now.toISOString(),
+        timestamp: now.getTime(),
         concluido: true
       };
 
@@ -2387,7 +2288,7 @@
       renderHistoryCardUI(historyItem, true);
       updateHomeScreenUI();
 
-      alert(`🏆 Treino "${title}" finalizado com sucesso em ${duracao} min!\nSalvo no histórico e sincronizado.`);
+      alert(`🏆 Treino "${title}" finalizado com sucesso em ${duracao} min!\nSalvo no histórico e registrado no painel semanal e mensal.`);
       switchTab('screenHistory', document.querySelectorAll('.nav-item')[3]);
     }
 
@@ -2718,28 +2619,74 @@
       }
     }
 
-    function loadHistoryFromStorage() {
+    async function loadHistoryFromStorage() {
       const container = document.getElementById('historyListContainer');
-      if (!container) return;
 
-      container.innerHTML = '';
       let historyList = [];
       try {
         historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
       } catch (e) {}
 
-      if (historyList.length === 0) {
-        container.innerHTML = `
-          <div class="empty-history-msg" style="text-align: center; padding: 30px 16px; color: var(--text-grey);">
-            <div style="font-size: 32px; margin-bottom: 8px;">📊</div>
-            <div style="font-weight: 700; font-size: 14px; color: white;">Nenhum treino no histórico ainda</div>
-            <div style="font-size: 12px; margin-top: 4px;">Inicie e finalize um treino para acompanhar o seu progresso aqui!</div>
-          </div>
-        `;
-        return;
+      // Sincronizar com Supabase (Nuvem / Mobile) se online
+      if (_supabase) {
+        try {
+          const { data, error } = await _supabase
+            .from('sessoes_de_treino')
+            .select('*')
+            .order('fim', { ascending: false });
+
+          if (!error && Array.isArray(data) && data.length > 0) {
+            const onlineHistory = data.map(row => {
+              const fimDate = row.fim ? new Date(row.fim) : new Date();
+              const inicioDate = row.inicio ? new Date(row.inicio) : fimDate;
+              const duracaoMin = Math.max(1, Math.round((fimDate - inicioDate) / 60000));
+              const dataFormatada = fimDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+              return {
+                id: row.id,
+                nomeTreino: row.nome_treino || 'Treino Concluído',
+                duracaoMinutos: duracaoMin,
+                data: dataFormatada,
+                inicioIso: row.inicio,
+                fimIso: row.fim,
+                timestamp: fimDate.getTime(),
+                concluido: row.concluido !== false
+              };
+            });
+
+            // Mesclar mantendo todos os registros únicos
+            const mapById = new Map();
+            onlineHistory.forEach(h => mapById.set(h.id, h));
+            historyList.forEach(h => mapById.set(h.id, h));
+            historyList = Array.from(mapById.values()).sort((a, b) => {
+              const timeA = a.timestamp || (a.fimIso ? new Date(a.fimIso).getTime() : 0);
+              const timeB = b.timestamp || (b.fimIso ? new Date(b.fimIso).getTime() : 0);
+              return timeB - timeA;
+            });
+
+            localStorage.setItem('jtech_fit_history', JSON.stringify(historyList));
+          }
+        } catch (e) {
+          console.log('[Supabase] Erro ao sincronizar histórico da nuvem:', e);
+        }
       }
 
-      historyList.forEach(item => renderHistoryCardUI(item, false));
+      if (container) {
+        container.innerHTML = '';
+        if (historyList.length === 0) {
+          container.innerHTML = `
+            <div class="empty-history-msg" style="text-align: center; padding: 30px 16px; color: var(--text-grey);">
+              <div style="font-size: 32px; margin-bottom: 8px;">📊</div>
+              <div style="font-weight: 700; font-size: 14px; color: white;">Nenhum treino no histórico ainda</div>
+              <div style="font-size: 12px; margin-top: 4px;">Inicie e finalize um treino para acompanhar o seu progresso aqui!</div>
+            </div>
+          `;
+        } else {
+          historyList.forEach(item => renderHistoryCardUI(item, false));
+        }
+      }
+
+      updateHomeScreenUI();
     }
 
     function deleteHistoryItem(id) {
@@ -2794,7 +2741,9 @@
 
       historyList.forEach(item => {
         let itemDate = null;
-        if (item.fimIso) {
+        if (item.timestamp && !isNaN(item.timestamp)) {
+          itemDate = new Date(item.timestamp);
+        } else if (item.fimIso) {
           itemDate = new Date(item.fimIso);
         } else if (item.inicioIso) {
           itemDate = new Date(item.inicioIso);
@@ -2822,16 +2771,16 @@
       });
 
       // Atualizar elementos da Semana e Mês na Home
-      const weekCountEl = document.getElementById('homeWeekCount');
-      const monthCountEl = document.getElementById('homeMonthCount');
-      const weekSubtitleEl = document.getElementById('homeWeekSubtitle');
-      const monthSubtitleEl = document.getElementById('homeMonthSubtitle');
+      const weekCountEl = document.getElementById('homeWeeklyCount') || document.getElementById('homeWeekCount');
+      const weekSubtitleEl = document.getElementById('homeWeeklySub') || document.getElementById('homeWeekSubtitle');
+      const monthCountEl = document.getElementById('homeMonthlyCount') || document.getElementById('homeMonthCount');
+      const monthSubtitleEl = document.getElementById('homeMonthlySub') || document.getElementById('homeMonthSubtitle');
 
       if (weekCountEl) {
         weekCountEl.innerText = `${weekCount} ${weekCount === 1 ? 'treino' : 'treinos'}`;
       }
       if (weekSubtitleEl) {
-        weekSubtitleEl.innerText = weekCount === 0 ? 'Nenhum treino ainda' : 'Concluídos na semana';
+        weekSubtitleEl.innerText = weekCount === 0 ? 'Nenhum treino ainda' : `${weekCount} ${weekCount === 1 ? 'treino concluído' : 'treinos concluídos'}`;
       }
 
       if (monthCountEl) {
@@ -2845,19 +2794,18 @@
 
       // 3. Atualizar Card do Último Treino Concluído
       const lastWorkout = historyList.length > 0 ? historyList[0] : null;
-      const lastWorkoutWhenEl = document.getElementById('homeLastWorkoutWhen');
+      const lastWorkoutBadgeEl = document.getElementById('homeLastWorkoutBadge') || document.getElementById('homeLastWorkoutWhen');
       const lastWorkoutTitleEl = document.getElementById('homeLastWorkoutTitle');
-      const lastWorkoutInfoEl = document.getElementById('homeLastWorkoutInfo');
+      const lastWorkoutSubEl = document.getElementById('homeLastWorkoutSub') || document.getElementById('homeLastWorkoutInfo');
       const lastWorkoutCardEl = document.getElementById('homeLastWorkoutCard');
 
       if (lastWorkout) {
         let whenText = 'Recentemente';
         let itemDate = null;
-        if (lastWorkout.fimIso) {
-          itemDate = new Date(lastWorkout.fimIso);
-        } else if (lastWorkout.inicioIso) {
-          itemDate = new Date(lastWorkout.inicioIso);
-        } else if (lastWorkout.id && lastWorkout.id.startsWith('sessao_')) {
+        if (lastWorkout.timestamp) itemDate = new Date(lastWorkout.timestamp);
+        else if (lastWorkout.fimIso) itemDate = new Date(lastWorkout.fimIso);
+        else if (lastWorkout.inicioIso) itemDate = new Date(lastWorkout.inicioIso);
+        else if (lastWorkout.id && lastWorkout.id.startsWith('sessao_')) {
           const timestamp = parseInt(lastWorkout.id.replace('sessao_', ''));
           if (!isNaN(timestamp)) itemDate = new Date(timestamp);
         }
@@ -2873,8 +2821,8 @@
           } else if (diffDays === 1) {
             whenText = `Ontem às ${timeStr}`;
           } else if (diffDays > 1 && diffDays < 7) {
-            const weekdays = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-            whenText = `${weekdays[itemDate.getDay()]} (${diffDays}d atrás)`;
+            const weekdays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            whenText = `${weekdays[itemDate.getDay()]}, ${timeStr}`;
           } else {
             whenText = itemDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
           }
@@ -2882,18 +2830,18 @@
           whenText = lastWorkout.data;
         }
 
-        if (lastWorkoutWhenEl) lastWorkoutWhenEl.innerText = whenText;
+        if (lastWorkoutBadgeEl) lastWorkoutBadgeEl.innerText = whenText;
         if (lastWorkoutTitleEl) lastWorkoutTitleEl.innerText = lastWorkout.nomeTreino || 'Treino Concluído';
-        if (lastWorkoutInfoEl) {
-          lastWorkoutInfoEl.innerHTML = `⏱ <strong>${lastWorkout.duracaoMinutos || 1} min</strong> de duração • Concluído com sucesso 🏆`;
+        if (lastWorkoutSubEl) {
+          lastWorkoutSubEl.innerHTML = `⏱ <strong>${lastWorkout.duracaoMinutos || 1} min</strong> de duração • Concluído com sucesso 🏆`;
         }
         if (lastWorkoutCardEl) {
           lastWorkoutCardEl.style.borderLeftColor = 'var(--success-green)';
         }
       } else {
-        if (lastWorkoutWhenEl) lastWorkoutWhenEl.innerText = 'Nenhum ainda';
+        if (lastWorkoutBadgeEl) lastWorkoutBadgeEl.innerText = 'Nenhum ainda';
         if (lastWorkoutTitleEl) lastWorkoutTitleEl.innerText = 'Nenhum treino registrado';
-        if (lastWorkoutInfoEl) lastWorkoutInfoEl.innerText = 'Inicie seu primeiro treino para registrar seu progresso!';
+        if (lastWorkoutSubEl) lastWorkoutSubEl.innerText = 'Inicie seu primeiro treino para registrar seu progresso!';
         if (lastWorkoutCardEl) {
           lastWorkoutCardEl.style.borderLeftColor = 'var(--divider)';
         }
@@ -2906,7 +2854,7 @@
     function updateRecommendedWorkoutHero(lastWorkout) {
       const heroTitleEl = document.getElementById('homeHeroTitle');
       const heroSubtitleEl = document.getElementById('homeHeroSubtitle');
-      const heroBtnEl = document.getElementById('homeHeroStartBtn');
+      const heroBtnEl = document.getElementById('homeHeroBtn') || document.getElementById('homeHeroStartBtn');
 
       if (!heroTitleEl || !heroBtnEl) return;
 
@@ -2919,12 +2867,12 @@
         }
         heroBtnEl.innerHTML = `⚡ CONTINUAR TREINO (${tempoStr})`;
         heroBtnEl.className = 'btn btn-success';
-        heroBtnEl.setAttribute('onclick', 'resumeActiveWorkoutScreen()');
+        heroBtnEl.onclick = () => resumeActiveWorkoutScreen();
         return;
       }
 
       // Estado padrão: sugerir próximo treino da sequência
-      heroBtnEl.className = 'btn btn-primary';
+      heroBtnEl.className = 'btn btn-success';
       heroBtnEl.innerHTML = '▶ INICIAR TREINO AGORA';
 
       const workouts = (Array.isArray(allWorkoutsList) && allWorkoutsList.length > 0) ? allWorkoutsList : DEFAULT_WORKOUT_DIVISIONS;
@@ -2949,7 +2897,7 @@
       }
 
       const safeWorkoutParam = (recommended.id || recommended.nome).replace(/'/g, "\\'");
-      heroBtnEl.setAttribute('onclick', `startActiveWorkout('${safeWorkoutParam}')`);
+      heroBtnEl.onclick = () => startActiveWorkout(safeWorkoutParam);
     }
 
     // (DEFAULT_BASE_EXERCISES movido para o topo do script)
