@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jtech-fit-v1.0.6';
+const CACHE_NAME = 'jtech-fit-v1.0.7';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
