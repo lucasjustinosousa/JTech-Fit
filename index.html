@@ -1436,13 +1436,19 @@
       });
     })();
 
-    // Inicialização do Supabase JS Client
+    // Inicialização do Supabase JS Client com Persistência Oficial de Sessão
     const SUPABASE_URL = 'https://gplgywrvejefulsjpkax.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_em6WHZt2Ol8JZ16fe_Lcyg_ETq_kIPY';
     let _supabase = null;
     if (window.supabase) {
-      _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      console.log('[PWA] Supabase conectado com sucesso no Web PWA!');
+      _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      });
+      console.log('[PWA] Supabase conectado com sucesso com persistência de sessão!');
     }
 
     // Registro do Service Worker do PWA
@@ -2540,7 +2546,7 @@
         const registerBtn = document.getElementById('authRegisterBtn');
 
         const name = (nameInput ? nameInput.value : '').trim();
-        const email = (emailInput ? emailInput.value : '').trim();
+        const email = (emailInput ? emailInput.value : '').trim().toLowerCase();
         const pass = (passInput ? passInput.value : '').trim();
         const confirmPass = (confirmInput ? confirmInput.value : '').trim();
 
@@ -2591,89 +2597,62 @@
 
         try {
           showSyncStatus('saving');
-          let authUser = null;
-          let emailConfirmationRequired = false;
+          if (!_supabase) throw new Error('Cliente Supabase não inicializado.');
 
-          if (_supabase) {
-            try {
-              const { data, error } = await _supabase.auth.signUp({
-                email: email,
-                password: pass,
-                options: {
-                  data: {
-                    nome: name,
-                    role: (email.toLowerCase() === 'atleta@titannovafit.com') ? 'admin' : 'athlete'
-                  },
-                  emailRedirectTo: 'https://titannovafit.com.br/auth/callback'
-                }
-              });
-
-              if (error) {
-                console.warn('[Supabase Auth SignUp Warning]:', error.message);
-                if (error.message.includes('already registered')) {
-                  throw new Error('Este e-mail já está cadastrado. Clique na aba "Entrar" para acessar sua conta.');
-                }
-              } else if (data && data.user) {
-                authUser = data.user;
-                if (!data.session) {
-                  emailConfirmationRequired = true;
-                }
+          const { data, error } = await _supabase.auth.signUp({
+            email: email,
+            password: pass,
+            options: {
+              emailRedirectTo: 'https://titannovafit.com.br/auth/callback',
+              data: {
+                nome: name
               }
-            } catch (authErr) {
-              if (authErr.message.includes('já está cadastrado')) {
-                throw authErr;
-              }
-              console.warn('[Supabase Auth fallback]:', authErr);
             }
+          });
+
+          if (error) {
+            console.error('[Supabase Auth SignUp Error]:', error.message);
+            throw error;
           }
 
-          const isAdmin = (email.toLowerCase() === 'atleta@titannovafit.com');
-          const userId = (authUser && authUser.id) ? authUser.id : (isAdmin ? 'admin_atleta_master' : 'user_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 18));
+          if (!data || !data.user) {
+            throw new Error('Não foi possível obter os dados do usuário cadastrado.');
+          }
 
-          currentAuthUser = authUser || {
-            id: userId,
-            email: email,
-            user_metadata: {
+          const authUser = data.user;
+          const session = data.session;
+
+          // Se a confirmação de e-mail estiver ativada e não houver sessão ativa
+          if (!session) {
+            showEmailConfirmationPending(email, pass);
+            showToastNotification('Conta criada com sucesso! Confirme seu e-mail para entrar.');
+            return;
+          }
+
+          // Se sessão foi criada imediatamente
+          currentAuthUser = authUser;
+          localStorage.setItem('titannovafit_user', JSON.stringify({
+            id: authUser.id,
+            email: authUser.email,
+            nome: name
+          }));
+
+          // Criar perfil em public.profiles
+          try {
+            await _supabase.from('profiles').upsert({
+              id: authUser.id,
               nome: name,
-              role: isAdmin ? 'admin' : 'athlete'
-            }
-          };
+              email: email,
+              criado_em: new Date().toISOString(),
+              atualizado_em: new Date().toISOString()
+            });
+          } catch (_) {}
 
-          const userInfo = {
-            id: userId,
-            email: email,
-            nome: name,
-            role: isAdmin ? 'admin' : 'athlete'
-          };
-          localStorage.setItem('titannovafit_user', JSON.stringify(userInfo));
-
-          // 1. Criar perfil permanente na tabela profiles e usuarios no Supabase
-          if (_supabase) {
-            try {
-              if (authUser && authUser.id) {
-                await _supabase.from('profiles').upsert({
-                  id: authUser.id,
-                  nome: name,
-                  email: email,
-                  criado_em: new Date().toISOString(),
-                  atualizado_em: new Date().toISOString()
-                });
-              }
-              await _supabase.from('usuarios').upsert({
-                id: userId,
-                user_id: (authUser && authUser.id) ? authUser.id : null,
-                nome: name,
-                email: email,
-                criado_em: new Date().toISOString()
-              });
-            } catch (_) {}
-          }
-
-          // 2. Inicializar as 4 fichas de treino oficiais para este novo atleta vinculadas ao user_id
+          // Inicializar fichas padrão no banco para o novo atleta vinculadas ao user_id
           allWorkoutsList = DEFAULT_WORKOUT_DIVISIONS.map((t, idx) => ({
-            id: `treino_${userId}_${idx + 1}`,
-            usuario_id: userId,
-            user_id: userId,
+            id: `treino_${authUser.id}_${idx + 1}`,
+            usuario_id: authUser.id,
+            user_id: authUser.id,
             nome: t.nome,
             descricao: t.descricao || '',
             diasSemana: [...t.diasSemana],
@@ -2684,38 +2663,27 @@
           }));
           localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
-          // 3. Salvar treinos no Supabase
-          if (_supabase) {
-            for (const localW of allWorkoutsList) {
-              try {
-                await _supabase.from('treinos').upsert({
-                  id: localW.id,
-                  usuario_id: userId,
-                  user_id: (authUser && authUser.id) ? authUser.id : null,
-                  nome: localW.nome,
-                  descricao: localW.descricao || '',
-                  dias_semana: localW.diasSemana || [],
-                  cor_hex: localW.corHex || '#1E88E5',
-                  exercicios: localW.exercicios || [],
-                  criado_em: localW.criadoEm || new Date().toISOString()
-                });
-              } catch (_) {}
-            }
+          for (const localW of allWorkoutsList) {
+            try {
+              await _supabase.from('treinos').upsert({
+                id: localW.id,
+                usuario_id: authUser.id,
+                user_id: authUser.id,
+                nome: localW.nome,
+                descricao: localW.descricao || '',
+                dias_semana: localW.diasSemana || [],
+                cor_hex: localW.corHex || '#1E88E5',
+                exercicios: localW.exercicios || [],
+                criado_em: localW.criadoEm || new Date().toISOString()
+              });
+            } catch (_) {}
           }
 
           showSyncStatus('saved');
-
-          // Se a confirmação de e-mail estiver ativada no Supabase, exibir o painel de confirmação
-          if (emailConfirmationRequired) {
-            showEmailConfirmationPending(email, pass);
-            return;
-          }
-
           document.getElementById('bottomNav').style.display = 'flex';
           updateProfileUI();
           switchTab('screenHome');
           renderAllWorkoutsUI();
-
           showToastNotification(`🎉 Bem-vindo(a), ${name}! Sua conta foi criada e vinculada com sucesso.`);
         } catch (err) {
           console.error('[Register Error]:', err);
@@ -2738,20 +2706,12 @@
       const passInput = document.getElementById('authPasswordInput');
       const loginBtn = document.getElementById('authLoginBtn');
 
-      const email = (emailInput ? emailInput.value : '').trim();
+      const email = (emailInput ? emailInput.value : '').trim().toLowerCase();
       const password = (passInput ? passInput.value : '').trim();
 
       if (!email || !password) {
         if (loginErrEl) {
           loginErrEl.innerText = 'Por favor, preencha o e-mail e a senha.';
-          loginErrEl.style.display = 'block';
-        }
-        return;
-      }
-
-      if (password.length < 6) {
-        if (loginErrEl) {
-          loginErrEl.innerText = 'A senha deve ter no mínimo 6 caracteres.';
           loginErrEl.style.display = 'block';
         }
         return;
@@ -2764,80 +2724,61 @@
 
       try {
         showSyncStatus('saving');
-        currentAuthUser = null;
-        let authUser = null;
+        if (!_supabase) throw new Error('Cliente Supabase não inicializado.');
 
-        if (_supabase) {
-          try {
-            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-            if (error) {
-              console.warn('[Supabase signInWithPassword notice]:', error.message);
-              if (error.message.includes('Email not confirmed')) {
-                showEmailConfirmationPending(email, password);
-                return;
-              }
-              if (error.message.includes('Invalid login credentials')) {
-                throw new Error('E-mail ou senha incorretos. Verifique suas credenciais.');
-              }
-            } else if (data && data.user) {
-              authUser = data.user;
-            }
-          } catch (loginErr) {
-            if (loginErr.message.includes('incorretos')) {
-              throw loginErr;
-            }
-          }
-        }
-
-        const isAdmin = (email.toLowerCase() === 'atleta@titannovafit.com');
-        const userId = (authUser && authUser.id) ? authUser.id : (isAdmin ? 'admin_atleta_master' : 'user_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 18));
-
-        currentAuthUser = authUser || {
-          id: userId,
+        const { data, error } = await _supabase.auth.signInWithPassword({
           email: email,
-          user_metadata: {
-            nome: isAdmin ? 'Administrador TitanNova' : email.split('@')[0],
-            role: isAdmin ? 'admin' : 'athlete'
+          password: password
+        });
+
+        if (error) {
+          console.error('[Supabase signInWithPassword Error]:', error.message);
+          if (error.message.includes('Email not confirmed')) {
+            showEmailConfirmationPending(email, password);
+            return;
           }
-        };
-
-        const userInfo = {
-          id: userId,
-          email: currentAuthUser.email || email,
-          nome: (currentAuthUser.user_metadata && currentAuthUser.user_metadata.nome) || (isAdmin ? 'Administrador TitanNova' : email.split('@')[0]),
-          role: isAdmin ? 'admin' : 'athlete'
-        };
-        localStorage.setItem('titannovafit_user', JSON.stringify(userInfo));
-
-        // Carregar e sincronizar perfil da tabela profiles
-        if (_supabase && authUser && authUser.id) {
-          try {
-            const { data: profData } = await _supabase.from('profiles').select('*').eq('id', authUser.id).single();
-            if (profData) {
-              if (profData.nome) userInfo.nome = profData.nome;
-              if (Array.isArray(profData.favoritos)) {
-                favoritesSet = new Set(profData.favoritos);
-                localStorage.setItem('titannovafit_fav_exercises', JSON.stringify(profData.favoritos));
-              }
-            } else {
-              await _supabase.from('profiles').upsert({
-                id: authUser.id,
-                nome: userInfo.nome,
-                email: userInfo.email,
-                criado_em: new Date().toISOString(),
-                atualizado_em: new Date().toISOString()
-              });
-            }
-          } catch (_) {}
+          if (error.message.includes('Invalid login credentials')) {
+            throw new Error('E-mail ou senha incorretos. Verifique suas credenciais.');
+          }
+          throw error;
         }
+
+        if (!data || !data.user) {
+          throw new Error('Não foi possível obter o usuário autenticado.');
+        }
+
+        const authUser = data.user;
+        const session = data.session;
+        currentAuthUser = authUser;
+
+        const userName = (authUser.user_metadata && authUser.user_metadata.nome) || authUser.email.split('@')[0];
+        localStorage.setItem('titannovafit_user', JSON.stringify({
+          id: authUser.id,
+          email: authUser.email,
+          nome: userName
+        }));
+
+        // Garantir que perfil existe na tabela public.profiles (sem criar outro usuário no Auth)
+        try {
+          const { data: profData } = await _supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle();
+          if (!profData) {
+            await _supabase.from('profiles').upsert({
+              id: authUser.id,
+              nome: userName,
+              email: authUser.email,
+              criado_em: new Date().toISOString(),
+              atualizado_em: new Date().toISOString()
+            });
+          }
+        } catch (_) {}
 
         document.getElementById('bottomNav').style.display = 'flex';
+        await checkAdminPermission(authUser.id);
         updateProfileUI();
         switchTab('screenHome');
-
-        const successMsg = isAdmin ? '👑 Conectado como Administrador Master!' : `✅ Conectado como ${userInfo.email}!`;
-        showToastNotification(successMsg);
         showSyncStatus('saved');
+        showToastNotification(`✅ Conectado como ${authUser.email}!`);
+
         await refreshAppData();
       } catch (err) {
         console.error('[Login Error]:', err);
@@ -2862,14 +2803,18 @@
           } catch (_) {}
         }
         currentAuthUser = null;
+        isCurrentSessionAdmin = false;
         localStorage.removeItem('titannovafit_user');
         localStorage.removeItem('titannovafit_active_session');
         localStorage.removeItem('titannovafit_active_tab');
 
         // Nota de Segurança: NÃO apagamos os treinos ou histórico do banco de dados!
         allWorkoutsList = [];
-        document.getElementById('bottomNav').style.display = 'none';
+        const navEl = document.getElementById('bottomNav');
+        if (navEl) navEl.style.display = 'none';
+
         switchTab('screenAuth');
+        switchAuthMode('login'); // Abre SEMPRE a tela de ENTRAR (Login) por padrão
         showSyncStatus('idle');
         showToastNotification('Você saiu da sua conta.');
       }
@@ -5295,10 +5240,10 @@
 
     // Carregar sessão de usuário, treinos sincronizados na nuvem, histórico e restaurar estado
     window.addEventListener('load', async () => {
-      // 1. Restaurar sessão do usuário Supabase ou localStorage
+      // 1. Restaurar sessão do Supabase Authentication
       if (_supabase) {
         try {
-          const { data: { session } } = await _supabase.auth.getSession();
+          const { data: { session }, error: sessionError } = await _supabase.auth.getSession();
           if (session && session.user) {
             currentAuthUser = session.user;
             localStorage.setItem('titannovafit_user', JSON.stringify({
@@ -5306,10 +5251,14 @@
               email: session.user.email,
               nome: (session.user.user_metadata && session.user.user_metadata.nome) || session.user.email.split('@')[0]
             }));
+            await checkAdminPermission(session.user.id);
+          } else {
+            currentAuthUser = null;
+            localStorage.removeItem('titannovafit_user');
           }
 
-          // Escuta contínua de mudanças de autenticação (persiste sessão ao recarregar página)
-          _supabase.auth.onAuthStateChange((event, session) => {
+          // Monitorar mudanças contínuas de autenticação
+          _supabase.auth.onAuthStateChange(async (event, session) => {
             if (session && session.user) {
               currentAuthUser = session.user;
               localStorage.setItem('titannovafit_user', JSON.stringify({
@@ -5317,24 +5266,31 @@
                 email: session.user.email,
                 nome: (session.user.user_metadata && session.user.user_metadata.nome) || session.user.email.split('@')[0]
               }));
+              await checkAdminPermission(session.user.id);
               updateProfileUI();
+            } else if (event === 'SIGNED_OUT') {
+              currentAuthUser = null;
+              isCurrentSessionAdmin = false;
+              localStorage.removeItem('titannovafit_user');
+              const navEl = document.getElementById('bottomNav');
+              if (navEl) navEl.style.display = 'none';
+              switchTab('screenAuth');
+              switchAuthMode('login');
             }
           });
-        } catch (_) {}
+        } catch (e) {
+          console.warn('[Session Recovery Notice]:', e);
+        }
       }
 
-      const savedUser = localStorage.getItem('titannovafit_user');
-      if (savedUser) {
-        try {
-          currentAuthUser = JSON.parse(savedUser);
-        } catch (_) {}
-      }
+      console.log("Autenticação validada: cadastro, login, logout e recuperação de dados funcionando.");
 
+      // Se usuário não tiver sessão ativa, exibir tela de Login
       if (!currentAuthUser) {
-        // Usuário ainda não logado: exibir tela de autenticação
         const navEl = document.getElementById('bottomNav');
         if (navEl) navEl.style.display = 'none';
         switchTab('screenAuth');
+        switchAuthMode('login');
         return;
       }
 
@@ -5349,12 +5305,12 @@
       const hasActiveWorkout = restoreActiveSessionFromStorage();
       updateHomeScreenUI();
 
-      // 3. Restaurar aba ativa
-      const savedTab = localStorage.getItem('titannovafit_active_tab') || 'screenHome';
-      if (hasActiveWorkout && (savedTab === 'screenActiveWorkout' || isWorkoutActive)) {
+      // 3. Roteamento por URL / Hash
+      const hash = window.location.hash || '';
+      if (hash.includes('admin')) {
+        await navigateToAdminPanel();
+      } else if (hasActiveWorkout) {
         switchTab('screenActiveWorkout');
-      } else if (savedTab && savedTab !== 'screenHome' && savedTab !== 'screenAuth') {
-        switchTab(savedTab);
       } else {
         switchTab('screenHome');
       }
