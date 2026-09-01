@@ -672,7 +672,7 @@
           </button>
         </div>
 
-        <!-- BANNER DA BIBLIOTECA NATIVA JTECH -->
+        <!-- BANNER DA BIBLIOTECA NATIVA TITANNOVA -->
         <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--divider); margin-bottom: 12px; font-size: 11px; color: var(--accent-cyan);">
           <span>🏋️‍♂️ Biblioteca Oficial de Exercícios TitanNova</span>
           <span style="display: flex; align-items: center; gap: 4px;">⚡ 100% Offline & Rápido</span>
@@ -786,7 +786,7 @@
           </div>
         </div>
 
-        <!-- PAINEL DE CONTROLE DO ADMINISTRADOR (EXCLUSIVO PARA ATLETA@JTECHFIT.COM) -->
+        <!-- PAINEL DE CONTROLE DO ADMINISTRADOR (EXCLUSIVO PARA ATLETA@TITANNOVAFIT.COM) -->
         <div id="adminPanelCard" class="card" style="display: none; border-left: 4px solid #ffd700; background: #161a24; margin-bottom: 16px;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -1097,6 +1097,22 @@
   </div>
 
   <script>
+    // Migração automática transparente de dados legados (jtech_fit_* -> titannovafit_*)
+    (function migrateLegacyStorage() {
+      const keysToMigrate = [
+        'custom_workouts', 'history', 'fav_exercises', 'custom_exercises',
+        'exercises_library', 'user', 'active_session', 'active_tab'
+      ];
+      keysToMigrate.forEach(k => {
+        const oldKey = 'titannovafit_' + k;
+        const newKey = 'titannovafit_' + k;
+        const oldVal = localStorage.getItem(oldKey);
+        if (oldVal !== null && localStorage.getItem(newKey) === null) {
+          localStorage.setItem(newKey, oldVal);
+        }
+      });
+    })();
+
     // Inicialização do Supabase JS Client
     const SUPABASE_URL = 'https://gplgywrvejefulsjpkax.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_em6WHZt2Ol8JZ16fe_Lcyg_ETq_kIPY';
@@ -1162,7 +1178,7 @@
 
       // Salvar aba ativa no localStorage
       if (screenId && screenId !== 'screenAuth') {
-        localStorage.setItem('jtech_fit_active_tab', screenId);
+        localStorage.setItem('titannovafit_active_tab', screenId);
       }
 
       // Gerenciar barra flutuante de treino em andamento
@@ -1259,7 +1275,7 @@
         return currentAuthUser.id;
       }
       try {
-        const saved = JSON.parse(localStorage.getItem('jtech_fit_user') || 'null');
+        const saved = JSON.parse(localStorage.getItem('titannovafit_user') || 'null');
         if (saved && saved.id) return saved.id;
       } catch (_) {}
       return 'guest_user_1';
@@ -1270,7 +1286,7 @@
         return currentAuthUser.email;
       }
       try {
-        const saved = JSON.parse(localStorage.getItem('jtech_fit_user') || 'null');
+        const saved = JSON.parse(localStorage.getItem('titannovafit_user') || 'null');
         if (saved && saved.email) return saved.email;
       } catch (_) {}
       return 'atleta@titannovafit.com';
@@ -1278,7 +1294,7 @@
 
     function isCurrentUserAdmin() {
       const email = getEffectiveUserEmail().toLowerCase().trim();
-      return email === 'atleta@titannovafit.com' || email === 'atleta@jtechfit.com' || (currentAuthUser && currentAuthUser.user_metadata && currentAuthUser.user_metadata.role === 'admin');
+      return email === 'atleta@titannovafit.com' || email === 'atleta@titannovafit.com' || (currentAuthUser && currentAuthUser.user_metadata && currentAuthUser.user_metadata.role === 'admin');
     }
 
     function updateProfileUI() {
@@ -1363,7 +1379,7 @@
       }
       if (confirm('Deseja restaurar todos os exercícios padrão da biblioteca com seus GIFs 3D oficiais?')) {
         exercisesList = [...DEFAULT_BASE_EXERCISES];
-        localStorage.setItem('jtech_fit_exercises_library', JSON.stringify(exercisesList));
+        localStorage.setItem('titannovafit_exercises_library', JSON.stringify(exercisesList));
         renderExercisesLibraryUI();
         showToastNotification('✅ Biblioteca oficial restaurada com sucesso!');
       }
@@ -1376,7 +1392,7 @@
         exportedAt: new Date().toISOString(),
         user: currentAuthUser || { email: getEffectiveUserEmail(), role: 'admin' },
         workouts: allWorkoutsList,
-        history: JSON.parse(localStorage.getItem('jtech_fit_history') || '[]'),
+        history: JSON.parse(localStorage.getItem('titannovafit_history') || '[]'),
         exercises: exercisesList
       };
 
@@ -1438,7 +1454,7 @@
           email: 'convidado@titannovafit.com',
           user_metadata: { nome: 'Atleta Convidado', role: 'guest' }
         };
-        localStorage.setItem('jtech_fit_user', JSON.stringify({
+        localStorage.setItem('titannovafit_user', JSON.stringify({
           id: currentAuthUser.id,
           email: currentAuthUser.email,
           nome: 'Atleta Convidado',
@@ -1502,8 +1518,8 @@
 
         try {
           // Limpar dados de contas anteriores para iniciar conta limpa
-          localStorage.removeItem('jtech_fit_history');
-          localStorage.removeItem('jtech_fit_active_session');
+          localStorage.removeItem('titannovafit_history');
+          localStorage.removeItem('titannovafit_active_session');
 
           const isAdmin = (email.toLowerCase() === 'atleta@titannovafit.com');
           const newUid = isAdmin 
@@ -1525,7 +1541,7 @@
             nome: name,
             role: isAdmin ? 'admin' : 'athlete'
           };
-          localStorage.setItem('jtech_fit_user', JSON.stringify(userInfo));
+          localStorage.setItem('titannovafit_user', JSON.stringify(userInfo));
 
           // 1. Criar perfil na tabela 'usuarios'
           if (_supabase) {
@@ -1551,7 +1567,7 @@
             exerciciosCount: t.exercicios.length,
             criadoEm: new Date().toISOString()
           }));
-          localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+          localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
           // 3. Salvar treinos no Supabase para este novo atleta
           if (_supabase) {
@@ -1656,7 +1672,7 @@
           nome: (currentAuthUser.user_metadata && currentAuthUser.user_metadata.nome) || (isAdmin ? 'Administrador TitanNova' : email.split('@')[0]),
           role: isAdmin ? 'admin' : 'athlete'
         };
-        localStorage.setItem('jtech_fit_user', JSON.stringify(userInfo));
+        localStorage.setItem('titannovafit_user', JSON.stringify(userInfo));
 
         if (_supabase) {
           try {
@@ -1698,11 +1714,11 @@
           } catch (_) {}
         }
         currentAuthUser = null;
-        localStorage.removeItem('jtech_fit_user');
-        localStorage.removeItem('jtech_fit_custom_workouts');
-        localStorage.removeItem('jtech_fit_history');
-        localStorage.removeItem('jtech_fit_active_session');
-        localStorage.removeItem('jtech_fit_active_tab');
+        localStorage.removeItem('titannovafit_user');
+        localStorage.removeItem('titannovafit_custom_workouts');
+        localStorage.removeItem('titannovafit_history');
+        localStorage.removeItem('titannovafit_active_session');
+        localStorage.removeItem('titannovafit_active_tab');
 
         allWorkoutsList = [];
         document.getElementById('bottomNav').style.display = 'none';
@@ -1716,7 +1732,7 @@
     }
 
     // ==========================================
-    // BIBLIOTECA NATIVA DE EXERCÍCIOS JTECH
+    // BIBLIOTECA NATIVA DE EXERCÍCIOS TITANNOVA
     // ==========================================
     const DEFAULT_BASE_EXERCISES = [
       // Peito
@@ -2299,11 +2315,11 @@
     async function loadWorkoutsFromStorage() {
       // 1. Carregar treinos locais
       try {
-        const savedRaw = localStorage.getItem('jtech_fit_custom_workouts');
+        const savedRaw = localStorage.getItem('titannovafit_custom_workouts');
         if (savedRaw === null) {
           // Primeira vez abrindo o app: inicializa com os treinos padrão
           allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
-          localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+          localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
         } else {
           const saved = JSON.parse(savedRaw || '[]');
           if (Array.isArray(saved) && saved.length > 0) {
@@ -2319,7 +2335,7 @@
                 });
               }
             });
-            localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+            localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
           } else if (Array.isArray(saved) && saved.length === 0 && savedRaw.trim() === '[]') {
             allWorkoutsList = [];
           } else {
@@ -2408,7 +2424,7 @@
             });
             allWorkoutsList = Array.from(mapById.values());
 
-            localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+            localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
             renderAllWorkoutsUI();
             console.log(`[Supabase] Total consolidado: ${allWorkoutsList.length} treinos sincronizados para o usuário ${uid}.`);
           } else if (!error && Array.isArray(data) && data.length === 0 && allWorkoutsList.length > 0) {
@@ -2550,7 +2566,7 @@
     async function deleteWorkoutCard(workoutId) {
       if (confirm('Deseja realmente excluir este treino?')) {
         allWorkoutsList = allWorkoutsList.filter(w => w.id !== workoutId && w.nome !== workoutId);
-        localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+        localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
         renderAllWorkoutsUI();
 
         if (_supabase) {
@@ -2686,7 +2702,7 @@
 
     function saveActiveSessionToStorage() {
       if (!isWorkoutActive || !currentActiveWorkout) {
-        localStorage.removeItem('jtech_fit_active_session');
+        localStorage.removeItem('titannovafit_active_session');
         return;
       }
 
@@ -2712,13 +2728,13 @@
       };
 
       try {
-        localStorage.setItem('jtech_fit_active_session', JSON.stringify(sessionData));
+        localStorage.setItem('titannovafit_active_session', JSON.stringify(sessionData));
       } catch (e) {}
     }
 
     function restoreActiveSessionFromStorage() {
       try {
-        const raw = localStorage.getItem('jtech_fit_active_session');
+        const raw = localStorage.getItem('titannovafit_active_session');
         if (!raw) return false;
         const sessionData = JSON.parse(raw);
         if (!sessionData || !sessionData.workout) return false;
@@ -2812,7 +2828,7 @@
         clearInterval(activeWorkoutInterval);
         activeWorkoutSeconds = 0;
         document.getElementById('activeTimer').innerText = '00:00';
-        localStorage.removeItem('jtech_fit_active_session');
+        localStorage.removeItem('titannovafit_active_session');
 
         const floatingBar = document.getElementById('activeWorkoutFloatingBar');
         if (floatingBar) floatingBar.style.display = 'none';
@@ -2849,10 +2865,10 @@
       // 1. Salvar no localStorage
       let historyList = [];
       try {
-        historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
+        historyList = JSON.parse(localStorage.getItem('titannovafit_history') || '[]');
       } catch (e) {}
       historyList.unshift(historyItem);
-      localStorage.setItem('jtech_fit_history', JSON.stringify(historyList));
+      localStorage.setItem('titannovafit_history', JSON.stringify(historyList));
 
       // 2. Sincronizar com Supabase se online
       if (_supabase) {
@@ -2876,7 +2892,7 @@
       isWorkoutActive = false;
       currentActiveWorkout = null;
       activeWorkoutSeconds = 0;
-      localStorage.removeItem('jtech_fit_active_session');
+      localStorage.removeItem('titannovafit_active_session');
 
       const floatingBar = document.getElementById('activeWorkoutFloatingBar');
       if (floatingBar) floatingBar.style.display = 'none';
@@ -3143,7 +3159,7 @@
 
       // 1. Salvar na lista em memória e no localStorage
       allWorkoutsList.unshift(newWorkout);
-      localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
+      localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
       // 2. Sincronizar com Supabase se online
       if (_supabase) {
@@ -3232,7 +3248,7 @@
 
       let historyList = [];
       try {
-        historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
+        historyList = JSON.parse(localStorage.getItem('titannovafit_history') || '[]');
       } catch (e) {}
 
       // Sincronizar com Supabase (Nuvem / Mobile e outros aparelhos) se online
@@ -3276,7 +3292,7 @@
               return timeB - timeA;
             });
 
-            localStorage.setItem('jtech_fit_history', JSON.stringify(historyList));
+            localStorage.setItem('titannovafit_history', JSON.stringify(historyList));
           }
         } catch (e) {
           console.log('[Supabase] Erro ao sincronizar histórico da nuvem:', e);
@@ -3307,9 +3323,9 @@
         if (card) card.remove();
 
         try {
-          let historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
+          let historyList = JSON.parse(localStorage.getItem('titannovafit_history') || '[]');
           historyList = historyList.filter(h => h.id !== id);
-          localStorage.setItem('jtech_fit_history', JSON.stringify(historyList));
+          localStorage.setItem('titannovafit_history', JSON.stringify(historyList));
         } catch (e) {}
 
         if (_supabase) {
@@ -3328,7 +3344,7 @@
 
     async function clearAllHistory() {
       if (confirm('Tem certeza que deseja limpar todo o histórico de treinos?')) {
-        localStorage.removeItem('jtech_fit_history');
+        localStorage.removeItem('titannovafit_history');
         if (_supabase) {
           try {
             const uid = getEffectiveUserId();
@@ -3358,7 +3374,7 @@
 
       let historyList = [];
       try {
-        historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
+        historyList = JSON.parse(localStorage.getItem('titannovafit_history') || '[]');
       } catch (e) {}
 
       const now = new Date();
@@ -3539,13 +3555,13 @@
     // (DEFAULT_BASE_EXERCISES movido para o topo do script)
     let currentSelectedGroup = 'Todos';
     let onlyFavoritesFilter = false;
-    let favoritesSet = new Set(JSON.parse(localStorage.getItem('jtech_fit_fav_exercises') || '[]'));
+    let favoritesSet = new Set(JSON.parse(localStorage.getItem('titannovafit_fav_exercises') || '[]'));
     let selectedForWorkoutSet = new Set();
     let currentExerciseState = 'SUCESSO';
 
     function loadExercisesLibrary() {
       try {
-        const custom = JSON.parse(localStorage.getItem('jtech_fit_custom_exercises') || '[]');
+        const custom = JSON.parse(localStorage.getItem('titannovafit_custom_exercises') || '[]');
         if (Array.isArray(custom) && custom.length > 0) {
           const map = new Map();
           DEFAULT_BASE_EXERCISES.forEach(e => map.set(e.exerciseId, e));
@@ -3755,7 +3771,7 @@
       } else {
         favoritesSet.add(id);
       }
-      localStorage.setItem('jtech_fit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
+      localStorage.setItem('titannovafit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
       renderExercisesLibraryUI();
     }
 
@@ -3928,7 +3944,7 @@
       } else {
         favoritesSet.add(currentOnlyGifId);
       }
-      localStorage.setItem('jtech_fit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
+      localStorage.setItem('titannovafit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
       updateOnlyGifFavButton();
       renderExercisesLibraryUI();
     }
@@ -4070,7 +4086,7 @@
       } else {
         favoritesSet.add(currentDetailExerciseId);
       }
-      localStorage.setItem('jtech_fit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
+      localStorage.setItem('titannovafit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
       updateDetailFavButton();
       renderExercisesLibraryUI();
     }
@@ -4109,7 +4125,7 @@
           const { data: { session } } = await _supabase.auth.getSession();
           if (session && session.user) {
             currentAuthUser = session.user;
-            localStorage.setItem('jtech_fit_user', JSON.stringify({
+            localStorage.setItem('titannovafit_user', JSON.stringify({
               id: session.user.id,
               email: session.user.email,
               nome: (session.user.user_metadata && session.user.user_metadata.nome) || session.user.email.split('@')[0]
@@ -4118,7 +4134,7 @@
         } catch (_) {}
       }
 
-      const savedUser = localStorage.getItem('jtech_fit_user');
+      const savedUser = localStorage.getItem('titannovafit_user');
       if (savedUser) {
         try {
           currentAuthUser = JSON.parse(savedUser);
@@ -4145,7 +4161,7 @@
       updateHomeScreenUI();
 
       // 3. Restaurar aba ativa
-      const savedTab = localStorage.getItem('jtech_fit_active_tab') || 'screenHome';
+      const savedTab = localStorage.getItem('titannovafit_active_tab') || 'screenHome';
       if (hasActiveWorkout && (savedTab === 'screenActiveWorkout' || isWorkoutActive)) {
         switchTab('screenActiveWorkout');
       } else if (savedTab && savedTab !== 'screenHome' && savedTab !== 'screenAuth') {

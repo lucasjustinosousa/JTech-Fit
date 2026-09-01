@@ -30,8 +30,8 @@ Para gerar o pacote `.aab` exigido para publicação na Google Play Store:
 ```properties
 storePassword=SuaSenhaDaKeystore
 keyPassword=SuaSenhaDaChave
-keyAlias=jtechfit
-storeFile=../jtechfit-upload-key.jks
+keyAlias=titannovafit
+storeFile=../titannovafit-upload-key.jks
 ```
 2. Execute o comando de compilação:
 ```bash
@@ -49,7 +49,7 @@ O pacote `.aab` final estará localizado em:
 ```bash
 open ios/Runner.xcworkspace
 ```
-2. Em **Signing & Capabilities**, selecione seu **Team** de desenvolvimento e insira o Bundle Identifier (ex: `com.jtech.fit`).
+2. Em **Signing & Capabilities**, selecione seu **Team** de desenvolvimento e insira o Bundle Identifier (ex: `com.titannova.fit`).
 
 ### B. Gerar Arquivo IPA para TestFlight e App Store
 1. Execute a compilação do iOS sem assinatura:

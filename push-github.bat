@@ -1,7 +1,7 @@
 @echo off
-title Enviar JTech Fit para o GitHub
+title Enviar TitanNovaFit para o GitHub
 echo ========================================================
-echo Enviando projeto JTech Fit para https://github.com/lucasjustinosousa/JTech-Fit.git
+echo Enviando projeto TitanNovaFit para https://github.com/lucasjustinosousa/TitanNovaFit.git
 echo ========================================================
 echo.
 git push -u origin main

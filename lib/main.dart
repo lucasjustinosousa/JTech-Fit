@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'core/theme/jtech_theme.dart';
+import 'core/theme/titannova_theme.dart';
 import 'core/services/supabase_service.dart';
 import 'core/services/timer_audio_service.dart';
 import 'data/repositories/workout_repository.dart';

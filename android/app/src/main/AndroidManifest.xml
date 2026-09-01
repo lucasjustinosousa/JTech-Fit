@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.jtech.fit">
+    package="com.titannova.fit">
 
     <!-- Permissões Obrigatórias para Android -->
     <uses-permission android:name="android.permission.INTERNET"/>

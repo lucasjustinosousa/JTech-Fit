@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/jtech_theme.dart';
+import '../../core/theme/titannova_theme.dart';
 import '../../data/models/models.dart';
 import '../exercises/exercise_details_screen.dart';
 

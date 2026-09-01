@@ -48,9 +48,9 @@
 	<true/>
 	<!-- Permissões de Mídia e Notificações -->
 	<key>NSCameraUsageDescription</key>
-	<string>JTech Fit precisa de acesso à câmera para tirar foto de perfil ou exercício personalizado.</string>
+	<string>TitanNova Fit precisa de acesso à câmera para tirar foto de perfil ou exercício personalizado.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>JTech Fit precisa de acesso à galeria para selecionar mídias para exercícios personalizados.</string>
+	<string>TitanNova Fit precisa de acesso à galeria para selecionar mídias para exercícios personalizados.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

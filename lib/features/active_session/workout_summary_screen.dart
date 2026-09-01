@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../core/theme/jtech_theme.dart';
+import '../../core/theme/titannova_theme.dart';
 import '../../data/repositories/workout_repository.dart';
 import '../../data/models/models.dart';
 

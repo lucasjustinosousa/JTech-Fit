@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme/jtech_theme.dart';
+import '../../core/theme/titannova_theme.dart';
 import '../common/disclaimer_banner.dart';
 import '../../data/repositories/workout_repository.dart';
 import '../../core/services/supabase_service.dart';
@@ -127,7 +127,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 text: const TextSpan(
                   children: [
                     TextSpan(
-                      text: 'JTECH ',
+                      text: 'TITANNOVA ',
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.black,

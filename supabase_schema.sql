@@ -1,5 +1,5 @@
 -- ====================================================================
--- JTECH FIT - SCRIPT COMPLETO DE BANCO DE DADOS SUPABASE (POSTGRESQL)
+-- TITANNOVAFIT - SCRIPT COMPLETO DE BANCO DE DADOS SUPABASE (POSTGRESQL)
 -- Instruções: Copie todo este conteúdo e execute no SQL Editor do Supabase.
 -- ====================================================================
 

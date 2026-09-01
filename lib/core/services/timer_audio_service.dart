@@ -46,7 +46,7 @@ class TimerAudioService {
     if (_notificationsInitialized) {
       try {
         const androidDetails = AndroidNotificationDetails(
-          'jtech_rest_timer',
+          'titannova_rest_timer',
           'Cronômetro de Descanso',
           channelDescription: 'Notificações ao concluir o tempo de descanso entre séries',
           importance: Importance.max,

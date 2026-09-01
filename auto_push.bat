@@ -1,8 +1,8 @@
 @echo off
 chcp 65001 > nul
-title JTech Fit - Auto Commit ^& Deploy Vercel
+title TitanNovaFit - Auto Commit ^& Deploy Vercel
 echo ========================================================
-echo   JTech Fit - Sincronizacao Automatica Git ^& Vercel
+echo   TitanNovaFit - Sincronizacao Automatica Git ^& Vercel
 echo ========================================================
 echo.
 
