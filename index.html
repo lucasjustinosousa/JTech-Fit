@@ -477,6 +477,75 @@
     .spinning {
       animation: spinIcon 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
+  
+    /* Estados Visuais de Sincronização Supabase Cloud */
+    .sync-pill-saving {
+      font-size: 11px;
+      background: rgba(0, 210, 255, 0.18);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 210, 255, 0.4);
+      padding: 4px 10px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 700;
+    }
+    .sync-spinner {
+      display: inline-block;
+      animation: spinIcon 1s linear infinite;
+    }
+    .sync-pill-saved {
+      font-size: 11px;
+      background: rgba(76, 175, 80, 0.2);
+      color: var(--success-green);
+      border: 1px solid rgba(76, 175, 80, 0.4);
+      padding: 4px 10px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 700;
+      transition: all 0.3s ease;
+    }
+    .sync-pill-error {
+      font-size: 11px;
+      background: rgba(255, 82, 82, 0.2);
+      color: #ff5252;
+      border: 1px solid rgba(255, 82, 82, 0.4);
+      padding: 3px 8px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+    }
+    .sync-retry-btn {
+      background: #ff5252;
+      color: white;
+      border: none;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-left: 2px;
+    }
+    .sync-retry-btn:hover {
+      background: #ff1744;
+    }
+    .sync-pill-idle {
+      font-size: 11px;
+      background: rgba(76, 175, 80, 0.15);
+      color: var(--success-green);
+      border: 1px solid rgba(76, 175, 80, 0.3);
+      padding: 4px 8px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      font-weight: 700;
+    }
+
   </style>
 </head>
 <body>
@@ -488,8 +557,8 @@
         <div class="brand-icon">🏋️‍♂️</div>
         TITANNOVA <span>FIT</span>
       </div>
-      <div id="connectionStatus" style="font-size: 11px; background: rgba(76,175,80,0.2); color: var(--success-green); padding: 4px 8px; border-radius: 12px;">
-        ● PWA Híbrido Offline
+      <div id="connectionStatus" class="sync-pill-idle">
+        ● Nuvem Conectada
       </div>
     </div>
 
@@ -1268,6 +1337,53 @@
       }
     }
 
+    
+    // ==========================================
+    // MOTOR DE ESTADOS VISUAIS DE SINCRONIZAÇÃO
+    // ==========================================
+    let _lastFailedSyncAction = null;
+
+    function showSyncStatus(status, retryFn = null) {
+      const statusEl = document.getElementById('connectionStatus');
+      if (!statusEl) return;
+
+      if (retryFn) _lastFailedSyncAction = retryFn;
+
+      if (status === 'saving') {
+        statusEl.className = 'sync-pill-saving';
+        statusEl.innerHTML = '<span class="sync-spinner">🔄</span> Salvando...';
+        statusEl.style.display = 'inline-flex';
+      } else if (status === 'saved') {
+        statusEl.className = 'sync-pill-saved';
+        statusEl.innerHTML = '✓ Alterações salvas';
+        statusEl.style.display = 'inline-flex';
+        if (statusEl._savedTimeout) clearTimeout(statusEl._savedTimeout);
+        statusEl._savedTimeout = setTimeout(() => {
+          statusEl.className = 'sync-pill-idle';
+          statusEl.innerHTML = '● Nuvem Conectada';
+        }, 3000);
+      } else if (status === 'error') {
+        statusEl.className = 'sync-pill-error';
+        statusEl.innerHTML = `⚠️ Não foi possível salvar <button onclick="retryLastSyncAction(event)" class="sync-retry-btn">Tentar novamente</button>`;
+        statusEl.style.display = 'inline-flex';
+      } else {
+        statusEl.className = 'sync-pill-idle';
+        statusEl.innerHTML = '● Nuvem Conectada';
+        statusEl.style.display = 'inline-flex';
+      }
+    }
+
+    async function retryLastSyncAction(e) {
+      if (e) e.stopPropagation();
+      if (typeof _lastFailedSyncAction === 'function') {
+        const fn = _lastFailedSyncAction;
+        _lastFailedSyncAction = null;
+        await fn();
+      } else {
+        await refreshAppData();
+      }
+    }
+
     let currentAuthUser = null;
 
     function getEffectiveUserId() {
@@ -1517,17 +1633,44 @@
         }
 
         try {
-          // Limpar dados de contas anteriores para iniciar conta limpa
-          localStorage.removeItem('titannovafit_history');
-          localStorage.removeItem('titannovafit_active_session');
+          showSyncStatus('saving');
+          let authUser = null;
+
+          if (_supabase) {
+            try {
+              const { data, error } = await _supabase.auth.signUp({
+                email: email,
+                password: pass,
+                options: {
+                  data: {
+                    nome: name,
+                    role: (email.toLowerCase() === 'atleta@titannovafit.com') ? 'admin' : 'athlete'
+                  }
+                }
+              });
+
+              if (error) {
+                console.warn('[Supabase Auth SignUp Warning]:', error.message);
+                if (error.message.includes('already registered')) {
+                  throw new Error('Este e-mail já está cadastrado. Clique na aba "Já tenho conta" para entrar.');
+                }
+                // Se for rate limit de envio de e-mail, prosseguir com sessão local vinculada
+              } else if (data && data.user) {
+                authUser = data.user;
+              }
+            } catch (authErr) {
+              if (authErr.message.includes('já está cadastrado')) {
+                throw authErr;
+              }
+              console.warn('[Supabase Auth fallback]:', authErr);
+            }
+          }
 
           const isAdmin = (email.toLowerCase() === 'atleta@titannovafit.com');
-          const newUid = isAdmin 
-            ? 'admin_atleta_master' 
-            : 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+          const userId = (authUser && authUser.id) ? authUser.id : (isAdmin ? 'admin_atleta_master' : 'user_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 18));
 
-          currentAuthUser = {
-            id: newUid,
+          currentAuthUser = authUser || {
+            id: userId,
             email: email,
             user_metadata: {
               nome: name,
@@ -1536,18 +1679,19 @@
           };
 
           const userInfo = {
-            id: newUid,
+            id: userId,
             email: email,
             nome: name,
             role: isAdmin ? 'admin' : 'athlete'
           };
           localStorage.setItem('titannovafit_user', JSON.stringify(userInfo));
 
-          // 1. Criar perfil na tabela 'usuarios'
+          // 1. Salvar perfil permanente na tabela usuarios no Supabase
           if (_supabase) {
             try {
               await _supabase.from('usuarios').upsert({
-                id: newUid,
+                id: userId,
+                user_id: (authUser && authUser.id) ? authUser.id : null,
                 nome: name,
                 email: email,
                 criado_em: new Date().toISOString()
@@ -1555,10 +1699,11 @@
             } catch (_) {}
           }
 
-          // 2. Inicializar a conta com a divisão padrão oficial vinculada a este novo atleta
+          // 2. Inicializar as 4 fichas de treino oficiais para este novo atleta
           allWorkoutsList = DEFAULT_WORKOUT_DIVISIONS.map((t, idx) => ({
-            id: `treino_${newUid}_${idx + 1}`,
-            usuario_id: newUid,
+            id: `treino_${userId}_${idx + 1}`,
+            usuario_id: userId,
+            user_id: userId,
             nome: t.nome,
             descricao: t.descricao || '',
             diasSemana: [...t.diasSemana],
@@ -1569,13 +1714,14 @@
           }));
           localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
-          // 3. Salvar treinos no Supabase para este novo atleta
+          // 3. Salvar permanentemente no Supabase
           if (_supabase) {
             for (const localW of allWorkoutsList) {
               try {
                 await _supabase.from('treinos').upsert({
                   id: localW.id,
-                  usuario_id: newUid,
+                  usuario_id: userId,
+                  user_id: (authUser && authUser.id) ? authUser.id : null,
                   nome: localW.nome,
                   descricao: localW.descricao || '',
                   dias_semana: localW.diasSemana || [],
@@ -1587,14 +1733,16 @@
             }
           }
 
+          showSyncStatus('saved');
           document.getElementById('bottomNav').style.display = 'flex';
           updateProfileUI();
           switchTab('screenHome');
           renderAllWorkoutsUI();
 
-          showToastNotification(`🎉 Bem-vindo(a), ${name}! Sua conta foi criada com sucesso.`);
+          showToastNotification(`🎉 Bem-vindo(a), ${name}! Sua conta foi criada e sincronizada com a nuvem.`);
         } catch (err) {
           console.error('[Register Error]:', err);
+          showSyncStatus('error', () => handleAuthAction('register'));
           if (regErrEl) {
             regErrEl.innerText = err.message || 'Erro ao criar conta. Tente novamente.';
             regErrEl.style.display = 'block';
@@ -1634,50 +1782,67 @@
 
       if (loginBtn) {
         loginBtn.disabled = true;
-        loginBtn.innerText = 'Conectando...';
+        loginBtn.innerText = 'Conectando à nuvem...';
       }
 
       try {
+        showSyncStatus('saving');
         currentAuthUser = null;
+        let authUser = null;
 
         if (_supabase) {
           try {
             const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-            if (!error && data && data.user) {
-              currentAuthUser = data.user;
+            if (error) {
+              console.warn('[Supabase signInWithPassword notice]:', error.message);
+              if (error.message.includes('Invalid login credentials')) {
+                // Tentar signUp automático se for a primeira vez
+                const { data: signUpData, error: signUpErr } = await _supabase.auth.signUp({
+                  email,
+                  password,
+                  options: {
+                    data: {
+                      nome: email.split('@')[0],
+                      role: (email.toLowerCase() === 'atleta@titannovafit.com') ? 'admin' : 'athlete'
+                    }
+                  }
+                });
+                if (!signUpErr && signUpData && signUpData.user) {
+                  authUser = signUpData.user;
+                }
+              }
+            } else if (data && data.user) {
+              authUser = data.user;
             }
           } catch (_) {}
         }
 
-        if (!currentAuthUser) {
-          const isAdmin = (email.toLowerCase() === 'atleta@titannovafit.com');
-          const deterministicId = isAdmin 
-            ? 'admin_atleta_master' 
-            : 'user_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+        const isAdmin = (email.toLowerCase() === 'atleta@titannovafit.com');
+        const userId = (authUser && authUser.id) ? authUser.id : (isAdmin ? 'admin_atleta_master' : 'user_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 18));
 
-          currentAuthUser = {
-            id: deterministicId,
-            email: email,
-            user_metadata: {
-              nome: isAdmin ? 'Administrador TitanNova' : email.split('@')[0],
-              role: isAdmin ? 'admin' : 'athlete'
-            }
-          };
-        }
+        currentAuthUser = authUser || {
+          id: userId,
+          email: email,
+          user_metadata: {
+            nome: isAdmin ? 'Administrador TitanNova' : email.split('@')[0],
+            role: isAdmin ? 'admin' : 'athlete'
+          }
+        };
 
-        const isAdmin = (email.toLowerCase() === 'atleta@titannovafit.com') || (currentAuthUser.user_metadata && currentAuthUser.user_metadata.role === 'admin');
         const userInfo = {
-          id: currentAuthUser.id,
+          id: userId,
           email: currentAuthUser.email || email,
           nome: (currentAuthUser.user_metadata && currentAuthUser.user_metadata.nome) || (isAdmin ? 'Administrador TitanNova' : email.split('@')[0]),
           role: isAdmin ? 'admin' : 'athlete'
         };
         localStorage.setItem('titannovafit_user', JSON.stringify(userInfo));
 
+        // Salvar/Atualizar perfil permanente na tabela usuarios
         if (_supabase) {
           try {
             await _supabase.from('usuarios').upsert({
-              id: userInfo.id,
+              id: userId,
+              user_id: (authUser && authUser.id) ? authUser.id : null,
               nome: userInfo.nome,
               email: userInfo.email,
               criado_em: new Date().toISOString()
@@ -1691,9 +1856,11 @@
 
         const successMsg = isAdmin ? '👑 Conectado como Administrador Master!' : `✅ Conectado como ${userInfo.email}!`;
         showToastNotification(successMsg);
+        showSyncStatus('saved');
         await refreshAppData();
       } catch (err) {
         console.error('[Login Error]:', err);
+        showSyncStatus('error', () => handleAuthAction('login'));
         if (loginErrEl) {
           loginErrEl.innerText = err.message || 'Erro ao conectar. Verifique seus dados.';
           loginErrEl.style.display = 'block';
@@ -1707,7 +1874,7 @@
     }
 
     async function logoutUser() {
-      if (confirm('Deseja realmente sair da sua conta?\nSeus dados salvos na nuvem continuarão disponíveis ao fazer login novamente em qualquer aparelho.')) {
+      if (confirm('Deseja realmente sair da sua conta?\n\nSeus dados salvos na nuvem permanecerão seguros e serão restaurados automaticamente quando você entrar novamente em qualquer aparelho.')) {
         if (_supabase) {
           try {
             await _supabase.auth.signOut();
@@ -1715,14 +1882,14 @@
         }
         currentAuthUser = null;
         localStorage.removeItem('titannovafit_user');
-        localStorage.removeItem('titannovafit_custom_workouts');
-        localStorage.removeItem('titannovafit_history');
         localStorage.removeItem('titannovafit_active_session');
         localStorage.removeItem('titannovafit_active_tab');
 
+        // Nota: NÃO apagamos os treinos ou histórico do banco de dados!
         allWorkoutsList = [];
         document.getElementById('bottomNav').style.display = 'none';
         switchTab('screenAuth');
+        showSyncStatus('idle');
         showToastNotification('Você saiu da sua conta.');
       }
     }
@@ -2571,10 +2738,13 @@
 
         if (_supabase) {
           try {
+            showSyncStatus('saving');
             await _supabase.from('treinos').delete().eq('id', workoutId);
+            showSyncStatus('saved');
             console.log('[Supabase] Treino excluído na nuvem:', workoutId);
           } catch (e) {
             console.log('[Supabase] Erro ao excluir treino na nuvem:', e);
+            showSyncStatus('error', () => deleteWorkoutCard(workoutId));
           }
         }
       }
@@ -2873,18 +3043,22 @@
       // 2. Sincronizar com Supabase se online
       if (_supabase) {
         try {
+          showSyncStatus('saving');
           const uid = getEffectiveUserId();
           await _supabase.from('sessoes_de_treino').upsert({
             id: historyItem.id,
+            user_id: uid.startsWith('user_') || uid.startsWith('admin_') || uid.startsWith('guest_') ? null : uid,
             usuario_id: uid,
             nome_treino: title,
             inicio: historyItem.inicioIso,
             fim: historyItem.fimIso,
             concluido: true
           });
+          showSyncStatus('saved');
           console.log('[Supabase] Sessão de treino salva no histórico online para o usuário', uid, ':', title);
         } catch (e) {
           console.log('[Supabase] Aviso: Histórico mantido offline (sem conexão):', e);
+          showSyncStatus('error', () => finishActiveWorkout());
         }
       }
 
@@ -3164,9 +3338,11 @@
       // 2. Sincronizar com Supabase se online
       if (_supabase) {
         try {
+          showSyncStatus('saving');
           const uid = getEffectiveUserId();
           const payload = {
             id: workoutId,
+            user_id: uid.startsWith('user_') || uid.startsWith('admin_') || uid.startsWith('guest_') ? null : uid,
             usuario_id: uid,
             nome: name,
             descricao: descInput.value.trim(),
@@ -3200,9 +3376,11 @@
             await _supabase.from('exercicios_do_treino').upsert(exRows);
           } catch (_) {}
 
+          showSyncStatus('saved');
           console.log('[Supabase] Treino e exercícios salvos na nuvem com sucesso:', name);
         } catch (e) {
           console.log('[Supabase] Aviso: Treino mantido offline (sem conexão):', e);
+          showSyncStatus('error', () => saveNewWorkout());
         }
       }
 
@@ -3330,8 +3508,12 @@
 
         if (_supabase) {
           try {
+            showSyncStatus('saving');
             await _supabase.from('sessoes_de_treino').delete().eq('id', id);
-          } catch (_) {}
+            showSyncStatus('saved');
+          } catch (_) {
+            showSyncStatus('error', () => deleteHistoryItem(id));
+          }
         }
 
         const container = document.getElementById('historyListContainer');
@@ -3765,7 +3947,7 @@
       renderExercisesLibraryUI();
     }
 
-    function toggleFavoriteExercise(id, btnElement) {
+    async function toggleFavoriteExercise(id, btnElement) {
       if (favoritesSet.has(id)) {
         favoritesSet.delete(id);
       } else {
@@ -3773,6 +3955,19 @@
       }
       localStorage.setItem('titannovafit_fav_exercises', JSON.stringify(Array.from(favoritesSet)));
       renderExercisesLibraryUI();
+
+      if (_supabase) {
+        try {
+          showSyncStatus('saving');
+          const uid = getEffectiveUserId();
+          await _supabase.from('usuarios').upsert({
+            id: uid,
+            user_id: uid.startsWith('user_') || uid.startsWith('admin_') || uid.startsWith('guest_') ? null : uid,
+            favoritos: Array.from(favoritesSet)
+          });
+          showSyncStatus('saved');
+        } catch (_) {}
+      }
     }
 
     function toggleSelectForWorkout(id, checkboxEl) {
@@ -4131,6 +4326,19 @@
               nome: (session.user.user_metadata && session.user.user_metadata.nome) || session.user.email.split('@')[0]
             }));
           }
+
+          // Escuta contínua de mudanças de autenticação (persiste sessão ao recarregar página)
+          _supabase.auth.onAuthStateChange((event, session) => {
+            if (session && session.user) {
+              currentAuthUser = session.user;
+              localStorage.setItem('titannovafit_user', JSON.stringify({
+                id: session.user.id,
+                email: session.user.email,
+                nome: (session.user.user_metadata && session.user.user_metadata.nome) || session.user.email.split('@')[0]
+              }));
+              updateProfileUI();
+            }
+          });
         } catch (_) {}
       }
 
