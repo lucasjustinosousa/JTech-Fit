@@ -13,6 +13,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="TitanNova Fit">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png">
 
   <!-- Tipografia Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -553,8 +554,8 @@
   <div class="app-frame">
     <!-- Header -->
     <div class="header">
-      <div class="brand-logo">
-        <div class="brand-icon">🏋️‍♂️</div>
+      <div class="brand-logo" style="display: flex; align-items: center; gap: 8px;">
+        <img src="assets/icons/logo.png" alt="TitanNova Fit" style="width: 28px; height: 28px; border-radius: 7px; object-fit: cover; box-shadow: 0 2px 8px rgba(0,210,255,0.35);">
         TITANNOVA <span>FIT</span>
       </div>
       <div id="connectionStatus" class="sync-pill-idle">
@@ -597,8 +598,8 @@
       <!-- TELA DE ABERTURA / AUTH COM ABAS ENTRAR / CRIAR CONTA -->
       <div id="screenAuth" class="screen">
         <div style="text-align: center; padding: 20px 10px 14px;">
-          <div style="width: 76px; height: 76px; background: var(--primary-blue); border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 38px; box-shadow: 0 8px 24px rgba(30,136,229,0.35);">
-            🏋️‍♂️
+          <div style="width: 96px; height: 96px; margin: 0 auto 14px; border-radius: 22px; overflow: hidden; background: #0c0e14; border: 2px solid var(--accent-cyan); box-shadow: 0 0 30px rgba(0,210,255,0.45); display: flex; align-items: center; justify-content: center;">
+            <img src="assets/icons/logo.png" alt="TitanNova Fit Logo" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <h2 style="font-size: 26px; font-weight: 900; letter-spacing: -0.5px;">TITANNOVA <span style="color: var(--accent-cyan);">FIT</span></h2>
           <p style="color: var(--text-grey); font-size: 13px; margin-top: 2px;">Seu Treino sob Controle Absoluto (Cloud Sync)</p>
@@ -953,7 +954,9 @@
       <!-- TELA PERFIL -->
       <div id="screenProfile" class="screen">
         <div style="text-align: center; margin-bottom: 20px;">
-          <div style="width: 70px; height: 70px; background: var(--primary-blue); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 4px 16px rgba(30,136,229,0.35);">👤</div>
+          <div style="width: 76px; height: 76px; border-radius: 50%; margin: 0 auto 10px; border: 2px solid var(--accent-cyan); overflow: hidden; box-shadow: 0 4px 18px rgba(0,210,255,0.35); display: flex; align-items: center; justify-content: center; background: #0c0e14;">
+            <img src="assets/icons/logo.png" alt="Perfil" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
           <h3 id="profileUserName" style="font-size: 18px; font-weight: 800;">Atleta TitanNova</h3>
           <p id="profileUserEmail" style="font-size: 12px; color: var(--text-grey);">atleta@titannovafit.com</p>
           <span id="profileUserBadge" style="display: inline-block; font-size: 10px; font-weight: 800; background: rgba(0,210,255,0.15); color: var(--accent-cyan); padding: 2px 8px; border-radius: 10px; margin-top: 4px;">Conta Vinculada</span>
