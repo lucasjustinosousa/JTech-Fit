@@ -155,7 +155,7 @@ class LocalDatabase {
         equipamento: 'Halteres e Banco Inclinado',
         instrucoes: 'Ajuste o banco em ângulo de 30º a 45º. Posicione os halteres acima do peito e desça flexionando os cotovelos até a linha dos ombros.',
         cuidados: 'Não incline demais o banco para não sobrecarregar os ombros.',
-        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-incline-bench-press.gif',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/dumbbell-incline-bench-press.gif',
       ),
       Exercicio(
         id: 'base_peito_3',
@@ -289,7 +289,7 @@ class LocalDatabase {
         equipamento: 'Barra / Halteres',
         instrucoes: 'Incline o quadril para trás descendo o peso rente às pernas até sentir os posteriores.',
         cuidados: 'Mantenha a coluna reta e os joelhos destravados.',
-        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/glutes/band-stiff-leg-deadlift.gif',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/glutes/barbell-stiff-leg-deadlift.gif',
       ),
       Exercicio(
         id: 'base_pernas_6',
@@ -301,6 +301,16 @@ class LocalDatabase {
         cuidados: 'Mantenha o movimento amplo e controlado.',
         gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/calves/barbell-standing-calf-raise.gif',
       ),
+      Exercicio(
+        id: 'base_pernas_7',
+        nome: 'Panturrilha Sentado',
+        grupoMuscular: 'Pernas',
+        musculosAuxiliares: 'Sóleo, Gastrocnêmio',
+        equipamento: 'Máquina Gêmeos Sentado',
+        instrucoes: 'Ajuste a almofada sobre as coxas e eleve os calcanhares contraindo a panturrilha.',
+        cuidados: 'Faça o movimento completo sem rebater.',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/calves/lever-seated-calf-raise.gif',
+      ),
 
       // Ombros
       Exercicio(
@@ -311,7 +321,7 @@ class LocalDatabase {
         equipamento: 'Halteres e Banco',
         instrucoes: 'Sentado com as costas apoiadas, eleve os halteres acima da cabeça até estender os braços.',
         cuidados: 'Não arqueie as costas nem empurre a cabeça à frente.',
-        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/delts/barbell-seated-overhead-press.gif',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/delts/dumbbell-shoulder-press.gif',
       ),
       Exercicio(
         id: 'base_ombros_2',
@@ -341,7 +351,17 @@ class LocalDatabase {
         equipamento: 'Halteres ou Peck Deck',
         instrucoes: 'Incline o tronco e abra os braços para trás com foco na parte posterior dos ombros.',
         cuidados: 'Não use impulso excessivo.',
-        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/delts/barbell-rear-delt-row.gif',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/delts/dumbbell-rear-lateral-raise.gif',
+      ),
+      Exercicio(
+        id: 'base_ombros_5',
+        nome: 'Encolhimento com Halteres',
+        grupoMuscular: 'Ombros',
+        musculosAuxiliares: 'Trapézio Superior, Antebraço',
+        equipamento: 'Halteres',
+        instrucoes: 'Em pé segurando os halteres ao lado do corpo, eleve os ombros em direção às orelhas.',
+        cuidados: 'Evite girar os ombros durante o encolhimento.',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/upper-back/dumbbell-shrug.gif',
       ),
 
       // Bíceps
@@ -363,7 +383,7 @@ class LocalDatabase {
         equipamento: 'Halteres',
         instrucoes: 'Com pegada neutra (palmas para dentro), eleve os halteres sem girar os punhos.',
         cuidados: 'Controle a velocidade na descida.',
-        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/cable-hammer-curl-with-rope.gif',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/dumbbell-hammer-curl.gif',
       ),
       Exercicio(
         id: 'base_biceps_3',
@@ -383,7 +403,7 @@ class LocalDatabase {
         equipamento: 'Banco Scott e Polia',
         instrucoes: 'Apoie os braços no banco Scott e flexione os cotovelos isolando os bíceps.',
         cuidados: 'Não estenda os braços bruscamente na descida.',
-        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/barbell-lying-preacher-curl.gif',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/barbell-preacher-curl.gif',
       ),
 
       // Tríceps
@@ -395,7 +415,7 @@ class LocalDatabase {
         equipamento: 'Polia Alta e Corda',
         instrucoes: 'Empurre a corda para baixo abrindo as pontas no final do movimento para contração máxima.',
         cuidados: 'Mantenha os cotovelos colados ao corpo.',
-        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/cable-one-arm-tricep-pushdown.gif',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/cable-rope-pushdown.gif',
       ),
       Exercicio(
         id: 'base_triceps_2',
@@ -405,7 +425,7 @@ class LocalDatabase {
         equipamento: 'Barra W e Banco Reto',
         instrucoes: 'Deitado no banco, flexione os cotovelos descendo a barra até a testa e empurre para cima.',
         cuidados: 'Não abra os cotovelos para fora.',
-        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/barbell-reverse-grip-skullcrusher.gif',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/barbell-lying-triceps-extension.gif',
       ),
       Exercicio(
         id: 'base_triceps_3',
@@ -415,7 +435,7 @@ class LocalDatabase {
         equipamento: 'Halteres e Banco',
         instrucoes: 'Com o cotovelo alto, estenda o antebraço para trás contraindo o tríceps.',
         cuidados: 'Mantenha o braço paralelo ao tronco.',
-        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/cable-kickback.gif',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/dumbbell-kickback.gif',
       ),
       Exercicio(
         id: 'base_triceps_4',
@@ -437,7 +457,7 @@ class LocalDatabase {
         equipamento: 'Colchonete',
         instrucoes: 'Deitado de costas, eleve as pernas retas até a vertical e desça devagar sem tocar o chão.',
         cuidados: 'Mantenha a lombar apoiada no chão.',
-        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/abs/hanging-leg-raise.gif',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/abs/lying-leg-raise.gif',
       ),
       Exercicio(
         id: 'base_abdom_2',
@@ -447,7 +467,7 @@ class LocalDatabase {
         equipamento: 'Colchonete',
         instrucoes: 'Apoie os antebraços e pontas dos pés mantendo o corpo em linha reta e abdômen contraído.',
         cuidados: 'Não deixe o quadril descer ou subir demais.',
-        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/abs/bodyweight-incline-side-plank.gif',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/abs/bodyweight-plank.gif',
       ),
       Exercicio(
         id: 'base_abdom_3',
@@ -457,7 +477,7 @@ class LocalDatabase {
         equipamento: 'Colchonete / Polia',
         instrucoes: 'Flexione o tronco aproximando as costelas do quadril, solte o ar no topo e retorne.',
         cuidados: 'Não puxe o pescoço com as mãos.',
-        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/abs/band-standing-crunch.gif',
+        gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/abs/crunch.gif',
       ),
     ];
 
