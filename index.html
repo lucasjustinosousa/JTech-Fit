@@ -614,20 +614,50 @@
           </button>
         </div>
 
+        <!-- PAINEL DE CONFIRMAÇÃO DE E-MAIL PENDENTE -->
+        <div id="authEmailConfirmationContainer" style="display: none; background: #161a24; border: 1px solid rgba(0,210,255,0.3); border-radius: 12px; padding: 20px 16px; text-align: center; margin-bottom: 16px; animation: fadeIn 0.3s ease-in-out;">
+          <div style="font-size: 42px; margin-bottom: 8px;">✉️</div>
+          <h3 style="font-size: 18px; font-weight: 800; color: white; margin-bottom: 6px;">Enviamos uma confirmação para seu e-mail</h3>
+          <p style="font-size: 12px; color: var(--text-grey); margin-bottom: 12px;">
+            Confirme seu endereço para liberar todas as funcionalidades e a sincronização em nuvem:<br>
+            <strong id="authPendingEmailDisplay" style="color: var(--accent-cyan); font-size: 13px; word-break: break-all;">seuemail@exemplo.com</strong>
+          </p>
+          <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px; background: rgba(255,255,255,0.04); padding: 8px; border-radius: 8px;">
+            💡 Verifique também sua caixa de <strong>Spam / Lixo Eletrônico</strong> caso não encontre na caixa de entrada.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button id="authCheckConfirmedBtn" onclick="checkEmailConfirmed()" class="btn btn-success" style="font-weight: 800;">
+              ✅ Já confirmei meu e-mail
+            </button>
+            <button id="authResendEmailBtn" onclick="resendConfirmationEmail()" class="btn btn-outline" style="border-color: var(--accent-cyan); color: var(--accent-cyan); font-size: 12px; font-weight: 700;">
+              🔁 Reenviar confirmação
+            </button>
+            <button onclick="changePendingEmail()" class="btn btn-text" style="color: var(--text-grey); font-size: 11px;">
+              ✏️ Alterar e-mail
+            </button>
+          </div>
+        </div>
+
         <!-- FORMULÁRIO DE LOGIN -->
         <div id="authLoginFormContainer">
           <div class="form-group">
             <label class="form-label">E-mail</label>
             <input type="email" id="authEmailInput" class="form-input" placeholder="seuemail@exemplo.com" value="atleta@titannovafit.com">
           </div>
-          <div class="form-group">
+          <div class="form-group" style="margin-bottom: 6px;">
             <label class="form-label">Senha</label>
             <input type="password" id="authPasswordInput" class="form-input" value="123456" placeholder="Sua senha de acesso">
           </div>
 
+          <div style="display: flex; justify-content: flex-end; margin-bottom: 14px;">
+            <button type="button" onclick="openForgotPasswordModal()" class="btn-text" style="font-size: 11px; color: var(--accent-cyan); padding: 0; text-decoration: underline; cursor: pointer;">
+              Esqueci minha senha
+            </button>
+          </div>
+
           <div id="authLoginErrorMessage" style="color: #ff5252; background: rgba(255,82,82,0.15); border: 1px solid rgba(255,82,82,0.3); border-radius: 8px; padding: 10px; font-size: 12px; margin-bottom: 12px; display: none; text-align: center; font-weight: 600;"></div>
 
-          <button id="authLoginBtn" onclick="handleAuthAction('login')" class="btn btn-primary" style="margin-top: 4px; font-weight: 800;">ENTRAR</button>
+          <button id="authLoginBtn" onclick="handleAuthAction('login')" class="btn btn-primary" style="font-weight: 800;">ENTRAR</button>
           <button onclick="switchAuthMode('register')" class="btn btn-outline" style="margin-top: 10px;">Não tem uma conta? Cadastre-se</button>
         </div>
 
@@ -638,11 +668,11 @@
             <input type="text" id="authRegisterNameInput" class="form-input" placeholder="Ex: Lucas Justino">
           </div>
           <div class="form-group">
-            <label class="form-label">Seu E-mail</label>
-            <input type="email" id="authRegisterEmailInput" class="form-input" placeholder="seuemail@gmail.com">
+            <label class="form-label">Seu E-mail (Identificação de Acesso)</label>
+            <input type="email" id="authRegisterEmailInput" class="form-input" placeholder="seuemail@exemplo.com">
           </div>
           <div class="form-group">
-            <label class="form-label">Criar Senha (mín. 6 dígitos)</label>
+            <label class="form-label">Senha (mín. 6 dígitos)</label>
             <input type="password" id="authRegisterPasswordInput" class="form-input" placeholder="Sua senha segura">
           </div>
           <div class="form-group">
@@ -650,9 +680,17 @@
             <input type="password" id="authRegisterConfirmPasswordInput" class="form-input" placeholder="Repita a senha">
           </div>
 
+          <!-- CHECKBOX DE ACEITE DOS TERMOS E POLÍTICA -->
+          <div style="display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 16px 0;">
+            <input type="checkbox" id="authTermsCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
+            <label for="authTermsCheck" style="font-size: 11px; color: var(--text-grey); cursor: pointer; line-height: 1.4;">
+              Li e aceito os <a href="javascript:void(0)" onclick="openTermsModal()" style="color: var(--accent-cyan); text-decoration: underline;">Termos de Uso</a> e a <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: var(--accent-cyan); text-decoration: underline;">Política de Privacidade</a> do TitanNovaFit.
+            </label>
+          </div>
+
           <div id="authRegisterErrorMessage" style="color: #ff5252; background: rgba(255,82,82,0.15); border: 1px solid rgba(255,82,82,0.3); border-radius: 8px; padding: 10px; font-size: 12px; margin-bottom: 12px; display: none; text-align: center; font-weight: 600;"></div>
 
-          <button id="authRegisterBtn" onclick="handleAuthAction('register')" class="btn btn-success" style="margin-top: 4px; font-weight: 800; background: linear-gradient(135deg, #00d2ff 0%, #1E88E5 100%);">CRIAR MINHA CONTA</button>
+          <button id="authRegisterBtn" onclick="handleAuthAction('register')" class="btn btn-success" style="font-weight: 800; background: linear-gradient(135deg, #00d2ff 0%, #1E88E5 100%);">CRIAR MINHA CONTA</button>
           <button onclick="switchAuthMode('login')" class="btn btn-outline" style="margin-top: 10px;">Já possui conta? Fazer Login</button>
         </div>
 
@@ -925,6 +963,74 @@
       <div class="nav-item" onclick="switchTab('screenProfile', this)">
         <div class="nav-icon">👤</div>
         Perfil
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- MODAL DE RECUPERAÇÃO DE SENHA -->
+  <div id="forgotPasswordModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="max-width: 380px;">
+      <div class="modal-header">
+        <h3 style="font-size: 16px; font-weight: 800; color: white; display: flex; align-items: center; gap: 8px;">
+          <span>🔑</span> Recuperar Senha
+        </h3>
+        <button onclick="closeForgotPasswordModal()" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 16px;">
+        <p style="font-size: 12px; color: var(--text-grey); margin-bottom: 14px; line-height: 1.4;">
+          Informe o e-mail cadastrado. O Supabase enviará um link seguro para você redefinir sua senha mantendo todas as suas fichas de treino e históricos salvos intactos.
+        </p>
+        <div class="form-group">
+          <label class="form-label">E-mail Cadastrado</label>
+          <input type="email" id="forgotPasswordEmailInput" class="form-input" placeholder="seuemail@exemplo.com">
+        </div>
+        <div id="forgotPasswordErrorMessage" style="color: #ff5252; background: rgba(255,82,82,0.15); border: 1px solid rgba(255,82,82,0.3); border-radius: 8px; padding: 8px; font-size: 11px; margin-bottom: 12px; display: none; text-align: center; font-weight: 600;"></div>
+        <button id="forgotPasswordSendBtn" onclick="sendPasswordResetEmail()" class="btn btn-primary" style="width: 100%; font-weight: 800;">
+          ENVIAR LINK DE RECUPERAÇÃO
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE TERMOS DE USO -->
+  <div id="termsModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="max-width: 440px; max-height: 80vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h3 style="font-size: 16px; font-weight: 800; color: white;">📜 Termos de Uso</h3>
+        <button onclick="closeTermsModal()" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 16px; overflow-y: auto; font-size: 12px; color: var(--text-grey); line-height: 1.5;">
+        <h4 style="color: white; margin-bottom: 4px;">1. Aceite dos Termos</h4>
+        <p style="margin-bottom: 12px;">Ao criar uma conta no TitanNovaFit, você concorda com o uso da plataforma para gerenciamento pessoal e acompanhamento de seus treinos físicos.</p>
+        <h4 style="color: white; margin-bottom: 4px;">2. Armazenamento e Sincronização</h4>
+        <p style="margin-bottom: 12px;">Seus dados de treinos, repetições, cargas e históricos são vinculados com segurança ao seu identificador único de usuário (user.id) no banco de dados Supabase com criptografia e isolamento por políticas RLS.</p>
+        <h4 style="color: white; margin-bottom: 4px;">3. Responsabilidade Física</h4>
+        <p>A execução dos exercícios físicos deve respeitar seus limites e, sempre que possível, contar com a orientação de um profissional de Educação Física habilitado.</p>
+      </div>
+      <div style="padding: 12px 16px; border-top: 1px solid var(--divider); text-align: right;">
+        <button onclick="closeTermsModal()" class="btn btn-primary" style="width: auto; padding: 6px 16px; font-size: 12px;">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE POLÍTICA DE PRIVACIDADE -->
+  <div id="privacyModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="max-width: 440px; max-height: 80vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h3 style="font-size: 16px; font-weight: 800; color: white;">🔒 Política de Privacidade</h3>
+        <button onclick="closePrivacyModal()" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 16px; overflow-y: auto; font-size: 12px; color: var(--text-grey); line-height: 1.5;">
+        <h4 style="color: white; margin-bottom: 4px;">1. Coleta de Dados</h4>
+        <p style="margin-bottom: 12px;">Coletamos estritamente seu nome, e-mail para autenticação e os registros de treinos que você cria na plataforma.</p>
+        <h4 style="color: white; margin-bottom: 4px;">2. Segurança & RLS</h4>
+        <p style="margin-bottom: 12px;">Não vendemos nem compartilhamos seus dados com terceiros. Suas informações são protegidas por Row Level Security (RLS), garantindo que apenas seu user.id autenticado tenha acesso às suas fichas.</p>
+        <h4 style="color: white; margin-bottom: 4px;">3. Senhas</h4>
+        <p>Suas senhas são criptografadas e administradas exclusivamente pelo Supabase Auth. Nenhuma senha em texto claro é armazenada no aplicativo.</p>
+      </div>
+      <div style="padding: 12px 16px; border-top: 1px solid var(--divider); text-align: right;">
+        <button onclick="closePrivacyModal()" class="btn btn-primary" style="width: auto; padding: 6px 16px; font-size: 12px;">Fechar</button>
       </div>
     </div>
   </div>
@@ -1558,6 +1664,200 @@
       }
     }
 
+    // ==========================================
+    // CONTROLE DE MODAIS DE TERMOS, PRIVACIDADE E RECUPERAÇÃO DE SENHA
+    // ==========================================
+    function openForgotPasswordModal() {
+      const emailInput = document.getElementById('authEmailInput');
+      const forgotInput = document.getElementById('forgotPasswordEmailInput');
+      if (emailInput && forgotInput && emailInput.value) {
+        forgotInput.value = emailInput.value.trim();
+      }
+      const err = document.getElementById('forgotPasswordErrorMessage');
+      if (err) err.style.display = 'none';
+      const modal = document.getElementById('forgotPasswordModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeForgotPasswordModal() {
+      const modal = document.getElementById('forgotPasswordModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function sendPasswordResetEmail() {
+      const emailInput = document.getElementById('forgotPasswordEmailInput');
+      const errEl = document.getElementById('forgotPasswordErrorMessage');
+      const btn = document.getElementById('forgotPasswordSendBtn');
+      const email = (emailInput ? emailInput.value : '').trim();
+
+      if (!email || !email.includes('@')) {
+        if (errEl) {
+          errEl.innerText = 'Por favor, informe um endereço de e-mail válido.';
+          errEl.style.display = 'block';
+        }
+        return;
+      }
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Enviando...';
+      }
+      if (errEl) errEl.style.display = 'none';
+
+      try {
+        if (_supabase) {
+          const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: 'https://titannovafit.com.br/auth/callback'
+          });
+          if (error) throw error;
+        }
+        closeForgotPasswordModal();
+        alert(`📧 Enviamos um link de recuperação para o e-mail: ${email}\n\nVerifique sua caixa de entrada e spam para redefinir sua senha.`);
+        showToastNotification('📧 Link de recuperação enviado com sucesso!');
+      } catch (err) {
+        console.error('[Reset Password Error]:', err);
+        if (errEl) {
+          errEl.innerText = err.message || 'Erro ao enviar e-mail de recuperação. Tente novamente.';
+          errEl.style.display = 'block';
+        }
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'ENVIAR LINK DE RECUPERAÇÃO';
+        }
+      }
+    }
+
+    function openTermsModal() {
+      const modal = document.getElementById('termsModal');
+      if (modal) modal.style.display = 'flex';
+    }
+    function closeTermsModal() {
+      const modal = document.getElementById('termsModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function openPrivacyModal() {
+      const modal = document.getElementById('privacyModal');
+      if (modal) modal.style.display = 'flex';
+    }
+    function closePrivacyModal() {
+      const modal = document.getElementById('privacyModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    // ==========================================
+    // CONTROLE DE CONFIRMAÇÃO DE E-MAIL PENDENTE
+    // ==========================================
+    let _pendingRegistrationEmail = '';
+    let _pendingRegistrationPassword = '';
+
+    function showEmailConfirmationPending(email, password = '') {
+      _pendingRegistrationEmail = email;
+      _pendingRegistrationPassword = password;
+      localStorage.setItem('titannovafit_pending_email', email);
+
+      const displayEl = document.getElementById('authPendingEmailDisplay');
+      if (displayEl) displayEl.innerText = email;
+
+      const confirmContainer = document.getElementById('authEmailConfirmationContainer');
+      const loginContainer = document.getElementById('authLoginFormContainer');
+      const regContainer = document.getElementById('authRegisterFormContainer');
+
+      if (confirmContainer) confirmContainer.style.display = 'block';
+      if (loginContainer) loginContainer.style.display = 'none';
+      if (regContainer) regContainer.style.display = 'none';
+    }
+
+    function changePendingEmail() {
+      const confirmContainer = document.getElementById('authEmailConfirmationContainer');
+      const regContainer = document.getElementById('authRegisterFormContainer');
+      if (confirmContainer) confirmContainer.style.display = 'none';
+      if (regContainer) regContainer.style.display = 'block';
+
+      const emailInput = document.getElementById('authRegisterEmailInput');
+      if (emailInput && _pendingRegistrationEmail) {
+        emailInput.value = _pendingRegistrationEmail;
+        emailInput.focus();
+      }
+    }
+
+    async function resendConfirmationEmail() {
+      const email = _pendingRegistrationEmail || localStorage.getItem('titannovafit_pending_email');
+      if (!email) {
+        alert('Nenhum e-mail pendente encontrado.');
+        return;
+      }
+      const btn = document.getElementById('authResendEmailBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Reenviando...';
+      }
+      try {
+        if (_supabase) {
+          const { error } = await _supabase.auth.resend({
+            type: 'signup',
+            email: email,
+            options: {
+              emailRedirectTo: 'https://titannovafit.com.br/auth/callback'
+            }
+          });
+          if (error) throw error;
+        }
+        showToastNotification('📧 Confirmação reenviada! Verifique seu e-mail.');
+      } catch (err) {
+        console.error('[Resend Confirmation Error]:', err);
+        alert('Erro ao reenviar confirmação: ' + (err.message || 'Tente novamente mais tarde.'));
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = '🔁 Reenviar confirmação';
+        }
+      }
+    }
+
+    async function checkEmailConfirmed() {
+      const email = _pendingRegistrationEmail || localStorage.getItem('titannovafit_pending_email');
+      const password = _pendingRegistrationPassword;
+      const btn = document.getElementById('authCheckConfirmedBtn');
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Verificando...';
+      }
+
+      try {
+        if (_supabase && email && password) {
+          const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+          if (!error && data && data.user) {
+            currentAuthUser = data.user;
+            const confirmContainer = document.getElementById('authEmailConfirmationContainer');
+            if (confirmContainer) confirmContainer.style.display = 'none';
+            localStorage.removeItem('titannovafit_pending_email');
+
+            document.getElementById('bottomNav').style.display = 'flex';
+            updateProfileUI();
+            switchTab('screenHome');
+            showToastNotification('🎉 E-mail confirmado com sucesso! Bem-vindo(a) ao TitanNovaFit.');
+            await refreshAppData();
+            return;
+          }
+        }
+        alert('Seu e-mail ainda não foi confirmado ou o link expirou.\n\nPor favor, abra a mensagem enviada para seu e-mail e clique no link de ativação.');
+      } catch (err) {
+        console.error('[Check Confirmed Error]:', err);
+        alert('Não foi possível verificar. Certifique-se de clicar no link enviado para seu e-mail.');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = '✅ Já confirmei meu e-mail';
+        }
+      }
+    }
+
+    // ==========================================
+    // AUTENTICAÇÃO SUPABASE COM VINCULAÇÃO A EMAIL E USER.ID
+    // ==========================================
     async function handleAuthAction(mode) {
       const loginErrEl = document.getElementById('authLoginErrorMessage');
       const regErrEl = document.getElementById('authRegisterErrorMessage');
@@ -1588,6 +1888,7 @@
         const emailInput = document.getElementById('authRegisterEmailInput');
         const passInput = document.getElementById('authRegisterPasswordInput');
         const confirmInput = document.getElementById('authRegisterConfirmPasswordInput');
+        const termsCheck = document.getElementById('authTermsCheck');
         const registerBtn = document.getElementById('authRegisterBtn');
 
         const name = (nameInput ? nameInput.value : '').trim();
@@ -1627,6 +1928,14 @@
           return;
         }
 
+        if (termsCheck && !termsCheck.checked) {
+          if (regErrEl) {
+            regErrEl.innerText = 'É necessário aceitar os Termos de Uso e a Política de Privacidade para cadastrar.';
+            regErrEl.style.display = 'block';
+          }
+          return;
+        }
+
         if (registerBtn) {
           registerBtn.disabled = true;
           registerBtn.innerText = 'Criando sua conta...';
@@ -1635,6 +1944,7 @@
         try {
           showSyncStatus('saving');
           let authUser = null;
+          let emailConfirmationRequired = false;
 
           if (_supabase) {
             try {
@@ -1645,18 +1955,21 @@
                   data: {
                     nome: name,
                     role: (email.toLowerCase() === 'atleta@titannovafit.com') ? 'admin' : 'athlete'
-                  }
+                  },
+                  emailRedirectTo: 'https://titannovafit.com.br/auth/callback'
                 }
               });
 
               if (error) {
                 console.warn('[Supabase Auth SignUp Warning]:', error.message);
                 if (error.message.includes('already registered')) {
-                  throw new Error('Este e-mail já está cadastrado. Clique na aba "Já tenho conta" para entrar.');
+                  throw new Error('Este e-mail já está cadastrado. Clique na aba "Entrar" para acessar sua conta.');
                 }
-                // Se for rate limit de envio de e-mail, prosseguir com sessão local vinculada
               } else if (data && data.user) {
                 authUser = data.user;
+                if (!data.session) {
+                  emailConfirmationRequired = true;
+                }
               }
             } catch (authErr) {
               if (authErr.message.includes('já está cadastrado')) {
@@ -1686,9 +1999,18 @@
           };
           localStorage.setItem('titannovafit_user', JSON.stringify(userInfo));
 
-          // 1. Salvar perfil permanente na tabela usuarios no Supabase
+          // 1. Criar perfil permanente na tabela profiles e usuarios no Supabase
           if (_supabase) {
             try {
+              if (authUser && authUser.id) {
+                await _supabase.from('profiles').upsert({
+                  id: authUser.id,
+                  nome: name,
+                  email: email,
+                  criado_em: new Date().toISOString(),
+                  atualizado_em: new Date().toISOString()
+                });
+              }
               await _supabase.from('usuarios').upsert({
                 id: userId,
                 user_id: (authUser && authUser.id) ? authUser.id : null,
@@ -1699,7 +2021,7 @@
             } catch (_) {}
           }
 
-          // 2. Inicializar as 4 fichas de treino oficiais para este novo atleta
+          // 2. Inicializar as 4 fichas de treino oficiais para este novo atleta vinculadas ao user_id
           allWorkoutsList = DEFAULT_WORKOUT_DIVISIONS.map((t, idx) => ({
             id: `treino_${userId}_${idx + 1}`,
             usuario_id: userId,
@@ -1714,7 +2036,7 @@
           }));
           localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
-          // 3. Salvar permanentemente no Supabase
+          // 3. Salvar treinos no Supabase
           if (_supabase) {
             for (const localW of allWorkoutsList) {
               try {
@@ -1734,12 +2056,19 @@
           }
 
           showSyncStatus('saved');
+
+          // Se a confirmação de e-mail estiver ativada no Supabase, exibir o painel de confirmação
+          if (emailConfirmationRequired) {
+            showEmailConfirmationPending(email, pass);
+            return;
+          }
+
           document.getElementById('bottomNav').style.display = 'flex';
           updateProfileUI();
           switchTab('screenHome');
           renderAllWorkoutsUI();
 
-          showToastNotification(`🎉 Bem-vindo(a), ${name}! Sua conta foi criada e sincronizada com a nuvem.`);
+          showToastNotification(`🎉 Bem-vindo(a), ${name}! Sua conta foi criada e vinculada com sucesso.`);
         } catch (err) {
           console.error('[Register Error]:', err);
           showSyncStatus('error', () => handleAuthAction('register'));
@@ -1782,7 +2111,7 @@
 
       if (loginBtn) {
         loginBtn.disabled = true;
-        loginBtn.innerText = 'Conectando à nuvem...';
+        loginBtn.innerText = 'Conectando...';
       }
 
       try {
@@ -1795,26 +2124,21 @@
             const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
             if (error) {
               console.warn('[Supabase signInWithPassword notice]:', error.message);
+              if (error.message.includes('Email not confirmed')) {
+                showEmailConfirmationPending(email, password);
+                return;
+              }
               if (error.message.includes('Invalid login credentials')) {
-                // Tentar signUp automático se for a primeira vez
-                const { data: signUpData, error: signUpErr } = await _supabase.auth.signUp({
-                  email,
-                  password,
-                  options: {
-                    data: {
-                      nome: email.split('@')[0],
-                      role: (email.toLowerCase() === 'atleta@titannovafit.com') ? 'admin' : 'athlete'
-                    }
-                  }
-                });
-                if (!signUpErr && signUpData && signUpData.user) {
-                  authUser = signUpData.user;
-                }
+                throw new Error('E-mail ou senha incorretos. Verifique suas credenciais.');
               }
             } else if (data && data.user) {
               authUser = data.user;
             }
-          } catch (_) {}
+          } catch (loginErr) {
+            if (loginErr.message.includes('incorretos')) {
+              throw loginErr;
+            }
+          }
         }
 
         const isAdmin = (email.toLowerCase() === 'atleta@titannovafit.com');
@@ -1837,16 +2161,25 @@
         };
         localStorage.setItem('titannovafit_user', JSON.stringify(userInfo));
 
-        // Salvar/Atualizar perfil permanente na tabela usuarios
-        if (_supabase) {
+        // Carregar e sincronizar perfil da tabela profiles
+        if (_supabase && authUser && authUser.id) {
           try {
-            await _supabase.from('usuarios').upsert({
-              id: userId,
-              user_id: (authUser && authUser.id) ? authUser.id : null,
-              nome: userInfo.nome,
-              email: userInfo.email,
-              criado_em: new Date().toISOString()
-            });
+            const { data: profData } = await _supabase.from('profiles').select('*').eq('id', authUser.id).single();
+            if (profData) {
+              if (profData.nome) userInfo.nome = profData.nome;
+              if (Array.isArray(profData.favoritos)) {
+                favoritesSet = new Set(profData.favoritos);
+                localStorage.setItem('titannovafit_fav_exercises', JSON.stringify(profData.favoritos));
+              }
+            } else {
+              await _supabase.from('profiles').upsert({
+                id: authUser.id,
+                nome: userInfo.nome,
+                email: userInfo.email,
+                criado_em: new Date().toISOString(),
+                atualizado_em: new Date().toISOString()
+              });
+            }
           } catch (_) {}
         }
 
@@ -1874,7 +2207,7 @@
     }
 
     async function logoutUser() {
-      if (confirm('Deseja realmente sair da sua conta?\n\nSeus dados salvos na nuvem permanecerão seguros e serão restaurados automaticamente quando você entrar novamente em qualquer aparelho.')) {
+      if (confirm('Deseja realmente sair da sua conta?\n\nSeus dados salvos na nuvem permanecerão seguros e serão restaurados automaticamente quando você entrar novamente com seu e-mail em qualquer aparelho.')) {
         if (_supabase) {
           try {
             await _supabase.auth.signOut();
@@ -1885,7 +2218,7 @@
         localStorage.removeItem('titannovafit_active_session');
         localStorage.removeItem('titannovafit_active_tab');
 
-        // Nota: NÃO apagamos os treinos ou histórico do banco de dados!
+        // Nota de Segurança: NÃO apagamos os treinos ou histórico do banco de dados!
         allWorkoutsList = [];
         document.getElementById('bottomNav').style.display = 'none';
         switchTab('screenAuth');

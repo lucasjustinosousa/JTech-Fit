@@ -1,19 +1,41 @@
 -- ====================================================================
 -- TITANNOVAFIT - SCRIPT COMPLETO DE BANCO DE DADOS SUPABASE (POSTGRESQL)
--- Suporte a Supabase Auth, RLS (Row Level Security) e Salvamento Permanente
+-- Suporte a Supabase Auth, Profiles, RLS (Row Level Security) e Salvamento Permanente
 -- ====================================================================
 -- URLs configuradas no Supabase Authentication -> URL Configuration:
 -- Site URL: https://titannovafit.com.br
 -- Redirect URLs:
 --   https://titannovafit.com.br
 --   https://www.titannovafit.com.br
+--   https://titannovafit.com.br/**
 --   https://titannovafit.com.br/auth/callback
 -- ====================================================================
 
 -- 1. EXTENSÕES
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 2. TABELA DE USUÁRIOS / PERFIS (VINCULADA AO AUTH.USERS)
+-- 2. TABELA OFICIAL DE PERFIS (PROFILES) - id UUID = auth.users.id
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    nome TEXT,
+    email TEXT,
+    foto_url TEXT,
+    unidade_carga TEXT DEFAULT 'kg',
+    descanso_padrao INT DEFAULT 60,
+    favoritos JSONB DEFAULT '[]'::jsonb,
+    criado_em TIMESTAMPTZ DEFAULT NOW(),
+    atualizado_em TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Garantir colunas na tabela profiles
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS foto_url TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS unidade_carga TEXT DEFAULT 'kg';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS descanso_padrao INT DEFAULT 60;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS favoritos JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS criado_em TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS atualizado_em TIMESTAMPTZ DEFAULT NOW();
+
+-- Tabela usuarios (compatibilidade retroativa)
 CREATE TABLE IF NOT EXISTS public.usuarios (
     id TEXT PRIMARY KEY,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -26,7 +48,6 @@ CREATE TABLE IF NOT EXISTS public.usuarios (
     criado_em TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Garantir colunas na tabela usuarios caso já exista
 ALTER TABLE public.usuarios ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
 ALTER TABLE public.usuarios ADD COLUMN IF NOT EXISTS favoritos JSONB DEFAULT '[]'::jsonb;
 
@@ -61,7 +82,6 @@ CREATE TABLE IF NOT EXISTS public.exercicios (
     criado_em TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Garantir colunas em exercicios caso já exista
 ALTER TABLE public.exercicios ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
 ALTER TABLE public.exercicios ADD COLUMN IF NOT EXISTS usuario_id TEXT;
 
@@ -78,7 +98,6 @@ CREATE TABLE IF NOT EXISTS public.treinos (
     criado_em TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Garantir colunas em treinos caso já exista
 ALTER TABLE public.treinos ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
 ALTER TABLE public.treinos ADD COLUMN IF NOT EXISTS usuario_id TEXT;
 
@@ -96,7 +115,6 @@ CREATE TABLE IF NOT EXISTS public.exercicios_do_treino (
     observacoes TEXT
 );
 
--- Garantir colunas em exercicios_do_treino caso já exista
 ALTER TABLE public.exercicios_do_treino ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
 
 -- 6. TABELA DE SESSÕES DE TREINO (HISTÓRICO PERMANENTE)
@@ -112,7 +130,6 @@ CREATE TABLE IF NOT EXISTS public.sessoes_de_treino (
     concluido BOOLEAN DEFAULT FALSE
 );
 
--- Garantir colunas em sessoes_de_treino caso já exista
 ALTER TABLE public.sessoes_de_treino ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
 ALTER TABLE public.sessoes_de_treino ADD COLUMN IF NOT EXISTS usuario_id TEXT;
 
@@ -128,7 +145,6 @@ CREATE TABLE IF NOT EXISTS public.series_realizadas (
     concluida BOOLEAN DEFAULT FALSE
 );
 
--- Garantir colunas em series_realizadas caso já exista
 ALTER TABLE public.series_realizadas ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
 
 -- 8. TABELA DE EXERCÍCIOS FAVORITOS
@@ -145,11 +161,24 @@ ALTER TABLE public.exercicios_favoritos ADD COLUMN IF NOT EXISTS user_id UUID RE
 ALTER TABLE public.exercicios_favoritos ADD COLUMN IF NOT EXISTS usuario_id TEXT;
 
 -- ====================================================================
--- 9. TRIGGER DE CRIAÇÃO AUTOMÁTICA DE PERFIL VIA SUPABASE AUTH
+-- 9. TRIGGER DE CRIAÇÃO AUTOMÁTICA DE PERFIL EM PROFILES E USUARIOS
 -- ====================================================================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
+    -- 1. Inserir em profiles
+    INSERT INTO public.profiles (id, nome, email)
+    VALUES (
+        NEW.id,
+        COALESCE(NEW.raw_user_meta_data->>'nome', SPLIT_PART(NEW.email, '@', 1)),
+        NEW.email
+    )
+    ON CONFLICT (id) DO UPDATE SET
+        nome = COALESCE(EXCLUDED.nome, public.profiles.nome),
+        email = EXCLUDED.email,
+        atualizado_em = NOW();
+
+    -- 2. Inserir em usuarios (retrocompatibilidade)
     INSERT INTO public.usuarios (id, user_id, nome, email)
     VALUES (
         NEW.id::text,
@@ -161,6 +190,7 @@ BEGIN
         user_id = EXCLUDED.user_id,
         nome = COALESCE(EXCLUDED.nome, public.usuarios.nome),
         email = EXCLUDED.email;
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -172,8 +202,8 @@ CREATE TRIGGER on_auth_user_created
 
 -- ====================================================================
 -- 10. SEGURANÇA E POLÍTICAS RLS (ROW LEVEL SECURITY)
--- Cada usuário visualiza e altera somente suas próprias informações
 -- ====================================================================
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.exercicios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.treinos ENABLE ROW LEVEL SECURITY;
@@ -182,138 +212,65 @@ ALTER TABLE public.sessoes_de_treino ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.series_realizadas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.exercicios_favoritos ENABLE ROW LEVEL SECURITY;
 
--- Limpar políticas antigas para evitar conflito
-DROP POLICY IF EXISTS "Permitir leitura de perfil" ON public.usuarios;
-DROP POLICY IF EXISTS "Permitir controle de perfil" ON public.usuarios;
+-- Limpar políticas antigas
+DROP POLICY IF EXISTS "Usuarios gerenciam seu proprio perfil em profiles" ON public.profiles;
 DROP POLICY IF EXISTS "Usuarios gerenciam seu proprio perfil" ON public.usuarios;
-
-DROP POLICY IF EXISTS "Permitir leitura de exercicios" ON public.exercicios;
-DROP POLICY IF EXISTS "Permitir criacao e edicao de exercicios" ON public.exercicios;
 DROP POLICY IF EXISTS "Permitir leitura de exercicios publicos e proprios" ON public.exercicios;
 DROP POLICY IF EXISTS "Usuarios gerenciam seus exercicios personalizados" ON public.exercicios;
-
-DROP POLICY IF EXISTS "Permitir leitura de treinos" ON public.treinos;
-DROP POLICY IF EXISTS "Permitir gravacao de treinos" ON public.treinos;
 DROP POLICY IF EXISTS "Usuarios gerenciam seus proprios treinos" ON public.treinos;
-
-DROP POLICY IF EXISTS "Permitir controle de exercicios do treino" ON public.exercicios_do_treino;
 DROP POLICY IF EXISTS "Usuarios gerenciam seus exercicios do treino" ON public.exercicios_do_treino;
-
-DROP POLICY IF EXISTS "Permitir controle de historico" ON public.sessoes_de_treino;
 DROP POLICY IF EXISTS "Usuarios gerenciam suas proprias sessoes" ON public.sessoes_de_treino;
-
-DROP POLICY IF EXISTS "Permitir controle de series" ON public.series_realizadas;
 DROP POLICY IF EXISTS "Usuarios gerenciam suas proprias series" ON public.series_realizadas;
-
 DROP POLICY IF EXISTS "Usuarios gerenciam seus favoritos" ON public.exercicios_favoritos;
 
--- 10.1 POLÍTICAS PARA USUÁRIOS
+-- 10.1 POLÍTICA PARA PROFILES (auth.uid() = id)
+CREATE POLICY "Usuarios gerenciam seu proprio perfil em profiles" ON public.profiles
+    FOR ALL TO authenticated, anon
+    USING (auth.uid() = id OR auth.uid()::text = id::text OR auth.role() = 'anon')
+    WITH CHECK (auth.uid() = id OR auth.uid()::text = id::text OR auth.role() = 'anon');
+
+-- 10.2 POLÍTICA PARA USUARIOS
 CREATE POLICY "Usuarios gerenciam seu proprio perfil" ON public.usuarios
     FOR ALL TO authenticated, anon
-    USING (
-        auth.uid() = user_id 
-        OR auth.uid()::text = id 
-        OR auth.uid()::text = user_id::text
-        OR auth.role() = 'anon'
-    )
-    WITH CHECK (
-        auth.uid() = user_id 
-        OR auth.uid()::text = id 
-        OR auth.uid()::text = user_id::text
-        OR auth.role() = 'anon'
-    );
+    USING (auth.uid() = user_id OR auth.uid()::text = id OR auth.role() = 'anon')
+    WITH CHECK (auth.uid() = user_id OR auth.uid()::text = id OR auth.role() = 'anon');
 
--- 10.2 POLÍTICAS PARA EXERCÍCIOS
+-- 10.3 POLÍTICA PARA EXERCÍCIOS
 CREATE POLICY "Permitir leitura de exercicios publicos e proprios" ON public.exercicios
     FOR SELECT TO authenticated, anon
-    USING (
-        user_id IS NULL 
-        OR usuario_id IS NULL 
-        OR usuario_id = 'publico' 
-        OR auth.uid() = user_id 
-        OR auth.uid()::text = usuario_id
-        OR auth.role() = 'anon'
-    );
+    USING (user_id IS NULL OR usuario_id IS NULL OR usuario_id = 'publico' OR auth.uid() = user_id OR auth.uid()::text = usuario_id OR auth.role() = 'anon');
 
 CREATE POLICY "Usuarios gerenciam seus exercicios personalizados" ON public.exercicios
     FOR ALL TO authenticated, anon
-    USING (
-        auth.uid() = user_id 
-        OR auth.uid()::text = usuario_id
-        OR auth.role() = 'anon'
-    )
-    WITH CHECK (
-        auth.uid() = user_id 
-        OR auth.uid()::text = usuario_id
-        OR auth.role() = 'anon'
-    );
+    USING (auth.uid() = user_id OR auth.uid()::text = usuario_id OR auth.role() = 'anon')
+    WITH CHECK (auth.uid() = user_id OR auth.uid()::text = usuario_id OR auth.role() = 'anon');
 
--- 10.3 POLÍTICAS PARA TREINOS
+-- 10.4 POLÍTICA PARA TREINOS (auth.uid() = user_id)
 CREATE POLICY "Usuarios gerenciam seus proprios treinos" ON public.treinos
     FOR ALL TO authenticated, anon
-    USING (
-        auth.uid() = user_id 
-        OR auth.uid()::text = usuario_id
-        OR auth.uid()::text = user_id::text
-        OR auth.role() = 'anon'
-    )
-    WITH CHECK (
-        auth.uid() = user_id 
-        OR auth.uid()::text = usuario_id
-        OR auth.uid()::text = user_id::text
-        OR auth.role() = 'anon'
-    );
+    USING (auth.uid() = user_id OR auth.uid()::text = usuario_id OR auth.uid()::text = user_id::text OR auth.role() = 'anon')
+    WITH CHECK (auth.uid() = user_id OR auth.uid()::text = usuario_id OR auth.uid()::text = user_id::text OR auth.role() = 'anon');
 
--- 10.4 POLÍTICAS PARA EXERCÍCIOS DO TREINO
+-- 10.5 POLÍTICA PARA EXERCÍCIOS DO TREINO
 CREATE POLICY "Usuarios gerenciam seus exercicios do treino" ON public.exercicios_do_treino
     FOR ALL TO authenticated, anon
-    USING (
-        auth.uid() = user_id 
-        OR auth.role() = 'anon'
-    )
-    WITH CHECK (
-        auth.uid() = user_id 
-        OR auth.role() = 'anon'
-    );
+    USING (auth.uid() = user_id OR auth.role() = 'anon')
+    WITH CHECK (auth.uid() = user_id OR auth.role() = 'anon');
 
--- 10.5 POLÍTICAS PARA SESSÕES DE TREINO (HISTÓRICO)
+-- 10.6 POLÍTICA PARA SESSÕES DE TREINO (HISTÓRICO)
 CREATE POLICY "Usuarios gerenciam suas proprias sessoes" ON public.sessoes_de_treino
     FOR ALL TO authenticated, anon
-    USING (
-        auth.uid() = user_id 
-        OR auth.uid()::text = usuario_id
-        OR auth.uid()::text = user_id::text
-        OR auth.role() = 'anon'
-    )
-    WITH CHECK (
-        auth.uid() = user_id 
-        OR auth.uid()::text = usuario_id
-        OR auth.uid()::text = user_id::text
-        OR auth.role() = 'anon'
-    );
+    USING (auth.uid() = user_id OR auth.uid()::text = usuario_id OR auth.uid()::text = user_id::text OR auth.role() = 'anon')
+    WITH CHECK (auth.uid() = user_id OR auth.uid()::text = usuario_id OR auth.uid()::text = user_id::text OR auth.role() = 'anon');
 
--- 10.6 POLÍTICAS PARA SÉRIES REALIZADAS
+-- 10.7 POLÍTICA PARA SÉRIES REALIZADAS
 CREATE POLICY "Usuarios gerenciam suas proprias series" ON public.series_realizadas
     FOR ALL TO authenticated, anon
-    USING (
-        auth.uid() = user_id 
-        OR auth.role() = 'anon'
-    )
-    WITH CHECK (
-        auth.uid() = user_id 
-        OR auth.role() = 'anon'
-    );
+    USING (auth.uid() = user_id OR auth.role() = 'anon')
+    WITH CHECK (auth.uid() = user_id OR auth.role() = 'anon');
 
--- 10.7 POLÍTICAS PARA EXERCÍCIOS FAVORITOS
+-- 10.8 POLÍTICA PARA EXERCÍCIOS FAVORITOS
 CREATE POLICY "Usuarios gerenciam seus favoritos" ON public.exercicios_favoritos
     FOR ALL TO authenticated, anon
-    USING (
-        auth.uid() = user_id 
-        OR auth.uid()::text = usuario_id
-        OR auth.role() = 'anon'
-    )
-    WITH CHECK (
-        auth.uid() = user_id 
-        OR auth.uid()::text = usuario_id
-        OR auth.role() = 'anon'
-    );
+    USING (auth.uid() = user_id OR auth.uid()::text = usuario_id OR auth.role() = 'anon')
+    WITH CHECK (auth.uid() = user_id OR auth.uid()::text = usuario_id OR auth.role() = 'anon');
