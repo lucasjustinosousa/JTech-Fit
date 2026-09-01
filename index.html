@@ -764,14 +764,21 @@
         </div>
 
         <div class="card" style="margin-bottom: 16px;">
-          <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">PWA & Sincronização em Nuvem</h4>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="font-size: 14px; font-weight: 700; margin: 0;">Sincronização em Nuvem</h4>
+            <span style="font-size: 10px; font-weight: 800; background: rgba(76,175,80,0.18); color: var(--success-green); padding: 2px 8px; border-radius: 8px; border: 1px solid rgba(76,175,80,0.35);">● Automática 24/7</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--divider);">
+            <span>Status da Conta</span>
+            <span style="color: var(--success-green); font-weight: 700;">Vinculada ao Login</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--divider);">
+            <span>Nuvem (Supabase)</span>
+            <span style="color: var(--accent-cyan); font-weight: 700;">Sincronização Automática</span>
+          </div>
           <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--divider);">
             <span>Status PWA</span>
             <span style="color: var(--success-green); font-weight: 700;">Pronto (Service Worker Ativo)</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--divider);">
-            <span>Sincronização Cloud</span>
-            <span style="color: var(--accent-cyan); font-weight: 700;">Supabase Multi-Dispositivo</span>
           </div>
           <div style="display: flex; justify-content: space-between; padding: 8px 0;">
             <span>ID do Usuário</span>
@@ -803,10 +810,6 @@
             </button>
           </div>
         </div>
-
-        <button onclick="refreshAppData(this)" class="btn btn-outline" style="width: 100%; margin-bottom: 10px; border-color: var(--accent-cyan); color: var(--accent-cyan);">
-          🔄 Sincronizar Nuvem Agora
-        </button>
 
         <button onclick="logoutUser()" class="btn btn-outline" style="width: 100%; border-color: rgba(255,82,82,0.4); color: #ff5252;">
           🚪 Sair da Conta (Logout)
@@ -3298,7 +3301,7 @@
       updateHomeScreenUI();
     }
 
-    function deleteHistoryItem(id) {
+    async function deleteHistoryItem(id) {
       if (confirm('Deseja excluir este registro do histórico?')) {
         const card = document.getElementById(`history_${id}`);
         if (card) card.remove();
@@ -3309,6 +3312,12 @@
           localStorage.setItem('jtech_fit_history', JSON.stringify(historyList));
         } catch (e) {}
 
+        if (_supabase) {
+          try {
+            await _supabase.from('sessoes_de_treino').delete().eq('id', id);
+          } catch (_) {}
+        }
+
         const container = document.getElementById('historyListContainer');
         if (container && container.children.length === 0) {
           loadHistoryFromStorage();
@@ -3317,9 +3326,15 @@
       }
     }
 
-    function clearAllHistory() {
+    async function clearAllHistory() {
       if (confirm('Tem certeza que deseja limpar todo o histórico de treinos?')) {
         localStorage.removeItem('jtech_fit_history');
+        if (_supabase) {
+          try {
+            const uid = getEffectiveUserId();
+            await _supabase.from('sessoes_de_treino').delete().eq('usuario_id', uid);
+          } catch (_) {}
+        }
         loadHistoryFromStorage();
         updateHomeScreenUI();
       }
