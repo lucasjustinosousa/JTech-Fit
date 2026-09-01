@@ -14,7 +14,7 @@ class WorkoutListScreen extends StatelessWidget {
     try {
       return Color(int.parse(hex.replaceAll('#', '0xFF')));
     } catch (_) {
-      return JTechTheme.primaryBlue;
+      return TitanNovaTheme.primaryBlue;
     }
   }
 
@@ -28,7 +28,7 @@ class WorkoutListScreen extends StatelessWidget {
         title: const Text('Divisões de Treino'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, color: JTechTheme.accentCyan),
+            icon: const Icon(Icons.add, color: TitanNovaTheme.accentCyan),
             onPressed: () {
               Navigator.push(
                 context,
@@ -43,9 +43,9 @@ class WorkoutListScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.fitness_center_outlined, size: 64, color: JTechTheme.textMuted),
+                  const Icon(Icons.fitness_center_outlined, size: 64, color: TitanNovaTheme.textMuted),
                   const SizedBox(height: 16),
-                  const Text('Nenhum treino criado ainda.', style: TextStyle(color: JTechTheme.textGrey, fontSize: 16)),
+                  const Text('Nenhum treino criado ainda.', style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 16)),
                   const SizedBox(height: 12),
                   ElevatedButton.icon(
                     onPressed: () {
@@ -85,15 +85,15 @@ class WorkoutListScreen extends StatelessWidget {
                               child: Text(
                                 treino.nome,
                                 style: const TextStyle(
-                                  color: JTechTheme.textWhite,
+                                  color: TitanNovaTheme.textWhite,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
                             PopupMenuButton<String>(
-                              icon: const Icon(Icons.more_vert, color: JTechTheme.textGrey),
-                              color: JTechTheme.surfaceDark,
+                              icon: const Icon(Icons.more_vert, color: TitanNovaTheme.textGrey),
+                              color: TitanNovaTheme.surfaceDark,
                               onSelected: (val) {
                                 if (val == 'editar') {
                                   Navigator.push(
@@ -109,14 +109,14 @@ class WorkoutListScreen extends StatelessWidget {
                               itemBuilder: (ctx) => [
                                 const PopupMenuItem(value: 'editar', child: Text('Editar Treino', style: TextStyle(color: Colors.white))),
                                 const PopupMenuItem(value: 'duplicar', child: Text('Duplicar', style: TextStyle(color: Colors.white))),
-                                const PopupMenuItem(value: 'deletar', child: Text('Excluir', style: TextStyle(color: JTechTheme.errorRed))),
+                                const PopupMenuItem(value: 'deletar', child: Text('Excluir', style: TextStyle(color: TitanNovaTheme.errorRed))),
                               ],
                             ),
                           ],
                         ),
                         if (treino.descricao.isNotEmpty) ...[
                           const SizedBox(height: 4),
-                          Text(treino.descricao, style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12)),
+                          Text(treino.descricao, style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12)),
                         ],
                         const SizedBox(height: 10),
                         Wrap(
@@ -134,7 +134,7 @@ class WorkoutListScreen extends StatelessWidget {
                             ),
                           )).toList(),
                         ),
-                        const Divider(height: 20, color: JTechTheme.dividerColor),
+                        const Divider(height: 20, color: TitanNovaTheme.dividerColor),
                         
                         // Lista Expansível de Exercícios Montados no Treino
                         Theme(
@@ -144,9 +144,9 @@ class WorkoutListScreen extends StatelessWidget {
                             childrenPadding: EdgeInsets.zero,
                             title: Text(
                               '${treino.exercicios.length} exercícios montados',
-                              style: const TextStyle(color: JTechTheme.accentCyan, fontSize: 13, fontWeight: FontWeight.bold),
+                              style: const TextStyle(color: TitanNovaTheme.accentCyan, fontSize: 13, fontWeight: FontWeight.bold),
                             ),
-                            trailing: const Icon(Icons.keyboard_arrow_down, color: JTechTheme.accentCyan),
+                            trailing: const Icon(Icons.keyboard_arrow_down, color: TitanNovaTheme.accentCyan),
                             children: [
                               const SizedBox(height: 6),
                               ...treino.exercicios.asMap().entries.map((entry) {
@@ -160,18 +160,18 @@ class WorkoutListScreen extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF090B10),
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: JTechTheme.dividerColor),
+                                    border: Border.all(color: TitanNovaTheme.dividerColor),
                                   ),
                                   child: Row(
                                     children: [
-                                      Text('${idx + 1}.', style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12, fontWeight: FontWeight.bold)),
+                                      Text('${idx + 1}.', style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12, fontWeight: FontWeight.bold)),
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(nome, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-                                            Text('$grupo • ${exItem.quantidadeSeries} séries x ${exItem.repeticoes} reps', style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11)),
+                                            Text('$grupo • ${exItem.quantidadeSeries} séries x ${exItem.repeticoes} reps', style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11)),
                                           ],
                                         ),
                                       ),
@@ -191,7 +191,7 @@ class WorkoutListScreen extends StatelessWidget {
                             ElevatedButton.icon(
                               onPressed: () => onStartWorkout(treino),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: JTechTheme.successGreen,
+                                backgroundColor: TitanNovaTheme.successGreen,
                                 minimumSize: const Size(130, 40),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               ),
@@ -207,7 +207,7 @@ class WorkoutListScreen extends StatelessWidget {
               },
             ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: JTechTheme.primaryBlue,
+        backgroundColor: TitanNovaTheme.primaryBlue,
         onPressed: () {
           Navigator.push(
             context,

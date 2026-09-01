@@ -28,20 +28,20 @@ void main() async {
   runApp(
     ChangeNotifierProvider(
       create: (_) => WorkoutRepository(),
-      child: const JTechFitApp(),
+      child: const TitanNovaFitApp(),
     ),
   );
 }
 
-class JTechFitApp extends StatelessWidget {
-  const JTechFitApp({super.key});
+class TitanNovaFitApp extends StatelessWidget {
+  const TitanNovaFitApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'JTech Fit',
+      title: 'TitanNova Fit',
       debugShowCheckedModeBanner: false,
-      theme: JTechTheme.darkTheme,
+      theme: TitanNovaTheme.darkTheme,
       home: const MainRootNavigator(),
     );
   }

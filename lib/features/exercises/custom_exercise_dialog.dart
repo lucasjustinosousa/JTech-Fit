@@ -63,7 +63,7 @@ class _CustomExerciseDialogState extends State<CustomExerciseDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: JTechTheme.cardDark,
+      backgroundColor: TitanNovaTheme.cardDark,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -72,7 +72,7 @@ class _CustomExerciseDialogState extends State<CustomExerciseDialog> {
           children: [
             const Text(
               'Criar Exercício Personalizado',
-              style: TextStyle(color: JTechTheme.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -82,7 +82,7 @@ class _CustomExerciseDialogState extends State<CustomExerciseDialog> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: _grupoMuscular,
-              dropdownColor: JTechTheme.cardDark,
+              dropdownColor: TitanNovaTheme.cardDark,
               decoration: const InputDecoration(labelText: 'Grupo Muscular Principal'),
               items: _grupos.map((g) => DropdownMenuItem(value: g, child: Text(g, style: const TextStyle(color: Colors.white)))).toList(),
               onChanged: (val) => setState(() => _grupoMuscular = val!),
@@ -90,7 +90,7 @@ class _CustomExerciseDialogState extends State<CustomExerciseDialog> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: _equipamento,
-              dropdownColor: JTechTheme.cardDark,
+              dropdownColor: TitanNovaTheme.cardDark,
               decoration: const InputDecoration(labelText: 'Equipamento Necessário'),
               items: _equipamentos.map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(color: Colors.white)))).toList(),
               onChanged: (val) => setState(() => _equipamento = val!),
@@ -117,7 +117,7 @@ class _CustomExerciseDialogState extends State<CustomExerciseDialog> {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('CANCELAR', style: TextStyle(color: JTechTheme.textGrey)),
+                  child: const Text('CANCELAR', style: TextStyle(color: TitanNovaTheme.textGrey)),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(

@@ -1,6 +1,6 @@
 {
-  "name": "JTech Fit — Acompanhamento de Treinos",
-  "short_name": "JTech Fit",
+  "name": "TitanNova Fit — Acompanhamento de Treinos",
+  "short_name": "TitanNova Fit",
   "description": "Aplicativo de acompanhamento de treinos de musculação, divisões de treino, biblioteca de exercícios, cronômetro de descanso e histórico offline.",
   "start_url": "./",
   "scope": "./",

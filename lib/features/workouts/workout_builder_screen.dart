@@ -96,7 +96,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
         title: Text(widget.treinoExistente == null ? 'Criar Novo Treino' : 'Editar Treino'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.check, color: JTechTheme.successGreen, size: 28),
+            icon: const Icon(Icons.check, color: TitanNovaTheme.successGreen, size: 28),
             onPressed: _salvarTreino,
           ),
         ],
@@ -109,10 +109,10 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
             // Nome do Treino
             TextField(
               controller: _nomeController,
-              style: const TextStyle(color: JTechTheme.textWhite, fontSize: 16),
+              style: const TextStyle(color: TitanNovaTheme.textWhite, fontSize: 16),
               decoration: const InputDecoration(
                 labelText: 'Nome do Treino (ex: Treino A — Peito e Tríceps)',
-                prefixIcon: Icon(Icons.edit, color: JTechTheme.primaryBlue),
+                prefixIcon: Icon(Icons.edit, color: TitanNovaTheme.primaryBlue),
               ),
             ),
             const SizedBox(height: 12),
@@ -120,7 +120,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
             // Foco / Objetivo do Treino (Chips de seleção rápida)
             const Text(
               'Foco / Objetivo do Treino (Opcional)',
-              style: TextStyle(color: JTechTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
+              style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -139,8 +139,8 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                 return ChoiceChip(
                   label: Text(foco),
                   selected: isSelected,
-                  selectedColor: JTechTheme.primaryBlue,
-                  labelStyle: TextStyle(color: isSelected ? Colors.white : JTechTheme.textGrey, fontSize: 12),
+                  selectedColor: TitanNovaTheme.primaryBlue,
+                  labelStyle: TextStyle(color: isSelected ? Colors.white : TitanNovaTheme.textGrey, fontSize: 12),
                   onSelected: (val) {
                     setState(() {
                       if (val) {
@@ -160,7 +160,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
             // Dias da Semana
             const Text(
               'Dias da Semana (Opcional)',
-              style: TextStyle(color: JTechTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
+              style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Wrap(
@@ -170,8 +170,8 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                 return FilterChip(
                   label: Text(dia),
                   selected: isSelected,
-                  selectedColor: JTechTheme.primaryBlue,
-                  labelStyle: TextStyle(color: isSelected ? Colors.white : JTechTheme.textGrey, fontSize: 12),
+                  selectedColor: TitanNovaTheme.primaryBlue,
+                  labelStyle: TextStyle(color: isSelected ? Colors.white : TitanNovaTheme.textGrey, fontSize: 12),
                   onSelected: (val) {
                     setState(() {
                       if (val) {
@@ -192,12 +192,12 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
               children: [
                 const Text(
                   'Exercícios do Treino',
-                  style: TextStyle(color: JTechTheme.textWhite, fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 TextButton.icon(
                   onPressed: _adicionarExercicioDaBiblioteca,
-                  icon: const Icon(Icons.add, color: JTechTheme.accentCyan),
-                  label: const Text('Adicionar Exercício', style: TextStyle(color: JTechTheme.accentCyan)),
+                  icon: const Icon(Icons.add, color: TitanNovaTheme.accentCyan),
+                  label: const Text('Adicionar Exercício', style: TextStyle(color: TitanNovaTheme.accentCyan)),
                 ),
               ],
             ),
@@ -208,14 +208,14 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: JTechTheme.cardDark,
+                  color: TitanNovaTheme.cardDark,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: JTechTheme.dividerColor),
+                  border: Border.all(color: TitanNovaTheme.dividerColor),
                 ),
                 child: const Text(
                   'Nenhum exercício adicionado a este treino ainda.\nClique em "+ Adicionar Exercício" acima.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: JTechTheme.textMuted, fontSize: 13),
+                  style: TextStyle(color: TitanNovaTheme.textMuted, fontSize: 13),
                 ),
               )
             else
@@ -237,15 +237,15 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                     margin: const EdgeInsets.only(bottom: 12),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: JTechTheme.cardDark,
+                      color: TitanNovaTheme.cardDark,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: JTechTheme.dividerColor),
+                      border: Border.all(color: TitanNovaTheme.dividerColor),
                     ),
                     child: Column(
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.drag_handle, color: JTechTheme.textMuted),
+                            const Icon(Icons.drag_handle, color: TitanNovaTheme.textMuted),
                             const SizedBox(width: 8),
                             if (exItem.exercicioInfo?.gifUrl != null && exItem.exercicioInfo!.gifUrl!.isNotEmpty)
                               Padding(
@@ -263,14 +263,14 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                                     decoration: BoxDecoration(
                                       color: Colors.black,
                                       borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.5)),
+                                      border: Border.all(color: TitanNovaTheme.accentCyan.withOpacity(0.5)),
                                     ),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(5),
                                       child: Image.network(
                                         exItem.exercicioInfo!.gifUrl!,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => const Icon(Icons.fitness_center, size: 16, color: JTechTheme.primaryBlue),
+                                        errorBuilder: (_, __, ___) => const Icon(Icons.fitness_center, size: 16, color: TitanNovaTheme.primaryBlue),
                                       ),
                                     ),
                                   ),
@@ -286,7 +286,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                                 child: Text(
                                   exItem.exercicioInfo?.nome ?? 'Exercício',
                                   style: const TextStyle(
-                                    color: JTechTheme.textWhite,
+                                    color: TitanNovaTheme.textWhite,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15,
                                   ),
@@ -294,7 +294,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.delete_outline, color: JTechTheme.errorRed, size: 20),
+                              icon: const Icon(Icons.delete_outline, color: TitanNovaTheme.errorRed, size: 20),
                               onPressed: () {
                                 setState(() {
                                   _exerciciosDoTreino.removeAt(index);
@@ -394,7 +394,7 @@ class _WorkoutBuilderScreenState extends State<WorkoutBuilderScreen> {
     return TextFormField(
       initialValue: value,
       keyboardType: TextInputType.text,
-      style: const TextStyle(color: JTechTheme.textWhite, fontSize: 13),
+      style: const TextStyle(color: TitanNovaTheme.textWhite, fontSize: 13),
       decoration: InputDecoration(
         labelText: label,
         isDense: true,

@@ -11,18 +11,18 @@ class DisclaimerBanner extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: JTechTheme.warningOrange.withOpacity(0.12),
+          color: TitanNovaTheme.warningOrange.withOpacity(0.12),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: JTechTheme.warningOrange.withOpacity(0.4)),
+          border: Border.all(color: TitanNovaTheme.warningOrange.withOpacity(0.4)),
         ),
         child: Row(
           children: const [
-            Icon(Icons.shield_outlined, color: JTechTheme.warningOrange, size: 20),
+            Icon(Icons.shield_outlined, color: TitanNovaTheme.warningOrange, size: 20),
             SizedBox(width: 8),
             Expanded(
               child: Text(
                 'Este aplicativo não substitui orientação profissional. Interrompa se sentir dor.',
-                style: TextStyle(color: JTechTheme.textGrey, fontSize: 11, fontWeight: FontWeight.w500),
+                style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11, fontWeight: FontWeight.w500),
               ),
             ),
           ],
@@ -36,19 +36,19 @@ class DisclaimerBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0FF231B0E),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: JTechTheme.warningOrange, width: 1),
+        border: Border.all(color: TitanNovaTheme.warningOrange, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAlignment.start,
         children: [
           Row(
             children: const [
-              Icon(Icons.warning_amber_rounded, color: JTechTheme.warningOrange, size: 24),
+              Icon(Icons.warning_amber_rounded, color: TitanNovaTheme.warningOrange, size: 24),
               SizedBox(width: 10),
               Text(
                 'Aviso de Saúde e Segurança',
                 style: TextStyle(
-                  color: JTechTheme.warningOrange,
+                  color: TitanNovaTheme.warningOrange,
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
@@ -57,12 +57,12 @@ class DisclaimerBanner extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           const Text(
-            '• O JTech Fit é uma ferramenta de acompanhamento e não substitui o trabalho de um profissional de Educação Física ou médico.\n'
+            '• O TitanNova Fit é uma ferramenta de acompanhamento e não substitui o trabalho de um profissional de Educação Física ou médico.\n'
             '• Interrompa imediatamente o exercício se sentir dor, tontura ou mal-estar.\n'
             '• Não tente executar exercícios com cargas excessivas sem orientação prévia.\n'
             '• Iniciantes e menores de idade devem treinar sob supervisão qualificada.',
             style: TextStyle(
-              color: JTechTheme.textWhite,
+              color: TitanNovaTheme.textWhite,
               fontSize: 12,
               height: 1.5,
             ),

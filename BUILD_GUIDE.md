@@ -1,6 +1,6 @@
-# Guia de Compilação e Publicação — JTech Fit (Android & iOS)
+# Guia de Compilação e Publicação — TitanNova Fit (Android & iOS)
 
-Este guia descreve o procedimento passo a passo para gerar as compilações nativas para **Android (APK e AAB)** e **iOS (IPA)** a partir do código-fonte Flutter do JTech Fit.
+Este guia descreve o procedimento passo a passo para gerar as compilações nativas para **Android (APK e AAB)** e **iOS (IPA)** a partir do código-fonte Flutter do TitanNova Fit.
 
 ---
 

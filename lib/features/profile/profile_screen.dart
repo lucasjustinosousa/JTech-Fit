@@ -21,19 +21,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: JTechTheme.cardDark,
-        title: const Text('Excluir Conta e Dados?', style: TextStyle(color: JTechTheme.errorRed)),
+        backgroundColor: TitanNovaTheme.cardDark,
+        title: const Text('Excluir Conta e Dados?', style: TextStyle(color: TitanNovaTheme.errorRed)),
         content: const Text(
           'Esta ação apagará permanentemente todos os seus treinos criados, histórico e configurações tanto do dispositivo quanto da nuvem.',
-          style: TextStyle(color: JTechTheme.textWhite, fontSize: 13),
+          style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 13),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('CANCELAR', style: TextStyle(color: JTechTheme.textGrey)),
+            child: const Text('CANCELAR', style: TextStyle(color: TitanNovaTheme.textGrey)),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: JTechTheme.errorRed),
+            style: ElevatedButton.styleFrom(backgroundColor: TitanNovaTheme.errorRed),
             onPressed: () {
               Navigator.pop(ctx);
               widget.onLogout();
@@ -65,18 +65,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   CircleAvatar(
                     radius: 40,
-                    backgroundColor: JTechTheme.primaryBlue,
+                    backgroundColor: TitanNovaTheme.primaryBlue,
                     child: const Icon(Icons.person, size: 48, color: Colors.white),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    user?.nome ?? 'Atleta JTech',
-                    style: const TextStyle(color: JTechTheme.textWhite, fontSize: 20, fontWeight: FontWeight.bold),
+                    user?.nome ?? 'Atleta TitanNova',
+                    style: const TextStyle(color: TitanNovaTheme.textWhite, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    user?.email ?? 'atleta@jtechfit.com',
-                    style: const TextStyle(color: JTechTheme.textGrey, fontSize: 13),
+                    user?.email ?? 'atleta@titannovafit.com',
+                    style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 13),
                   ),
                 ],
               ),
@@ -86,7 +86,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // PREFERÊNCIAS DE TREINO
             const Text(
               'Preferências de Treino',
-              style: TextStyle(color: JTechTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
+              style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
 
@@ -94,11 +94,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.scale, color: JTechTheme.accentCyan),
+                    leading: const Icon(Icons.scale, color: TitanNovaTheme.accentCyan),
                     title: const Text('Unidade de Carga', style: TextStyle(color: Colors.white)),
                     trailing: DropdownButton<String>(
                       value: user?.unidadeCarga ?? 'kg',
-                      dropdownColor: JTechTheme.cardDark,
+                      dropdownColor: TitanNovaTheme.cardDark,
                       underline: const SizedBox(),
                       items: const [
                         DropdownMenuItem(value: 'kg', child: Text('Quilogramas (kg)', style: TextStyle(color: Colors.white))),
@@ -109,13 +109,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                     ),
                   ),
-                  const Divider(height: 1, color: JTechTheme.dividerColor),
+                  const Divider(height: 1, color: TitanNovaTheme.dividerColor),
                   ListTile(
-                    leading: const Icon(Icons.timer_outlined, color: JTechTheme.primaryBlue),
+                    leading: const Icon(Icons.timer_outlined, color: TitanNovaTheme.primaryBlue),
                     title: const Text('Descanso Padrão entre Séries', style: TextStyle(color: Colors.white)),
                     trailing: DropdownButton<int>(
                       value: user?.descansoPadrao ?? 60,
-                      dropdownColor: JTechTheme.cardDark,
+                      dropdownColor: TitanNovaTheme.cardDark,
                       underline: const SizedBox(),
                       items: const [
                         DropdownMenuItem(value: 30, child: Text('30 seg', style: TextStyle(color: Colors.white))),
@@ -136,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // SONS E NOTIFICAÇÕES
             const Text(
               'Sons e Notificações',
-              style: TextStyle(color: JTechTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
+              style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
 
@@ -146,14 +146,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   SwitchListTile(
                     title: const Text('Som no Alerta de Descanso', style: TextStyle(color: Colors.white)),
                     value: _somHabilitado,
-                    activeColor: JTechTheme.successGreen,
+                    activeColor: TitanNovaTheme.successGreen,
                     onChanged: (val) => setState(() => _somHabilitado = val),
                   ),
-                  const Divider(height: 1, color: JTechTheme.dividerColor),
+                  const Divider(height: 1, color: TitanNovaTheme.dividerColor),
                   SwitchListTile(
                     title: const Text('Vibração ao Zerar o Cronômetro', style: TextStyle(color: Colors.white)),
                     value: _vibracaoHabilitada,
-                    activeColor: JTechTheme.successGreen,
+                    activeColor: TitanNovaTheme.successGreen,
                     onChanged: (val) => setState(() => _vibracaoHabilitada = val),
                   ),
                 ],
@@ -164,7 +164,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // NUVEM E DADOS
             const Text(
               'Sincronização e Dados da Biblioteca',
-              style: TextStyle(color: JTechTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
+              style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
 
@@ -172,11 +172,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Icons.fitness_center, color: JTechTheme.successGreen),
+                    leading: const Icon(Icons.fitness_center, color: TitanNovaTheme.successGreen),
                     title: const Text('Biblioteca de Exercícios', style: TextStyle(color: Colors.white)),
                     subtitle: Text(
                       '${repo.exercicios.length} exercícios nativos disponíveis offline\nStatus: 100% Sincronizado',
-                      style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                      style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11),
                     ),
                     trailing: TextButton(
                       onPressed: () async {
@@ -187,14 +187,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           );
                         }
                       },
-                      child: const Text('RECARREGAR', style: TextStyle(color: JTechTheme.accentCyan, fontWeight: FontWeight.bold)),
+                      child: const Text('RECARREGAR', style: TextStyle(color: TitanNovaTheme.accentCyan, fontWeight: FontWeight.bold)),
                     ),
                   ),
-                  const Divider(height: 1, color: JTechTheme.dividerColor),
+                  const Divider(height: 1, color: TitanNovaTheme.dividerColor),
                   ListTile(
-                    leading: const Icon(Icons.cleaned_services, color: JTechTheme.warningOrange),
+                    leading: const Icon(Icons.cleaned_services, color: TitanNovaTheme.warningOrange),
                     title: const Text('Limpar Cache de Imagens / GIFs', style: TextStyle(color: Colors.white)),
-                    subtitle: const Text('Fichas e treinos criados continuam salvos intactos.', style: TextStyle(color: JTechTheme.textGrey, fontSize: 11)),
+                    subtitle: const Text('Fichas e treinos criados continuam salvos intactos.', style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11)),
                     onTap: () {
                       PaintingBinding.instance.imageCache.clear();
                       PaintingBinding.instance.imageCache.clearLiveImages();
@@ -203,13 +203,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     },
                   ),
-                  const Divider(height: 1, color: JTechTheme.dividerColor),
+                  const Divider(height: 1, color: TitanNovaTheme.dividerColor),
                   ListTile(
-                    leading: const Icon(Icons.cloud_sync, color: JTechTheme.accentCyan),
+                    leading: const Icon(Icons.cloud_sync, color: TitanNovaTheme.accentCyan),
                     title: const Text('Sincronizar com Supabase', style: TextStyle(color: Colors.white)),
-                    subtitle: const Text('Offline-first ativo. Sincronização automática.', style: TextStyle(color: JTechTheme.textGrey, fontSize: 11)),
+                    subtitle: const Text('Offline-first ativo. Sincronização automática.', style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11)),
                     trailing: IconButton(
-                      icon: const Icon(Icons.refresh, color: JTechTheme.accentCyan),
+                      icon: const Icon(Icons.refresh, color: TitanNovaTheme.accentCyan),
                       onPressed: () {
                         repo.carregarDados();
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -218,9 +218,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                     ),
                   ),
-                  const Divider(height: 1, color: JTechTheme.dividerColor),
+                  const Divider(height: 1, color: TitanNovaTheme.dividerColor),
                   ListTile(
-                    leading: const Icon(Icons.download, color: JTechTheme.warningOrange),
+                    leading: const Icon(Icons.download, color: TitanNovaTheme.warningOrange),
                     title: const Text('Exportar Meus Dados (JSON/CSV)', style: TextStyle(color: Colors.white)),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -236,16 +236,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // BOTÃO SAIR E EXCLUIR
             ElevatedButton.icon(
               onPressed: widget.onLogout,
-              style: ElevatedButton.styleFrom(backgroundColor: JTechTheme.surfaceDark),
-              icon: const Icon(Icons.logout, color: JTechTheme.textWhite),
-              label: const Text('SAIR DA CONTA', style: TextStyle(color: JTechTheme.textWhite)),
+              style: ElevatedButton.styleFrom(backgroundColor: TitanNovaTheme.surfaceDark),
+              icon: const Icon(Icons.logout, color: TitanNovaTheme.textWhite),
+              label: const Text('SAIR DA CONTA', style: TextStyle(color: TitanNovaTheme.textWhite)),
             ),
             const SizedBox(height: 10),
             TextButton(
               onPressed: _exibirConfirmacaoExclusao,
               child: const Text(
                 'Excluir Conta e Todos os Dados',
-                style: TextStyle(color: JTechTheme.errorRed, fontSize: 13, decoration: TextDecoration.underline),
+                style: TextStyle(color: TitanNovaTheme.errorRed, fontSize: 13, decoration: TextDecoration.underline),
               ),
             ),
 

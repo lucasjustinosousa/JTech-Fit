@@ -146,15 +146,15 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
           constraints: BoxConstraints(maxHeight: dialogMaxHeight),
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
           decoration: BoxDecoration(
-            color: JTechTheme.surfaceDark,
+            color: TitanNovaTheme.surfaceDark,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: JTechTheme.accentCyan.withOpacity(0.4),
+              color: TitanNovaTheme.accentCyan.withOpacity(0.4),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: JTechTheme.accentCyan.withOpacity(0.2),
+                color: TitanNovaTheme.accentCyan.withOpacity(0.2),
                 blurRadius: 30,
                 spreadRadius: 2,
                 offset: const Offset(0, 8),
@@ -218,18 +218,18 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 12, 12),
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: JTechTheme.dividerColor)),
+        border: Border(bottom: BorderSide(color: TitanNovaTheme.dividerColor)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: JTechTheme.primaryBlue.withOpacity(0.2),
+              color: TitanNovaTheme.primaryBlue.withOpacity(0.2),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: JTechTheme.primaryBlue.withOpacity(0.4)),
+              border: Border.all(color: TitanNovaTheme.primaryBlue.withOpacity(0.4)),
             ),
-            child: Icon(_getGroupIcon(ex.grupoMuscular), color: JTechTheme.accentCyan, size: 20),
+            child: Icon(_getGroupIcon(ex.grupoMuscular), color: TitanNovaTheme.accentCyan, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -239,7 +239,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
                 Text(
                   ex.nome,
                   style: const TextStyle(
-                    color: JTechTheme.textWhite,
+                    color: TitanNovaTheme.textWhite,
                     fontWeight: FontWeight.w900,
                     fontSize: 17,
                     letterSpacing: 0.3,
@@ -250,7 +250,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
                 Text(
                   '${ex.grupoMuscular} • ${ex.equipamento}',
                   style: const TextStyle(
-                    color: JTechTheme.textGrey,
+                    color: TitanNovaTheme.textGrey,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -262,7 +262,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
           IconButton(
             icon: Icon(
               ex.isFavorito ? Icons.star_rounded : Icons.star_outline_rounded,
-              color: ex.isFavorito ? Colors.amber : JTechTheme.textMuted,
+              color: ex.isFavorito ? Colors.amber : TitanNovaTheme.textMuted,
               size: 26,
             ),
             tooltip: ex.isFavorito ? 'Remover dos favoritos' : 'Favoritar exercício',
@@ -276,7 +276,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              icon: const Icon(Icons.close_rounded, color: JTechTheme.textWhite, size: 20),
+              icon: const Icon(Icons.close_rounded, color: TitanNovaTheme.textWhite, size: 20),
               tooltip: 'Fechar',
               onPressed: () => Navigator.pop(context),
             ),
@@ -293,7 +293,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
       decoration: BoxDecoration(
         color: const Color(0xFF060709),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: JTechTheme.dividerColor, width: 1.5),
+        border: Border.all(color: TitanNovaTheme.dividerColor, width: 1.5),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.6),
@@ -339,14 +339,14 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
                                     height: 42,
                                     child: CircularProgressIndicator(
                                       value: progress,
-                                      color: JTechTheme.accentCyan,
+                                      color: TitanNovaTheme.accentCyan,
                                       strokeWidth: 3,
                                     ),
                                   ),
                                   const SizedBox(height: 12),
                                   const Text(
                                     'Carregando animação 3D...',
-                                    style: TextStyle(color: JTechTheme.textGrey, fontSize: 12),
+                                    style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12),
                                   ),
                                 ],
                               ),
@@ -358,17 +358,17 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(_getGroupIcon(ex.grupoMuscular), color: JTechTheme.accentCyan, size: 64),
+                                  Icon(_getGroupIcon(ex.grupoMuscular), color: TitanNovaTheme.accentCyan, size: 64),
                                   const SizedBox(height: 12),
                                   const Text(
                                     'Demonstração em GIF indisponível',
-                                    style: TextStyle(color: JTechTheme.textWhite, fontWeight: FontWeight.bold, fontSize: 13),
+                                    style: TextStyle(color: TitanNovaTheme.textWhite, fontWeight: FontWeight.bold, fontSize: 13),
                                   ),
                                   const SizedBox(height: 4),
                                   const Text(
                                     'Siga as orientações escritas abaixo para executar corretamente.',
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                                    style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11),
                                   ),
                                 ],
                               ),
@@ -379,11 +379,11 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(_getGroupIcon(ex.grupoMuscular), color: JTechTheme.accentCyan, size: 64),
+                              Icon(_getGroupIcon(ex.grupoMuscular), color: TitanNovaTheme.accentCyan, size: 64),
                               const SizedBox(height: 12),
                               const Text(
                                 'Demonstração indisponível',
-                                style: TextStyle(color: JTechTheme.textGrey, fontSize: 13),
+                                style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 13),
                               ),
                             ],
                           ),
@@ -401,7 +401,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.75),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.6)),
+                  border: Border.all(color: TitanNovaTheme.accentCyan.withOpacity(0.6)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -410,7 +410,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
                       width: 6,
                       height: 6,
                       decoration: const BoxDecoration(
-                        color: JTechTheme.accentCyan,
+                        color: TitanNovaTheme.accentCyan,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -418,7 +418,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
                     const Text(
                       'GIF LOOP',
                       style: TextStyle(
-                        color: JTechTheme.accentCyan,
+                        color: TitanNovaTheme.accentCyan,
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.5,
@@ -437,7 +437,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: JTechTheme.primaryBlue.withOpacity(0.85),
+                    color: TitanNovaTheme.primaryBlue.withOpacity(0.85),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -460,20 +460,20 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: JTechTheme.cardDark,
+        color: TitanNovaTheme.cardDark,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: JTechTheme.dividerColor),
+        border: Border.all(color: TitanNovaTheme.dividerColor),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Row(
             children: [
-              Icon(Icons.touch_app_rounded, color: JTechTheme.accentCyan, size: 16),
+              Icon(Icons.touch_app_rounded, color: TitanNovaTheme.accentCyan, size: 16),
               SizedBox(width: 6),
               Text(
                 'Faça pinça ou duplo clique para ampliar',
-                style: TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11),
               ),
             ],
           ),
@@ -495,7 +495,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
                 _buildSmallIconButton(
                   icon: Icons.restart_alt_rounded,
                   tooltip: 'Redefinir zoom (1.0x)',
-                  color: JTechTheme.accentCyan,
+                  color: TitanNovaTheme.accentCyan,
                   onTap: _resetZoom,
                 ),
               ],
@@ -510,7 +510,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
     required IconData icon,
     required VoidCallback onTap,
     required String tooltip,
-    Color color = JTechTheme.textWhite,
+    Color color = TitanNovaTheme.textWhite,
   }) {
     return Tooltip(
       message: tooltip,
@@ -534,10 +534,10 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
       spacing: 8,
       runSpacing: 8,
       children: [
-        _buildTag('🎯 ${ex.grupoMuscular}', JTechTheme.primaryBlue),
-        _buildTag('🏋️ ${ex.equipamento}', JTechTheme.accentCyan),
+        _buildTag('🎯 ${ex.grupoMuscular}', TitanNovaTheme.primaryBlue),
+        _buildTag('🏋️ ${ex.equipamento}', TitanNovaTheme.accentCyan),
         if (ex.musculosAuxiliares.isNotEmpty)
-          _buildTag('💪 Auxiliares: ${ex.musculosAuxiliares}', JTechTheme.successGreen),
+          _buildTag('💪 Auxiliares: ${ex.musculosAuxiliares}', TitanNovaTheme.successGreen),
       ],
     );
   }
@@ -564,9 +564,9 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
   Widget _buildInstructionsAccordion(Exercicio ex) {
     return Container(
       decoration: BoxDecoration(
-        color: JTechTheme.cardDark,
+        color: TitanNovaTheme.cardDark,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: JTechTheme.dividerColor),
+        border: Border.all(color: TitanNovaTheme.dividerColor),
       ),
       child: Column(
         children: [
@@ -580,12 +580,12 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
                 children: [
                   const Row(
                     children: [
-                      Icon(Icons.menu_book_rounded, color: JTechTheme.accentCyan, size: 18),
+                      Icon(Icons.menu_book_rounded, color: TitanNovaTheme.accentCyan, size: 18),
                       SizedBox(width: 8),
                       Text(
                         'Instruções e Cuidados',
                         style: TextStyle(
-                          color: JTechTheme.textWhite,
+                          color: TitanNovaTheme.textWhite,
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                         ),
@@ -594,7 +594,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
                   ),
                   Icon(
                     _showInstructions ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
-                    color: JTechTheme.accentCyan,
+                    color: TitanNovaTheme.accentCyan,
                   ),
                 ],
               ),
@@ -606,28 +606,28 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Divider(color: JTechTheme.dividerColor, height: 12),
+                  const Divider(color: TitanNovaTheme.dividerColor, height: 12),
                   const Text(
                     'Instruções de Execução:',
-                    style: TextStyle(color: JTechTheme.textWhite, fontWeight: FontWeight.bold, fontSize: 12),
+                    style: TextStyle(color: TitanNovaTheme.textWhite, fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     ex.instrucoes.isNotEmpty
                         ? ex.instrucoes
                         : 'Realizar o movimento com amplitude completa, mantendo o abdômen contraído e postura alinhada.',
-                    style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12, height: 1.35),
+                    style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12, height: 1.35),
                   ),
                   if (ex.cuidados.isNotEmpty) ...[
                     const SizedBox(height: 10),
                     const Text(
                       '⚠️ Cuidados importantes:',
-                      style: TextStyle(color: JTechTheme.warningOrange, fontWeight: FontWeight.bold, fontSize: 12),
+                      style: TextStyle(color: TitanNovaTheme.warningOrange, fontWeight: FontWeight.bold, fontSize: 12),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       ex.cuidados,
-                      style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12, height: 1.35),
+                      style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12, height: 1.35),
                     ),
                   ],
                 ],
@@ -642,12 +642,12 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: const BoxDecoration(
-        color: JTechTheme.surfaceDark,
+        color: TitanNovaTheme.surfaceDark,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(24),
           bottomRight: Radius.circular(24),
         ),
-        border: Border(top: BorderSide(color: JTechTheme.dividerColor)),
+        border: Border(top: BorderSide(color: TitanNovaTheme.dividerColor)),
       ),
       child: Row(
         children: [
@@ -656,11 +656,11 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
               child: OutlinedButton(
                 onPressed: () => Navigator.pop(context),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: JTechTheme.dividerColor),
+                  side: const BorderSide(color: TitanNovaTheme.dividerColor),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text('CANCELAR', style: TextStyle(color: JTechTheme.textGrey, fontWeight: FontWeight.bold)),
+                child: const Text('CANCELAR', style: TextStyle(color: TitanNovaTheme.textGrey, fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(width: 12),
@@ -669,7 +669,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
               child: ElevatedButton.icon(
                 onPressed: () => Navigator.pop(context, ex),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: JTechTheme.successGreen,
+                  backgroundColor: TitanNovaTheme.successGreen,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
@@ -682,7 +682,7 @@ class _ExerciseGifDialogState extends State<ExerciseGifDialog> {
               child: ElevatedButton.icon(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: JTechTheme.primaryBlue,
+                  backgroundColor: TitanNovaTheme.primaryBlue,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 4,

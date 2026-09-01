@@ -68,13 +68,13 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
             child: TextField(
-              style: const TextStyle(color: JTechTheme.textWhite),
+              style: const TextStyle(color: TitanNovaTheme.textWhite),
               decoration: InputDecoration(
                 hintText: '🔍 Buscar por nome, grupo ou equipamento...',
-                prefixIcon: const Icon(Icons.search, color: JTechTheme.primaryBlue),
+                prefixIcon: const Icon(Icons.search, color: TitanNovaTheme.primaryBlue),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, color: JTechTheme.textGrey),
+                        icon: const Icon(Icons.clear, color: TitanNovaTheme.textGrey),
                         onPressed: () => setState(() => _searchQuery = ''),
                       )
                     : null,
@@ -98,10 +98,10 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                   child: ChoiceChip(
                     label: Text(bp),
                     selected: isSelected,
-                    selectedColor: JTechTheme.primaryBlue,
-                    backgroundColor: JTechTheme.cardDark,
+                    selectedColor: TitanNovaTheme.primaryBlue,
+                    backgroundColor: TitanNovaTheme.cardDark,
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : JTechTheme.textGrey,
+                      color: isSelected ? Colors.white : TitanNovaTheme.textGrey,
                       fontSize: 11,
                     ),
                     onSelected: (val) {
@@ -129,10 +129,10 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                   child: ChoiceChip(
                     label: Text(eq),
                     selected: isSelected,
-                    selectedColor: JTechTheme.accentCyan,
-                    backgroundColor: JTechTheme.cardDark,
+                    selectedColor: TitanNovaTheme.accentCyan,
+                    backgroundColor: TitanNovaTheme.cardDark,
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.black : JTechTheme.textGrey,
+                      color: isSelected ? Colors.black : TitanNovaTheme.textGrey,
                       fontSize: 11,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
@@ -149,19 +149,19 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
           // BANNER DISCRETO MODO OFFLINE / STATS
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            color: JTechTheme.cardDark,
+            color: TitanNovaTheme.cardDark,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   '${filtered.length} exercícios disponíveis',
-                  style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                  style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11),
                 ),
                 const Row(
                   children: [
-                    Icon(Icons.wifi_off_rounded, color: JTechTheme.accentCyan, size: 14),
+                    Icon(Icons.wifi_off_rounded, color: TitanNovaTheme.accentCyan, size: 14),
                     SizedBox(width: 4),
-                    Text('Modo Offline Ativo', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 11)),
+                    Text('Modo Offline Ativo', style: TextStyle(color: TitanNovaTheme.accentCyan, fontSize: 11)),
                   ],
                 ),
               ],
@@ -174,7 +174,7 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                 ? const Center(
                     child: Text(
                       'Nenhum exercício encontrado com estes filtros.',
-                      style: TextStyle(color: JTechTheme.textMuted),
+                      style: TextStyle(color: TitanNovaTheme.textMuted),
                     ),
                   )
                 : ListView.builder(
@@ -187,7 +187,7 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
                         child: CheckboxListTile(
-                          activeColor: JTechTheme.successGreen,
+                          activeColor: TitanNovaTheme.successGreen,
                           value: isChecked,
                           onChanged: (val) {
                             setState(() {
@@ -201,27 +201,27 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                           title: Text(
                             ex.nome,
                             style: const TextStyle(
-                              color: JTechTheme.textWhite,
+                              color: TitanNovaTheme.textWhite,
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
                             ),
                           ),
                           subtitle: Text(
                             '${ex.grupoMuscular} • Equipamento: ${ex.equipamento}',
-                            style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                            style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11),
                           ),
                           secondary: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.zoom_in, color: JTechTheme.accentCyan, size: 22),
+                                icon: const Icon(Icons.zoom_in, color: TitanNovaTheme.accentCyan, size: 22),
                                 tooltip: 'Expandir GIF',
                                 onPressed: () {
                                   ExerciseGifDialog.show(context, exercicio: ex, modoSelecao: false);
                                 },
                               ),
                               IconButton(
-                                icon: const Icon(Icons.info_outline, color: JTechTheme.textGrey, size: 20),
+                                icon: const Icon(Icons.info_outline, color: TitanNovaTheme.textGrey, size: 20),
                                 tooltip: 'Detalhes completos',
                                 onPressed: () async {
                                   final res = await Navigator.push(
@@ -249,8 +249,8 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: const BoxDecoration(
-              color: JTechTheme.cardDark,
-              border: Border(top: BorderSide(color: JTechTheme.dividerColor)),
+              color: TitanNovaTheme.cardDark,
+              border: Border(top: BorderSide(color: TitanNovaTheme.dividerColor)),
             ),
             child: SizedBox(
               width: double.infinity,
@@ -265,7 +265,7 @@ class _ExerciseSelectionScreenState extends State<ExerciseSelectionScreen> {
                         Navigator.pop(context, selectedObjects);
                       },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: JTechTheme.successGreen,
+                  backgroundColor: TitanNovaTheme.successGreen,
                   disabledBackgroundColor: Colors.grey.shade800,
                 ),
                 icon: const Icon(Icons.check_circle),

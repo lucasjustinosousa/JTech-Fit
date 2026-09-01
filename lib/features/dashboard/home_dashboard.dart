@@ -35,14 +35,14 @@ class HomeDashboard extends StatelessWidget {
       appBar: AppBar(
         title: Row(
           children: const [
-            Icon(Icons.fitness_center, color: JTechTheme.primaryBlue, size: 24),
+            Icon(Icons.fitness_center, color: TitanNovaTheme.primaryBlue, size: 24),
             SizedBox(width: 8),
-            Text('JTECH FIT', style: TextStyle(fontWeight: FontWeight.black, letterSpacing: 1)),
+            Text('TITANNOVA FIT', style: TextStyle(fontWeight: FontWeight.black, letterSpacing: 1)),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: JTechTheme.textWhite),
+            icon: const Icon(Icons.notifications_outlined, color: TitanNovaTheme.textWhite),
             onPressed: () {},
           ),
         ],
@@ -64,13 +64,13 @@ class HomeDashboard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: JTechTheme.textWhite,
+                        color: TitanNovaTheme.textWhite,
                       ),
                     ),
                     const SizedBox(height: 4),
                     const Text(
                       'Bora superar seus limites hoje?',
-                      style: TextStyle(color: JTechTheme.textGrey, fontSize: 13),
+                      style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 13),
                     ),
                   ],
                 ),
@@ -78,13 +78,13 @@ class HomeDashboard extends StatelessWidget {
                   children: [
                     IconButton(
                       style: IconButton.styleFrom(
-                        backgroundColor: JTechTheme.cardDark,
+                        backgroundColor: TitanNovaTheme.cardDark,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
-                          side: const BorderSide(color: JTechTheme.dividerColor),
+                          side: const BorderSide(color: TitanNovaTheme.dividerColor),
                         ),
                       ),
-                      icon: const Icon(Icons.refresh_rounded, color: JTechTheme.accentCyan, size: 20),
+                      icon: const Icon(Icons.refresh_rounded, color: TitanNovaTheme.accentCyan, size: 20),
                       tooltip: 'Atualizar Dados',
                       onPressed: () async {
                         await repo.carregarDados();
@@ -101,8 +101,8 @@ class HomeDashboard extends StatelessWidget {
                     const SizedBox(width: 8),
                     const CircleAvatar(
                       radius: 20,
-                      backgroundColor: JTechTheme.primaryBlue,
-                      child: Icon(Icons.person, color: JTechTheme.textWhite, size: 20),
+                      backgroundColor: TitanNovaTheme.primaryBlue,
+                      child: Icon(Icons.person, color: TitanNovaTheme.textWhite, size: 20),
                     ),
                   ],
                 ),
@@ -123,7 +123,7 @@ class HomeDashboard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: JTechTheme.primaryBlue.withOpacity(0.35),
+                    color: TitanNovaTheme.primaryBlue.withOpacity(0.35),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),
@@ -167,7 +167,7 @@ class HomeDashboard extends StatelessWidget {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: JTechTheme.successGreen,
+                      backgroundColor: TitanNovaTheme.successGreen,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -196,21 +196,21 @@ class HomeDashboard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: JTechTheme.cardDark,
+                      color: TitanNovaTheme.cardDark,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: JTechTheme.dividerColor),
+                      border: Border.all(color: TitanNovaTheme.dividerColor),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAlignment.start,
                       children: [
-                        const Icon(Icons.fitness_center_outlined, color: JTechTheme.accentCyan, size: 24),
+                        const Icon(Icons.fitness_center_outlined, color: TitanNovaTheme.accentCyan, size: 24),
                         const SizedBox(height: 8),
                         Text(
                           '$treinosNaSemana treinos',
-                          style: const TextStyle(color: JTechTheme.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(color: TitanNovaTheme.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 2),
-                        const Text('Concluídos esta semana', style: TextStyle(color: JTechTheme.textGrey, fontSize: 11)),
+                        const Text('Concluídos esta semana', style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11)),
                       ],
                     ),
                   ),
@@ -220,23 +220,23 @@ class HomeDashboard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: JTechTheme.cardDark,
+                      color: TitanNovaTheme.cardDark,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: JTechTheme.dividerColor),
+                      border: Border.all(color: TitanNovaTheme.dividerColor),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAlignment.start,
                       children: [
-                        const Icon(Icons.history_toggle_off_rounded, color: JTechTheme.successGreen, size: 24),
+                        const Icon(Icons.history_toggle_off_rounded, color: TitanNovaTheme.successGreen, size: 24),
                         const SizedBox(height: 8),
                         Text(
                           ultimoTreino != null ? DateFormat('dd/MM').format(ultimoTreino.inicio) : 'Nenhum',
-                          style: const TextStyle(color: JTechTheme.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(color: TitanNovaTheme.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           ultimoTreino != null ? ultimoTreino.nomeTreino : 'Último treino efetuado',
-                          style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                          style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
@@ -250,7 +250,7 @@ class HomeDashboard extends StatelessWidget {
             // ATALHOS RÁPIDOS
             const Text(
               'Acesso Rápido',
-              style: TextStyle(color: JTechTheme.textWhite, fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             Row(
@@ -259,19 +259,19 @@ class HomeDashboard extends StatelessWidget {
                 _buildShortcutItem(
                   icon: Icons.list_alt_rounded,
                   label: 'Meus Treinos',
-                  color: JTechTheme.primaryBlue,
+                  color: TitanNovaTheme.primaryBlue,
                   onTap: () => onNavigateToTab(1),
                 ),
                 _buildShortcutItem(
                   icon: Icons.fitness_center_sharp,
                   label: 'Exercícios',
-                  color: JTechTheme.accentCyan,
+                  color: TitanNovaTheme.accentCyan,
                   onTap: () => onNavigateToTab(2),
                 ),
                 _buildShortcutItem(
                   icon: Icons.bar_chart_rounded,
                   label: 'Histórico',
-                  color: JTechTheme.warningOrange,
+                  color: TitanNovaTheme.warningOrange,
                   onTap: () => onNavigateToTab(3),
                 ),
                 _buildShortcutItem(
@@ -314,7 +314,7 @@ class HomeDashboard extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             label,
-            style: const TextStyle(color: JTechTheme.textWhite, fontSize: 12, fontWeight: FontWeight.w500),
+            style: const TextStyle(color: TitanNovaTheme.textWhite, fontSize: 12, fontWeight: FontWeight.w500),
           ),
         ],
       ),

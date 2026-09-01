@@ -185,12 +185,12 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
               padding: const EdgeInsets.only(right: 16),
               child: Row(
                 children: [
-                  const Icon(Icons.timer_outlined, color: JTechTheme.accentCyan, size: 18),
+                  const Icon(Icons.timer_outlined, color: TitanNovaTheme.accentCyan, size: 18),
                   const SizedBox(width: 4),
                   Text(
                     _formatTempo(_segundosDecorridos),
                     style: const TextStyle(
-                      color: JTechTheme.accentCyan,
+                      color: TitanNovaTheme.accentCyan,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -214,7 +214,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                 children: [
                   // CABEÇALHO DO EXERCÍCIO ATUAL
                   Card(
-                    color: JTechTheme.surfaceDark,
+                    color: TitanNovaTheme.surfaceDark,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -225,17 +225,17 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                             children: [
                               Text(
                                 'Exercício ${_exercicioIndexAtual + 1} de ${widget.treino.exercicios.length}',
-                                style: const TextStyle(color: JTechTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 12),
+                                style: const TextStyle(color: TitanNovaTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 12),
                               ),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: JTechTheme.cardDark,
+                                  color: TitanNovaTheme.cardDark,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
                                   currentExInfo?.grupoMuscular ?? 'Treino',
-                                  style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                                  style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11),
                                 ),
                               ),
                             ],
@@ -250,12 +250,12 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                   children: [
                                     Text(
                                       currentExInfo?.nome ?? 'Exercício Sem Nome',
-                                      style: const TextStyle(color: JTechTheme.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
+                                      style: const TextStyle(color: TitanNovaTheme.textWhite, fontSize: 18, fontWeight: FontWeight.bold),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       'Metas: ${currentExItem.quantidadeSeries} séries x ${currentExItem.repeticoes} reps • Descanso: ${currentExItem.descansoSegundos}s',
-                                      style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12),
+                                      style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12),
                                     ),
                                   ],
                                 ),
@@ -271,10 +271,10 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                 decoration: BoxDecoration(
-                                  color: JTechTheme.accentCyan.withOpacity(0.08),
+                                  color: TitanNovaTheme.accentCyan.withOpacity(0.08),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: JTechTheme.accentCyan.withOpacity(0.4),
+                                    color: TitanNovaTheme.accentCyan.withOpacity(0.4),
                                   ),
                                 ),
                                 child: Row(
@@ -286,7 +286,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                       decoration: BoxDecoration(
                                         color: Colors.black,
                                         borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4)),
+                                        border: Border.all(color: TitanNovaTheme.accentCyan.withOpacity(0.4)),
                                       ),
                                       child: Stack(
                                         children: [
@@ -298,7 +298,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                               height: 48,
                                               fit: BoxFit.cover,
                                               errorBuilder: (_, __, ___) => const Center(
-                                                child: Icon(Icons.fitness_center, color: JTechTheme.primaryBlue),
+                                                child: Icon(Icons.fitness_center, color: TitanNovaTheme.primaryBlue),
                                               ),
                                             ),
                                           ),
@@ -310,9 +310,9 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                               decoration: BoxDecoration(
                                                 color: Colors.black.withOpacity(0.85),
                                                 borderRadius: BorderRadius.circular(3),
-                                                border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.6), width: 0.5),
+                                                border: Border.all(color: TitanNovaTheme.accentCyan.withOpacity(0.6), width: 0.5),
                                               ),
-                                              child: const Text('GIF', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 7, fontWeight: FontWeight.bold)),
+                                              child: const Text('GIF', style: TextStyle(color: TitanNovaTheme.accentCyan, fontSize: 7, fontWeight: FontWeight.bold)),
                                             ),
                                           ),
                                         ],
@@ -324,12 +324,12 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                         children: [
                                           Row(
                                             children: [
-                                              Icon(Icons.menu_book, color: JTechTheme.accentCyan, size: 14),
+                                              Icon(Icons.menu_book, color: TitanNovaTheme.accentCyan, size: 14),
                                               SizedBox(width: 4),
                                               Text(
                                                 'INSTRUÇÕES E GIF',
                                                 style: TextStyle(
-                                                  color: JTechTheme.accentCyan,
+                                                  color: TitanNovaTheme.accentCyan,
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 12,
                                                   letterSpacing: 0.3,
@@ -340,12 +340,12 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                                           SizedBox(height: 2),
                                           Text(
                                             'Ver animação 3D e guia de execução',
-                                            style: TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                                            style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    const Icon(Icons.north_east, color: JTechTheme.accentCyan, size: 18),
+                                    const Icon(Icons.north_east, color: TitanNovaTheme.accentCyan, size: 18),
                                   ],
                                 ),
                               ),
@@ -360,7 +360,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                   // TABELA DE REGISTRO DE SÉRIES
                   const Text(
                     'Registro de Séries & Cargas',
-                    style: TextStyle(color: JTechTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
 
@@ -374,10 +374,10 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                         margin: const EdgeInsets.only(bottom: 8),
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: s.concluida ? JTechTheme.successGreen.withOpacity(0.15) : JTechTheme.cardDark,
+                          color: s.concluida ? TitanNovaTheme.successGreen.withOpacity(0.15) : TitanNovaTheme.cardDark,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: s.concluida ? JTechTheme.successGreen : JTechTheme.dividerColor,
+                            color: s.concluida ? TitanNovaTheme.successGreen : TitanNovaTheme.dividerColor,
                           ),
                         ),
                         child: Row(
@@ -387,7 +387,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                               height: 32,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: s.concluida ? JTechTheme.successGreen : JTechTheme.primaryBlue,
+                                color: s.concluida ? TitanNovaTheme.successGreen : TitanNovaTheme.primaryBlue,
                                 shape: BoxShape.circle,
                               ),
                               child: Text(
@@ -402,7 +402,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                               child: TextFormField(
                                 initialValue: '${s.carga}',
                                 keyboardType: TextInputType.number,
-                                style: const TextStyle(color: JTechTheme.textWhite, fontSize: 14),
+                                style: const TextStyle(color: TitanNovaTheme.textWhite, fontSize: 14),
                                 decoration: const InputDecoration(
                                   labelText: 'Carga (kg)',
                                   isDense: true,
@@ -428,7 +428,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                               child: TextFormField(
                                 initialValue: '${s.repeticoes}',
                                 keyboardType: TextInputType.number,
-                                style: const TextStyle(color: JTechTheme.textWhite, fontSize: 14),
+                                style: const TextStyle(color: TitanNovaTheme.textWhite, fontSize: 14),
                                 decoration: const InputDecoration(
                                   labelText: 'Reps',
                                   isDense: true,
@@ -452,7 +452,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                             // Checkbox de Conclusão Verde
                             Checkbox(
                               value: s.concluida,
-                              activeColor: JTechTheme.successGreen,
+                              activeColor: TitanNovaTheme.successGreen,
                               onChanged: (val) => _concluirSerie(currentExItem.exercicioId, idx, val ?? false),
                             ),
                           ],
@@ -479,8 +479,8 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                             : _finalizarTreino,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _exercicioIndexAtual == widget.treino.exercicios.length - 1
-                              ? JTechTheme.successGreen
-                              : JTechTheme.primaryBlue,
+                              ? TitanNovaTheme.successGreen
+                              : TitanNovaTheme.primaryBlue,
                         ),
                         icon: Icon(_exercicioIndexAtual == widget.treino.exercicios.length - 1 ? Icons.check : Icons.arrow_forward),
                         label: Text(_exercicioIndexAtual == widget.treino.exercicios.length - 1 ? 'FINALIZAR' : 'Próximo'),
@@ -496,12 +496,12 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(
-              color: JTechTheme.surfaceDark,
-              border: Border(top: BorderSide(color: JTechTheme.dividerColor)),
+              color: TitanNovaTheme.surfaceDark,
+              border: Border(top: BorderSide(color: TitanNovaTheme.dividerColor)),
             ),
             child: ElevatedButton(
               onPressed: _finalizarTreino,
-              style: ElevatedButton.styleFrom(backgroundColor: JTechTheme.successGreen),
+              style: ElevatedButton.styleFrom(backgroundColor: TitanNovaTheme.successGreen),
               child: const Text('FINALIZAR TREINO COMPLETO'),
             ),
           ),
@@ -523,9 +523,9 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
             children: [
               Row(
                 children: const [
-                  Icon(Icons.hourglass_top_rounded, color: JTechTheme.accentCyan, size: 20),
+                  Icon(Icons.hourglass_top_rounded, color: TitanNovaTheme.accentCyan, size: 20),
                   SizedBox(width: 8),
-                  Text('DESCANSO EM ANDAMENTO', style: TextStyle(color: JTechTheme.accentCyan, fontWeight: FontWeight.bold, fontSize: 13)),
+                  Text('DESCANSO EM ANDAMENTO', style: TextStyle(color: TitanNovaTheme.accentCyan, fontWeight: FontWeight.bold, fontSize: 13)),
                 ],
               ),
               Text(
@@ -537,8 +537,8 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
           const SizedBox(height: 8),
           LinearProgressIndicator(
             value: progress,
-            backgroundColor: JTechTheme.cardDark,
-            color: JTechTheme.accentCyan,
+            backgroundColor: TitanNovaTheme.cardDark,
+            color: TitanNovaTheme.accentCyan,
             minHeight: 6,
           ),
           const SizedBox(height: 8),
@@ -546,22 +546,22 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
-                icon: const Icon(Icons.remove_circle_outline, color: JTechTheme.textWhite),
+                icon: const Icon(Icons.remove_circle_outline, color: TitanNovaTheme.textWhite),
                 onPressed: () => _ajustarTempoDescanso(-15),
                 tooltip: '-15s',
               ),
               IconButton(
-                icon: Icon(_isRestPaused ? Icons.play_arrow : Icons.pause, color: JTechTheme.accentCyan),
+                icon: Icon(_isRestPaused ? Icons.play_arrow : Icons.pause, color: TitanNovaTheme.accentCyan),
                 onPressed: () => setState(() => _isRestPaused = !_isRestPaused),
               ),
               IconButton(
-                icon: const Icon(Icons.add_circle_outline, color: JTechTheme.textWhite),
+                icon: const Icon(Icons.add_circle_outline, color: TitanNovaTheme.textWhite),
                 onPressed: () => _ajustarTempoDescanso(15),
                 tooltip: '+15s',
               ),
               TextButton(
                 onPressed: _pularDescanso,
-                child: const Text('PULAR', style: TextStyle(color: JTechTheme.warningOrange, fontWeight: FontWeight.bold)),
+                child: const Text('PULAR', style: TextStyle(color: TitanNovaTheme.warningOrange, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -582,10 +582,10 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
           decoration: BoxDecoration(
             color: const Color(0xFF0C0E14),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: JTechTheme.accentCyan, width: 1.5),
+            border: Border.all(color: TitanNovaTheme.accentCyan, width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: JTechTheme.accentCyan.withOpacity(0.3),
+                color: TitanNovaTheme.accentCyan.withOpacity(0.3),
                 blurRadius: 25,
                 spreadRadius: 2,
               ),
@@ -613,7 +613,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                           const SizedBox(height: 2),
                           Text(
                             '${exInfo.grupoMuscular} • ${exInfo.equipamento}',
-                            style: const TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                            style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11),
                           ),
                         ],
                       ),
@@ -625,7 +625,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                   ],
                 ),
               ),
-              const Divider(height: 1, color: JTechTheme.dividerColor),
+              const Divider(height: 1, color: TitanNovaTheme.dividerColor),
 
               // Visualizador do GIF com Zoom Interativo
               Container(
@@ -639,7 +639,7 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                     exInfo.gifUrl!,
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) => const Center(
-                      child: Text('GIF indisponível', style: TextStyle(color: JTechTheme.textGrey)),
+                      child: Text('GIF indisponível', style: TextStyle(color: TitanNovaTheme.textGrey)),
                     ),
                   ),
                 ),
@@ -653,12 +653,12 @@ class _ActiveWorkoutScreenState extends State<ActiveWorkoutScreen> {
                   children: [
                     const Text(
                       'Pinça ou duplo toque p/ zoom',
-                      style: TextStyle(color: JTechTheme.textGrey, fontSize: 11),
+                      style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11),
                     ),
                     ElevatedButton(
                       onPressed: () => Navigator.of(ctx).pop(),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: JTechTheme.accentCyan,
+                        backgroundColor: TitanNovaTheme.accentCyan,
                         foregroundColor: Colors.black,
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       ),

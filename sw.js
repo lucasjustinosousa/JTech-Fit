@@ -1,4 +1,4 @@
-const CACHE_NAME = 'jtech-fit-v1.1.3';
+const CACHE_NAME = 'titannova-fit-v2.0.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

@@ -44,8 +44,8 @@
     <circle cx="100" cy="0" r="16" fill="#ffffff"/>
   </g>
 
-  <!-- Texto JTECH FIT no Ícone Executável -->
-  <text x="256" y="420" font-family="'Outfit', sans-serif" font-weight="900" font-size="44" fill="#ffffff" text-anchor="middle" letter-spacing="4">
-    JTECH <tspan fill="#00d2ff">FIT</tspan>
+  <!-- Texto TITANNOVA FIT no Ícone Executável -->
+  <text x="256" y="420" font-family="'Outfit', sans-serif" font-weight="900" font-size="36" fill="#ffffff" text-anchor="middle" letter-spacing="3">
+    TITANNOVA <tspan fill="#00d2ff">FIT</tspan>
   </text>
 </svg>

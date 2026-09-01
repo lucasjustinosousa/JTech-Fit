@@ -15,7 +15,7 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final _emailController = TextEditingController(text: 'atleta@jtechfit.com');
+  final _emailController = TextEditingController(text: 'atleta@titannovafit.com');
   final _passController = TextEditingController(text: '123456');
   bool _isLogin = true;
   bool _isLoading = false;
@@ -56,14 +56,14 @@ class _AuthScreenState extends State<AuthScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: JTechTheme.cardDark,
-        title: const Text('Recuperar Senha', style: TextStyle(color: JTechTheme.textWhite)),
+        backgroundColor: TitanNovaTheme.cardDark,
+        title: const Text('Recuperar Senha', style: TextStyle(color: TitanNovaTheme.textWhite)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
               'Digite seu e-mail cadastrado para receber o link de redefinição de senha:',
-              style: TextStyle(color: JTechTheme.textGrey, fontSize: 13),
+              style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 13),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -75,7 +75,7 @@ class _AuthScreenState extends State<AuthScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar', style: TextStyle(color: JTechTheme.textGrey)),
+            child: const Text('Cancelar', style: TextStyle(color: TitanNovaTheme.textGrey)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -101,16 +101,16 @@ class _AuthScreenState extends State<AuthScreen> {
             crossAxisAlignment: CrossAlignment.center,
             children: [
               const SizedBox(height: 30),
-              // LOGOTIPO JTECH FIT
+              // LOGOTIPO TITANNOVA FIT
               Container(
                 width: 90,
                 height: 90,
                 decoration: BoxDecoration(
-                  color: JTechTheme.primaryBlue,
+                  color: TitanNovaTheme.primaryBlue,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: JTechTheme.primaryBlue.withOpacity(0.4),
+                      color: TitanNovaTheme.primaryBlue.withOpacity(0.4),
                       blurRadius: 20,
                       spreadRadius: 2,
                     ),
@@ -119,7 +119,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: const Icon(
                   Icons.fitness_center_rounded,
                   size: 52,
-                  color: JTechTheme.textWhite,
+                  color: TitanNovaTheme.textWhite,
                 ),
               ),
               const SizedBox(height: 16),
@@ -131,7 +131,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.black,
-                        color: JTechTheme.textWhite,
+                        color: TitanNovaTheme.textWhite,
                         letterSpacing: 1.5,
                       ),
                     ),
@@ -140,7 +140,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.black,
-                        color: JTechTheme.accentCyan,
+                        color: TitanNovaTheme.accentCyan,
                         letterSpacing: 1.5,
                       ),
                     ),
@@ -150,27 +150,27 @@ class _AuthScreenState extends State<AuthScreen> {
               const SizedBox(height: 6),
               const Text(
                 'Seu Treino sob Controle Absoluto',
-                style: TextStyle(color: JTechTheme.textGrey, fontSize: 14),
+                style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 14),
               ),
               const SizedBox(height: 36),
 
               // Formulário de Autenticação
               TextField(
                 controller: _emailController,
-                style: const TextStyle(color: JTechTheme.textWhite),
+                style: const TextStyle(color: TitanNovaTheme.textWhite),
                 decoration: const InputDecoration(
                   labelText: 'E-mail',
-                  prefixIcon: Icon(Icons.email_outlined, color: JTechTheme.primaryBlue),
+                  prefixIcon: Icon(Icons.email_outlined, color: TitanNovaTheme.primaryBlue),
                 ),
               ),
               const SizedBox(height: 14),
               TextField(
                 controller: _passController,
                 obscureText: true,
-                style: const TextStyle(color: JTechTheme.textWhite),
+                style: const TextStyle(color: TitanNovaTheme.textWhite),
                 decoration: const InputDecoration(
                   labelText: 'Senha',
-                  prefixIcon: Icon(Icons.lock_outline, color: JTechTheme.primaryBlue),
+                  prefixIcon: Icon(Icons.lock_outline, color: TitanNovaTheme.primaryBlue),
                 ),
               ),
               const SizedBox(height: 8),
@@ -181,7 +181,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   onPressed: _recuperarSenha,
                   child: const Text(
                     'Esqueceu a senha?',
-                    style: TextStyle(color: JTechTheme.accentCyan, fontSize: 13),
+                    style: TextStyle(color: TitanNovaTheme.accentCyan, fontSize: 13),
                   ),
                 ),
               ),
@@ -200,12 +200,12 @@ class _AuthScreenState extends State<AuthScreen> {
                 },
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(50),
-                  side: const BorderSide(color: JTechTheme.primaryBlue),
+                  side: const BorderSide(color: TitanNovaTheme.primaryBlue),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
                 child: Text(
                   _isLogin ? 'Criar nova conta' : 'Já possuo uma conta (Entrar)',
-                  style: const TextStyle(color: JTechTheme.primaryBlue, fontWeight: FontWeight.bold),
+                  style: const TextStyle(color: TitanNovaTheme.primaryBlue, fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(height: 16),
@@ -218,10 +218,10 @@ class _AuthScreenState extends State<AuthScreen> {
                   children: const [
                     Text(
                       'Continuar sem cadastro (Modo Convidado)',
-                      style: TextStyle(color: JTechTheme.textGrey, fontSize: 13, decoration: TextDecoration.underline),
+                      style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 13, decoration: TextDecoration.underline),
                     ),
                     SizedBox(width: 4),
-                    Icon(Icons.arrow_forward_ios, size: 12, color: JTechTheme.textGrey),
+                    Icon(Icons.arrow_forward_ios, size: 12, color: TitanNovaTheme.textGrey),
                   ],
                 ),
               ),

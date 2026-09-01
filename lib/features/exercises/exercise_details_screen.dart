@@ -51,7 +51,7 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
               decoration: BoxDecoration(
                 color: Colors.black,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: JTechTheme.dividerColor),
+                border: Border.all(color: TitanNovaTheme.dividerColor),
               ),
               child: Stack(
                 alignment: Alignment.center,
@@ -78,10 +78,10 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                                 children: [
                                   CircularProgressIndicator(
                                     value: progress,
-                                    color: JTechTheme.accentCyan,
+                                    color: TitanNovaTheme.accentCyan,
                                   ),
                                   const SizedBox(height: 12),
-                                  const Text('Carregando animação GIF...', style: TextStyle(color: JTechTheme.textGrey, fontSize: 12)),
+                                  const Text('Carregando animação GIF...', style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12)),
                                 ],
                               ),
                             );
@@ -90,9 +90,9 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.fitness_center, color: JTechTheme.primaryBlue, size: 64),
+                                Icon(Icons.fitness_center, color: TitanNovaTheme.primaryBlue, size: 64),
                                 SizedBox(height: 8),
-                                Text('Pré-visualização 3D demonstrativa', style: TextStyle(color: JTechTheme.textGrey, fontSize: 12)),
+                                Text('Pré-visualização 3D demonstrativa', style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12)),
                               ],
                             ),
                           ),
@@ -114,9 +114,9 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.play_circle_outline, color: JTechTheme.accentCyan, size: 64),
+                              Icon(Icons.play_circle_outline, color: TitanNovaTheme.accentCyan, size: 64),
                               SizedBox(height: 8),
-                              Text('Toque para reproduzir animação', style: TextStyle(color: JTechTheme.textGrey, fontSize: 12)),
+                              Text('Toque para reproduzir animação', style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12)),
                             ],
                           ),
                         ),
@@ -133,14 +133,14 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.75),
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4), width: 0.5),
+                          border: Border.all(color: TitanNovaTheme.accentCyan.withOpacity(0.4), width: 0.5),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.zoom_in, color: JTechTheme.accentCyan, size: 14),
+                            Icon(Icons.zoom_in, color: TitanNovaTheme.accentCyan, size: 14),
                             SizedBox(width: 4),
-                            Text('Toque para zoom / tela cheia', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 10, fontWeight: FontWeight.bold)),
+                            Text('Toque para zoom / tela cheia', style: TextStyle(color: TitanNovaTheme.accentCyan, fontSize: 10, fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),
@@ -157,7 +157,7 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: IconButton(
-                          icon: const Icon(Icons.fullscreen, color: JTechTheme.accentCyan),
+                          icon: const Icon(Icons.fullscreen, color: TitanNovaTheme.accentCyan),
                           tooltip: 'Expandir GIF',
                           onPressed: () => _mostrarGifEmTelaCheia(context, ex),
                         ),
@@ -176,14 +176,14 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                         decoration: BoxDecoration(
                           color: Colors.black.withOpacity(0.75),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.5)),
+                          border: Border.all(color: TitanNovaTheme.accentCyan.withOpacity(0.5)),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.zoom_in, color: JTechTheme.accentCyan, size: 14),
+                            Icon(Icons.zoom_in, color: TitanNovaTheme.accentCyan, size: 14),
                             SizedBox(width: 4),
-                            Text('AMPLIAR', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 10, fontWeight: FontWeight.bold)),
+                            Text('AMPLIAR', style: TextStyle(color: TitanNovaTheme.accentCyan, fontSize: 10, fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),
@@ -196,7 +196,7 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                       bottom: 12,
                       right: 12,
                       child: FloatingActionButton.small(
-                        backgroundColor: JTechTheme.primaryBlue,
+                        backgroundColor: TitanNovaTheme.primaryBlue,
                         onPressed: () {
                           setState(() => _isPlayingGif = !_isPlayingGif);
                         },
@@ -211,13 +211,13 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
             // INFORMATIVO TÉCNICO
             Text(
               ex.nome,
-              style: const TextStyle(color: JTechTheme.textWhite, fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: TitanNovaTheme.textWhite, fontSize: 20, fontWeight: FontWeight.bold),
             ),
             if (ex.nomeOriginal != null && ex.nomeOriginal!.isNotEmpty) ...[
               const SizedBox(height: 2),
               Text(
                 ex.nomeOriginal!,
-                style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12, fontStyle: FontStyle.italic),
+                style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12, fontStyle: FontStyle.italic),
               ),
             ],
             const SizedBox(height: 12),
@@ -226,10 +226,10 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
               spacing: 8,
               runSpacing: 8,
               children: [
-                _buildTag('🎯 Músculo: ${ex.grupoMuscular}', JTechTheme.primaryBlue),
-                _buildTag('🏋️ Equipamento: ${ex.equipamento}', JTechTheme.accentCyan),
+                _buildTag('🎯 Músculo: ${ex.grupoMuscular}', TitanNovaTheme.primaryBlue),
+                _buildTag('🏋️ Equipamento: ${ex.equipamento}', TitanNovaTheme.accentCyan),
                 if (ex.musculosAuxiliares.isNotEmpty)
-                  _buildTag('💪 Auxiliares: ${ex.musculosAuxiliares}', JTechTheme.successGreen),
+                  _buildTag('💪 Auxiliares: ${ex.musculosAuxiliares}', TitanNovaTheme.successGreen),
               ],
             ),
             const SizedBox(height: 20),
@@ -237,19 +237,19 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
             // INSTRUÇÕES PASSO A PASSO
             const Text(
               'Instruções de Execução',
-              style: TextStyle(color: JTechTheme.textWhite, fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: JTechTheme.cardDark,
+                color: TitanNovaTheme.cardDark,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: JTechTheme.dividerColor),
+                border: Border.all(color: TitanNovaTheme.dividerColor),
               ),
               child: Text(
                 ex.instrucoes.isNotEmpty ? ex.instrucoes : 'Executar o movimento com amplitude completa e controle de carga.',
-                style: const TextStyle(color: JTechTheme.textGrey, fontSize: 13, height: 1.4),
+                style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 13, height: 1.4),
               ),
             ),
             const SizedBox(height: 20),
@@ -287,7 +287,7 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                   onPressed: () {
                     Navigator.pop(context, 'select');
                   },
-                  style: ElevatedButton.styleFrom(backgroundColor: JTechTheme.successGreen),
+                  style: ElevatedButton.styleFrom(backgroundColor: TitanNovaTheme.successGreen),
                   icon: const Icon(Icons.add_circle_outline),
                   label: const Text('ADICIONAR AO TREINO', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
@@ -368,7 +368,7 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                         return const Center(
                           child: Padding(
                             padding: EdgeInsets.all(40),
-                            child: CircularProgressIndicator(color: JTechTheme.accentCyan),
+                            child: CircularProgressIndicator(color: TitanNovaTheme.accentCyan),
                           ),
                         );
                       },
@@ -378,9 +378,9 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.broken_image_outlined, color: JTechTheme.warningOrange, size: 48),
+                              Icon(Icons.broken_image_outlined, color: TitanNovaTheme.warningOrange, size: 48),
                               SizedBox(height: 8),
-                              Text('Não foi possível carregar o GIF em tela cheia', style: TextStyle(color: JTechTheme.textWhite, fontSize: 12)),
+                              Text('Não foi possível carregar o GIF em tela cheia', style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 12)),
                             ],
                           ),
                         ),
@@ -394,7 +394,7 @@ class _ExerciseDetailsScreenState extends State<ExerciseDetailsScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(ctx),
-                  style: ElevatedButton.styleFrom(backgroundColor: JTechTheme.primaryBlue),
+                  style: ElevatedButton.styleFrom(backgroundColor: TitanNovaTheme.primaryBlue),
                   child: const Text('FECHAR TELA CHEIA'),
                 ),
               ),

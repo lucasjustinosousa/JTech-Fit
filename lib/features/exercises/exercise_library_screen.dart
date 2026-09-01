@@ -47,14 +47,14 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           IconButton(
             icon: Icon(
               _apenasFavoritos ? Icons.star : Icons.star_border,
-              color: _apenasFavoritos ? Colors.amber : JTechTheme.textWhite,
+              color: _apenasFavoritos ? Colors.amber : TitanNovaTheme.textWhite,
             ),
             onPressed: () {
               setState(() => _apenasFavoritos = !_apenasFavoritos);
             },
           ),
           IconButton(
-            icon: const Icon(Icons.add, color: JTechTheme.accentCyan),
+            icon: const Icon(Icons.add, color: TitanNovaTheme.accentCyan),
             onPressed: () {
               showDialog(
                 context: context,
@@ -70,13 +70,13 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
           Padding(
             padding: const EdgeInsets.all(12),
             child: TextField(
-              style: const TextStyle(color: JTechTheme.textWhite),
+              style: const TextStyle(color: TitanNovaTheme.textWhite),
               decoration: InputDecoration(
                 hintText: 'Buscar exercício por nome, equipamento...',
-                prefixIcon: const Icon(Icons.search, color: JTechTheme.primaryBlue),
+                prefixIcon: const Icon(Icons.search, color: TitanNovaTheme.primaryBlue),
                 suffixIcon: _buscaQuery.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear, color: JTechTheme.textGrey),
+                        icon: const Icon(Icons.clear, color: TitanNovaTheme.textGrey),
                         onPressed: () => setState(() => _buscaQuery = ''),
                       )
                     : null,
@@ -100,10 +100,10 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                   child: ChoiceChip(
                     label: Text(grupo),
                     selected: isSelected,
-                    selectedColor: JTechTheme.primaryBlue,
-                    backgroundColor: JTechTheme.cardDark,
+                    selectedColor: TitanNovaTheme.primaryBlue,
+                    backgroundColor: TitanNovaTheme.cardDark,
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : JTechTheme.textGrey,
+                      color: isSelected ? Colors.white : TitanNovaTheme.textGrey,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                       fontSize: 12,
                     ),
@@ -123,7 +123,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                 ? const Center(
                     child: Text(
                       'Nenhum exercício encontrado para estes filtros.',
-                      style: TextStyle(color: JTechTheme.textMuted),
+                      style: TextStyle(color: TitanNovaTheme.textMuted),
                     ),
                   )
                 : ListView.builder(
@@ -134,8 +134,8 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                       return Card(
                         margin: const EdgeInsets.only(bottom: 12),
                         child: ExpansionTile(
-                          iconColor: JTechTheme.accentCyan,
-                          collapsedIconColor: JTechTheme.textGrey,
+                          iconColor: TitanNovaTheme.accentCyan,
+                          collapsedIconColor: TitanNovaTheme.textGrey,
                           leading: GestureDetector(
                             onTap: () => _mostrarGifExpandido(context, ex),
                             child: Stack(
@@ -146,7 +146,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                   decoration: BoxDecoration(
                                     color: Colors.black,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4)),
+                                    border: Border.all(color: TitanNovaTheme.accentCyan.withOpacity(0.4)),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.black.withOpacity(0.5),
@@ -163,12 +163,12 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                             fit: BoxFit.cover,
                                             errorBuilder: (context, error, stackTrace) => Icon(
                                               _getGroupIcon(ex.grupoMuscular),
-                                              color: JTechTheme.primaryBlue,
+                                              color: TitanNovaTheme.primaryBlue,
                                             ),
                                           )
                                         : Icon(
                                             _getGroupIcon(ex.grupoMuscular),
-                                            color: JTechTheme.primaryBlue,
+                                            color: TitanNovaTheme.primaryBlue,
                                           ),
                                   ),
                                 ),
@@ -180,9 +180,9 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                     decoration: BoxDecoration(
                                       color: Colors.black.withOpacity(0.8),
                                       borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.6), width: 0.5),
+                                      border: Border.all(color: TitanNovaTheme.accentCyan.withOpacity(0.6), width: 0.5),
                                     ),
-                                    child: const Icon(Icons.zoom_in, color: JTechTheme.accentCyan, size: 10),
+                                    child: const Icon(Icons.zoom_in, color: TitanNovaTheme.accentCyan, size: 10),
                                   ),
                                 ),
                               ],
@@ -194,7 +194,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                 child: Text(
                                   ex.nome,
                                   style: const TextStyle(
-                                    color: JTechTheme.textWhite,
+                                    color: TitanNovaTheme.textWhite,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15,
                                   ),
@@ -203,7 +203,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                               IconButton(
                                 icon: Icon(
                                   ex.isFavorito ? Icons.star : Icons.star_border,
-                                  color: ex.isFavorito ? Colors.amber : JTechTheme.textMuted,
+                                  color: ex.isFavorito ? Colors.amber : TitanNovaTheme.textMuted,
                                   size: 22,
                                 ),
                                 onPressed: () => repo.toggleFavorito(ex.id),
@@ -212,7 +212,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                           ),
                           subtitle: Text(
                             '${ex.grupoMuscular} • Equipamento: ${ex.equipamento}',
-                            style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12),
+                            style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12),
                           ),
                           children: [
                             Padding(
@@ -229,7 +229,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                       decoration: BoxDecoration(
                                         color: const Color(0xFF060709),
                                         borderRadius: BorderRadius.circular(16),
-                                        border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4), width: 1.2),
+                                        border: Border.all(color: TitanNovaTheme.accentCyan.withOpacity(0.4), width: 1.2),
                                         boxShadow: [
                                           BoxShadow(
                                             color: Colors.black.withOpacity(0.6),
@@ -253,15 +253,15 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                                       child: Column(
                                                         mainAxisAlignment: MainAxisAlignment.center,
                                                         children: [
-                                                          Icon(_getGroupIcon(ex.grupoMuscular), color: JTechTheme.accentCyan, size: 54),
+                                                          Icon(_getGroupIcon(ex.grupoMuscular), color: TitanNovaTheme.accentCyan, size: 54),
                                                           const SizedBox(height: 8),
-                                                          const Text('Demonstração indisponível', style: TextStyle(color: JTechTheme.textGrey, fontSize: 11)),
+                                                          const Text('Demonstração indisponível', style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 11)),
                                                         ],
                                                       ),
                                                     ),
                                                   )
                                                 : Center(
-                                                    child: Icon(_getGroupIcon(ex.grupoMuscular), color: JTechTheme.accentCyan, size: 54),
+                                                    child: Icon(_getGroupIcon(ex.grupoMuscular), color: TitanNovaTheme.accentCyan, size: 54),
                                                   ),
 
                                             // Badge no GIF
@@ -273,14 +273,14 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                                 decoration: BoxDecoration(
                                                   color: Colors.black.withOpacity(0.8),
                                                   borderRadius: BorderRadius.circular(6),
-                                                  border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.6)),
+                                                  border: Border.all(color: TitanNovaTheme.accentCyan.withOpacity(0.6)),
                                                 ),
                                                 child: const Row(
                                                   mainAxisSize: MainAxisSize.min,
                                                   children: [
-                                                    Icon(Icons.zoom_in, color: JTechTheme.accentCyan, size: 12),
+                                                    Icon(Icons.zoom_in, color: TitanNovaTheme.accentCyan, size: 12),
                                                     SizedBox(width: 4),
-                                                    Text('TOQUE P/ ZOOM 3D', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 9, fontWeight: FontWeight.bold)),
+                                                    Text('TOQUE P/ ZOOM 3D', style: TextStyle(color: TitanNovaTheme.accentCyan, fontSize: 9, fontWeight: FontWeight.bold)),
                                                   ],
                                                 ),
                                               ),
@@ -295,17 +295,17 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
 
                                   if (ex.musculosAuxiliares.isNotEmpty) ...[
                                     Text('Músculos auxiliares: ${ex.musculosAuxiliares}',
-                                        style: const TextStyle(color: JTechTheme.accentCyan, fontSize: 12)),
+                                        style: const TextStyle(color: TitanNovaTheme.accentCyan, fontSize: 12)),
                                     const SizedBox(height: 8),
                                   ],
-                                  const Text('Instruções:', style: TextStyle(color: JTechTheme.textWhite, fontWeight: FontWeight.bold, fontSize: 13)),
+                                  const Text('Instruções:', style: TextStyle(color: TitanNovaTheme.textWhite, fontWeight: FontWeight.bold, fontSize: 13)),
                                   const SizedBox(height: 4),
-                                  Text(ex.instrucoes, style: const TextStyle(color: JTechTheme.textGrey, fontSize: 13)),
+                                  Text(ex.instrucoes, style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 13)),
                                   if (ex.cuidados.isNotEmpty) ...[
                                     const SizedBox(height: 10),
-                                    const Text('Cuidados na execução:', style: TextStyle(color: JTechTheme.warningOrange, fontWeight: FontWeight.bold, fontSize: 13)),
+                                    const Text('Cuidados na execução:', style: TextStyle(color: TitanNovaTheme.warningOrange, fontWeight: FontWeight.bold, fontSize: 13)),
                                     const SizedBox(height: 4),
-                                    Text(ex.cuidados, style: const TextStyle(color: JTechTheme.textGrey, fontSize: 13)),
+                                    Text(ex.cuidados, style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 13)),
                                   ],
                                   const SizedBox(height: 14),
                                   Row(
@@ -315,11 +315,11 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                           child: OutlinedButton.icon(
                                             onPressed: () => _mostrarGifExpandido(context, ex),
                                             style: OutlinedButton.styleFrom(
-                                              side: const BorderSide(color: JTechTheme.accentCyan),
+                                              side: const BorderSide(color: TitanNovaTheme.accentCyan),
                                               padding: const EdgeInsets.symmetric(vertical: 12),
                                             ),
-                                            icon: const Icon(Icons.zoom_in, color: JTechTheme.accentCyan, size: 18),
-                                            label: const Text('EXPANDIR GIF', style: TextStyle(color: JTechTheme.accentCyan, fontWeight: FontWeight.bold, fontSize: 12)),
+                                            icon: const Icon(Icons.zoom_in, color: TitanNovaTheme.accentCyan, size: 18),
+                                            label: const Text('EXPANDIR GIF', style: TextStyle(color: TitanNovaTheme.accentCyan, fontWeight: FontWeight.bold, fontSize: 12)),
                                           ),
                                         ),
                                         const SizedBox(width: 8),
@@ -328,7 +328,7 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                           child: ElevatedButton.icon(
                                             onPressed: () => Navigator.pop(context, ex),
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: JTechTheme.successGreen,
+                                              backgroundColor: TitanNovaTheme.successGreen,
                                               padding: const EdgeInsets.symmetric(vertical: 12),
                                             ),
                                             icon: const Icon(Icons.add_circle_outline, size: 18),
@@ -340,14 +340,14 @@ class _ExerciseLibraryScreenState extends State<ExerciseLibraryScreen> {
                                           child: ElevatedButton.icon(
                                             onPressed: () => _mostrarGifExpandido(context, ex),
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: JTechTheme.cardDark,
-                                              side: const BorderSide(color: JTechTheme.accentCyan, width: 1.2),
+                                              backgroundColor: TitanNovaTheme.cardDark,
+                                              side: const BorderSide(color: TitanNovaTheme.accentCyan, width: 1.2),
                                               padding: const EdgeInsets.symmetric(vertical: 12),
                                             ),
-                                            icon: const Icon(Icons.fullscreen_rounded, color: JTechTheme.accentCyan),
+                                            icon: const Icon(Icons.fullscreen_rounded, color: TitanNovaTheme.accentCyan),
                                             label: const Text(
                                               'VER GIF EXPANDIDO (ZOOM 3D)',
-                                              style: TextStyle(color: JTechTheme.accentCyan, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.3),
+                                              style: TextStyle(color: TitanNovaTheme.accentCyan, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.3),
                                             ),
                                           ),
                                         ),

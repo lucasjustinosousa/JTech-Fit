@@ -12,7 +12,7 @@ class LocalDatabase {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('jtech_fit_offline.db');
+    _database = await _initDB('titannova_fit_offline.db');
     return _database!;
   }
 

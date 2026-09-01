@@ -30,11 +30,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
-                  Icon(Icons.bar_chart_outlined, size: 64, color: JTechTheme.textMuted),
+                  Icon(Icons.bar_chart_outlined, size: 64, color: TitanNovaTheme.textMuted),
                   SizedBox(height: 16),
-                  Text('Nenhum treino registrado ainda.', style: TextStyle(color: JTechTheme.textGrey, fontSize: 16)),
+                  Text('Nenhum treino registrado ainda.', style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 16)),
                   SizedBox(height: 6),
-                  Text('Complete seu primeiro treino para visualizar a evolução.', style: TextStyle(color: JTechTheme.textMuted, fontSize: 12)),
+                  Text('Complete seu primeiro treino para visualizar a evolução.', style: TextStyle(color: TitanNovaTheme.textMuted, fontSize: 12)),
                 ],
               ),
             )
@@ -46,25 +46,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   // GRÁFICO SIMPLES DE EVOLUÇÃO DE TREINOS POR SEMANA
                   const Text(
                     'Evolução de Volume Semanal',
-                    style: TextStyle(color: JTechTheme.textWhite, fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
                   Container(
                     height: 180,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: JTechTheme.cardDark,
+                      color: TitanNovaTheme.cardDark,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: JTechTheme.dividerColor),
+                      border: Border.all(color: TitanNovaTheme.dividerColor),
                     ),
                     child: BarChart(
                       BarChartData(
                         backgroundColor: Colors.transparent,
                         barGroups: [
-                          BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 3, color: JTechTheme.primaryBlue, width: 14)]),
-                          BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 4, color: JTechTheme.primaryBlue, width: 14)]),
-                          BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 5, color: JTechTheme.accentCyan, width: 14)]),
-                          BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 4, color: JTechTheme.successGreen, width: 14)]),
+                          BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 3, color: TitanNovaTheme.primaryBlue, width: 14)]),
+                          BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 4, color: TitanNovaTheme.primaryBlue, width: 14)]),
+                          BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 5, color: TitanNovaTheme.accentCyan, width: 14)]),
+                          BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 4, color: TitanNovaTheme.successGreen, width: 14)]),
                         ],
                         titlesData: FlTitlesData(
                           leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -75,10 +75,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               showTitles: true,
                               getTitlesWidget: (val, meta) {
                                 switch (val.toInt()) {
-                                  case 1: return const Text('Sem 1', style: TextStyle(color: JTechTheme.textGrey, fontSize: 10));
-                                  case 2: return const Text('Sem 2', style: TextStyle(color: JTechTheme.textGrey, fontSize: 10));
-                                  case 3: return const Text('Sem 3', style: TextStyle(color: JTechTheme.textGrey, fontSize: 10));
-                                  case 4: return const Text('Atual', style: TextStyle(color: JTechTheme.successGreen, fontSize: 10, fontWeight: FontWeight.bold));
+                                  case 1: return const Text('Sem 1', style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 10));
+                                  case 2: return const Text('Sem 2', style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 10));
+                                  case 3: return const Text('Sem 3', style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 10));
+                                  case 4: return const Text('Atual', style: TextStyle(color: TitanNovaTheme.successGreen, fontSize: 10, fontWeight: FontWeight.bold));
                                 }
                                 return const Text('');
                               },
@@ -95,7 +95,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   // LISTA DE TREINOS ANTERIORES
                   const Text(
                     'Treinos Realizados',
-                    style: TextStyle(color: JTechTheme.textWhite, fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
 
@@ -112,18 +112,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         margin: const EdgeInsets.only(bottom: 10),
                         child: ListTile(
                           leading: const CircleAvatar(
-                            backgroundColor: JTechTheme.successGreen,
+                            backgroundColor: TitanNovaTheme.successGreen,
                             child: Icon(Icons.check, color: Colors.white),
                           ),
                           title: Text(
                             sessao.nomeTreino,
-                            style: const TextStyle(color: JTechTheme.textWhite, fontWeight: FontWeight.bold),
+                            style: const TextStyle(color: TitanNovaTheme.textWhite, fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
                             '$dataStr • Duração: $duracao',
-                            style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12),
+                            style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12),
                           ),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: JTechTheme.textGrey),
+                          trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: TitanNovaTheme.textGrey),
                           onTap: () {
                             // Exibir detalhes das séries gravadas
                           },

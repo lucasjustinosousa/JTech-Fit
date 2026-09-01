@@ -82,7 +82,7 @@ void showGifFullscreenDialog(BuildContext context, Exercicio exercicio) {
                     return const Center(
                       child: Padding(
                         padding: EdgeInsets.all(40),
-                        child: CircularProgressIndicator(color: JTechTheme.accentCyan),
+                        child: CircularProgressIndicator(color: TitanNovaTheme.accentCyan),
                       ),
                     );
                   },
@@ -92,9 +92,9 @@ void showGifFullscreenDialog(BuildContext context, Exercicio exercicio) {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.broken_image_outlined, color: JTechTheme.warningOrange, size: 48),
+                          Icon(Icons.broken_image_outlined, color: TitanNovaTheme.warningOrange, size: 48),
                           SizedBox(height: 8),
-                          Text('Não foi possível carregar o GIF em tela cheia', style: TextStyle(color: JTechTheme.textWhite, fontSize: 12)),
+                          Text('Não foi possível carregar o GIF em tela cheia', style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 12)),
                         ],
                       ),
                     ),
@@ -109,7 +109,7 @@ void showGifFullscreenDialog(BuildContext context, Exercicio exercicio) {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(ctx),
-                style: ElevatedButton.styleFrom(backgroundColor: JTechTheme.primaryBlue),
+                style: ElevatedButton.styleFrom(backgroundColor: TitanNovaTheme.primaryBlue),
                 child: const Text('FECHAR TELA CHEIA'),
               ),
             ),
@@ -159,7 +159,7 @@ class _GifViewerModalState extends State<GifViewerModal> {
     return Container(
       height: screenHeight * 0.85,
       decoration: const BoxDecoration(
-        color: JTechTheme.cardDark,
+        color: TitanNovaTheme.cardDark,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -192,26 +192,26 @@ class _GifViewerModalState extends State<GifViewerModal> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: JTechTheme.primaryBlue.withOpacity(0.2),
+                              color: TitanNovaTheme.primaryBlue.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: JTechTheme.primaryBlue.withOpacity(0.4)),
+                              border: Border.all(color: TitanNovaTheme.primaryBlue.withOpacity(0.4)),
                             ),
                             child: Text(
                               ex.grupoMuscular.toUpperCase(),
-                              style: const TextStyle(color: JTechTheme.accentCyan, fontSize: 10, fontWeight: FontWeight.bold),
+                              style: const TextStyle(color: TitanNovaTheme.accentCyan, fontSize: 10, fontWeight: FontWeight.bold),
                             ),
                           ),
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: JTechTheme.surfaceDark,
+                              color: TitanNovaTheme.surfaceDark,
                               borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: JTechTheme.dividerColor),
+                              border: Border.all(color: TitanNovaTheme.dividerColor),
                             ),
                             child: Text(
                               ex.equipamento,
-                              style: const TextStyle(color: JTechTheme.textGrey, fontSize: 10),
+                              style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 10),
                             ),
                           ),
                         ],
@@ -220,7 +220,7 @@ class _GifViewerModalState extends State<GifViewerModal> {
                       Text(
                         ex.nome,
                         style: const TextStyle(
-                          color: JTechTheme.textWhite,
+                          color: TitanNovaTheme.textWhite,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -229,13 +229,13 @@ class _GifViewerModalState extends State<GifViewerModal> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, color: JTechTheme.textGrey),
+                  icon: const Icon(Icons.close, color: TitanNovaTheme.textGrey),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: JTechTheme.dividerColor),
+          const Divider(height: 1, color: TitanNovaTheme.dividerColor),
 
           // Conteúdo rolável seguro
           Expanded(
@@ -251,7 +251,7 @@ class _GifViewerModalState extends State<GifViewerModal> {
                     decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: JTechTheme.dividerColor),
+                      border: Border.all(color: TitanNovaTheme.dividerColor),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.5),
@@ -285,12 +285,12 @@ class _GifViewerModalState extends State<GifViewerModal> {
                                       children: [
                                         CircularProgressIndicator(
                                           value: progress,
-                                          color: JTechTheme.accentCyan,
+                                          color: TitanNovaTheme.accentCyan,
                                         ),
                                         const SizedBox(height: 12),
                                         const Text(
                                           'Carregando animação GIF...',
-                                          style: TextStyle(color: JTechTheme.textGrey, fontSize: 12),
+                                          style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12),
                                         ),
                                       ],
                                     ),
@@ -300,11 +300,11 @@ class _GifViewerModalState extends State<GifViewerModal> {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.broken_image_outlined, color: JTechTheme.warningOrange, size: 48),
+                                      const Icon(Icons.broken_image_outlined, color: TitanNovaTheme.warningOrange, size: 48),
                                       const SizedBox(height: 8),
                                       const Text(
                                         'Animação indisponível offline',
-                                        style: TextStyle(color: JTechTheme.textGrey, fontSize: 12),
+                                        style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12),
                                       ),
                                     ],
                                   ),
@@ -322,9 +322,9 @@ class _GifViewerModalState extends State<GifViewerModal> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.play_circle_outline, color: JTechTheme.accentCyan, size: 56),
+                                    Icon(Icons.play_circle_outline, color: TitanNovaTheme.accentCyan, size: 56),
                                     SizedBox(height: 8),
-                                    Text('Toque para reproduzir animação', style: TextStyle(color: JTechTheme.textGrey, fontSize: 12)),
+                                    Text('Toque para reproduzir animação', style: TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12)),
                                   ],
                                 ),
                               ),
@@ -342,7 +342,7 @@ class _GifViewerModalState extends State<GifViewerModal> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: IconButton(
-                                icon: const Icon(Icons.fullscreen, color: JTechTheme.accentCyan, size: 22),
+                                icon: const Icon(Icons.fullscreen, color: TitanNovaTheme.accentCyan, size: 22),
                                 tooltip: 'Ver em Tela Cheia / Zoom',
                                 onPressed: () => showGifFullscreenDialog(context, ex),
                               ),
@@ -373,9 +373,9 @@ class _GifViewerModalState extends State<GifViewerModal> {
                               decoration: BoxDecoration(
                                 color: Colors.black.withOpacity(0.7),
                                 borderRadius: BorderRadius.circular(4),
-                                border: Border.all(color: JTechTheme.accentCyan.withOpacity(0.4), width: 0.5),
+                                border: Border.all(color: TitanNovaTheme.accentCyan.withOpacity(0.4), width: 0.5),
                               ),
-                              child: const Text('GIF ANIMADO', style: TextStyle(color: JTechTheme.accentCyan, fontSize: 8, fontWeight: FontWeight.bold)),
+                              child: const Text('GIF ANIMADO', style: TextStyle(color: TitanNovaTheme.accentCyan, fontSize: 8, fontWeight: FontWeight.bold)),
                             ),
                           ),
                         ],
@@ -388,12 +388,12 @@ class _GifViewerModalState extends State<GifViewerModal> {
                   if (ex.musculosAuxiliares.isNotEmpty) ...[
                     Row(
                       children: [
-                        const Icon(Icons.fitness_center, color: JTechTheme.accentCyan, size: 16),
+                        const Icon(Icons.fitness_center, color: TitanNovaTheme.accentCyan, size: 16),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             'Auxiliares: ${ex.musculosAuxiliares}',
-                            style: const TextStyle(color: JTechTheme.accentCyan, fontSize: 12, fontWeight: FontWeight.bold),
+                            style: const TextStyle(color: TitanNovaTheme.accentCyan, fontSize: 12, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -404,24 +404,24 @@ class _GifViewerModalState extends State<GifViewerModal> {
                   // Instruções
                   const Text(
                     'Instruções de Execução:',
-                    style: TextStyle(color: JTechTheme.textWhite, fontSize: 13, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: TitanNovaTheme.textWhite, fontSize: 13, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     ex.instrucoes.isNotEmpty ? ex.instrucoes : 'Execute o movimento com controle de carga e amplitude correta.',
-                    style: const TextStyle(color: JTechTheme.textGrey, fontSize: 13, height: 1.4),
+                    style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 13, height: 1.4),
                   ),
 
                   if (ex.cuidados.isNotEmpty) ...[
                     const SizedBox(height: 10),
                     const Text(
                       'Cuidados:',
-                      style: TextStyle(color: JTechTheme.warningOrange, fontSize: 13, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: TitanNovaTheme.warningOrange, fontSize: 13, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       ex.cuidados,
-                      style: const TextStyle(color: JTechTheme.textGrey, fontSize: 12, height: 1.3),
+                      style: const TextStyle(color: TitanNovaTheme.textGrey, fontSize: 12, height: 1.3),
                     ),
                   ],
                   const SizedBox(height: 16),
@@ -434,8 +434,8 @@ class _GifViewerModalState extends State<GifViewerModal> {
           Container(
             padding: const EdgeInsets.fromLTRB(20, 10, 20, 16),
             decoration: BoxDecoration(
-              color: JTechTheme.surfaceDark,
-              border: Border(top: BorderSide(color: JTechTheme.dividerColor.withOpacity(0.5))),
+              color: TitanNovaTheme.surfaceDark,
+              border: Border(top: BorderSide(color: TitanNovaTheme.dividerColor.withOpacity(0.5))),
             ),
             child: Row(
               children: [
@@ -443,10 +443,10 @@ class _GifViewerModalState extends State<GifViewerModal> {
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: JTechTheme.dividerColor),
+                      side: const BorderSide(color: TitanNovaTheme.dividerColor),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text('FECHAR', style: TextStyle(color: JTechTheme.textGrey)),
+                    child: const Text('FECHAR', style: TextStyle(color: TitanNovaTheme.textGrey)),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -458,7 +458,7 @@ class _GifViewerModalState extends State<GifViewerModal> {
                         widget.onAdd!();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: JTechTheme.successGreen,
+                        backgroundColor: TitanNovaTheme.successGreen,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                       icon: const Icon(Icons.add_circle_outline, size: 18),
@@ -478,7 +478,7 @@ class _GifViewerModalState extends State<GifViewerModal> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: JTechTheme.primaryBlue,
+                        backgroundColor: TitanNovaTheme.primaryBlue,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                       icon: const Icon(Icons.info_outline, size: 18),

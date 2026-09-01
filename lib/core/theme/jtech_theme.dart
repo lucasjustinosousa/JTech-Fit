@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class JTechTheme {
-  // Paleta de Cores Oficial JTech Fit
+class TitanNovaTheme {
+  // Paleta de Cores Oficial TitanNova Fit
   static const Color backgroundBlack = Color(0FF0D0D0D);
   static const Color surfaceDark = Color(0FF16181C);
   static const Color cardDark = Color(0FF22252A);

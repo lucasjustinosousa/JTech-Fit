@@ -29,8 +29,8 @@ class WorkoutRepository extends ChangeNotifier {
     // Criar usuário convidado padrão se nenhum logado
     _usuarioAtual = Usuario(
       id: 'guest_user_1',
-      nome: 'Atleta JTech',
-      email: 'atleta@jtechfit.com',
+      nome: 'Atleta TitanNova',
+      email: 'atleta@titannovafit.com',
       unidadeCarga: 'kg',
       descansoPadrao: 60,
       criadoEm: DateTime.now(),
