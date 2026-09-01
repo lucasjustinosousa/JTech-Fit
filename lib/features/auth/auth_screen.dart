@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../core/theme/jtech_theme.dart';
 import '../common/disclaimer_banner.dart';
 import '../../data/repositories/workout_repository.dart';
+import '../../core/services/supabase_service.dart';
 
 class AuthScreen extends StatefulWidget {
   final VoidCallback onLoginSuccess;
@@ -14,13 +15,41 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final _emailController = TextEditingController();
-  final _passController = TextEditingController();
+  final _emailController = TextEditingController(text: 'atleta@jtechfit.com');
+  final _passController = TextEditingController(text: '123456');
   bool _isLogin = true;
+  bool _isLoading = false;
 
-  void _submitAuth() {
-    // Simulação ou conexão Supabase
-    widget.onLoginSuccess();
+  Future<void> _submitAuth() async {
+    final email = _emailController.text.trim();
+    final pass = _passController.text.trim();
+
+    if (email.isEmpty || pass.isEmpty) {
+      widget.onLoginSuccess();
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      if (SupabaseService.instance.isInitialized) {
+        if (_isLogin) {
+          final user = await SupabaseService.instance.signIn(email, pass);
+          if (user == null) {
+            await SupabaseService.instance.signUp(email, pass);
+          }
+        } else {
+          await SupabaseService.instance.signUp(email, pass);
+        }
+      }
+    } catch (e) {
+      debugPrint('[Auth] Erro ao autenticar no Supabase: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        widget.onLoginSuccess();
+      }
+    }
   }
 
   void _recuperarSenha() {

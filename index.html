@@ -537,20 +537,22 @@
 
         <div class="form-group">
           <label class="form-label">E-mail</label>
-          <input type="email" class="form-input" placeholder="atleta@jtechfit.com" value="atleta@jtechfit.com">
+          <input type="email" id="authEmailInput" class="form-input" placeholder="seuemail@exemplo.com" value="atleta@jtechfit.com">
         </div>
         <div class="form-group">
           <label class="form-label">Senha</label>
-          <input type="password" class="form-input" value="123456">
+          <input type="password" id="authPasswordInput" class="form-input" value="123456" placeholder="Sua senha de acesso">
         </div>
 
-        <button onclick="loginUser()" class="btn btn-primary" style="margin-top: 10px;">ENTRAR</button>
-        <button onclick="loginUser()" class="btn btn-outline" style="margin-top: 10px;">CRIAR MINHA CONTA</button>
-        <button onclick="loginUser()" class="btn btn-text" style="margin-top: 10px;">Continuar sem cadastro (Modo Convidado)</button>
+        <div id="authErrorMessage" style="color: #ff5252; background: rgba(255,82,82,0.15); border: 1px solid rgba(255,82,82,0.3); border-radius: 8px; padding: 10px; font-size: 12px; margin-bottom: 12px; display: none; text-align: center; font-weight: 600;"></div>
+
+        <button id="authLoginBtn" onclick="handleAuthAction('login')" class="btn btn-primary" style="margin-top: 6px;">ENTRAR</button>
+        <button id="authRegisterBtn" onclick="handleAuthAction('register')" class="btn btn-outline" style="margin-top: 10px;">CRIAR MINHA CONTA</button>
+        <button onclick="handleAuthAction('guest')" class="btn btn-text" style="margin-top: 10px;">Continuar sem cadastro (Modo Convidado)</button>
 
         <div class="safety-banner">
           <div>⚠️</div>
-          <p><strong>Aviso Importante:</strong> O JTech Fit não substitui o acompanhamento de um profissional de Educação Física ou Médico. Interrompa se sentir dor.</p>
+          <p><strong>Aviso Importante:</strong> O JTech Fit sincroniza seus treinos na nuvem entre múltiplos dispositivos automaticamente.</p>
         </div>
       </div>
 
@@ -717,24 +719,35 @@
       <!-- TELA PERFIL -->
       <div id="screenProfile" class="screen">
         <div style="text-align: center; margin-bottom: 20px;">
-          <div style="width: 70px; height: 70px; background: var(--primary-blue); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 32px;">👤</div>
-          <h3 style="font-size: 18px; font-weight: 800;">Atleta JTech</h3>
-          <p style="font-size: 12px; color: var(--text-grey);">atleta@jtechfit.com</p>
+          <div style="width: 70px; height: 70px; background: var(--primary-blue); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 4px 16px rgba(30,136,229,0.35);">👤</div>
+          <h3 id="profileUserName" style="font-size: 18px; font-weight: 800;">Atleta JTech</h3>
+          <p id="profileUserEmail" style="font-size: 12px; color: var(--text-grey);">atleta@jtechfit.com</p>
+          <span id="profileUserBadge" style="display: inline-block; font-size: 10px; font-weight: 800; background: rgba(0,210,255,0.15); color: var(--accent-cyan); padding: 2px 8px; border-radius: 10px; margin-top: 4px;">Conta Vinculada</span>
         </div>
 
-        <div class="card">
-          <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">PWA & Sincronização</h4>
+        <div class="card" style="margin-bottom: 16px;">
+          <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">PWA & Sincronização em Nuvem</h4>
           <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--divider);">
             <span>Status PWA</span>
             <span style="color: var(--success-green); font-weight: 700;">Pronto (Service Worker Ativo)</span>
           </div>
-          <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--divider);">
             <span>Sincronização Cloud</span>
-            <span style="color: var(--accent-cyan); font-weight: 700;">Supabase Híbrido</span>
+            <span style="color: var(--accent-cyan); font-weight: 700;">Supabase Multi-Dispositivo</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+            <span>ID do Usuário</span>
+            <span id="profileUserIdDisplay" style="color: var(--text-grey); font-family: monospace; font-size: 11px;">guest_user_1</span>
           </div>
         </div>
 
-        <button onclick="switchTab('screenAuth')" class="btn btn-outline" style="margin-top: 16px;">Sair da Conta</button>
+        <button onclick="refreshAppData(this)" class="btn btn-outline" style="width: 100%; margin-bottom: 10px; border-color: var(--accent-cyan); color: var(--accent-cyan);">
+          🔄 Sincronizar Nuvem Agora
+        </button>
+
+        <button onclick="logoutUser()" class="btn btn-outline" style="width: 100%; border-color: rgba(255,82,82,0.4); color: #ff5252;">
+          🚪 Sair da Conta (Logout)
+        </button>
       </div>
 
     </div>
@@ -1173,14 +1186,218 @@
       }
     }
 
-    function updateHomeDashboardUI() {
-      updateHomeScreenUI();
+    let currentAuthUser = null;
+
+    function getEffectiveUserId() {
+      if (currentAuthUser && currentAuthUser.id) {
+        return currentAuthUser.id;
+      }
+      try {
+        const saved = JSON.parse(localStorage.getItem('jtech_fit_user') || 'null');
+        if (saved && saved.id) return saved.id;
+      } catch (_) {}
+      return 'guest_user_1';
+    }
+
+    function getEffectiveUserEmail() {
+      if (currentAuthUser && currentAuthUser.email) {
+        return currentAuthUser.email;
+      }
+      try {
+        const saved = JSON.parse(localStorage.getItem('jtech_fit_user') || 'null');
+        if (saved && saved.email) return saved.email;
+      } catch (_) {}
+      return 'atleta@jtechfit.com';
+    }
+
+    function updateProfileUI() {
+      const email = getEffectiveUserEmail();
+      const name = (currentAuthUser && currentAuthUser.user_metadata && currentAuthUser.user_metadata.nome) ||
+                   email.split('@')[0] || 'Atleta JTech';
+      const uid = getEffectiveUserId();
+
+      const nameEl = document.getElementById('profileUserName');
+      if (nameEl) nameEl.innerText = name;
+
+      const emailEl = document.getElementById('profileUserEmail');
+      if (emailEl) emailEl.innerText = email;
+
+      const idEl = document.getElementById('profileUserIdDisplay');
+      if (idEl) idEl.innerText = uid.length > 18 ? uid.substring(0, 18) + '...' : uid;
+
+      const badgeEl = document.getElementById('profileUserBadge');
+      if (badgeEl) {
+        if (uid === 'guest_user_1') {
+          badgeEl.innerText = 'Modo Convidado';
+          badgeEl.style.background = 'rgba(255,152,0,0.15)';
+          badgeEl.style.color = 'var(--warning-orange)';
+        } else {
+          badgeEl.innerText = 'Conta Sincronizada ☁️';
+          badgeEl.style.background = 'rgba(0,210,255,0.15)';
+          badgeEl.style.color = 'var(--accent-cyan)';
+        }
+      }
+    }
+
+    async function handleAuthAction(mode) {
+      const errEl = document.getElementById('authErrorMessage');
+      if (errEl) errEl.style.display = 'none';
+
+      const emailInput = document.getElementById('authEmailInput');
+      const passInput = document.getElementById('authPasswordInput');
+      const loginBtn = document.getElementById('authLoginBtn');
+      const registerBtn = document.getElementById('authRegisterBtn');
+
+      const email = emailInput ? emailInput.value.trim() : '';
+      const password = passInput ? passInput.value.trim() : '';
+
+      if (mode === 'guest') {
+        currentAuthUser = {
+          id: 'guest_user_1',
+          email: 'convidado@jtechfit.com',
+          user_metadata: { nome: 'Atleta Convidado' }
+        };
+        localStorage.setItem('jtech_fit_user', JSON.stringify({
+          id: currentAuthUser.id,
+          email: currentAuthUser.email,
+          nome: 'Atleta Convidado'
+        }));
+        document.getElementById('bottomNav').style.display = 'flex';
+        updateProfileUI();
+        switchTab('screenHome');
+        await refreshAppData();
+        return;
+      }
+
+      if (!email || !password) {
+        if (errEl) {
+          errEl.innerText = 'Por favor, preencha o e-mail e a senha.';
+          errEl.style.display = 'block';
+        }
+        return;
+      }
+
+      if (password.length < 6) {
+        if (errEl) {
+          errEl.innerText = 'A senha deve ter no mínimo 6 caracteres.';
+          errEl.style.display = 'block';
+        }
+        return;
+      }
+
+      if (loginBtn) loginBtn.disabled = true;
+      if (registerBtn) registerBtn.disabled = true;
+
+      try {
+        if (_supabase) {
+          if (mode === 'login') {
+            if (loginBtn) loginBtn.innerText = 'Conectando à nuvem...';
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+            if (error) {
+              // Se as credenciais não existirem ainda, tenta registrar a conta
+              if (error.message.includes('Invalid login credentials') || error.message.includes('not found') || error.message.includes('User not found')) {
+                const suRes = await _supabase.auth.signUp({
+                  email,
+                  password,
+                  options: { data: { nome: email.split('@')[0] } }
+                });
+                if (suRes.error) {
+                  throw suRes.error;
+                }
+                currentAuthUser = suRes.data.user;
+              } else {
+                throw error;
+              }
+            } else {
+              currentAuthUser = data.user;
+            }
+          } else if (mode === 'register') {
+            if (registerBtn) registerBtn.innerText = 'Criando conta na nuvem...';
+            const { data, error } = await _supabase.auth.signUp({
+              email,
+              password,
+              options: { data: { nome: email.split('@')[0] } }
+            });
+            if (error) throw error;
+            currentAuthUser = data.user;
+          }
+
+          // Se autenticado com sucesso
+          if (currentAuthUser) {
+            const userInfo = {
+              id: currentAuthUser.id,
+              email: currentAuthUser.email || email,
+              nome: (currentAuthUser.user_metadata && currentAuthUser.user_metadata.nome) || email.split('@')[0]
+            };
+            localStorage.setItem('jtech_fit_user', JSON.stringify(userInfo));
+
+            // Gravar/Atualizar na tabela 'usuarios'
+            try {
+              await _supabase.from('usuarios').upsert({
+                id: userInfo.id,
+                nome: userInfo.nome,
+                email: userInfo.email,
+                criado_em: new Date().toISOString()
+              });
+            } catch (_) {}
+          }
+        } else {
+          // Fallback offline caso sem conexão
+          const userInfo = {
+            id: 'user_' + btoa(email).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16),
+            email: email,
+            nome: email.split('@')[0]
+          };
+          currentAuthUser = userInfo;
+          localStorage.setItem('jtech_fit_user', JSON.stringify(userInfo));
+        }
+
+        document.getElementById('bottomNav').style.display = 'flex';
+        updateProfileUI();
+        switchTab('screenHome');
+        showToastNotification(`✅ Conectado como ${getEffectiveUserEmail()}!`);
+        await refreshAppData();
+      } catch (err) {
+        console.error('[Auth Error]:', err);
+        if (errEl) {
+          errEl.innerText = err.message || 'Erro ao conectar à sua conta. Verifique os dados.';
+          errEl.style.display = 'block';
+        }
+      } finally {
+        if (loginBtn) {
+          loginBtn.disabled = false;
+          loginBtn.innerText = 'ENTRAR';
+        }
+        if (registerBtn) {
+          registerBtn.disabled = false;
+          registerBtn.innerText = 'CRIAR MINHA CONTA';
+        }
+      }
+    }
+
+    async function logoutUser() {
+      if (confirm('Deseja realmente sair da sua conta?\nSeus dados salvos na nuvem continuarão disponíveis ao fazer login novamente em qualquer aparelho.')) {
+        if (_supabase) {
+          try {
+            await _supabase.auth.signOut();
+          } catch (_) {}
+        }
+        currentAuthUser = null;
+        localStorage.removeItem('jtech_fit_user');
+        localStorage.removeItem('jtech_fit_custom_workouts');
+        localStorage.removeItem('jtech_fit_history');
+        localStorage.removeItem('jtech_fit_active_session');
+        localStorage.removeItem('jtech_fit_active_tab');
+
+        allWorkoutsList = [];
+        document.getElementById('bottomNav').style.display = 'none';
+        switchTab('screenAuth');
+        showToastNotification('Você saiu da sua conta.');
+      }
     }
 
     function loginUser() {
-      switchTab('screenHome');
-      document.getElementById('bottomNav').style.display = 'flex';
-      updateHomeScreenUI();
+      handleAuthAction('guest');
     }
 
     // ==========================================
@@ -1799,12 +2016,14 @@
       }
       renderAllWorkoutsUI();
 
-      // 2. Buscar treinos no Supabase (Nuvem / Sincronizados com Mobile)
+      // 2. Buscar treinos no Supabase (Nuvem / Sincronizados com Mobile e outros aparelhos)
       if (_supabase) {
         try {
+          const uid = getEffectiveUserId();
           const { data, error } = await _supabase
             .from('treinos')
             .select('*')
+            .or(`usuario_id.eq.${uid},usuario_id.eq.guest_user_1,usuario_id.is.null`)
             .order('criado_em', { ascending: false });
 
           if (!error && Array.isArray(data) && data.length > 0) {
@@ -1847,13 +2066,14 @@
               };
             });
 
-            // Enviar para o Supabase quaisquer treinos locais que ainda não estejam na nuvem
+            // Enviar para o Supabase quaisquer treinos locais que ainda não estejam na nuvem com o usuario_id atual
             const onlineIds = new Set(onlineWorkouts.map(w => w.id));
             for (const localW of allWorkoutsList) {
               if (!onlineIds.has(localW.id)) {
                 try {
                   await _supabase.from('treinos').upsert({
                     id: localW.id,
+                    usuario_id: uid,
                     nome: localW.nome,
                     descricao: localW.descricao || '',
                     dias_semana: localW.diasSemana || [],
@@ -1865,21 +2085,40 @@
               }
             }
 
-            // Mesclar treinos com prioridade aos treinos locais
+            // Consolidar treinos da nuvem
             const mapById = new Map();
             onlineWorkouts.forEach(w => mapById.set(w.id, w));
-            allWorkoutsList.forEach(w => mapById.set(w.id, w));
+            allWorkoutsList.forEach(w => {
+              if (!mapById.has(w.id)) mapById.set(w.id, w);
+            });
             allWorkoutsList = Array.from(mapById.values());
 
             localStorage.setItem('jtech_fit_custom_workouts', JSON.stringify(allWorkoutsList));
             renderAllWorkoutsUI();
-            console.log(`[Supabase] Total consolidado: ${allWorkoutsList.length} treinos sincronizados.`);
+            console.log(`[Supabase] Total consolidado: ${allWorkoutsList.length} treinos sincronizados para o usuário ${uid}.`);
+          } else if (!error && Array.isArray(data) && data.length === 0 && allWorkoutsList.length > 0) {
+            // Inicializar conta na nuvem com os treinos locais vinculados ao ID do usuário
+            const uid = getEffectiveUserId();
+            for (const localW of allWorkoutsList) {
+              try {
+                await _supabase.from('treinos').upsert({
+                  id: localW.id,
+                  usuario_id: uid,
+                  nome: localW.nome,
+                  descricao: localW.descricao || '',
+                  dias_semana: localW.diasSemana || [],
+                  cor_hex: localW.corHex || '#1E88E5',
+                  exercicios: localW.exercicios || [],
+                  criado_em: localW.criadoEm || new Date().toISOString()
+                });
+              } catch (_) {}
+            }
           }
         } catch (e) {
           console.log('[Supabase] Erro ao sincronizar treinos da nuvem:', e);
         }
 
-        // Subscrição em Tempo Real: Atualiza a lista automaticamente se o Mobile criar/excluir treinos
+        // Subscrição em Tempo Real: Atualiza a lista automaticamente se outro dispositivo criar/excluir treinos
         if (!_supabaseRealtimeSubscribed) {
           _supabaseRealtimeSubscribed = true;
           try {
@@ -2303,14 +2542,16 @@
       // 2. Sincronizar com Supabase se online
       if (_supabase) {
         try {
+          const uid = getEffectiveUserId();
           await _supabase.from('sessoes_de_treino').upsert({
             id: historyItem.id,
+            usuario_id: uid,
             nome_treino: title,
             inicio: historyItem.inicioIso,
             fim: historyItem.fimIso,
             concluido: true
           });
-          console.log('[Supabase] Sessão de treino salva no histórico online:', title);
+          console.log('[Supabase] Sessão de treino salva no histórico online para o usuário', uid, ':', title);
         } catch (e) {
           console.log('[Supabase] Aviso: Histórico mantido offline (sem conexão):', e);
         }
@@ -2592,8 +2833,10 @@
       // 2. Sincronizar com Supabase se online
       if (_supabase) {
         try {
+          const uid = getEffectiveUserId();
           const payload = {
             id: workoutId,
+            usuario_id: uid,
             nome: name,
             descricao: descInput.value.trim(),
             dias_semana: selectedDays,
@@ -2677,12 +2920,14 @@
         historyList = JSON.parse(localStorage.getItem('jtech_fit_history') || '[]');
       } catch (e) {}
 
-      // Sincronizar com Supabase (Nuvem / Mobile) se online
+      // Sincronizar com Supabase (Nuvem / Mobile e outros aparelhos) se online
       if (_supabase) {
         try {
+          const uid = getEffectiveUserId();
           const { data, error } = await _supabase
             .from('sessoes_de_treino')
             .select('*')
+            .or(`usuario_id.eq.${uid},usuario_id.eq.guest_user_1,usuario_id.is.null`)
             .order('fim', { ascending: false });
 
           if (!error && Array.isArray(data) && data.length > 0) {
@@ -2707,7 +2952,9 @@
             // Mesclar mantendo todos os registros únicos
             const mapById = new Map();
             onlineHistory.forEach(h => mapById.set(h.id, h));
-            historyList.forEach(h => mapById.set(h.id, h));
+            historyList.forEach(h => {
+              if (!mapById.has(h.id)) mapById.set(h.id, h);
+            });
             historyList = Array.from(mapById.values()).sort((a, b) => {
               const timeA = a.timestamp || (a.fimIso ? new Date(a.fimIso).getTime() : 0);
               const timeB = b.timestamp || (b.fimIso ? new Date(b.fimIso).getTime() : 0);
@@ -3518,19 +3765,54 @@
       });
     });
 
-    // Carregar treinos criados anteriormente, histórico, biblioteca e restaurar sessão ativa se existir
-    window.addEventListener('load', () => {
-      loadHistoryFromStorage();
-      loadExercisesLibrary();
-      loadWorkoutsFromStorage();
+    // Carregar sessão de usuário, treinos sincronizados na nuvem, histórico e restaurar estado
+    window.addEventListener('load', async () => {
+      // 1. Restaurar sessão do usuário Supabase ou localStorage
+      if (_supabase) {
+        try {
+          const { data: { session } } = await _supabase.auth.getSession();
+          if (session && session.user) {
+            currentAuthUser = session.user;
+            localStorage.setItem('jtech_fit_user', JSON.stringify({
+              id: session.user.id,
+              email: session.user.email,
+              nome: (session.user.user_metadata && session.user.user_metadata.nome) || session.user.email.split('@')[0]
+            }));
+          }
+        } catch (_) {}
+      }
+
+      const savedUser = localStorage.getItem('jtech_fit_user');
+      if (savedUser) {
+        try {
+          currentAuthUser = JSON.parse(savedUser);
+        } catch (_) {}
+      }
+
+      if (!currentAuthUser) {
+        // Usuário ainda não logado: exibir tela de autenticação
+        const navEl = document.getElementById('bottomNav');
+        if (navEl) navEl.style.display = 'none';
+        switchTab('screenAuth');
+        return;
+      }
+
+      const navEl = document.getElementById('bottomNav');
+      if (navEl) navEl.style.display = 'flex';
+      updateProfileUI();
+
+      // 2. Carregar treinos, histórico e biblioteca sincronizados na nuvem
+      await loadExercisesLibrary();
+      await loadWorkoutsFromStorage();
+      await loadHistoryFromStorage();
       const hasActiveWorkout = restoreActiveSessionFromStorage();
       updateHomeScreenUI();
 
-      // Restaurar última aba acessada pelo usuário
+      // 3. Restaurar aba ativa
       const savedTab = localStorage.getItem('jtech_fit_active_tab') || 'screenHome';
       if (hasActiveWorkout && (savedTab === 'screenActiveWorkout' || isWorkoutActive)) {
         switchTab('screenActiveWorkout');
-      } else if (savedTab && savedTab !== 'screenHome') {
+      } else if (savedTab && savedTab !== 'screenHome' && savedTab !== 'screenAuth') {
         switchTab(savedTab);
       } else {
         switchTab('screenHome');
