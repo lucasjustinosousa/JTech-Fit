@@ -502,10 +502,12 @@
       <div class="progress-bar-bg">
         <div id="restProgressFill" class="progress-bar-fill"></div>
       </div>
-      <div style="display: flex; justify-content: space-around; font-size: 12px;">
-        <button onclick="adjustRestTimer(-15)" class="btn-text" style="padding: 4px;">-15s</button>
-        <button onclick="adjustRestTimer(15)" class="btn-text" style="padding: 4px;">+15s</button>
-        <button onclick="skipRestTimer()" class="btn-text" style="padding: 4px; color: var(--warning-orange);">Pular</button>
+      <div style="display: flex; justify-content: space-around; align-items: center; font-size: 12px; gap: 2px;">
+        <button onclick="adjustRestTimer(-15)" class="btn-text" style="padding: 4px 6px;">-15s</button>
+        <button onclick="adjustRestTimer(15)" class="btn-text" style="padding: 4px 6px; color: var(--accent-cyan);">+15s</button>
+        <button onclick="adjustRestTimer(30)" class="btn-text" style="padding: 4px 6px; color: var(--accent-cyan);">+30s</button>
+        <button onclick="adjustRestTimer(60)" class="btn-text" style="padding: 4px 6px; color: var(--accent-cyan);">+1min</button>
+        <button onclick="skipRestTimer()" class="btn-text" style="padding: 4px 6px; color: var(--warning-orange); font-weight: 700;">Pular</button>
       </div>
     </div>
 
@@ -2343,8 +2345,11 @@
       }
     }
 
+    let restTotalDuration = 60;
+
     function startRestTimer(seconds) {
-      restTimeRemaining = seconds;
+      restTimeRemaining = seconds || 60;
+      restTotalDuration = restTimeRemaining;
       document.getElementById('restTimerBar').classList.add('active');
       updateRestUI();
 
@@ -2365,12 +2370,16 @@
       let m = String(Math.floor(restTimeRemaining / 60)).padStart(2, '0');
       let s = String(restTimeRemaining % 60).padStart(2, '0');
       document.getElementById('restTimerText').innerText = `${m}:${s}`;
-      let fillPct = (restTimeRemaining / 60) * 100;
+      let total = Math.max(restTotalDuration, restTimeRemaining, 1);
+      let fillPct = Math.min(100, Math.max(0, (restTimeRemaining / total) * 100));
       document.getElementById('restProgressFill').style.width = `${fillPct}%`;
     }
 
     function adjustRestTimer(seconds) {
       restTimeRemaining = Math.max(0, restTimeRemaining + seconds);
+      if (restTimeRemaining > restTotalDuration) {
+        restTotalDuration = restTimeRemaining;
+      }
       updateRestUI();
     }
 
