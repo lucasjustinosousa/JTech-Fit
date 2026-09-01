@@ -2512,11 +2512,48 @@
     // ==========================================
     // AUTENTICAÇÃO SUPABASE COM VINCULAÇÃO A EMAIL E USER.ID
     // ==========================================
+    // ==========================================
+    // CONTROLE DE COOLDOWN E LIMITES DE TAXA (RATE LIMIT 429)
+    // ==========================================
+    let _lastRegisterAttemptTime = 0;
+    let _isRegisterRequestInProgress = false;
+    let _registerCooldownInterval = null;
+
+    function startRegisterCooldown(seconds = 60) {
+      const registerBtn = document.getElementById('authRegisterBtn');
+      if (!registerBtn) return;
+
+      if (_registerCooldownInterval) clearInterval(_registerCooldownInterval);
+
+      let remaining = seconds;
+      registerBtn.disabled = true;
+      registerBtn.style.opacity = '0.6';
+      registerBtn.style.cursor = 'not-allowed';
+      registerBtn.innerText = `Aguarde (${remaining}s)...`;
+
+      _registerCooldownInterval = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(_registerCooldownInterval);
+          _registerCooldownInterval = null;
+          registerBtn.disabled = false;
+          registerBtn.style.opacity = '1';
+          registerBtn.style.cursor = 'pointer';
+          registerBtn.innerText = 'CRIAR MINHA CONTA';
+        } else {
+          registerBtn.innerText = `Aguarde (${remaining}s)...`;
+        }
+      }, 1000);
+    }
+
+    // ==========================================
+    // AUTENTICAÇÃO SUPABASE COM VINCULAÇÃO A EMAIL E USER.ID
+    // ==========================================
     async function handleAuthAction(mode) {
       const loginErrEl = document.getElementById('authLoginErrorMessage');
       const regErrEl = document.getElementById('authRegisterErrorMessage');
-      if (loginErrEl) loginErrEl.style.display = 'none';
-      if (regErrEl) regErrEl.style.display = 'none';
+      if (loginErrEl) { loginErrEl.style.display = 'none'; loginErrEl.innerHTML = ''; }
+      if (regErrEl) { regErrEl.style.display = 'none'; regErrEl.innerHTML = ''; }
 
       if (mode === 'guest') {
         currentAuthUser = {
@@ -2538,6 +2575,23 @@
       }
 
       if (mode === 'register') {
+        // 1. Prevenção de múltiplos cliques concorrentes
+        if (_isRegisterRequestInProgress) {
+          console.warn('[Cadastro]: Requisição em andamento, clique ignorado.');
+          return;
+        }
+
+        // 2. Intervalo mínimo entre tentativas (debounce de 3 segundos)
+        const now = Date.now();
+        if (now - _lastRegisterAttemptTime < 3000) {
+          if (regErrEl) {
+            regErrEl.innerText = 'Aguarde alguns instantes antes de enviar novamente.';
+            regErrEl.style.display = 'block';
+          }
+          return;
+        }
+        _lastRegisterAttemptTime = now;
+
         const nameInput = document.getElementById('authRegisterNameInput');
         const emailInput = document.getElementById('authRegisterEmailInput');
         const passInput = document.getElementById('authRegisterPasswordInput');
@@ -2590,6 +2644,7 @@
           return;
         }
 
+        _isRegisterRequestInProgress = true;
         if (registerBtn) {
           registerBtn.disabled = true;
           registerBtn.innerText = 'Criando sua conta...';
@@ -2611,7 +2666,8 @@
           });
 
           if (error) {
-            console.error('[Supabase Auth SignUp Error]:', error.message);
+            const errStatus = error.status || error.code || 'UNKNOWN';
+            console.error(`[Supabase Auth SignUp Error]: Status ${errStatus} - ${error.message}`);
             throw error;
           }
 
@@ -2626,6 +2682,7 @@
           if (!session) {
             showEmailConfirmationPending(email, pass);
             showToastNotification('Conta criada com sucesso! Confirme seu e-mail para entrar.');
+            showSyncStatus('saved');
             return;
           }
 
@@ -2686,14 +2743,48 @@
           renderAllWorkoutsUI();
           showToastNotification(`🎉 Bem-vindo(a), ${name}! Sua conta foi criada e vinculada com sucesso.`);
         } catch (err) {
-          console.error('[Register Error]:', err);
-          showSyncStatus('error', () => handleAuthAction('register'));
+          const errStatus = err.status || err.code || 'UNKNOWN';
+          const errMsg = (err.message || '').toLowerCase();
+          console.error(`[Cadastro Tratado]: Código ${errStatus} - Mensagem: ${err.message}`);
+
+          // 1. Tratamento específico para Rate Limit (429 / email rate limit exceeded)
+          if (err.status === 429 || errMsg.includes('rate limit') || errMsg.includes('too many requests')) {
+            showSyncStatus('idle'); // Não exibir botão de tentar novamente automático
+            if (regErrEl) {
+              regErrEl.innerHTML = `
+                <div style="font-weight: 700; margin-bottom: 4px;">⚠️ Limite de E-mails Atingido</div>
+                <div>Muitos e-mails foram solicitados. Aguarde alguns minutos e tente novamente.</div>
+              `;
+              regErrEl.style.display = 'block';
+            }
+            startRegisterCooldown(60); // Desativa temporariamente por 60 segundos com contagem
+            return;
+          }
+
+          // 2. Tratamento específico para Usuário já existente
+          if (errMsg.includes('already registered') || errMsg.includes('already exists') || errMsg.includes('user already registered')) {
+            showSyncStatus('idle');
+            if (regErrEl) {
+              regErrEl.innerHTML = `
+                <div style="margin-bottom: 6px;">Este e-mail já está cadastrado. Faça login para acessar sua conta.</div>
+                <button onclick="switchAuthMode('login')" class="btn btn-outline" style="margin-top: 4px; width: 100%; border-color: var(--accent-cyan); color: var(--accent-cyan); font-weight: 800; padding: 8px;">
+                  🔑 FAZER LOGIN
+                </button>
+              `;
+              regErrEl.style.display = 'block';
+            }
+            return;
+          }
+
+          // 3. Outros erros comuns de cadastro
+          showSyncStatus('idle');
           if (regErrEl) {
-            regErrEl.innerText = err.message || 'Erro ao criar conta. Tente novamente.';
+            regErrEl.innerText = err.message || 'Não foi possível criar a conta. Verifique seus dados e tente novamente.';
             regErrEl.style.display = 'block';
           }
         } finally {
-          if (registerBtn) {
+          _isRegisterRequestInProgress = false;
+          if (registerBtn && !_registerCooldownInterval) {
             registerBtn.disabled = false;
             registerBtn.innerText = 'CRIAR MINHA CONTA';
           }
@@ -2732,7 +2823,8 @@
         });
 
         if (error) {
-          console.error('[Supabase signInWithPassword Error]:', error.message);
+          const errStatus = error.status || error.code || 'UNKNOWN';
+          console.error(`[Supabase Auth Login Error]: Status ${errStatus} - ${error.message}`);
           if (error.message.includes('Email not confirmed')) {
             showEmailConfirmationPending(email, password);
             return;
@@ -2781,8 +2873,9 @@
 
         await refreshAppData();
       } catch (err) {
-        console.error('[Login Error]:', err);
-        showSyncStatus('error', () => handleAuthAction('login'));
+        const errStatus = err.status || err.code || 'UNKNOWN';
+        console.error(`[Login Tratado]: Código ${errStatus} - Mensagem: ${err.message}`);
+        showSyncStatus('idle');
         if (loginErrEl) {
           loginErrEl.innerText = err.message || 'Erro ao conectar. Verifique seus dados.';
           loginErrEl.style.display = 'block';
