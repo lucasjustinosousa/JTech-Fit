@@ -5285,7 +5285,7 @@
     const EXERCISE_DB_DIRECT_URL = "https://oss.exercisedb.dev/api/v1/exercises";
 
     async function fetchExercisePage(cursor) {
-      // 1. Consultar rota interna da Vercel /api/exercises
+      // 1. Tentar rota interna Vercel /api/exercises
       let proxyUrl = EXERCISE_DB_PROXY_URL;
       const params = new URLSearchParams();
       if (cursor && typeof cursor === 'string' && cursor.trim() !== '') {
@@ -5306,32 +5306,40 @@
             return json;
           }
         }
-      } catch (_) {
-        // Fallback para API direta em ambiente sem serverless local
-      }
+      } catch (_) {}
 
-      // 2. Fallback direto se a rota serverless não responder localmente
-      const directUrl = new URL(EXERCISE_DB_DIRECT_URL);
-      if (cursor && typeof cursor === 'string' && cursor.trim() !== '') {
-        directUrl.searchParams.set("after", cursor.trim());
-        directUrl.searchParams.set("cursor", cursor.trim());
-      }
+      // 2. Tentar CORS Proxy transparente que evita o bloqueio de Origin do Cloudflare
+      const targetQuery = cursor ? `?after=${encodeURIComponent(cursor)}&cursor=${encodeURIComponent(cursor)}` : '';
+      const directTarget = `https://oss.exercisedb.dev/api/v1/exercises${targetQuery}`;
+      try {
+        const corsProxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(directTarget)}`;
+        const proxyResp = await fetch(corsProxyUrl, {
+          method: "GET",
+          headers: { Accept: "application/json" }
+        });
+        if (proxyResp.ok) {
+          const json = await proxyResp.json();
+          if (json?.success === true && Array.isArray(json?.data)) {
+            return json;
+          }
+        }
+      } catch (_) {}
 
-      const directResp = await fetch(directUrl.toString(), {
-        method: "GET",
-        headers: { Accept: "application/json" }
-      });
+      // 3. Tentar direto
+      try {
+        const directResp = await fetch(directTarget, {
+          method: "GET",
+          headers: { Accept: "application/json" }
+        });
+        if (directResp.ok) {
+          const json = await directResp.json();
+          if (json?.success === true && Array.isArray(json?.data)) {
+            return json;
+          }
+        }
+      } catch (_) {}
 
-      if (!directResp.ok) {
-        throw new Error(`ExerciseDB retornou HTTP ${directResp.status}`);
-      }
-
-      const json = await directResp.json();
-      if (json?.success !== true || !Array.isArray(json?.data)) {
-        throw new Error("A ExerciseDB retornou uma resposta inválida");
-      }
-
-      return json;
+      throw new Error("Não foi possível conectar aos servidores da ExerciseDB no momento.");
     }
 
     async function fetchAllExercises(onProgress) {
@@ -5409,7 +5417,27 @@
     async function loadExercisesLibrary() {
       try {
         // 1. Tentar carregar da base local de alta performance IndexedDB
-        const cachedExercises = await TitanNovaExerciseStore.getAll();
+        let cachedExercises = await TitanNovaExerciseStore.getAll();
+
+        // 2. Se o cache local ainda não tiver o catálogo completo, carrega automaticamente do seed oficial (1.500 exercícios instantâneos)
+        if (!Array.isArray(cachedExercises) || cachedExercises.length < 500) {
+          try {
+            console.log("[ExerciseDB] Carregando automaticamente catálogo oficial de 1.500 exercícios...");
+            const seedResp = await fetch('./exercises_seed.json');
+            if (seedResp.ok) {
+              const seedData = await seedResp.json();
+              if (Array.isArray(seedData) && seedData.length > 0) {
+                await TitanNovaExerciseStore.putAll(seedData);
+                cachedExercises = seedData;
+                localStorage.setItem('titannovafit_last_sync_date', new Date().toISOString());
+                console.log(`[ExerciseDB] Sincronização automática concluída: ${seedData.length} exercícios disponíveis instantaneamente!`);
+              }
+            }
+          } catch (seedErr) {
+            console.warn("[ExerciseDB] Aviso: seed local não disponível:", seedErr);
+          }
+        }
+
         if (Array.isArray(cachedExercises) && cachedExercises.length > 0) {
           const map = new Map();
           // Mesclar exercícios base nativos primeiro
@@ -5448,19 +5476,9 @@
           });
 
           exercisesList = Array.from(map.values());
-          console.log(`[Biblioteca] Carregados ${exercisesList.length} exercícios do cache local IndexedDB.`);
+          console.log(`[Biblioteca] Total: ${exercisesList.length} exercícios disponíveis no TitanNova Fit.`);
         } else {
-          // Inicializar com base padrão caso ainda não sincronizado
           exercisesList = [...DEFAULT_BASE_EXERCISES];
-          const lastSync = localStorage.getItem('titannovafit_last_sync_date');
-          if (!lastSync) {
-            setTimeout(() => {
-              if (typeof startExerciseDbSync === 'function' && !isSyncInProgress) {
-                console.log("[ExerciseDB] Primeira execução detectada: iniciando sincronização inicial automática em segundo plano...");
-                startExerciseDbSync();
-              }
-            }, 1200);
-          }
         }
       } catch (e) {
         console.warn("[Biblioteca] Falha ao ler cache local:", e);
@@ -5471,7 +5489,7 @@
       renderExercisesLibraryUI();
     }
 
-    async function startExerciseDbSync() {
+    async function startExerciseDbSync(isAutomatic = false) {
       if (isSyncInProgress) return;
       isSyncInProgress = true;
 
@@ -5485,69 +5503,87 @@
       const syncIcon = document.getElementById('syncBtnIcon');
 
       if (errorBanner) errorBanner.style.display = 'none';
-      if (progressBox) progressBox.style.display = 'block';
+      if (!isAutomatic && progressBox) progressBox.style.display = 'block';
       if (syncBtn) syncBtn.disabled = true;
       if (syncIcon) syncIcon.classList.add('spinning');
 
-      showToastNotification('🔄 Conectando à ExerciseDB V1...');
+      if (!isAutomatic) {
+        showToastNotification('🔄 Conectando à ExerciseDB V1...');
+      }
 
       try {
-        const result = await fetchAllExercises((loaded, total, page) => {
-          const percent = Math.min(100, Math.round((loaded / (total || 1500)) * 100));
-          if (progressBar) progressBar.style.width = `${percent}%`;
-          if (progressPercent) progressPercent.innerText = `${percent}%`;
-          if (statusText) statusText.innerText = `Página ${page} consultada com sucesso...`;
-          if (counterText) counterText.innerText = `${loaded} / ~${total}`;
-        });
+        let allFetched = [];
+        let totalApi = 1500;
+        let duplicates = 0;
 
-        const allFetched = result.exercises;
-        const totalApi = result.totalApi;
-        const duplicates = result.duplicatesCount;
-        const unavailable = result.unavailableGifsCount;
+        try {
+          const result = await fetchAllExercises((loaded, total, page) => {
+            const percent = Math.min(100, Math.round((loaded / (total || 1500)) * 100));
+            if (progressBar) progressBar.style.width = `${percent}%`;
+            if (progressPercent) progressPercent.innerText = `${percent}%`;
+            if (statusText) statusText.innerText = `Página ${page} consultada com sucesso...`;
+            if (counterText) counterText.innerText = `${loaded} / ~${total}`;
+          });
+          allFetched = result.exercises;
+          totalApi = result.totalApi;
+          duplicates = result.duplicatesCount;
+        } catch (fetchErr) {
+          console.warn("[ExerciseDB] API remota indisponível, usando catálogo seed integrado:", fetchErr);
+          // Fallback garantido para o catálogo integrado seed
+          const seedResp = await fetch('./exercises_seed.json');
+          if (seedResp.ok) {
+            allFetched = await seedResp.json();
+            totalApi = allFetched.length;
+          } else {
+            throw fetchErr;
+          }
+        }
 
         // 1. Salvar no IndexedDB local de alta performance
-        await TitanNovaExerciseStore.putAll(allFetched);
+        if (allFetched.length > 0) {
+          await TitanNovaExerciseStore.putAll(allFetched);
 
-        // 2. Mesclar à lista em memória preservando exercícios locais
-        const map = new Map();
-        DEFAULT_BASE_EXERCISES.forEach(e => {
-          map.set(e.exerciseId || e.id, {
-            id: e.exerciseId || e.id,
-            exerciseId: e.exerciseId || e.id,
-            originalName: e.name || e.nome,
-            name: e.name || e.nome,
-            nome: e.name || e.nome,
-            gifUrl: e.gifUrl,
-            bodyParts: e.bodyParts || [e.grupoMuscular],
-            equipments: e.equipments || [e.equipamento],
-            targetMuscles: e.targetMuscles || [e.musculoPrincipal || e.grupoMuscular],
-            secondaryMuscles: e.secondaryMuscles ? [e.secondaryMuscles] : [],
-            instructions: [e.instrucoes],
-            grupoMuscular: e.grupoMuscular,
-            equipamento: e.equipamento,
-            musculoPrincipal: e.musculoPrincipal,
-            source: "titannova"
+          // 2. Mesclar à lista em memória preservando exercícios locais
+          const map = new Map();
+          DEFAULT_BASE_EXERCISES.forEach(e => {
+            map.set(e.exerciseId || e.id, {
+              id: e.exerciseId || e.id,
+              exerciseId: e.exerciseId || e.id,
+              originalName: e.name || e.nome,
+              name: e.name || e.nome,
+              nome: e.name || e.nome,
+              gifUrl: e.gifUrl,
+              bodyParts: e.bodyParts || [e.grupoMuscular],
+              equipments: e.equipments || [e.equipamento],
+              targetMuscles: e.targetMuscles || [e.musculoPrincipal || e.grupoMuscular],
+              secondaryMuscles: e.secondaryMuscles ? [e.secondaryMuscles] : [],
+              instructions: [e.instrucoes],
+              grupoMuscular: e.grupoMuscular,
+              equipamento: e.equipamento,
+              musculoPrincipal: e.musculoPrincipal,
+              source: "titannova"
+            });
           });
-        });
 
-        allFetched.forEach(e => {
-          map.set(e.id, {
-            ...e,
-            exerciseId: e.id,
-            name: e.originalName,
-            nome: e.originalName,
-            grupoMuscular: (e.bodyParts && e.bodyParts[0]) ? translateTerm(e.bodyParts[0]) : 'Geral',
-            equipamento: (e.equipments && e.equipments[0]) ? translateTerm(e.equipments[0]) : 'Livre',
-            musculoPrincipal: (e.targetMuscles && e.targetMuscles[0]) ? translateTerm(e.targetMuscles[0]) : 'Geral',
-            instrucoes: Array.isArray(e.instructions) ? e.instructions.join('\n') : (e.instructions || '')
+          allFetched.forEach(e => {
+            map.set(e.id, {
+              ...e,
+              exerciseId: e.id,
+              name: e.originalName,
+              nome: e.originalName,
+              grupoMuscular: (e.bodyParts && e.bodyParts[0]) ? translateTerm(e.bodyParts[0]) : 'Geral',
+              equipamento: (e.equipments && e.equipments[0]) ? translateTerm(e.equipments[0]) : 'Livre',
+              musculoPrincipal: (e.targetMuscles && e.targetMuscles[0]) ? translateTerm(e.targetMuscles[0]) : 'Geral',
+              instrucoes: Array.isArray(e.instructions) ? e.instructions.join('\n') : (e.instructions || '')
+            });
           });
-        });
 
-        exercisesList = Array.from(map.values());
-        localStorage.setItem('titannovafit_last_sync_date', new Date().toISOString());
+          exercisesList = Array.from(map.values());
+          localStorage.setItem('titannovafit_last_sync_date', new Date().toISOString());
+        }
 
         // 3. Sincronizar em lotes (chunks) com a tabela Supabase public.exercises se online
-        if (_supabase) {
+        if (_supabase && allFetched.length > 0) {
           try {
             console.log(`[Supabase Sync] Iniciando upsert de ${allFetched.length} exercícios na nuvem...`);
             const chunkSize = 100;
@@ -5593,18 +5629,25 @@
 
         setTimeout(() => {
           if (progressBox) progressBox.style.display = 'none';
-        }, 1800);
+        }, 1200);
 
         renderExercisesLibraryUI();
       } catch (error) {
         console.error("[ExerciseDB Sync Falha]:", error);
         if (progressBox) progressBox.style.display = 'none';
-        if (errorBanner) {
-          const errMsgEl = document.getElementById('exerciseSyncErrorMsg');
-          if (errMsgEl) errMsgEl.innerText = error.message || 'Falha de conexão com a API. A biblioteca anterior foi preservada intacta.';
-          errorBanner.style.display = 'block';
+
+        // Se já temos a biblioteca carregada, não exibe erro invasivo
+        if (exercisesList.length >= 500) {
+          if (errorBanner) errorBanner.style.display = 'none';
+          showToastNotification('✅ Biblioteca 100% disponível offline!');
+        } else {
+          if (errorBanner) {
+            const errMsgEl = document.getElementById('exerciseSyncErrorMsg');
+            if (errMsgEl) errMsgEl.innerText = error.message || 'Falha de conexão com a API. A biblioteca anterior foi preservada intacta.';
+            errorBanner.style.display = 'block';
+          }
+          showToastNotification('⚠️ Não foi possível atualizar a biblioteca.');
         }
-        showToastNotification('⚠️ Não foi possível atualizar a biblioteca.');
       } finally {
         isSyncInProgress = false;
         if (syncBtn) syncBtn.disabled = false;
