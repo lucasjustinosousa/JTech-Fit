@@ -159,6 +159,38 @@ ALTER TABLE public.exercicios ADD COLUMN IF NOT EXISTS usuario_id TEXT;
 ALTER TABLE public.exercicios ADD COLUMN IF NOT EXISTS ativo BOOLEAN DEFAULT TRUE;
 
 -- ====================================================================
+-- 6.1 TABELA OFICIAL EXERCISES (EXERCISEDB V1)
+-- ====================================================================
+CREATE TABLE IF NOT EXISTS public.exercises (
+    id TEXT PRIMARY KEY,
+    original_name TEXT NOT NULL,
+    translated_name TEXT,
+    gif_url TEXT,
+    body_parts TEXT[] DEFAULT '{}',
+    equipments TEXT[] DEFAULT '{}',
+    target_muscles TEXT[] DEFAULT '{}',
+    secondary_muscles TEXT[] DEFAULT '{}',
+    instructions JSONB DEFAULT '[]'::jsonb,
+    source TEXT NOT NULL DEFAULT 'exercisedb',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Índice GIN para pesquisa eficiente por texto
+CREATE INDEX IF NOT EXISTS exercises_original_name_idx ON public.exercises USING gin ( to_tsvector('simple', original_name) );
+
+-- Tabela de metadados da sincronização da biblioteca ExerciseDB
+CREATE TABLE IF NOT EXISTS public.exercise_sync_meta (
+    id TEXT PRIMARY KEY DEFAULT 'exercisedb_v1',
+    total_api INT DEFAULT 0,
+    total_salvo INT DEFAULT 0,
+    duplicados_ignorados INT DEFAULT 0,
+    ultimo_cursor TEXT,
+    status TEXT DEFAULT 'idle',
+    ultima_sincronizacao TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ====================================================================
 -- 7. TABELA DE TREINOS (FICHAS DE TREINO)
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS public.treinos (
@@ -287,6 +319,8 @@ CREATE TRIGGER on_auth_user_created
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.exercicios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.exercises ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.exercise_sync_meta ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.treinos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.exercicios_do_treino ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sessoes_de_treino ENABLE ROW LEVEL SECURITY;
@@ -300,6 +334,10 @@ DROP POLICY IF EXISTS "Usuarios gerenciam seu proprio perfil" ON public.usuarios
 
 DROP POLICY IF EXISTS "Permitir leitura de exercicios publicos e proprios" ON public.exercicios;
 DROP POLICY IF EXISTS "Usuarios gerenciam seus exercicios personalizados" ON public.exercicios;
+DROP POLICY IF EXISTS "Permitir leitura pública de exercises" ON public.exercises;
+DROP POLICY IF EXISTS "Administradores gerenciam exercises" ON public.exercises;
+DROP POLICY IF EXISTS "Permitir leitura de metadados de sync" ON public.exercise_sync_meta;
+DROP POLICY IF EXISTS "Administradores gerenciam metadados de sync" ON public.exercise_sync_meta;
 DROP POLICY IF EXISTS "Administradores visualizam exercícios" ON public.exercicios;
 DROP POLICY IF EXISTS "Administradores cadastram exercícios" ON public.exercicios;
 DROP POLICY IF EXISTS "Administradores editam exercícios" ON public.exercicios;
@@ -327,7 +365,7 @@ CREATE POLICY "Usuarios gerenciam seu proprio perfil" ON public.usuarios
     USING (auth.uid() = user_id OR auth.uid()::text = id OR public.is_admin() OR auth.role() = 'anon')
     WITH CHECK (auth.uid() = user_id OR auth.uid()::text = id OR public.is_admin() OR auth.role() = 'anon');
 
--- 13.3 POLÍTICAS PARA EXERCÍCIOS
+-- 13.3 POLÍTICAS PARA EXERCÍCIOS LEGADOS
 CREATE POLICY "Permitir leitura de exercicios publicos e proprios" ON public.exercicios
     FOR SELECT TO authenticated, anon
     USING (
@@ -342,6 +380,26 @@ CREATE POLICY "Usuarios gerenciam seus exercicios personalizados" ON public.exer
     FOR ALL TO authenticated, anon
     USING (auth.uid() = user_id OR auth.uid()::text = usuario_id OR public.is_admin() OR auth.role() = 'anon')
     WITH CHECK (auth.uid() = user_id OR auth.uid()::text = usuario_id OR public.is_admin() OR auth.role() = 'anon');
+
+-- 13.3.1 POLÍTICAS PARA OFICIAL EXERCISES (EXERCISEDB V1)
+CREATE POLICY "Permitir leitura pública de exercises" ON public.exercises
+    FOR SELECT TO authenticated, anon
+    USING (true);
+
+CREATE POLICY "Administradores gerenciam exercises" ON public.exercises
+    FOR ALL TO authenticated, anon
+    USING (public.is_admin() OR auth.role() = 'anon')
+    WITH CHECK (public.is_admin() OR auth.role() = 'anon');
+
+-- 13.3.2 POLÍTICAS PARA METADADOS DE SINCRONIZAÇÃO
+CREATE POLICY "Permitir leitura de metadados de sync" ON public.exercise_sync_meta
+    FOR SELECT TO authenticated, anon
+    USING (true);
+
+CREATE POLICY "Administradores gerenciam metadados de sync" ON public.exercise_sync_meta
+    FOR ALL TO authenticated, anon
+    USING (public.is_admin() OR auth.role() = 'anon')
+    WITH CHECK (public.is_admin() OR auth.role() = 'anon');
 
 -- 13.4 POLÍTICAS PARA TREINOS
 CREATE POLICY "Usuarios gerenciam seus proprios treinos" ON public.treinos

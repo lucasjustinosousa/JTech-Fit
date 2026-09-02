@@ -547,6 +547,106 @@
       font-weight: 700;
     }
 
+    /* Estilos da Integração ExerciseDB V1 */
+    .exercise-bulk-bar {
+      position: sticky;
+      bottom: 60px;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #1c2333 0%, #121622 100%);
+      border: 2px solid var(--accent-cyan);
+      box-shadow: 0 8px 30px rgba(0, 210, 255, 0.35);
+      border-radius: 16px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 99;
+      margin: 10px 0;
+      animation: slideUp 0.25s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .sync-progress-box {
+      background: #121622;
+      border: 1.5px solid var(--primary-blue);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 20px rgba(30, 136, 229, 0.25);
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .progress-bar-value {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-blue), var(--accent-cyan));
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .filter-select {
+      flex: 1;
+      background: var(--surface-dark);
+      color: white;
+      border: 1px solid var(--divider);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 11px;
+      outline: none;
+      font-weight: 600;
+    }
+
+    .filter-select:focus {
+      border-color: var(--accent-cyan);
+    }
+
+    .badge-chip {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .badge-cyan {
+      background: rgba(0, 210, 255, 0.12);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 210, 255, 0.25);
+    }
+
+    .badge-grey {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-grey);
+      border: 1px solid var(--divider);
+    }
+
+    .badge-gold {
+      background: rgba(255, 215, 0, 0.12);
+      color: #ffd700;
+      border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
   </style>
 </head>
 <body>
@@ -773,45 +873,161 @@
 
       <!-- TELA EXERCÍCIOS / BIBLIOTECA -->
       <div id="screenExercises" class="screen">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h3 style="font-size: 18px; font-weight: 800;">Biblioteca de Exercícios</h3>
-          <button onclick="toggleOnlyFavoritesFilter()" id="btnFavFilter" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px; color: var(--text-grey); border-color: var(--divider);">
-            ⭐ Apenas Favoritos
-          </button>
+        <!-- Top Bar da Biblioteca -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; flex-wrap: wrap;">
+          <div>
+            <h3 style="font-size: 18px; font-weight: 800; color: white; margin: 0;">Biblioteca de Exercícios</h3>
+            <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">ExerciseDB V1 Oficial &bull; ~1.500 exercícios</div>
+          </div>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <button onclick="toggleOnlyFavoritesFilter()" id="btnFavFilter" class="btn btn-outline" style="width: auto; padding: 5px 10px; font-size: 11px; color: var(--text-grey); border-color: var(--divider);" title="Filtrar apenas favoritos">
+              ⭐ Favoritos
+            </button>
+            <button onclick="startExerciseDbSync()" id="btnSyncExerciseDb" class="btn btn-primary" style="width: auto; padding: 5px 12px; font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 10px rgba(30,136,229,0.35);" title="Sincronizar todos os 1.500 exercícios da ExerciseDB">
+              <span id="syncBtnIcon">🔄</span> Atualizar Biblioteca
+            </button>
+          </div>
         </div>
 
-        <!-- BANNER DA BIBLIOTECA NATIVA TITANNOVA -->
-        <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--divider); margin-bottom: 12px; font-size: 11px; color: var(--accent-cyan);">
-          <span>🏋️‍♂️ Biblioteca Oficial de Exercícios TitanNova</span>
-          <span style="display: flex; align-items: center; gap: 4px;">⚡ 100% Offline & Rápido</span>
+        <!-- Indicadores de Status e Contagem -->
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(22, 24, 28, 0.8); border: 1px solid var(--divider); padding: 8px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 11px;">
+          <span id="exerciseStatsBadge" style="color: var(--accent-cyan); font-weight: 800;">
+            Carregando exercícios...
+          </span>
+          <span style="color: var(--success-green); font-weight: 700; display: flex; align-items: center; gap: 4px;">
+            ● 100% Offline (IndexedDB)
+          </span>
         </div>
 
-        <!-- BARRA DE PESQUISA DA BIBLIOTECA -->
-        <div class="form-group">
-          <input type="text" id="exerciseSearchInput" class="form-input" placeholder="🔍 Buscar exercício por nome, equipamento ou grupo..." oninput="filterExercisesLibrary()">
+        <!-- CARD DE PROGRESSO DE SINCRONIZAÇÃO DA EXERCISEDB (EXIBIDO DURANTE SYNC) -->
+        <div id="exerciseSyncProgressBox" class="sync-progress-box" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="sync-spinner">🔄</span>
+              <span style="font-size: 12px; font-weight: 800; color: white;">Sincronizando ExerciseDB V1</span>
+            </div>
+            <span id="exerciseSyncPercent" style="font-size: 12px; font-weight: 900; color: var(--accent-cyan);">0%</span>
+          </div>
+          <div class="progress-bar-container">
+            <div id="exerciseSyncProgressBar" class="progress-bar-value"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-grey);">
+            <span id="exerciseSyncStatusText">Consultando API com paginação por cursor...</span>
+            <span id="exerciseSyncCounterText">0 / ~1.500</span>
+          </div>
         </div>
 
-        <!-- CHIPS DE GRUPOS MUSCULARES DA BIBLIOTECA -->
-        <div class="chip-container" id="exerciseGroupChips">
+        <!-- BANNER DE ERRO COM BOTÃO TENTAR NOVAMENTE -->
+        <div id="exerciseSyncErrorBanner" style="display: none; background: rgba(255, 82, 82, 0.15); border: 1px solid rgba(255, 82, 82, 0.4); border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 12px; color: #ff5252;">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+            <div style="flex: 1;">
+              <strong>⚠️ Não foi possível atualizar a biblioteca</strong>
+              <div id="exerciseSyncErrorMsg" style="font-size: 11px; opacity: 0.9; margin-top: 2px;">Falha de conexão com a API. A biblioteca local foi preservada.</div>
+            </div>
+            <button onclick="startExerciseDbSync()" class="btn btn-outline" style="width: auto; padding: 5px 10px; font-size: 11px; color: white; border-color: #ff5252; background: rgba(255, 82, 82, 0.2); white-space: nowrap;">
+              🔄 Tentar novamente
+            </button>
+          </div>
+        </div>
+
+        <!-- BARRA DE PESQUISA DA BIBLIOTECA (PT-BR / EN) -->
+        <div class="form-group" style="margin-bottom: 10px;">
+          <input type="text" id="exerciseSearchInput" class="form-input" placeholder="🔍 Pesquise por nome (PT/EN), equipamento ou músculo..." oninput="filterExercisesLibrary()">
+        </div>
+
+        <!-- CHIPS DE GRUPOS MUSCULARES / PARTES DO CORPO -->
+        <div class="chip-container" id="exerciseGroupChips" style="margin-bottom: 10px;">
           <div class="chip active" onclick="filterExerciseGroup('Todos', this)">Todos</div>
           <div class="chip" onclick="filterExerciseGroup('Peito', this)">Peito</div>
           <div class="chip" onclick="filterExerciseGroup('Costas', this)">Costas</div>
           <div class="chip" onclick="filterExerciseGroup('Pernas', this)">Pernas</div>
           <div class="chip" onclick="filterExerciseGroup('Ombros', this)">Ombros</div>
+          <div class="chip" onclick="filterExerciseGroup('Braços', this)">Braços</div>
           <div class="chip" onclick="filterExerciseGroup('Bíceps', this)">Bíceps</div>
           <div class="chip" onclick="filterExerciseGroup('Tríceps', this)">Tríceps</div>
           <div class="chip" onclick="filterExerciseGroup('Abdômen', this)">Abdômen</div>
-          <div class="chip" onclick="filterExerciseGroup('Mobilidade', this)">Mobilidade</div>
+          <div class="chip" onclick="filterExerciseGroup('Cardio', this)">Cardio</div>
         </div>
 
-        <!-- AVISO DE SEGURANÇA PROFISSIONAL EM SAÚDE -->
-        <div style="background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); border-radius: 10px; padding: 10px 12px; margin-top: 10px; font-size: 11px; color: #FFC107; line-height: 1.3;">
-          ⚠️ <strong>Aviso de Segurança:</strong> A execução varia por nível. Interrompa se sentir dor ou mal-estar. O aplicativo não substitui a orientação de um profissional de saúde.
+        <!-- FILTROS SECUNDÁRIOS: MÚSCULO ALVO E EQUIPAMENTO -->
+        <div class="filter-row">
+          <select id="exerciseTargetMuscleFilter" class="filter-select" onchange="handleSecondaryFilterChange()">
+            <option value="Todos">🎯 Todos os Músculos Alvo</option>
+            <option value="peitorais">Peitorais (Pectorals)</option>
+            <option value="dorsais">Dorsais (Lats)</option>
+            <option value="quadríceps">Quadríceps (Quads)</option>
+            <option value="glúteos">Glúteos (Glutes)</option>
+            <option value="posteriores da coxa">Posteriores de Coxa (Hamstrings)</option>
+            <option value="deltoides">Deltoides / Ombros (Delts)</option>
+            <option value="bíceps">Bíceps</option>
+            <option value="tríceps">Tríceps</option>
+            <option value="abdômen">Abdômen (Abs)</option>
+            <option value="panturrilhas">Panturrilhas (Calves)</option>
+            <option value="antebraços">Antebraços (Forearms)</option>
+            <option value="trapézio">Trapézio (Traps)</option>
+            <option value="sistema cardiovascular">Cardiovascular</option>
+          </select>
+
+          <select id="exerciseEquipmentFilter" class="filter-select" onchange="handleSecondaryFilterChange()">
+            <option value="Todos">⚙️ Todos Equipamentos</option>
+            <option value="barra">Barra (Barbell)</option>
+            <option value="halteres">Halteres (Dumbbell)</option>
+            <option value="polia">Polia / Cabo (Cable)</option>
+            <option value="peso corporal">Peso Corporal (Body Weight)</option>
+            <option value="máquina">Máquinas (Leverage/Machine)</option>
+            <option value="faixa elástica">Faixa Elástica (Band)</option>
+            <option value="kettlebell">Kettlebell</option>
+            <option value="smith">Smith Machine</option>
+          </select>
+
+          <button onclick="resetExerciseFilters()" class="btn btn-outline" style="width: auto; padding: 7px 10px; font-size: 11px; color: var(--text-grey); border-color: var(--divider);" title="Limpar todos os filtros">
+            ✕
+          </button>
+        </div>
+
+        <!-- REGRAS DE SEGURANÇA E ORIENTAÇÃO PROFISSIONAL -->
+        <div style="background: rgba(255, 193, 7, 0.08); border: 1px solid rgba(255, 193, 7, 0.28); border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; font-size: 11px; color: #ffd54f; line-height: 1.45;">
+          <div style="font-weight: 800; font-size: 11.5px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; color: #ffca28;">
+            <span>🛡️</span> RECOMENDAÇÕES DE SEGURANÇA & SAÚDE:
+          </div>
+          <ul style="margin: 0; padding-left: 18px;">
+            <li>Interrompa imediatamente a execução caso sinta dor aguda, tontura ou mal-estar.</li>
+            <li>Exercícios desconhecidos devem ser realizados sob orientação de um profissional de Educação Física habilitado.</li>
+            <li>O aplicativo disponibiliza material demonstrativo e não substitui prescrição médica ou profissional.</li>
+            <li>O sistema não diagnostica condições de saúde nem recomenda aumento automático de cargas.</li>
+          </ul>
+        </div>
+
+        <!-- BARRA FLUTUANTE DE AÇÃO EM MASSA (SELEÇÃO MÚLTIPLA) -->
+        <div id="exerciseBulkActionBar" class="exercise-bulk-bar" style="display: none;">
+          <div>
+            <div id="exerciseBulkCountText" style="font-size: 13px; font-weight: 900; color: white;">
+              0 exercícios selecionados
+            </div>
+            <div style="font-size: 10px; color: var(--accent-cyan); font-weight: 700;">
+              Toque para inserir na sua ficha de treino
+            </div>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button onclick="clearBulkExerciseSelection()" class="btn btn-outline" style="width: auto; padding: 6px 10px; font-size: 11px; color: var(--text-grey); border-color: var(--divider);">
+              Desmarcar
+            </button>
+            <button onclick="openAddSelectedToWorkoutModal()" class="btn btn-success" style="width: auto; padding: 7px 14px; font-size: 12px; font-weight: 900; border-radius: 10px; box-shadow: 0 4px 12px rgba(76,175,80,0.4);">
+              ➕ Adicionar ao Treino
+            </button>
+          </div>
         </div>
 
         <!-- CONTAINER DA LISTA DE EXERCÍCIOS -->
         <div id="exerciseListContainer" style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">
           <!-- Exercícios renderizados dinamicamente via JS -->
+        </div>
+
+        <!-- BOTÃO CARREGAR MAIS / PROGRESSIVO -->
+        <div id="exerciseLoadMoreContainer" style="text-align: center; margin: 16px 0; display: none;">
+          <button onclick="loadMoreProgressiveExercises()" class="btn btn-outline" style="width: 100%; padding: 11px; font-size: 13px; font-weight: 700; border-color: var(--accent-cyan); color: var(--accent-cyan);">
+            ▼ Carregar Mais Exercícios (<span id="loadMoreRemainingCount">0</span> restantes)
+          </button>
         </div>
       </div>
 
@@ -1351,12 +1567,20 @@
         </div>
       </div>
 
+      <!-- AVISO DE SAÚDE & SEGURANÇA NO MODAL -->
+      <div style="background: rgba(255, 193, 7, 0.08); border: 1px solid rgba(255, 193, 7, 0.25); border-radius: 10px; padding: 8px 12px; margin-bottom: 14px; font-size: 10.5px; color: #ffd54f; line-height: 1.4;">
+        ⚠️ <strong>Aviso:</strong> Em caso de dor ou desconforto articular, interrompa imediatamente. Consulte um profissional de Educação Física habilitado para ajustes de postura e carga.
+      </div>
+
       <!-- BOTÕES DE AÇÃO -->
-      <div style="display: flex; gap: 8px;">
-        <button id="detailBtnFav" onclick="toggleFavoriteFromDetail()" class="btn btn-outline" style="flex: 1; padding: 11px; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button id="detailBtnFav" onclick="toggleFavoriteFromDetail()" class="btn btn-outline" style="flex: 1; min-width: 100px; padding: 10px; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px;">
           <span id="detailFavIcon">⭐</span> Favoritar
         </button>
-        <button data-close-detail-modal onclick="closeExerciseDetailModal()" class="btn btn-primary" style="flex: 1.4; padding: 11px; font-size: 13px; font-weight: 800; border-radius: 12px;">
+        <button id="detailBtnAddToWorkout" onclick="addCurrentDetailToWorkout()" class="btn btn-success" style="flex: 1.2; min-width: 130px; padding: 10px; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          ➕ Ao Treino
+        </button>
+        <button data-close-detail-modal onclick="closeExerciseDetailModal()" class="btn btn-primary" style="flex: 1; min-width: 90px; padding: 10px; font-size: 12px; font-weight: 800; border-radius: 12px;">
           ✓ FECHAR
         </button>
       </div>
@@ -1419,6 +1643,49 @@
         </button>
       </div>
 
+    </div>
+  </div>
+
+  <!-- MODAL DE ADICIONAR EXERCÍCIOS SELECIONADOS A UMA FICHA DE TREINO -->
+  <div id="modalAddSelectedToWorkout" class="modal-overlay" style="display: none; z-index: 99999;">
+    <div class="modal-card" style="max-width: 440px; width: 95%; padding: 20px; background: #0c0e14; border: 2px solid var(--accent-cyan); border-radius: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--divider); padding-bottom: 10px;">
+        <h3 style="font-size: 17px; font-weight: 800; color: white; margin: 0; display: flex; align-items: center; gap: 6px;">
+          <span>📋</span> Adicionar Exercícios ao Treino
+        </h3>
+        <button onclick="closeAddSelectedToWorkoutModal()" style="background: none; border: none; color: var(--text-grey); font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <p id="addSelectedSummaryText" style="font-size: 12px; color: var(--accent-cyan); font-weight: 700; margin-bottom: 12px;">
+        0 exercícios selecionados
+      </p>
+
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label class="form-label">Escolha a Ficha de Treino de Destino</label>
+        <select id="targetWorkoutSelectDropdown" class="form-input" style="font-size: 13px;">
+          <!-- Opções preenchidas dinamicamente -->
+        </select>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
+        <div>
+          <label class="form-label">Séries (opcional)</label>
+          <input type="number" id="bulkAddSeriesInput" class="form-input" placeholder="ex: 4" value="4">
+        </div>
+        <div>
+          <label class="form-label">Reps (opcional)</label>
+          <input type="text" id="bulkAddRepsInput" class="form-input" placeholder="ex: 10-12" value="10-12">
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <button onclick="closeAddSelectedToWorkoutModal()" class="btn btn-outline" style="flex: 1;">
+          Cancelar
+        </button>
+        <button onclick="confirmBulkAddExercisesToWorkout()" class="btn btn-success" style="flex: 1.5; font-weight: 800;">
+          ✓ CONFIRMAR INSERÇÃO
+        </button>
+      </div>
     </div>
   </div>
 
@@ -4810,29 +5077,539 @@
       heroBtnEl.onclick = () => startActiveWorkout(safeWorkoutParam);
     }
 
-    // (DEFAULT_BASE_EXERCISES movido para o topo do script)
+    // ==========================================
+    // INTEGRAÇÃO EXERCISEDB V1 - TITANNOVA FIT
+    // ==========================================
+
+    // Mapeamento interno oficial
+    function mapExercise(item) {
+      return {
+        id: String(item.exerciseId),
+        originalName: String(item.name ?? ""),
+        gifUrl: String(item.gifUrl ?? ""),
+        bodyParts: Array.isArray(item.bodyParts) ? item.bodyParts : [],
+        equipments: Array.isArray(item.equipments) ? item.equipments : [],
+        targetMuscles: Array.isArray(item.targetMuscles) ? item.targetMuscles : [],
+        secondaryMuscles: Array.isArray(item.secondaryMuscles) ? item.secondaryMuscles : [],
+        instructions: Array.isArray(item.instructions) ? item.instructions : [],
+        source: "exercisedb"
+      };
+    }
+
+    // Dicionário Oficial de Tradução PT-BR (Interface)
+    const exerciseTranslations = {
+      // Partes do corpo / Grupos Musculares
+      back: "costas",
+      waist: "abdômen",
+      chest: "peito",
+      shoulders: "ombros",
+      "upper arms": "braços",
+      "lower arms": "antebraços",
+      "upper legs": "pernas",
+      "lower legs": "panturrilhas",
+      cardio: "cardio",
+      neck: "pescoço",
+
+      // Equipamentos
+      "body weight": "peso corporal",
+      assisted: "assistido",
+      cable: "polia",
+      barbell: "barra",
+      dumbbell: "halteres",
+      band: "faixa elástica",
+      kettlebell: "kettlebell",
+      leverage: "máquina articulada",
+      "leverage machine": "máquina articulada",
+      machine: "máquina",
+      medicine: "bola medicinal",
+      "medicine ball": "bola medicinal",
+      olympic: "barra olímpica",
+      "olympic barbell": "barra olímpica",
+      resistance: "resistência",
+      "resistance band": "faixa elástica",
+      roller: "rolo de liberação",
+      rope: "corda",
+      skierg: "skierg",
+      sled: "trenó",
+      smith: "máquina smith",
+      "smith machine": "máquina smith",
+      stability: "bola suíça",
+      "stability ball": "bola suíça",
+      stationary: "bicicleta ergométrica",
+      "stationary bike": "bicicleta ergométrica",
+      tire: "pneu",
+      trap: "barra hexagonal",
+      "trap bar": "barra hexagonal",
+      weighted: "com peso",
+      wheel: "roda abdominal",
+      "wheel roller": "roda abdominal",
+
+      // Músculos Principais e Secundários
+      abs: "abdômen",
+      biceps: "bíceps",
+      triceps: "tríceps",
+      glutes: "glúteos",
+      hamstrings: "posteriores da coxa",
+      quadriceps: "quadríceps",
+      calves: "panturrilhas",
+      pectorals: "peitorais",
+      delts: "deltoides",
+      lats: "dorsais",
+      traps: "trapézio",
+      trapezius: "trapézio",
+      forearms: "antebraços",
+      abductors: "abdutores",
+      adductors: "adutores",
+      spine: "eretores da espinha",
+      "upper back": "costas superior",
+      "cardiovascular system": "sistema cardiovascular",
+      serratus: "serrátil anterior",
+      "serratus anterior": "serrátil anterior",
+      levator: "levantador da escápula",
+      soleus: "sóleo",
+      gastrocnemius: "gastrocnêmio",
+      brachialis: "braquial",
+      wrist: "punhos",
+      hands: "mãos",
+      feet: "pés",
+      ankles: "tornozelos"
+    };
+
+    function translateTerm(term) {
+      if (!term || typeof term !== 'string') return '';
+      const clean = term.toLowerCase().trim();
+      return exerciseTranslations[clean] || term;
+    }
+
+    function capitalizeText(text) {
+      if (!text || typeof text !== 'string') return '';
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    function formatExerciseTitle(ex) {
+      if (!ex) return 'Exercício';
+      const orig = ex.originalName || ex.name || ex.nome || '';
+      return capitalizeText(orig);
+    }
+
+    // Armazenamento IndexedDB de Alta Performance (Suporta ~1.500 exercícios)
+    const TitanNovaExerciseStore = {
+      DB_NAME: "TitanNovaFit_DB",
+      DB_VERSION: 1,
+      STORE_NAME: "exercisedb_v1",
+
+      openDB() {
+        return new Promise((resolve, reject) => {
+          if (!window.indexedDB) {
+            resolve(null);
+            return;
+          }
+          const req = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(this.STORE_NAME)) {
+              db.createObjectStore(this.STORE_NAME, { keyPath: "id" });
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => {
+            console.warn("[IndexedDB Open Error]:", req.error);
+            resolve(null);
+          };
+        });
+      },
+
+      async getAll() {
+        try {
+          const db = await this.openDB();
+          if (!db) {
+            const raw = localStorage.getItem('titannovafit_exercisedb_cache');
+            return raw ? JSON.parse(raw) : [];
+          }
+          return new Promise((resolve) => {
+            const tx = db.transaction(this.STORE_NAME, "readonly");
+            const store = tx.objectStore(this.STORE_NAME);
+            const req = store.getAll();
+            req.onsuccess = () => resolve(req.result || []);
+            req.onerror = () => resolve([]);
+          });
+        } catch (e) {
+          console.warn("[IndexedDB getAll]:", e);
+          return [];
+        }
+      },
+
+      async putAll(items) {
+        try {
+          const db = await this.openDB();
+          if (!db) {
+            try {
+              localStorage.setItem('titannovafit_exercisedb_cache', JSON.stringify(items.slice(0, 100)));
+            } catch (_) {}
+            return true;
+          }
+          return new Promise((resolve) => {
+            const tx = db.transaction(this.STORE_NAME, "readwrite");
+            const store = tx.objectStore(this.STORE_NAME);
+            for (const item of items) {
+              store.put(item);
+            }
+            tx.oncomplete = () => resolve(true);
+            tx.onerror = () => resolve(false);
+          });
+        } catch (e) {
+          console.warn("[IndexedDB putAll]:", e);
+          return false;
+        }
+      },
+
+      async count() {
+        try {
+          const db = await this.openDB();
+          if (!db) return 0;
+          return new Promise((resolve) => {
+            const tx = db.transaction(this.STORE_NAME, "readonly");
+            const store = tx.objectStore(this.STORE_NAME);
+            const req = store.count();
+            req.onsuccess = () => resolve(req.result || 0);
+            req.onerror = () => resolve(0);
+          });
+        } catch (_) {
+          return 0;
+        }
+      }
+    };
+
+    // Paginação por Cursor da ExerciseDB V1
+    const EXERCISE_DB_PROXY_URL = "/api/exercises";
+    const EXERCISE_DB_DIRECT_URL = "https://oss.exercisedb.dev/api/v1/exercises";
+
+    async function fetchExercisePage(cursor) {
+      // 1. Consultar rota interna da Vercel /api/exercises
+      let proxyUrl = EXERCISE_DB_PROXY_URL;
+      const params = new URLSearchParams();
+      if (cursor && typeof cursor === 'string' && cursor.trim() !== '') {
+        params.set("cursor", cursor.trim());
+        params.set("after", cursor.trim());
+      }
+      const q = params.toString();
+      if (q) proxyUrl += `?${q}`;
+
+      try {
+        const response = await fetch(proxyUrl, {
+          method: "GET",
+          headers: { Accept: "application/json" }
+        });
+        if (response.ok) {
+          const json = await response.json();
+          if (json?.success === true && Array.isArray(json?.data)) {
+            return json;
+          }
+        }
+      } catch (_) {
+        // Fallback para API direta em ambiente sem serverless local
+      }
+
+      // 2. Fallback direto se a rota serverless não responder localmente
+      const directUrl = new URL(EXERCISE_DB_DIRECT_URL);
+      if (cursor && typeof cursor === 'string' && cursor.trim() !== '') {
+        directUrl.searchParams.set("after", cursor.trim());
+        directUrl.searchParams.set("cursor", cursor.trim());
+      }
+
+      const directResp = await fetch(directUrl.toString(), {
+        method: "GET",
+        headers: { Accept: "application/json" }
+      });
+
+      if (!directResp.ok) {
+        throw new Error(`ExerciseDB retornou HTTP ${directResp.status}`);
+      }
+
+      const json = await directResp.json();
+      if (json?.success !== true || !Array.isArray(json?.data)) {
+        throw new Error("A ExerciseDB retornou uma resposta inválida");
+      }
+
+      return json;
+    }
+
+    async function fetchAllExercises(onProgress) {
+      const exercises = new Map();
+      const usedCursors = new Set();
+      let cursor = undefined;
+      let hasNextPage = true;
+      let pageIndex = 0;
+      let totalApiReported = 1500;
+      let duplicatesCount = 0;
+      let unavailableGifsCount = 0;
+
+      console.log("[ExerciseDB Sync] Iniciando busca paginada completa por cursor...");
+
+      while (hasNextPage) {
+        if (cursor && usedCursors.has(cursor)) {
+          throw new Error("Cursor repetido durante a paginação da ExerciseDB: " + cursor);
+        }
+        if (cursor) {
+          usedCursors.add(cursor);
+        }
+
+        pageIndex++;
+        const response = await fetchExercisePage(cursor);
+        totalApiReported = response.meta?.total || totalApiReported;
+
+        for (const item of response.data) {
+          const exercise = mapExercise(item);
+          if (exercise.id) {
+            if (exercises.has(exercise.id)) {
+              duplicatesCount++;
+            } else {
+              exercises.set(exercise.id, exercise);
+              if (!exercise.gifUrl) unavailableGifsCount++;
+            }
+          }
+        }
+
+        // Diagnóstico seguro (sem registrar dados pessoais)
+        console.log(`[ExerciseDB Sync] Página ${pageIndex}: ${response.data.length} exercícios recebidos. Próximo cursor: ${response.meta?.nextCursor || 'FIM'}`);
+
+        if (typeof onProgress === 'function') {
+          onProgress(exercises.size, totalApiReported, pageIndex);
+        }
+
+        hasNextPage = response.meta.hasNextPage === true;
+        const nextCursor = response.meta.nextCursor ?? undefined;
+
+        if (hasNextPage && !nextCursor) {
+          throw new Error("A API informou outra página, mas não enviou nextCursor");
+        }
+
+        cursor = nextCursor;
+      }
+
+      return {
+        exercises: Array.from(exercises.values()),
+        totalApi: totalApiReported,
+        duplicatesCount: duplicatesCount,
+        unavailableGifsCount: unavailableGifsCount
+      };
+    }
+
+    // Variáveis de Estado da Biblioteca
     let currentSelectedGroup = 'Todos';
+    let currentSelectedTargetMuscle = 'Todos';
+    let currentSelectedEquipment = 'Todos';
     let onlyFavoritesFilter = false;
     let favoritesSet = new Set(JSON.parse(localStorage.getItem('titannovafit_fav_exercises') || '[]'));
     let selectedForWorkoutSet = new Set();
     let currentExerciseState = 'SUCESSO';
+    let visibleExercisesLimit = 35;
+    let isSyncInProgress = false;
 
-    function loadExercisesLibrary() {
+    async function loadExercisesLibrary() {
       try {
-        const custom = JSON.parse(localStorage.getItem('titannovafit_custom_exercises') || '[]');
-        if (Array.isArray(custom) && custom.length > 0) {
+        // 1. Tentar carregar da base local de alta performance IndexedDB
+        const cachedExercises = await TitanNovaExerciseStore.getAll();
+        if (Array.isArray(cachedExercises) && cachedExercises.length > 0) {
           const map = new Map();
-          DEFAULT_BASE_EXERCISES.forEach(e => map.set(e.exerciseId, e));
-          custom.forEach(e => map.set(e.exerciseId || e.id, e));
+          // Mesclar exercícios base nativos primeiro
+          DEFAULT_BASE_EXERCISES.forEach(e => {
+            map.set(e.exerciseId || e.id, {
+              id: e.exerciseId || e.id,
+              exerciseId: e.exerciseId || e.id,
+              originalName: e.name || e.nome,
+              name: e.name || e.nome,
+              nome: e.name || e.nome,
+              gifUrl: e.gifUrl,
+              bodyParts: e.bodyParts || [e.grupoMuscular],
+              equipments: e.equipments || [e.equipamento],
+              targetMuscles: e.targetMuscles || [e.musculoPrincipal || e.grupoMuscular],
+              secondaryMuscles: e.secondaryMuscles ? [e.secondaryMuscles] : [],
+              instructions: [e.instrucoes],
+              grupoMuscular: e.grupoMuscular,
+              equipamento: e.equipamento,
+              musculoPrincipal: e.musculoPrincipal,
+              source: "titannova"
+            });
+          });
+
+          cachedExercises.forEach(e => {
+            const exObj = {
+              ...e,
+              exerciseId: e.id,
+              name: e.originalName,
+              nome: e.originalName,
+              grupoMuscular: (e.bodyParts && e.bodyParts[0]) ? translateTerm(e.bodyParts[0]) : 'Geral',
+              equipamento: (e.equipments && e.equipments[0]) ? translateTerm(e.equipments[0]) : 'Livre',
+              musculoPrincipal: (e.targetMuscles && e.targetMuscles[0]) ? translateTerm(e.targetMuscles[0]) : 'Geral',
+              instrucoes: Array.isArray(e.instructions) ? e.instructions.join('\n') : (e.instructions || '')
+            };
+            map.set(e.id, exObj);
+          });
+
           exercisesList = Array.from(map.values());
+          console.log(`[Biblioteca] Carregados ${exercisesList.length} exercícios do cache local IndexedDB.`);
         } else {
+          // Inicializar com base padrão caso ainda não sincronizado
           exercisesList = [...DEFAULT_BASE_EXERCISES];
+          const lastSync = localStorage.getItem('titannovafit_last_sync_date');
+          if (!lastSync) {
+            setTimeout(() => {
+              if (typeof startExerciseDbSync === 'function' && !isSyncInProgress) {
+                console.log("[ExerciseDB] Primeira execução detectada: iniciando sincronização inicial automática em segundo plano...");
+                startExerciseDbSync();
+              }
+            }, 1200);
+          }
         }
       } catch (e) {
+        console.warn("[Biblioteca] Falha ao ler cache local:", e);
         exercisesList = [...DEFAULT_BASE_EXERCISES];
       }
+
       currentExerciseState = 'SUCESSO';
       renderExercisesLibraryUI();
+    }
+
+    async function startExerciseDbSync() {
+      if (isSyncInProgress) return;
+      isSyncInProgress = true;
+
+      const progressBox = document.getElementById('exerciseSyncProgressBox');
+      const progressBar = document.getElementById('exerciseSyncProgressBar');
+      const progressPercent = document.getElementById('exerciseSyncPercent');
+      const statusText = document.getElementById('exerciseSyncStatusText');
+      const counterText = document.getElementById('exerciseSyncCounterText');
+      const errorBanner = document.getElementById('exerciseSyncErrorBanner');
+      const syncBtn = document.getElementById('btnSyncExerciseDb');
+      const syncIcon = document.getElementById('syncBtnIcon');
+
+      if (errorBanner) errorBanner.style.display = 'none';
+      if (progressBox) progressBox.style.display = 'block';
+      if (syncBtn) syncBtn.disabled = true;
+      if (syncIcon) syncIcon.classList.add('spinning');
+
+      showToastNotification('🔄 Conectando à ExerciseDB V1...');
+
+      try {
+        const result = await fetchAllExercises((loaded, total, page) => {
+          const percent = Math.min(100, Math.round((loaded / (total || 1500)) * 100));
+          if (progressBar) progressBar.style.width = `${percent}%`;
+          if (progressPercent) progressPercent.innerText = `${percent}%`;
+          if (statusText) statusText.innerText = `Página ${page} consultada com sucesso...`;
+          if (counterText) counterText.innerText = `${loaded} / ~${total}`;
+        });
+
+        const allFetched = result.exercises;
+        const totalApi = result.totalApi;
+        const duplicates = result.duplicatesCount;
+        const unavailable = result.unavailableGifsCount;
+
+        // 1. Salvar no IndexedDB local de alta performance
+        await TitanNovaExerciseStore.putAll(allFetched);
+
+        // 2. Mesclar à lista em memória preservando exercícios locais
+        const map = new Map();
+        DEFAULT_BASE_EXERCISES.forEach(e => {
+          map.set(e.exerciseId || e.id, {
+            id: e.exerciseId || e.id,
+            exerciseId: e.exerciseId || e.id,
+            originalName: e.name || e.nome,
+            name: e.name || e.nome,
+            nome: e.name || e.nome,
+            gifUrl: e.gifUrl,
+            bodyParts: e.bodyParts || [e.grupoMuscular],
+            equipments: e.equipments || [e.equipamento],
+            targetMuscles: e.targetMuscles || [e.musculoPrincipal || e.grupoMuscular],
+            secondaryMuscles: e.secondaryMuscles ? [e.secondaryMuscles] : [],
+            instructions: [e.instrucoes],
+            grupoMuscular: e.grupoMuscular,
+            equipamento: e.equipamento,
+            musculoPrincipal: e.musculoPrincipal,
+            source: "titannova"
+          });
+        });
+
+        allFetched.forEach(e => {
+          map.set(e.id, {
+            ...e,
+            exerciseId: e.id,
+            name: e.originalName,
+            nome: e.originalName,
+            grupoMuscular: (e.bodyParts && e.bodyParts[0]) ? translateTerm(e.bodyParts[0]) : 'Geral',
+            equipamento: (e.equipments && e.equipments[0]) ? translateTerm(e.equipments[0]) : 'Livre',
+            musculoPrincipal: (e.targetMuscles && e.targetMuscles[0]) ? translateTerm(e.targetMuscles[0]) : 'Geral',
+            instrucoes: Array.isArray(e.instructions) ? e.instructions.join('\n') : (e.instructions || '')
+          });
+        });
+
+        exercisesList = Array.from(map.values());
+        localStorage.setItem('titannovafit_last_sync_date', new Date().toISOString());
+
+        // 3. Sincronizar em lotes (chunks) com a tabela Supabase public.exercises se online
+        if (_supabase) {
+          try {
+            console.log(`[Supabase Sync] Iniciando upsert de ${allFetched.length} exercícios na nuvem...`);
+            const chunkSize = 100;
+            for (let i = 0; i < allFetched.length; i += chunkSize) {
+              const chunk = allFetched.slice(i, i + chunkSize).map(e => ({
+                id: e.id,
+                original_name: e.originalName,
+                translated_name: translateTerm(e.originalName),
+                gif_url: e.gifUrl,
+                body_parts: e.bodyParts,
+                equipments: e.equipments,
+                target_muscles: e.targetMuscles,
+                secondary_muscles: e.secondaryMuscles,
+                instructions: e.instructions,
+                source: "exercisedb",
+                updated_at: new Date().toISOString()
+              }));
+              await _supabase.from('exercises').upsert(chunk);
+            }
+            // Atualizar metadados de sync no banco
+            await _supabase.from('exercise_sync_meta').upsert({
+              id: 'exercisedb_v1',
+              total_api: totalApi,
+              total_salvo: allFetched.length,
+              duplicados_ignorados: duplicates,
+              status: 'concluido',
+              ultima_sincronizacao: new Date().toISOString()
+            });
+            console.log('[Supabase Sync] Sincronização concluída no Supabase!');
+          } catch (cloudErr) {
+            console.warn('[Supabase Sync Aviso]: Dados salvos localmente no IndexedDB; nuvem indisponível:', cloudErr);
+          }
+        }
+
+        // Diagnóstico final exigido
+        const msgSucesso = `Sincronização concluída: ${allFetched.length} exercícios carregados, ${allFetched.length} salvos, 0 atualizados e ${duplicates} duplicados ignorados.`;
+        console.log(`[DIAGNÓSTICO EXERCISEDB] ${msgSucesso}`);
+        showToastNotification(`✅ ${msgSucesso}`);
+
+        if (statusText) statusText.innerText = 'Sincronização 100% concluída!';
+        if (progressPercent) progressPercent.innerText = '100%';
+        if (progressBar) progressBar.style.width = '100%';
+
+        setTimeout(() => {
+          if (progressBox) progressBox.style.display = 'none';
+        }, 1800);
+
+        renderExercisesLibraryUI();
+      } catch (error) {
+        console.error("[ExerciseDB Sync Falha]:", error);
+        if (progressBox) progressBox.style.display = 'none';
+        if (errorBanner) {
+          const errMsgEl = document.getElementById('exerciseSyncErrorMsg');
+          if (errMsgEl) errMsgEl.innerText = error.message || 'Falha de conexão com a API. A biblioteca anterior foi preservada intacta.';
+          errorBanner.style.display = 'block';
+        }
+        showToastNotification('⚠️ Não foi possível atualizar a biblioteca.');
+      } finally {
+        isSyncInProgress = false;
+        if (syncBtn) syncBtn.disabled = false;
+        if (syncIcon) syncIcon.classList.remove('spinning');
+      }
     }
 
     const expandedCardsSet = new Set();
@@ -4847,164 +5624,58 @@
       renderExercisesLibraryUI();
     }
 
-    function renderExercisesLibraryUI() {
-      const container = document.getElementById('exerciseListContainer');
-      if (!container) return;
-
-      const searchInput = document.getElementById('exerciseSearchInput');
-      const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
-
-      const filtered = exercisesList.filter(ex => {
-        const matchesQuery = !query ||
-          ex.name.toLowerCase().includes(query) ||
-          ex.grupoMuscular.toLowerCase().includes(query) ||
-          ex.equipamento.toLowerCase().includes(query) ||
-          ex.musculoPrincipal.toLowerCase().includes(query);
-
-        const matchesGroup = currentSelectedGroup === 'Todos' || ex.grupoMuscular.toLowerCase() === currentSelectedGroup.toLowerCase();
-        const matchesFav = !onlyFavoritesFilter || favoritesSet.has(ex.exerciseId);
-
-        return matchesQuery && matchesGroup && matchesFav;
-      });
-
-      // Atualizar contador no topo
-      const statsBadge = document.getElementById('exerciseStatsBadge');
-      if (statsBadge) {
-        statsBadge.innerText = `${filtered.length} de ${exercisesList.length} exercícios`;
-      }
-
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 35px 16px; color: var(--text-grey);">
-            <div style="font-size: 36px; margin-bottom: 8px;">🔍</div>
-            <div style="font-weight: 700; font-size: 15px; color: white;">Nenhum exercício encontrado</div>
-            <div style="font-size: 12px; margin-top: 4px; margin-bottom: 14px;">Tente limpar a pesquisa ou os filtros de grupo muscular.</div>
-            <button onclick="resetExerciseFilters()" class="btn btn-outline" style="width: auto; padding: 6px 14px; font-size: 12px;">Limpar Filtros</button>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = filtered.map(ex => {
-        const id = ex.exerciseId || ex.id || '';
-        const isFav = favoritesSet.has(id);
-        const isChecked = selectedForWorkoutSet.has(id);
-        const isExpanded = expandedCardsSet.has(id);
-        const icon = getMuscleGroupIcon(ex.grupoMuscular);
-        const gif = ex.gifUrl || ex.gif_url || ex.gif || '';
-        const safeName = (ex.name || ex.nome || 'Exercício').replace(/'/g, "\\'");
-
-        const safeGroup = (ex.grupoMuscular || 'Geral').replace(/'/g, "\\'");
-        const safeEquip = (ex.equipamento || 'Nenhum').replace(/'/g, "\\'");
-        const safeSubtitle = `${safeGroup} • ${safeEquip}`;
-
-        return `
-          <div class="card exercise-item-card" style="border-left: 4px solid var(--accent-cyan); padding: 14px; margin-bottom: 12px; transition: all 0.25s ease;">
-            
-            <!-- Linha Principal do Card -->
-            <div style="display: flex; gap: 14px; align-items: center;">
-              
-              <!-- Thumbnail GIF Clicável: CLIQUE NO GIF EXPANDO O VISOR NO PRÓPRIO CARD -->
-              <div onclick="event.stopPropagation(); toggleCardExpansion('${id}', event)" 
-                   style="width: 64px; height: 64px; background: #080a0f; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1.5px solid ${isExpanded ? 'var(--accent-cyan)' : 'var(--divider)'}; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer; transition: all 0.2s;" 
-                   onmouseover="this.style.borderColor='var(--accent-cyan)'; this.style.transform='scale(1.04)'" 
-                   onmouseout="this.style.borderColor='${isExpanded ? 'var(--accent-cyan)' : 'var(--divider)'}'; this.style.transform='scale(1)'"
-                   title="Toque no GIF para expandir/recolher animação">
-                ${gif ? `<img src="${gif}" alt="${ex.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
-                <div style="display: ${gif ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 24px;">
-                  ${icon}
-                </div>
-                <div style="position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.85); border-radius: 4px; padding: 1px 4px; font-size: 8px; font-weight: 800; color: var(--accent-cyan);">
-                  ${isExpanded ? '▲ GIF' : '▼ GIF'}
-                </div>
-              </div>
-
-              <!-- Informações do Exercício (CAMPO): CLIQUE NO CAMPO ABRE INSTRUÇÕES & DETALHES -->
-              <div onclick="openExerciseDetailModal('${id}')" style="flex: 1; min-width: 0; cursor: pointer; padding: 2px 0;" title="Toque para ver Instruções e Detalhes">
-                <h4 style="font-size: 14px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; transition: color 0.2s;" onmouseover="this.style.color='var(--accent-cyan)'" onmouseout="this.style.color='white'">${ex.name}</h4>
-                <p style="font-size: 11px; color: var(--text-grey); margin: 0;">
-                  <strong style="color: var(--accent-cyan);">${ex.grupoMuscular}</strong> • ${ex.equipamento}
-                </p>
-                <div style="display: flex; gap: 8px; margin-top: 6px; align-items: center;">
-                  <span onclick="event.stopPropagation(); toggleCardExpansion('${id}', event)" 
-                        style="font-size: 11px; color: var(--accent-cyan); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; background: rgba(0,210,255,0.08); padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(0,210,255,0.25);"
-                        onmouseover="this.style.background='rgba(0,210,255,0.2)'"
-                        onmouseout="this.style.background='rgba(0,210,255,0.08)'"
-                        title="Expandir/Recolher animação do GIF">
-                    ${isExpanded ? '▲ Recolher' : '▼ Expandir GIF'}
-                  </span>
-                  <button onclick="event.stopPropagation(); toggleFavoriteExercise('${id}', this)" style="background: none; border: none; font-size: 17px; cursor: pointer; padding: 0 4px;" title="Favoritar">${isFav ? '⭐' : '☆'}</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- GAVETA EXPANSÍVEL DO GIF NA MESMA TELA -->
-            ${isExpanded ? `
-              <div style="margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--divider); animation: fadeIn 0.2s ease-in-out;">
-                
-                <!-- Visor Ampliado do GIF -->
-                <div style="width: 100%; height: 280px; background: #000; border-radius: 14px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1.5px solid rgba(0,210,255,0.4); position: relative; box-shadow: 0 6px 20px rgba(0,0,0,0.8);">
-                  ${gif ? `
-                    <img src="${gif}" alt="${ex.name}" style="width: 100%; height: 100%; object-fit: contain; display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                  ` : ''}
-                  <div style="display: ${gif ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: var(--text-grey);">
-                    <div style="font-size: 40px; margin-bottom: 6px;">🏋️‍♂️</div>
-                    <div style="font-size: 12px; font-weight: 700; color: white;">Demonstração em GIF indisponível</div>
-                  </div>
-
-                  <div style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.8); border: 1px solid rgba(0,210,255,0.5); border-radius: 6px; padding: 2px 7px; font-size: 9px; font-weight: 800; color: var(--accent-cyan);">
-                    ● 3D LOOP
-                  </div>
-                </div>
-
-                <!-- Botões de Ação Dentro do Card Expandido -->
-                <div style="display: flex; gap: 8px; margin-top: 10px;">
-                  <button onclick="openOnlyGifModal('${id}')" class="btn btn-outline" style="flex: 1; padding: 8px; font-size: 12px; border-color: var(--accent-cyan); color: var(--accent-cyan);">
-                    🔍 Pop-up com Zoom 3D
-                  </button>
-                  <button onclick="openExerciseDetailModal('${id}')" class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 12px;">
-                    📖 Instruções & Detalhes
-                  </button>
-                </div>
-              </div>
-            ` : ''}
-
-          </div>
-        `;
-      }).join('');
+    function loadMoreProgressiveExercises() {
+      visibleExercisesLimit += 35;
+      renderExercisesLibraryUI();
     }
 
-    function getMuscleGroupIcon(grupo) {
-      const g = (grupo || '').toLowerCase();
-      if (g.includes('peito')) return '🏋️‍♂️';
-      if (g.includes('costa')) return '🚣';
-      if (g.includes('perna') || g.includes('coxa') || g.includes('panturrilha')) return '🦵';
-      if (g.includes('ombro') || g.includes('deltoide')) return '🛡️';
-      if (g.includes('bíceps') || g.includes('biceps')) return '💪';
-      if (g.includes('tríceps') || g.includes('triceps')) return '⚡';
-      if (g.includes('abd') || g.includes('core')) return '🧘';
-      return '🏋️';
+    function handleSecondaryFilterChange() {
+      const targetSelect = document.getElementById('exerciseTargetMuscleFilter');
+      const equipSelect = document.getElementById('exerciseEquipmentFilter');
+      currentSelectedTargetMuscle = targetSelect ? targetSelect.value : 'Todos';
+      currentSelectedEquipment = equipSelect ? equipSelect.value : 'Todos';
+      visibleExercisesLimit = 35;
+      renderExercisesLibraryUI();
     }
 
     function resetExerciseFilters() {
       const searchInput = document.getElementById('exerciseSearchInput');
       if (searchInput) searchInput.value = '';
       currentSelectedGroup = 'Todos';
+      currentSelectedTargetMuscle = 'Todos';
+      currentSelectedEquipment = 'Todos';
       onlyFavoritesFilter = false;
+      visibleExercisesLimit = 35;
+
+      const targetSelect = document.getElementById('exerciseTargetMuscleFilter');
+      const equipSelect = document.getElementById('exerciseEquipmentFilter');
+      if (targetSelect) targetSelect.value = 'Todos';
+      if (equipSelect) equipSelect.value = 'Todos';
+
+      const favBtn = document.getElementById('btnFavFilter');
+      if (favBtn) {
+        favBtn.style.color = 'var(--text-grey)';
+        favBtn.style.borderColor = 'var(--divider)';
+        favBtn.innerText = '⭐ Favoritos';
+      }
+
       document.querySelectorAll('#exerciseGroupChips .chip').forEach(c => c.classList.remove('active'));
       const firstChip = document.querySelector('#exerciseGroupChips .chip');
       if (firstChip) firstChip.classList.add('active');
+
       renderExercisesLibraryUI();
     }
 
     function filterExerciseGroup(groupName, chipElement) {
       currentSelectedGroup = groupName;
+      visibleExercisesLimit = 35;
       document.querySelectorAll('#exerciseGroupChips .chip').forEach(c => c.classList.remove('active'));
       if (chipElement) chipElement.classList.add('active');
       renderExercisesLibraryUI();
     }
 
     function filterExercisesLibrary() {
+      visibleExercisesLimit = 35;
       renderExercisesLibraryUI();
     }
 
@@ -5012,14 +5683,19 @@
       onlyFavoritesFilter = !onlyFavoritesFilter;
       const btn = document.getElementById('btnFavFilter');
       if (onlyFavoritesFilter) {
-        btn.style.color = 'gold';
-        btn.style.borderColor = 'gold';
-        btn.innerText = '★ Exibindo Favoritos';
+        if (btn) {
+          btn.style.color = 'gold';
+          btn.style.borderColor = 'gold';
+          btn.innerText = '★ Apenas Favoritos';
+        }
       } else {
-        btn.style.color = 'var(--text-grey)';
-        btn.style.borderColor = 'var(--divider)';
-        btn.innerText = '⭐ Apenas Favoritos';
+        if (btn) {
+          btn.style.color = 'var(--text-grey)';
+          btn.style.borderColor = 'var(--divider)';
+          btn.innerText = '⭐ Favoritos';
+        }
       }
+      visibleExercisesLimit = 35;
       renderExercisesLibraryUI();
     }
 
@@ -5046,12 +5722,387 @@
       }
     }
 
-    function toggleSelectForWorkout(id, checkboxEl) {
-      if (checkboxEl.checked) {
+    // Gerenciamento de Seleção Múltipla
+    function toggleSelectExerciseForWorkout(id, isChecked) {
+      if (isChecked) {
         selectedForWorkoutSet.add(id);
       } else {
         selectedForWorkoutSet.delete(id);
       }
+      updateBulkActionBar();
+    }
+
+    function clearBulkExerciseSelection() {
+      selectedForWorkoutSet.clear();
+      updateBulkActionBar();
+      renderExercisesLibraryUI();
+    }
+
+    function updateBulkActionBar() {
+      const bar = document.getElementById('exerciseBulkActionBar');
+      const countText = document.getElementById('exerciseBulkCountText');
+      if (!bar) return;
+
+      const totalSelected = selectedForWorkoutSet.size;
+      if (totalSelected > 0) {
+        bar.style.display = 'flex';
+        if (countText) {
+          countText.innerText = `${totalSelected} ${totalSelected === 1 ? 'exercício selecionado' : 'exercícios selecionados'}`;
+        }
+      } else {
+        bar.style.display = 'none';
+      }
+    }
+
+    function openAddSelectedToWorkoutModal() {
+      if (selectedForWorkoutSet.size === 0) {
+        alert('Selecione ao menos um exercício marcando as caixas de seleção.');
+        return;
+      }
+
+      const modal = document.getElementById('modalAddSelectedToWorkout');
+      const summaryText = document.getElementById('addSelectedSummaryText');
+      const selectDropdown = document.getElementById('targetWorkoutSelectDropdown');
+
+      if (summaryText) {
+        summaryText.innerText = `${selectedForWorkoutSet.size} exercícios selecionados para adicionar`;
+      }
+
+      if (selectDropdown) {
+        let optionsHtml = '';
+        if (Array.isArray(allWorkoutsList) && allWorkoutsList.length > 0) {
+          optionsHtml += allWorkoutsList.map(w => `<option value="${w.id}">Ficha: ${w.nome} (${(w.exercicios || []).length} ex)</option>`).join('');
+        }
+        optionsHtml += '<option value="__new_workout__">➕ Criar Nova Ficha com estes Exercícios</option>';
+        selectDropdown.innerHTML = optionsHtml;
+      }
+
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeAddSelectedToWorkoutModal() {
+      const modal = document.getElementById('modalAddSelectedToWorkout');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function confirmBulkAddExercisesToWorkout() {
+      const selectDropdown = document.getElementById('targetWorkoutSelectDropdown');
+      const seriesInput = document.getElementById('bulkAddSeriesInput');
+      const repsInput = document.getElementById('bulkAddRepsInput');
+
+      const targetWorkoutId = selectDropdown ? selectDropdown.value : '';
+      const series = seriesInput ? seriesInput.value.trim() : '4';
+      const reps = repsInput ? repsInput.value.trim() : '10-12';
+
+      if (!targetWorkoutId) {
+        alert('Por favor, selecione um treino de destino.');
+        return;
+      }
+
+      const selectedExercisesObjects = [];
+      selectedForWorkoutSet.forEach(id => {
+        const found = exercisesList.find(e => (e.exerciseId === id || e.id === id));
+        if (found) {
+          selectedExercisesObjects.push({
+            id: `ex_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+            exerciseId: found.id || found.exerciseId,
+            nome: formatExerciseTitle(found),
+            series: series || '4',
+            reps: reps || '10-12',
+            grupoMuscular: found.grupoMuscular || 'Geral',
+            gifUrl: found.gifUrl || ''
+          });
+        }
+      });
+
+      if (selectedExercisesObjects.length === 0) {
+        alert('Nenhum exercício válido encontrado na seleção.');
+        return;
+      }
+
+      if (targetWorkoutId === '__new_workout__') {
+        const newName = prompt('Nome da Nova Ficha de Treino:', `Novo Treino (${selectedExercisesObjects.length} exercícios)`);
+        if (!newName) return;
+
+        const newId = `treino_${Date.now()}`;
+        const newW = {
+          id: newId,
+          nome: newName.trim(),
+          descricao: 'Ficha montada via biblioteca ExerciseDB',
+          diasSemana: ['Segunda-feira', 'Quarta-feira', 'Sexta-feira'],
+          corHex: '#1E88E5',
+          exercicios: selectedExercisesObjects,
+          exerciciosCount: selectedExercisesObjects.length,
+          criadoEm: new Date().toISOString()
+        };
+
+        allWorkoutsList.unshift(newW);
+        localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
+
+        if (_supabase) {
+          try {
+            const uid = getEffectiveUserId();
+            await _supabase.from('treinos').upsert({
+              id: newId,
+              usuario_id: uid,
+              user_id: uid.startsWith('user_') || uid.startsWith('admin_') || uid.startsWith('guest_') ? null : uid,
+              nome: newW.nome,
+              descricao: newW.descricao,
+              dias_semana: newW.diasSemana,
+              cor_hex: newW.corHex,
+              exercicios: newW.exercicios,
+              criado_em: newW.criadoEm
+            });
+          } catch (_) {}
+        }
+      } else {
+        const workout = allWorkoutsList.find(w => w.id === targetWorkoutId);
+        if (workout) {
+          if (!Array.isArray(workout.exercicios)) workout.exercicios = [];
+          workout.exercicios.push(...selectedExercisesObjects);
+          workout.exerciciosCount = workout.exercicios.length;
+          localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
+
+          if (_supabase) {
+            try {
+              await _supabase.from('treinos').upsert({
+                id: workout.id,
+                exercicios: workout.exercicios
+              });
+            } catch (_) {}
+          }
+        }
+      }
+
+      renderAllWorkoutsUI();
+      closeAddSelectedToWorkoutModal();
+      showToastNotification(`🎉 ${selectedExercisesObjects.length} exercícios adicionados com sucesso!`);
+      clearBulkExerciseSelection();
+    }
+
+    function addCurrentDetailToWorkout() {
+      if (!currentDetailExerciseId) return;
+      selectedForWorkoutSet.clear();
+      selectedForWorkoutSet.add(currentDetailExerciseId);
+      closeExerciseDetailModal();
+      openAddSelectedToWorkoutModal();
+    }
+
+    function renderExercisesLibraryUI() {
+      const container = document.getElementById('exerciseListContainer');
+      if (!container) return;
+
+      const searchInput = document.getElementById('exerciseSearchInput');
+      const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+
+      const filtered = exercisesList.filter(ex => {
+        const origName = (ex.originalName || ex.name || ex.nome || '').toLowerCase();
+        const transName = translateTerm(origName).toLowerCase();
+        const equip = (ex.equipamento || (ex.equipments && ex.equipments[0]) || '').toLowerCase();
+        const muscle = (ex.musculoPrincipal || (ex.targetMuscles && ex.targetMuscles[0]) || '').toLowerCase();
+        const bodyPart = (ex.grupoMuscular || (ex.bodyParts && ex.bodyParts[0]) || '').toLowerCase();
+
+        // 1. Busca por texto (em português e inglês)
+        const matchesQuery = !query ||
+          origName.includes(query) ||
+          transName.includes(query) ||
+          equip.includes(query) ||
+          muscle.includes(query) ||
+          bodyPart.includes(query);
+
+        // 2. Filtro por Grupo Muscular / Body Part
+        let matchesGroup = true;
+        if (currentSelectedGroup !== 'Todos') {
+          const targetG = currentSelectedGroup.toLowerCase();
+          const hasBodyPart = Array.isArray(ex.bodyParts) && ex.bodyParts.some(bp => {
+            const translatedBp = translateTerm(bp).toLowerCase();
+            return translatedBp.includes(targetG) || bp.toLowerCase().includes(targetG);
+          });
+          matchesGroup = hasBodyPart || bodyPart.includes(targetG);
+        }
+
+        // 3. Filtro por Músculo Alvo
+        let matchesTargetMuscle = true;
+        if (currentSelectedTargetMuscle !== 'Todos') {
+          const targetM = currentSelectedTargetMuscle.toLowerCase();
+          const hasMuscle = Array.isArray(ex.targetMuscles) && ex.targetMuscles.some(tm => {
+            const translatedTm = translateTerm(tm).toLowerCase();
+            return translatedTm.includes(targetM) || tm.toLowerCase().includes(targetM);
+          });
+          matchesTargetMuscle = hasMuscle || muscle.includes(targetM);
+        }
+
+        // 4. Filtro por Equipamento
+        let matchesEquip = true;
+        if (currentSelectedEquipment !== 'Todos') {
+          const targetE = currentSelectedEquipment.toLowerCase();
+          const hasEquip = Array.isArray(ex.equipments) && ex.equipments.some(eq => {
+            const translatedEq = translateTerm(eq).toLowerCase();
+            return translatedEq.includes(targetE) || eq.toLowerCase().includes(targetE);
+          });
+          matchesEquip = hasEquip || equip.includes(targetE);
+        }
+
+        // 5. Filtro de Favoritos
+        const id = ex.id || ex.exerciseId;
+        const matchesFav = !onlyFavoritesFilter || favoritesSet.has(id);
+
+        return matchesQuery && matchesGroup && matchesTargetMuscle && matchesEquip && matchesFav;
+      });
+
+      // Atualizar contador no topo
+      const statsBadge = document.getElementById('exerciseStatsBadge');
+      if (statsBadge) {
+        statsBadge.innerText = `${filtered.length} de ${exercisesList.length} exercícios`;
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px 16px; color: var(--text-grey);">
+            <div style="font-size: 40px; margin-bottom: 10px;">🔍</div>
+            <div style="font-weight: 800; font-size: 16px; color: white;">Nenhum exercício encontrado</div>
+            <div style="font-size: 12px; margin-top: 6px; margin-bottom: 16px; line-height: 1.4;">
+              Nenhum resultado corresponde aos filtros ou ao termo pesquisado.<br>Tente redefinir os filtros ou buscar por outro termo.
+            </div>
+            <button onclick="resetExerciseFilters()" class="btn btn-primary" style="width: auto; padding: 8px 18px; font-size: 12px; font-weight: 800;">
+              ✕ Limpar Filtros
+            </button>
+          </div>
+        `;
+        const loadMoreBox = document.getElementById('exerciseLoadMoreContainer');
+        if (loadMoreBox) loadMoreBox.style.display = 'none';
+        return;
+      }
+
+      // Renderização Progressiva (Primeiros N para manter 60fps suave)
+      const visibleItems = filtered.slice(0, visibleExercisesLimit);
+      const remainingCount = filtered.length - visibleItems.length;
+
+      const loadMoreBox = document.getElementById('exerciseLoadMoreContainer');
+      const loadMoreRemaining = document.getElementById('loadMoreRemainingCount');
+      if (loadMoreBox) {
+        if (remainingCount > 0) {
+          loadMoreBox.style.display = 'block';
+          if (loadMoreRemaining) loadMoreRemaining.innerText = remainingCount;
+        } else {
+          loadMoreBox.style.display = 'none';
+        }
+      }
+
+      container.innerHTML = visibleItems.map(ex => {
+        const id = ex.id || ex.exerciseId || '';
+        const isFav = favoritesSet.has(id);
+        const isChecked = selectedForWorkoutSet.has(id);
+        const isExpanded = expandedCardsSet.has(id);
+
+        const primaryBodyPart = (Array.isArray(ex.bodyParts) && ex.bodyParts[0]) ? translateTerm(ex.bodyParts[0]) : (ex.grupoMuscular || 'Geral');
+        const primaryEquip = (Array.isArray(ex.equipments) && ex.equipments[0]) ? translateTerm(ex.equipments[0]) : (ex.equipamento || 'Geral');
+        const primaryTarget = (Array.isArray(ex.targetMuscles) && ex.targetMuscles[0]) ? translateTerm(ex.targetMuscles[0]) : (ex.musculoPrincipal || 'Geral');
+        const secondary = Array.isArray(ex.secondaryMuscles) && ex.secondaryMuscles.length > 0 
+          ? ex.secondaryMuscles.map(m => translateTerm(m)).join(', ') 
+          : '';
+
+        const icon = getMuscleGroupIcon(primaryBodyPart);
+        const gif = ex.gifUrl || ex.gif_url || '';
+        const originalName = ex.originalName || ex.name || ex.nome || 'Exercício';
+        const formattedTitle = formatExerciseTitle(ex);
+
+        return `
+          <div class="card exercise-item-card" style="border-left: 4px solid var(--accent-cyan); padding: 14px; margin-bottom: 12px; transition: all 0.25s ease; background: #11141c;">
+            
+            <!-- Linha Principal do Card -->
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              
+              <!-- Checkbox de Seleção Múltipla -->
+              <div style="padding-top: 18px;" onclick="event.stopPropagation()">
+                <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleSelectExerciseForWorkout('${id}', this.checked)" 
+                       style="width: 20px; height: 20px; accent-color: var(--accent-cyan); cursor: pointer;" title="Selecionar para adicionar à ficha de treino">
+              </div>
+
+              <!-- Thumbnail GIF Clicável com Lazy Loading e ReferrerPolicy -->
+              <div onclick="event.stopPropagation(); toggleCardExpansion('${id}', event)" 
+                   style="width: 68px; height: 68px; background: #080a0f; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1.5px solid ${isExpanded ? 'var(--accent-cyan)' : 'var(--divider)'}; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.5); cursor: pointer; transition: all 0.2s;" 
+                   onmouseover="this.style.borderColor='var(--accent-cyan)'; this.style.transform='scale(1.03)'" 
+                   onmouseout="this.style.borderColor='${isExpanded ? 'var(--accent-cyan)' : 'var(--divider)'}'; this.style.transform='scale(1)'"
+                   title="Toque no GIF para expandir/recolher animação">
+                ${gif ? `<img src="${gif}" alt="Demonstração de ${originalName}" loading="lazy" referrerpolicy="no-referrer" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                <div style="display: ${gif ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 24px;">
+                  ${icon}
+                </div>
+                <div style="position: absolute; bottom: 2px; right: 2px; background: rgba(0,0,0,0.85); border-radius: 4px; padding: 1px 4px; font-size: 8px; font-weight: 800; color: var(--accent-cyan);">
+                  ${isExpanded ? '▲ GIF' : '▼ GIF'}
+                </div>
+              </div>
+
+              <!-- Informações do Exercício -->
+              <div onclick="openExerciseDetailModal('${id}')" style="flex: 1; min-width: 0; cursor: pointer; padding: 1px 0;" title="Toque para ver Detalhes e Execução">
+                <h4 style="font-size: 14.5px; font-weight: 800; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; transition: color 0.2s;" onmouseover="this.style.color='var(--accent-cyan)'" onmouseout="this.style.color='white'">
+                  ${formattedTitle}
+                </h4>
+
+                <!-- Tags / Badges com tradução PT-BR -->
+                <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 5px;">
+                  <span class="badge-chip badge-cyan">${capitalizeText(primaryBodyPart)}</span>
+                  <span class="badge-chip badge-grey">⚙️ ${capitalizeText(primaryEquip)}</span>
+                  <span class="badge-chip badge-gold">🎯 ${capitalizeText(primaryTarget)}</span>
+                </div>
+
+                ${secondary ? `
+                  <div style="font-size: 10.5px; color: var(--text-grey); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <span style="color: #a0aab8;">Secundários:</span> ${secondary}
+                  </div>
+                ` : ''}
+
+                <div style="display: flex; gap: 8px; margin-top: 6px; align-items: center;">
+                  <span onclick="event.stopPropagation(); toggleCardExpansion('${id}', event)" 
+                        style="font-size: 11px; color: var(--accent-cyan); font-weight: 700; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; background: rgba(0,210,255,0.08); padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(0,210,255,0.25);"
+                        onmouseover="this.style.background='rgba(0,210,255,0.2)'"
+                        onmouseout="this.style.background='rgba(0,210,255,0.08)'"
+                        title="Expandir animação do GIF">
+                    ${isExpanded ? '▲ Recolher GIF' : '▼ Ver GIF 3D'}
+                  </span>
+                  <button onclick="event.stopPropagation(); toggleFavoriteExercise('${id}', this)" style="background: none; border: none; font-size: 18px; cursor: pointer; padding: 0 4px;" title="Favoritar exercício">
+                    ${isFav ? '⭐' : '☆'}
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- GAVETA EXPANSÍVEL DO GIF NA MESMA TELA -->
+            ${isExpanded ? `
+              <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--divider); animation: fadeIn 0.2s ease-in-out;">
+                
+                <!-- Visor Ampliado do GIF com loading lazy e referrerpolicy -->
+                <div style="width: 100%; height: 260px; background: #000; border-radius: 14px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1.5px solid rgba(0,210,255,0.4); position: relative; box-shadow: 0 6px 20px rgba(0,0,0,0.8);">
+                  ${gif ? `
+                    <img src="${gif}" alt="Demonstração de ${originalName}" loading="lazy" referrerpolicy="no-referrer" style="width: 100%; height: 100%; object-fit: contain; display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  ` : ''}
+                  <div style="display: ${gif ? 'none' : 'flex'}; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: var(--text-grey);">
+                    <div style="font-size: 40px; margin-bottom: 6px;">🏋️‍♂️</div>
+                    <div style="font-size: 12px; font-weight: 700; color: white;">Demonstração em GIF indisponível</div>
+                  </div>
+
+                  <div style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.8); border: 1px solid rgba(0,210,255,0.5); border-radius: 6px; padding: 2px 7px; font-size: 9px; font-weight: 800; color: var(--accent-cyan);">
+                    ● 3D LOOP
+                  </div>
+                </div>
+
+                <!-- Botões de Ação Dentro do Card Expandido -->
+                <div style="display: flex; gap: 8px; margin-top: 10px;">
+                  <button onclick="openOnlyGifModal('${id}')" class="btn btn-outline" style="flex: 1; padding: 8px; font-size: 11.5px; border-color: var(--accent-cyan); color: var(--accent-cyan); font-weight: 700;">
+                    🔍 Pop-up Zoom 3D
+                  </button>
+                  <button onclick="openExerciseDetailModal('${id}')" class="btn btn-primary" style="flex: 1.2; padding: 8px; font-size: 11.5px; font-weight: 800;">
+                    📖 Instruções Passo a Passo
+                  </button>
+                </div>
+              </div>
+            ` : ''}
+
+          </div>
+        `;
+      }).join('');
     }
 
         // ==========================================
@@ -5280,12 +6331,27 @@
         if (ex && !targetUrl) targetUrl = ex.gifUrl || ex.gif_url || '';
       }
 
-      const exerciseName = (ex && (ex.name || ex.nome)) || optionalTitle || 'Exercício';
-      const muscleGroup = (ex && (ex.grupoMuscular || ex.musculoPrincipal)) || 'Geral';
-      const equip = (ex && ex.equipamento) || 'Livre / Aparelho';
-      const targetMuscle = (ex && (ex.musculoPrincipal || ex.grupoMuscular)) || 'Geral';
-      const secondaryMuscle = ex && ex.musculosSecundarios ? ` • Secundários: ${ex.musculosSecundarios}` : '';
-      const instructions = (ex && ex.instrucoes) || '1. Mantenha a postura correta e alinhada ao longo de toda a execução.\n2. Execute o movimento com cadência controlada nas fases concêntrica e excêntrica.\n3. Respire de forma ritmada durante a execução.';
+      const exerciseName = (ex && (ex.originalName || ex.name || ex.nome)) ? formatExerciseTitle(ex) : (optionalTitle || 'Exercício');
+      const origName = (ex && (ex.originalName || ex.name || ex.nome)) || '';
+      const muscleGroup = (ex && (ex.bodyParts ? translateTerm(ex.bodyParts[0]) : (ex.grupoMuscular || ex.musculoPrincipal))) || 'Geral';
+      const equip = (ex && (ex.equipments ? translateTerm(ex.equipments[0]) : ex.equipamento)) || 'Livre / Aparelho';
+      const targetMuscle = (ex && (ex.targetMuscles ? translateTerm(ex.targetMuscles[0]) : (ex.musculoPrincipal || ex.grupoMuscular))) || 'Geral';
+      
+      let secondaryText = '';
+      if (ex && Array.isArray(ex.secondaryMuscles) && ex.secondaryMuscles.length > 0) {
+        secondaryText = ` • Secundários: ${ex.secondaryMuscles.map(m => translateTerm(m)).join(', ')}`;
+      } else if (ex && ex.musculosSecundarios) {
+        secondaryText = ` • Secundários: ${ex.musculosSecundarios}`;
+      }
+
+      let instructions = '1. Mantenha a postura correta e alinhada ao longo de toda a execução.\n2. Execute o movimento com cadência controlada nas fases concêntrica e excêntrica.\n3. Respire de forma ritmada durante a execução.';
+      if (ex) {
+        if (Array.isArray(ex.instructions) && ex.instructions.length > 0) {
+          instructions = ex.instructions.map((step, idx) => `${idx + 1}. ${step}`).join('\n\n');
+        } else if (ex.instrucoes) {
+          instructions = ex.instrucoes;
+        }
+      }
       
       currentDetailExerciseId = (ex && (ex.exerciseId || ex.id)) || exerciseName;
       const gifFinalUrl = targetUrl || (ex && ex.gifUrl) || '';
@@ -5300,11 +6366,13 @@
       const imgEl = document.getElementById('detailGifImg');
       const fallbackEl = document.getElementById('detailFallbackIcon');
 
-      if (titleEl) titleEl.innerText = exerciseName;
-      if (badgeEl) badgeEl.innerText = muscleGroup;
-      if (equipBadgeEl) equipBadgeEl.innerText = equip;
-      if (equipEl) equipEl.innerText = equip;
-      if (targetEl) targetEl.innerText = targetMuscle + secondaryMuscle;
+      if (titleEl) {
+        titleEl.innerHTML = `${exerciseName} ${origName && origName.toLowerCase() !== exerciseName.toLowerCase() ? `<div style="font-size: 11.5px; color: var(--text-grey); font-weight: 600; margin-top: 2px;">Original: ${origName}</div>` : ''}`;
+      }
+      if (badgeEl) badgeEl.innerText = capitalizeText(muscleGroup);
+      if (equipBadgeEl) equipBadgeEl.innerText = capitalizeText(equip);
+      if (equipEl) equipEl.innerText = capitalizeText(equip);
+      if (targetEl) targetEl.innerText = capitalizeText(targetMuscle) + secondaryText;
       if (instructionsEl) instructionsEl.innerText = instructions;
 
       if (imgEl && fallbackEl) {
