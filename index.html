@@ -939,18 +939,18 @@
           <input type="text" id="exerciseSearchInput" class="form-input" placeholder="🔍 Pesquise por nome (PT/EN), equipamento ou músculo..." oninput="filterExercisesLibrary()">
         </div>
 
-        <!-- CHIPS DE GRUPOS MUSCULARES / PARTES DO CORPO -->
+        <!-- CHIPS DE GRUPOS MUSCULARES / PARTES DO CORPO (EM MAIÚSCULO) -->
         <div class="chip-container" id="exerciseGroupChips" style="margin-bottom: 10px;">
-          <div class="chip active" onclick="filterExerciseGroup('Todos', this)">Todos</div>
-          <div class="chip" onclick="filterExerciseGroup('Peito', this)">Peito</div>
-          <div class="chip" onclick="filterExerciseGroup('Costas', this)">Costas</div>
-          <div class="chip" onclick="filterExerciseGroup('Pernas', this)">Pernas</div>
-          <div class="chip" onclick="filterExerciseGroup('Ombros', this)">Ombros</div>
-          <div class="chip" onclick="filterExerciseGroup('Braços', this)">Braços</div>
-          <div class="chip" onclick="filterExerciseGroup('Bíceps', this)">Bíceps</div>
-          <div class="chip" onclick="filterExerciseGroup('Tríceps', this)">Tríceps</div>
-          <div class="chip" onclick="filterExerciseGroup('Abdômen', this)">Abdômen</div>
-          <div class="chip" onclick="filterExerciseGroup('Cardio', this)">Cardio</div>
+          <div class="chip active" onclick="filterExerciseGroup('TODOS', this)">TODOS</div>
+          <div class="chip" onclick="filterExerciseGroup('PEITO', this)">PEITO</div>
+          <div class="chip" onclick="filterExerciseGroup('COSTAS', this)">COSTAS</div>
+          <div class="chip" onclick="filterExerciseGroup('PERNAS', this)">PERNAS</div>
+          <div class="chip" onclick="filterExerciseGroup('OMBROS', this)">OMBROS</div>
+          <div class="chip" onclick="filterExerciseGroup('BRAÇOS', this)">BRAÇOS</div>
+          <div class="chip" onclick="filterExerciseGroup('BÍCEPS', this)">BÍCEPS</div>
+          <div class="chip" onclick="filterExerciseGroup('TRÍCEPS', this)">TRÍCEPS</div>
+          <div class="chip" onclick="filterExerciseGroup('ABDÔMEN', this)">ABDÔMEN</div>
+          <div class="chip" onclick="filterExerciseGroup('CARDIO', this)">CARDIO</div>
         </div>
 
         <!-- FILTROS SECUNDÁRIOS: MÚSCULO ALVO E EQUIPAMENTO -->
@@ -4505,20 +4505,23 @@
 
       const groups = {};
       exercisesList.forEach(ex => {
-        const g = ex.grupoMuscular || 'Geral';
+        const rawGroup = ex.grupoMuscular || (ex.bodyParts && ex.bodyParts[0]) || 'GERAL';
+        const g = translateTerm(rawGroup).toUpperCase();
         if (!groups[g]) groups[g] = [];
         groups[g].push(ex);
       });
 
       let optionsHtml = '<option value="">-- Selecione um Exercício da Biblioteca --</option>';
       for (const [group, list] of Object.entries(groups)) {
-        optionsHtml += `<optgroup label="${group}">`;
+        optionsHtml += `<optgroup label="${group.toUpperCase()}">`;
         list.forEach(ex => {
-          optionsHtml += `<option value="${ex.name || ex.nome}">${ex.name || ex.nome} (${ex.equipamento || 'Geral'})</option>`;
+          const exNome = ex.nomePt || ex.translatedName || ex.nome || ex.name || 'Exercício';
+          const exEquip = ex.equipamento || (ex.equipments && ex.equipments[0]) || 'Geral';
+          optionsHtml += `<option value="${exNome}">${exNome} (${exEquip})</option>`;
         });
         optionsHtml += `</optgroup>`;
       }
-      optionsHtml += `<optgroup label="Personalizado"><option value="__custom__">✏️ Outro (digitar nome personalizado)...</option></optgroup>`;
+      optionsHtml += `<optgroup label="PERSONALIZADO"><option value="__custom__">✏️ Outro (digitar nome personalizado)...</option></optgroup>`;
       select.innerHTML = optionsHtml;
     }
 
@@ -5195,8 +5198,8 @@
 
     function formatExerciseTitle(ex) {
       if (!ex) return 'Exercício';
-      const orig = ex.originalName || ex.name || ex.nome || '';
-      return capitalizeText(orig);
+      const ptName = ex.nomePt || ex.translatedName || ex.nome || ex.name || ex.originalName || '';
+      return capitalizeText(ptName);
     }
 
     function getMuscleGroupIcon(grupo) {
@@ -5477,20 +5480,25 @@
           allItems.forEach(e => {
             const exId = String(e.id || e.exerciseId || '');
             if (!exId) return;
+            const ptName = e.nomePt || e.translatedName || e.nome || e.name || e.originalName || '';
+            const rawGroup = e.grupoMuscular || (e.bodyParts && e.bodyParts[0]) || 'GERAL';
+            const groupUpper = translateTerm(rawGroup).toUpperCase();
             const exObj = {
               ...e,
               id: exId,
               exerciseId: exId,
               originalName: e.originalName || e.name || '',
-              name: e.originalName || e.name || '',
-              nome: e.originalName || e.name || '',
+              name: ptName,
+              nome: ptName,
+              nomePt: ptName,
+              translatedName: ptName,
               gifUrl: e.gifUrl || '',
-              bodyParts: Array.isArray(e.bodyParts) ? e.bodyParts : [],
+              bodyParts: [groupUpper],
               equipments: Array.isArray(e.equipments) ? e.equipments : [],
               targetMuscles: Array.isArray(e.targetMuscles) ? e.targetMuscles : [],
               secondaryMuscles: Array.isArray(e.secondaryMuscles) ? e.secondaryMuscles : [],
               instructions: Array.isArray(e.instructions) ? e.instructions : (e.instructions ? [e.instructions] : []),
-              grupoMuscular: (e.bodyParts && e.bodyParts[0]) ? translateTerm(e.bodyParts[0]) : 'Geral',
+              grupoMuscular: groupUpper,
               equipamento: (e.equipments && e.equipments[0]) ? translateTerm(e.equipments[0]) : 'Livre',
               musculoPrincipal: (e.targetMuscles && e.targetMuscles[0]) ? translateTerm(e.targetMuscles[0]) : 'Geral',
               instrucoes: Array.isArray(e.instructions) ? e.instructions.join('\n') : (e.instructions || ''),
@@ -5575,20 +5583,25 @@
           allFetched.forEach(e => {
             const exId = String(e.id || e.exerciseId || '');
             if (!exId) return;
+            const ptName = e.nomePt || e.translatedName || e.nome || e.name || e.originalName || '';
+            const rawGroup = e.grupoMuscular || (e.bodyParts && e.bodyParts[0]) || 'GERAL';
+            const groupUpper = translateTerm(rawGroup).toUpperCase();
             map.set(exId, {
               ...e,
               id: exId,
               exerciseId: exId,
               originalName: e.originalName || e.name || '',
-              name: e.originalName || e.name || '',
-              nome: e.originalName || e.name || '',
+              name: ptName,
+              nome: ptName,
+              nomePt: ptName,
+              translatedName: ptName,
               gifUrl: e.gifUrl || '',
-              bodyParts: Array.isArray(e.bodyParts) ? e.bodyParts : [],
+              bodyParts: [groupUpper],
               equipments: Array.isArray(e.equipments) ? e.equipments : [],
               targetMuscles: Array.isArray(e.targetMuscles) ? e.targetMuscles : [],
               secondaryMuscles: Array.isArray(e.secondaryMuscles) ? e.secondaryMuscles : [],
               instructions: Array.isArray(e.instructions) ? e.instructions : (e.instructions ? [e.instructions] : []),
-              grupoMuscular: (e.bodyParts && e.bodyParts[0]) ? translateTerm(e.bodyParts[0]) : 'Geral',
+              grupoMuscular: groupUpper,
               equipamento: (e.equipments && e.equipments[0]) ? translateTerm(e.equipments[0]) : 'Livre',
               musculoPrincipal: (e.targetMuscles && e.targetMuscles[0]) ? translateTerm(e.targetMuscles[0]) : 'Geral',
               instrucoes: Array.isArray(e.instructions) ? e.instructions.join('\n') : (e.instructions || ''),
@@ -5973,7 +5986,7 @@
 
         // 2. Filtro por Grupo Muscular / Body Part
         let matchesGroup = true;
-        if (currentSelectedGroup !== 'Todos') {
+        if (currentSelectedGroup && currentSelectedGroup.toUpperCase() !== 'TODOS' && currentSelectedGroup !== 'Todos') {
           const targetG = currentSelectedGroup.toLowerCase();
           const hasBodyPart = Array.isArray(ex.bodyParts) && ex.bodyParts.some(bp => {
             const translatedBp = translateTerm(bp).toLowerCase();
@@ -6103,7 +6116,7 @@
 
                 <!-- Tags / Badges com tradução PT-BR -->
                 <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 5px;">
-                  <span class="badge-chip badge-cyan">${capitalizeText(primaryBodyPart)}</span>
+                  <span class="badge-chip badge-cyan">${primaryBodyPart.toUpperCase()}</span>
                   <span class="badge-chip badge-grey">⚙️ ${capitalizeText(primaryEquip)}</span>
                   <span class="badge-chip badge-gold">🎯 ${capitalizeText(primaryTarget)}</span>
                 </div>
