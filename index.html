@@ -23,6 +23,9 @@
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <!-- Catálogo Oficial Completo ExerciseDB V1 (~1.500 exercícios) -->
+  <script src="./exercises_seed.js"></script>
+
   <style>
     :root {
       --bg-black: #0d0d0d;
@@ -883,9 +886,10 @@
             <button onclick="toggleOnlyFavoritesFilter()" id="btnFavFilter" class="btn btn-outline" style="width: auto; padding: 5px 10px; font-size: 11px; color: var(--text-grey); border-color: var(--divider);" title="Filtrar apenas favoritos">
               ⭐ Favoritos
             </button>
-            <button onclick="startExerciseDbSync()" id="btnSyncExerciseDb" class="btn btn-primary" style="width: auto; padding: 5px 12px; font-size: 11px; font-weight: 800; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 10px rgba(30,136,229,0.35);" title="Sincronizar todos os 1.500 exercícios da ExerciseDB">
-              <span id="syncBtnIcon">🔄</span> Atualizar Biblioteca
-            </button>
+            <div id="btnSyncExerciseDb" onclick="startExerciseDbSync(false)" style="cursor: pointer; display: flex; align-items: center; gap: 5px; background: rgba(76, 175, 80, 0.12); border: 1px solid rgba(76, 175, 80, 0.35); padding: 5px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; color: var(--success-green);" title="Catálogo de 1.500 exercícios sincronizado automaticamente.">
+              <span id="syncBtnIcon">✅</span>
+              <span id="syncBtnText">Auto-Sincronizado</span>
+            </div>
           </div>
         </div>
 
@@ -5192,6 +5196,20 @@
       return capitalizeText(orig);
     }
 
+    function getMuscleGroupIcon(grupo) {
+      const g = (grupo || '').toLowerCase();
+      if (g.includes('peito') || g.includes('chest') || g.includes('pectoral')) return '🏋️‍♂️';
+      if (g.includes('costa') || g.includes('back') || g.includes('dorsal') || g.includes('lats') || g.includes('spine') || g.includes('trapezius')) return '🚣';
+      if (g.includes('perna') || g.includes('leg') || g.includes('coxa') || g.includes('quadriceps') || g.includes('glute') || g.includes('hamstring') || g.includes('panturrilha') || g.includes('calf')) return '🦵';
+      if (g.includes('ombro') || g.includes('shoulder') || g.includes('deltoide') || g.includes('delts')) return '🛡️';
+      if (g.includes('bíceps') || g.includes('biceps')) return '💪';
+      if (g.includes('tríceps') || g.includes('triceps')) return '⚡';
+      if (g.includes('braço') || g.includes('arm') || g.includes('antebraço') || g.includes('forearm')) return '💪';
+      if (g.includes('abd') || g.includes('core') || g.includes('waist') || g.includes('abs')) return '🧘';
+      if (g.includes('cardio') || g.includes('corrida') || g.includes('run')) return '🏃';
+      return '🏋️';
+    }
+
     // Armazenamento IndexedDB de Alta Performance (Suporta ~1.500 exercícios)
     const TitanNovaExerciseStore = {
       DB_NAME: "TitanNovaFit_DB",
@@ -5416,29 +5434,42 @@
 
     async function loadExercisesLibrary() {
       try {
-        // 1. Tentar carregar da base local de alta performance IndexedDB
-        let cachedExercises = await TitanNovaExerciseStore.getAll();
+        let allItems = [];
 
-        // 2. Se o cache local ainda não tiver o catálogo completo, carrega automaticamente do seed oficial (1.500 exercícios instantâneos)
-        if (!Array.isArray(cachedExercises) || cachedExercises.length < 500) {
+        // 1. Prioridade máxima: Catálogo Oficial em Memória (exercises_seed.js) - 100% instantâneo e sem requisição de rede
+        if (window.TITANNOVA_EXERCISES_SEED && Array.isArray(window.TITANNOVA_EXERCISES_SEED) && window.TITANNOVA_EXERCISES_SEED.length > 0) {
+          allItems = window.TITANNOVA_EXERCISES_SEED;
+        }
+
+        // 2. Se não estiver no window, tentar carregar da base local de alta performance IndexedDB
+        if (allItems.length === 0) {
           try {
-            console.log("[ExerciseDB] Carregando automaticamente catálogo oficial de 1.500 exercícios...");
+            const cachedExercises = await TitanNovaExerciseStore.getAll();
+            if (Array.isArray(cachedExercises) && cachedExercises.length >= 500) {
+              allItems = cachedExercises;
+            }
+          } catch (_) {}
+        }
+
+        // 3. Se ainda não tiver, tentar fetch do seed JSON
+        if (allItems.length === 0) {
+          try {
             const seedResp = await fetch('./exercises_seed.json');
             if (seedResp.ok) {
               const seedData = await seedResp.json();
               if (Array.isArray(seedData) && seedData.length > 0) {
-                await TitanNovaExerciseStore.putAll(seedData);
-                cachedExercises = seedData;
-                localStorage.setItem('titannovafit_last_sync_date', new Date().toISOString());
-                console.log(`[ExerciseDB] Sincronização automática concluída: ${seedData.length} exercícios disponíveis instantaneamente!`);
+                allItems = seedData;
               }
             }
-          } catch (seedErr) {
-            console.warn("[ExerciseDB] Aviso: seed local não disponível:", seedErr);
-          }
+          } catch (_) {}
         }
 
-        if (Array.isArray(cachedExercises) && cachedExercises.length > 0) {
+        // 4. Salvar em background no IndexedDB para persistência offline futura
+        if (allItems.length > 0) {
+          TitanNovaExerciseStore.putAll(allItems).catch(() => {});
+        }
+
+        if (allItems.length > 0) {
           const map = new Map();
           // Mesclar exercícios base nativos primeiro
           DEFAULT_BASE_EXERCISES.forEach(e => {
@@ -5461,7 +5492,7 @@
             });
           });
 
-          cachedExercises.forEach(e => {
+          allItems.forEach(e => {
             const exObj = {
               ...e,
               exerciseId: e.id,
@@ -5481,7 +5512,7 @@
           exercisesList = [...DEFAULT_BASE_EXERCISES];
         }
       } catch (e) {
-        console.warn("[Biblioteca] Falha ao ler cache local:", e);
+        console.warn("[Biblioteca] Falha ao ler catálogo:", e);
         exercisesList = [...DEFAULT_BASE_EXERCISES];
       }
 

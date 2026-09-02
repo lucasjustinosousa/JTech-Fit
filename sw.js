@@ -1,9 +1,10 @@
-const CACHE_NAME = 'titannova-fit-v2.2.0';
+const CACHE_NAME = 'titannova-fit-v2.3.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
   './sw.js',
+  './exercises_seed.js',
   './exercises_seed.json',
   './BUILD_GUIDE.md',
   'https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap'
