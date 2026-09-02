@@ -3759,20 +3759,7 @@
       }
     ];
 
-    let exercisesList = (typeof window !== 'undefined' && Array.isArray(window.TITANNOVA_EXERCISES_SEED) && window.TITANNOVA_EXERCISES_SEED.length > 0)
-      ? window.TITANNOVA_EXERCISES_SEED.map(e => ({
-          ...e,
-          id: String(e.id || e.exerciseId || ''),
-          exerciseId: String(e.id || e.exerciseId || ''),
-          name: e.originalName || e.name || '',
-          nome: e.originalName || e.name || '',
-          grupoMuscular: (e.bodyParts && e.bodyParts[0]) ? translateTerm(e.bodyParts[0]) : 'Geral',
-          equipamento: (e.equipments && e.equipments[0]) ? translateTerm(e.equipments[0]) : 'Livre',
-          musculoPrincipal: (e.targetMuscles && e.targetMuscles[0]) ? translateTerm(e.targetMuscles[0]) : 'Geral',
-          instrucoes: Array.isArray(e.instructions) ? e.instructions.join('\n') : (e.instructions || ''),
-          source: "exercisedb"
-        }))
-      : [];
+    let exercisesList = [];
 
     // ==========================================
     // TREINOS PADRÃO COM EXERCÍCIOS COMPLETOS (4 DIVISÕES)
@@ -5195,7 +5182,10 @@
     function translateTerm(term) {
       if (!term || typeof term !== 'string') return '';
       const clean = term.toLowerCase().trim();
-      return exerciseTranslations[clean] || term;
+      if (typeof exerciseTranslations !== 'undefined' && exerciseTranslations) {
+        return exerciseTranslations[clean] || term;
+      }
+      return term;
     }
 
     function capitalizeText(text) {
@@ -5522,6 +5512,9 @@
       currentExerciseState = 'SUCESSO';
       renderExercisesLibraryUI();
     }
+
+    // Inicializar carregamento automático imediato
+    loadExercisesLibrary();
 
     async function startExerciseDbSync(isAutomatic = false) {
       if (isSyncInProgress) return;
@@ -6570,6 +6563,13 @@
       }
 
       console.log("Autenticação validada: cadastro, login, logout e recuperação de dados funcionando.");
+
+      // 1. Carregar a biblioteca de 1.500 exercícios da ExerciseDB V1 imediatamente para todos os modos
+      try {
+        await loadExercisesLibrary();
+      } catch (err) {
+        console.warn("[Biblioteca] Aviso na carga inicial:", err);
+      }
 
       // Se usuário não tiver sessão ativa, exibir tela de Login
       if (!currentAuthUser) {
