@@ -3759,7 +3759,20 @@
       }
     ];
 
-    let exercisesList = [...DEFAULT_BASE_EXERCISES];
+    let exercisesList = (typeof window !== 'undefined' && Array.isArray(window.TITANNOVA_EXERCISES_SEED) && window.TITANNOVA_EXERCISES_SEED.length > 0)
+      ? window.TITANNOVA_EXERCISES_SEED.map(e => ({
+          ...e,
+          id: String(e.id || e.exerciseId || ''),
+          exerciseId: String(e.id || e.exerciseId || ''),
+          name: e.originalName || e.name || '',
+          nome: e.originalName || e.name || '',
+          grupoMuscular: (e.bodyParts && e.bodyParts[0]) ? translateTerm(e.bodyParts[0]) : 'Geral',
+          equipamento: (e.equipments && e.equipments[0]) ? translateTerm(e.equipments[0]) : 'Livre',
+          musculoPrincipal: (e.targetMuscles && e.targetMuscles[0]) ? translateTerm(e.targetMuscles[0]) : 'Geral',
+          instrucoes: Array.isArray(e.instructions) ? e.instructions.join('\n') : (e.instructions || ''),
+          source: "exercisedb"
+        }))
+      : [];
 
     // ==========================================
     // TREINOS PADRÃO COM EXERCÍCIOS COMPLETOS (4 DIVISÕES)
@@ -5471,49 +5484,39 @@
 
         if (allItems.length > 0) {
           const map = new Map();
-          // Mesclar exercícios base nativos primeiro
-          DEFAULT_BASE_EXERCISES.forEach(e => {
-            map.set(e.exerciseId || e.id, {
-              id: e.exerciseId || e.id,
-              exerciseId: e.exerciseId || e.id,
-              originalName: e.name || e.nome,
-              name: e.name || e.nome,
-              nome: e.name || e.nome,
-              gifUrl: e.gifUrl,
-              bodyParts: e.bodyParts || [e.grupoMuscular],
-              equipments: e.equipments || [e.equipamento],
-              targetMuscles: e.targetMuscles || [e.musculoPrincipal || e.grupoMuscular],
-              secondaryMuscles: e.secondaryMuscles ? [e.secondaryMuscles] : [],
-              instructions: [e.instrucoes],
-              grupoMuscular: e.grupoMuscular,
-              equipamento: e.equipamento,
-              musculoPrincipal: e.musculoPrincipal,
-              source: "titannova"
-            });
-          });
-
           allItems.forEach(e => {
+            const exId = String(e.id || e.exerciseId || '');
+            if (!exId) return;
             const exObj = {
               ...e,
-              exerciseId: e.id,
-              name: e.originalName,
-              nome: e.originalName,
+              id: exId,
+              exerciseId: exId,
+              originalName: e.originalName || e.name || '',
+              name: e.originalName || e.name || '',
+              nome: e.originalName || e.name || '',
+              gifUrl: e.gifUrl || '',
+              bodyParts: Array.isArray(e.bodyParts) ? e.bodyParts : [],
+              equipments: Array.isArray(e.equipments) ? e.equipments : [],
+              targetMuscles: Array.isArray(e.targetMuscles) ? e.targetMuscles : [],
+              secondaryMuscles: Array.isArray(e.secondaryMuscles) ? e.secondaryMuscles : [],
+              instructions: Array.isArray(e.instructions) ? e.instructions : (e.instructions ? [e.instructions] : []),
               grupoMuscular: (e.bodyParts && e.bodyParts[0]) ? translateTerm(e.bodyParts[0]) : 'Geral',
               equipamento: (e.equipments && e.equipments[0]) ? translateTerm(e.equipments[0]) : 'Livre',
               musculoPrincipal: (e.targetMuscles && e.targetMuscles[0]) ? translateTerm(e.targetMuscles[0]) : 'Geral',
-              instrucoes: Array.isArray(e.instructions) ? e.instructions.join('\n') : (e.instructions || '')
+              instrucoes: Array.isArray(e.instructions) ? e.instructions.join('\n') : (e.instructions || ''),
+              source: "exercisedb"
             };
-            map.set(e.id, exObj);
+            map.set(exId, exObj);
           });
 
           exercisesList = Array.from(map.values());
-          console.log(`[Biblioteca] Total: ${exercisesList.length} exercícios disponíveis no TitanNova Fit.`);
+          console.log(`[Biblioteca] Total: ${exercisesList.length} exercícios exclusivos da ExerciseDB V1 disponíveis no TitanNova Fit.`);
         } else {
-          exercisesList = [...DEFAULT_BASE_EXERCISES];
+          exercisesList = [];
         }
       } catch (e) {
         console.warn("[Biblioteca] Falha ao ler catálogo:", e);
-        exercisesList = [...DEFAULT_BASE_EXERCISES];
+        exercisesList = [];
       }
 
       currentExerciseState = 'SUCESSO';
@@ -5574,38 +5577,29 @@
         if (allFetched.length > 0) {
           await TitanNovaExerciseStore.putAll(allFetched);
 
-          // 2. Mesclar à lista em memória preservando exercícios locais
+          // 2. Armazenar estritamente os exercícios da ExerciseDB na biblioteca
           const map = new Map();
-          DEFAULT_BASE_EXERCISES.forEach(e => {
-            map.set(e.exerciseId || e.id, {
-              id: e.exerciseId || e.id,
-              exerciseId: e.exerciseId || e.id,
-              originalName: e.name || e.nome,
-              name: e.name || e.nome,
-              nome: e.name || e.nome,
-              gifUrl: e.gifUrl,
-              bodyParts: e.bodyParts || [e.grupoMuscular],
-              equipments: e.equipments || [e.equipamento],
-              targetMuscles: e.targetMuscles || [e.musculoPrincipal || e.grupoMuscular],
-              secondaryMuscles: e.secondaryMuscles ? [e.secondaryMuscles] : [],
-              instructions: [e.instrucoes],
-              grupoMuscular: e.grupoMuscular,
-              equipamento: e.equipamento,
-              musculoPrincipal: e.musculoPrincipal,
-              source: "titannova"
-            });
-          });
-
           allFetched.forEach(e => {
-            map.set(e.id, {
+            const exId = String(e.id || e.exerciseId || '');
+            if (!exId) return;
+            map.set(exId, {
               ...e,
-              exerciseId: e.id,
-              name: e.originalName,
-              nome: e.originalName,
+              id: exId,
+              exerciseId: exId,
+              originalName: e.originalName || e.name || '',
+              name: e.originalName || e.name || '',
+              nome: e.originalName || e.name || '',
+              gifUrl: e.gifUrl || '',
+              bodyParts: Array.isArray(e.bodyParts) ? e.bodyParts : [],
+              equipments: Array.isArray(e.equipments) ? e.equipments : [],
+              targetMuscles: Array.isArray(e.targetMuscles) ? e.targetMuscles : [],
+              secondaryMuscles: Array.isArray(e.secondaryMuscles) ? e.secondaryMuscles : [],
+              instructions: Array.isArray(e.instructions) ? e.instructions : (e.instructions ? [e.instructions] : []),
               grupoMuscular: (e.bodyParts && e.bodyParts[0]) ? translateTerm(e.bodyParts[0]) : 'Geral',
               equipamento: (e.equipments && e.equipments[0]) ? translateTerm(e.equipments[0]) : 'Livre',
               musculoPrincipal: (e.targetMuscles && e.targetMuscles[0]) ? translateTerm(e.targetMuscles[0]) : 'Geral',
-              instrucoes: Array.isArray(e.instructions) ? e.instructions.join('\n') : (e.instructions || '')
+              instrucoes: Array.isArray(e.instructions) ? e.instructions.join('\n') : (e.instructions || ''),
+              source: "exercisedb"
             });
           });
 
