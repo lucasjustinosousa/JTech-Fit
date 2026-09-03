@@ -211,6 +211,21 @@ ALTER TABLE public.treinos ADD COLUMN IF NOT EXISTS usuario_id TEXT;
 -- ====================================================================
 -- 8. TABELA DE EXERCÍCIOS DO TREINO (RELACIONAL)
 -- ====================================================================
+CREATE TABLE IF NOT EXISTS public.workout_exercises (
+    id TEXT PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    workout_id TEXT REFERENCES public.treinos(id) ON DELETE CASCADE,
+    exercise_id TEXT,
+    "order" INT NOT NULL,
+    sets INT DEFAULT 3,
+    repetitions TEXT DEFAULT '8-12',
+    rest_seconds INT DEFAULT 60,
+    initial_load NUMERIC(6,2) DEFAULT NULL,
+    notes TEXT
+);
+
+ALTER TABLE public.workout_exercises ENABLE ROW LEVEL SECURITY;
+
 CREATE TABLE IF NOT EXISTS public.exercicios_do_treino (
     id TEXT PRIMARY KEY,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -219,7 +234,7 @@ CREATE TABLE IF NOT EXISTS public.exercicios_do_treino (
     ordem INT NOT NULL,
     quantidade_series INT DEFAULT 4,
     repeticoes TEXT DEFAULT '10-12',
-    carga_inicial NUMERIC(6,2) DEFAULT 0.0,
+    carga_inicial NUMERIC(6,2) DEFAULT NULL,
     descanso_segundos INT DEFAULT 60,
     observacoes TEXT
 );
@@ -408,6 +423,11 @@ CREATE POLICY "Usuarios gerenciam seus proprios treinos" ON public.treinos
     WITH CHECK (auth.uid() = user_id OR auth.uid()::text = usuario_id OR auth.uid()::text = user_id::text OR public.is_admin() OR auth.role() = 'anon');
 
 -- 13.5 POLÍTICAS PARA EXERCÍCIOS DO TREINO
+CREATE POLICY "Usuarios gerenciam seus workout_exercises" ON public.workout_exercises
+    FOR ALL TO authenticated, anon
+    USING (auth.uid() = user_id OR public.is_admin() OR auth.role() = 'anon')
+    WITH CHECK (auth.uid() = user_id OR public.is_admin() OR auth.role() = 'anon');
+
 CREATE POLICY "Usuarios gerenciam seus exercicios do treino" ON public.exercicios_do_treino
     FOR ALL TO authenticated, anon
     USING (auth.uid() = user_id OR public.is_admin() OR auth.role() = 'anon')

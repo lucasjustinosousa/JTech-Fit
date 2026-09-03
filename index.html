@@ -664,6 +664,28 @@
       font-weight: 700;
     }
 
+    .btn-micro {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: white;
+      border-radius: 6px;
+      padding: 3px 7px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-micro:hover:not(:disabled) {
+      background: rgba(0, 210, 255, 0.2);
+      border-color: var(--accent-cyan);
+    }
+    .btn-micro:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
     /* Estilos da Integração ExerciseDB V1 */
     .exercise-bulk-bar {
       position: sticky;
@@ -2099,6 +2121,9 @@
         </button>
         <button id="detailBtnAddToWorkout" onclick="addCurrentDetailToWorkout()" class="btn btn-success" style="flex: 1.2; min-width: 130px; padding: 10px; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 6px;">
           ➕ Ao Treino
+        </button>
+        <button id="detailBtnReplaceInWorkout" onclick="confirmReplaceCurrentDetailInWorkout()" class="btn" style="display: none; flex: 1.2; min-width: 130px; padding: 10px; font-size: 12px; font-weight: 800; align-items: center; justify-content: center; gap: 6px; background: rgba(255, 152, 0, 0.2); border: 1.5px solid #FF9800; color: #ffb74d; border-radius: 12px; cursor: pointer;">
+          🔄 Substituir no Treino
         </button>
         <button data-close-detail-modal onclick="closeExerciseDetailModal()" class="btn btn-primary" style="flex: 1; min-width: 90px; padding: 10px; font-size: 12px; font-weight: 800; border-radius: 12px;">
           ✓ FECHAR
@@ -5200,9 +5225,355 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
     let exercisesList = [];
 
-    // ==========================================
-    // TREINOS PADRÃO COM EXERCÍCIOS COMPLETOS (4 DIVISÕES)
-    // ==========================================
+    // ====================================================================
+    // DICIONÁRIO DE BUSCA E CORRESPONDÊNCIA NORMALIZADA (EXERCISEDB V1)
+    // ====================================================================
+    const defaultExerciseSearch = {
+      // Treino A — Peito & Tríceps
+      benchPress: ["barbell bench press", "bench press"],
+      inclinePress: ["dumbbell incline bench press", "incline dumbbell press"],
+      crossover: ["cable cross-over", "cable crossover", "cable middle fly"],
+      pushUp: ["push-up", "push up"],
+      cablePushdown: ["cable pushdown", "cable rope pushdown", "cable triceps pushdown", "pushdown"],
+      overheadTriceps: ["dumbbell overhead triceps extension", "dumbbell standing triceps extension", "overhead triceps extension"],
+
+      // Treino B — Costas & Bíceps
+      latPulldown: ["cable pulldown", "lat pulldown", "cable lat pulldown"],
+      seatedRow: ["cable seated row", "seated row", "cable row"],
+      bentOverRow: ["barbell bent over row", "bent over row"],
+      oneArmRow: ["dumbbell one arm row", "dumbbell one-arm row", "one arm row"],
+      barbellCurl: ["barbell curl", "biceps curl with barbell"],
+      hammerCurl: ["dumbbell hammer curl", "hammer curl"],
+
+      // Treino C — Pernas & Panturrilhas
+      bodyweightSquat: ["bodyweight squat", "body weight squat", "squat"],
+      legPress: ["lever leg press", "leg press", "sled 45"],
+      legExtension: ["lever leg extension", "leg extension"],
+      legCurl: ["lever leg curl", "leg curl", "lying leg curl", "seated leg curl"],
+      lunge: ["lunge", "dumbbell lunge", "bodyweight lunge"],
+      hipThrust: ["hip thrust", "barbell glute bridge", "glute bridge"],
+      calfRaise: ["standing calf raise", "bodyweight standing calf raise", "calf raise"],
+
+      // Treino D — Ombros, Trapézio & Abdômen
+      shoulderPress: ["dumbbell seated shoulder press", "seated shoulder press", "dumbbell shoulder press"],
+      lateralRaise: ["dumbbell lateral raise", "lateral raise"],
+      reverseFly: ["dumbbell reverse fly", "reverse fly", "rear delt"],
+      shrug: ["dumbbell shrug", "shrug"],
+      frontPlank: ["front plank", "plank"],
+      crunch: ["crunch", "ab crunch"],
+      kneeRaise: ["knee raise", "hanging knee raise", "captain chair knee raise"]
+    };
+
+    async function findExercise(searchNames) {
+      if (!Array.isArray(searchNames) || searchNames.length === 0) return null;
+
+      // 1. Procurar primeiro pelo nome exato / aproximado na tabela Supabase exercises
+      if (_supabase) {
+        for (const name of searchNames) {
+          try {
+            const { data } = await _supabase
+              .from("exercises")
+              .select("*")
+              .ilike("original_name", `%${name}%`)
+              .limit(1)
+              .maybeSingle();
+
+            if (data) {
+              return {
+                id: data.id,
+                exercise_id: data.id,
+                exerciseId: data.id,
+                nome: data.translated_name || translateTerm(data.original_name),
+                name: data.translated_name || translateTerm(data.original_name),
+                originalName: data.original_name,
+                original_name: data.original_name,
+                gifUrl: data.gif_url || '',
+                grupoMuscular: (data.body_parts && data.body_parts[0]) ? translateTerm(data.body_parts[0]).toUpperCase() : 'GERAL'
+              };
+            }
+          } catch (_) {}
+        }
+      }
+
+      // 2. Fallback no catálogo em memória (exercisesList)
+      for (const name of searchNames) {
+        const q = name.toLowerCase().trim();
+        if (Array.isArray(exercisesList) && exercisesList.length > 0) {
+          const match = exercisesList.find(e => {
+            const orig = (e.originalName || e.name || '').toLowerCase();
+            return orig.includes(q);
+          });
+          if (match) return match;
+        }
+      }
+
+      // 3. Fallback no IndexedDB (TitanNovaExerciseStore)
+      try {
+        if (typeof TitanNovaExerciseStore !== 'undefined' && TitanNovaExerciseStore.getAll) {
+          const allStore = await TitanNovaExerciseStore.getAll();
+          if (Array.isArray(allStore) && allStore.length > 0) {
+            for (const name of searchNames) {
+              const q = name.toLowerCase().trim();
+              const match = allStore.find(e => {
+                const orig = (e.originalName || e.name || '').toLowerCase();
+                return orig.includes(q);
+              });
+              if (match) return match;
+            }
+          }
+        }
+      } catch (_) {}
+
+      console.warn("[findExercise] Nenhum exercício encontrado para:", searchNames);
+      return null;
+    }
+
+    const DEFAULT_TRAINING_TEMPLATES = {
+      'Treino A': [
+        {
+          searchNames: defaultExerciseSearch.benchPress,
+          nome: 'Supino Reto com Barra',
+          series: '3',
+          reps: '8-12',
+          descanso: 60,
+          grupoMuscular: 'PEITO',
+          fallback: { id: 'EIeI8Vf', originalName: 'barbell bench press', gifUrl: 'https://static.exercisedb.dev/media/EIeI8Vf.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.inclinePress,
+          nome: 'Supino Inclinado com Halteres',
+          series: '3',
+          reps: '8-12',
+          descanso: 60,
+          grupoMuscular: 'PEITO',
+          fallback: { id: 'ns0SIbU', originalName: 'dumbbell incline bench press', gifUrl: 'https://static.exercisedb.dev/media/ns0SIbU.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.crossover,
+          nome: 'Crucifixo no Crossover',
+          series: '3',
+          reps: '10-12',
+          descanso: 60,
+          grupoMuscular: 'PEITO',
+          fallback: { id: '0CXGHya', originalName: 'cable cross-over variation', gifUrl: 'https://static.exercisedb.dev/media/0CXGHya.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.pushUp,
+          nome: 'Flexão de Braços',
+          series: '3',
+          reps: '8-12',
+          descanso: 60,
+          grupoMuscular: 'PEITO',
+          fallback: { id: '0br45wL', originalName: 'push-up inside leg kick', gifUrl: 'https://static.exercisedb.dev/media/0br45wL.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.cablePushdown,
+          nome: 'Tríceps na Polia',
+          series: '3',
+          reps: '10-12',
+          descanso: 60,
+          grupoMuscular: 'TRÍCEPS',
+          fallback: { id: '3ZflifB', originalName: 'cable pushdown', gifUrl: 'https://static.exercisedb.dev/media/3ZflifB.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.overheadTriceps,
+          nome: 'Tríceps Francês com Halter',
+          series: '3',
+          reps: '10-12',
+          descanso: 60,
+          grupoMuscular: 'TRÍCEPS',
+          fallback: { id: 'PdmaD0N', originalName: 'dumbbell standing triceps extension', gifUrl: 'https://static.exercisedb.dev/media/PdmaD0N.gif' }
+        }
+      ],
+      'Treino B': [
+        {
+          searchNames: defaultExerciseSearch.latPulldown,
+          nome: 'Puxada Frontal na Polia',
+          series: '3',
+          reps: '8-12',
+          descanso: 60,
+          grupoMuscular: 'COSTAS',
+          fallback: { id: '0MlxeMn', originalName: 'gentle style cable pulldown (pro lat bar)', gifUrl: 'https://static.exercisedb.dev/media/0MlxeMn.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.seatedRow,
+          nome: 'Remada Sentada na Polia',
+          series: '3',
+          reps: '8-12',
+          descanso: 60,
+          grupoMuscular: 'COSTAS',
+          fallback: { id: 'A3P4O0R', originalName: 'cable seated row with reverse', gifUrl: 'https://static.exercisedb.dev/media/A3P4O0R.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.bentOverRow,
+          nome: 'Remada Curvada com Barra',
+          series: '3',
+          reps: '8-10',
+          descanso: 60,
+          grupoMuscular: 'COSTAS',
+          fallback: { id: 'eZyBC3j', originalName: 'barbell bent over row', gifUrl: 'https://static.exercisedb.dev/media/eZyBC3j.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.oneArmRow,
+          nome: 'Remada Unilateral com Halter',
+          series: '3',
+          reps: '10-12',
+          descanso: 60,
+          grupoMuscular: 'COSTAS',
+          fallback: { id: 'g9AsZ8P', originalName: 'kettlebell one arm row', gifUrl: 'https://static.exercisedb.dev/media/g9AsZ8P.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.barbellCurl,
+          nome: 'Rosca Direta com Barra',
+          series: '3',
+          reps: '8-12',
+          descanso: 60,
+          grupoMuscular: 'BÍCEPS',
+          fallback: { id: '25GPyDY', originalName: 'barbell curl', gifUrl: 'https://static.exercisedb.dev/media/25GPyDY.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.hammerCurl,
+          nome: 'Rosca Martelo com Halteres',
+          series: '3',
+          reps: '10-12',
+          descanso: 60,
+          grupoMuscular: 'BÍCEPS',
+          fallback: { id: '2NpxjC1', originalName: 'dumbbell hammer curl v. 2', gifUrl: 'https://static.exercisedb.dev/media/2NpxjC1.gif' }
+        }
+      ],
+      'Treino C': [
+        {
+          searchNames: defaultExerciseSearch.bodyweightSquat,
+          nome: 'Agachamento com Peso Corporal',
+          series: '3',
+          reps: '10-12',
+          descanso: 60,
+          grupoMuscular: 'PERNAS',
+          fallback: { id: '3xK09Sk', originalName: 'bodyweight squatting row', gifUrl: 'https://static.exercisedb.dev/media/3xK09Sk.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.legPress,
+          nome: 'Leg Press',
+          series: '3',
+          reps: '8-12',
+          descanso: 90,
+          grupoMuscular: 'PERNAS',
+          fallback: { id: '10Z2DXU', originalName: 'sled 45 leg press', gifUrl: 'https://static.exercisedb.dev/media/10Z2DXU.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.legExtension,
+          nome: 'Cadeira Extensora',
+          series: '3',
+          reps: '10-12',
+          descanso: 60,
+          grupoMuscular: 'PERNAS',
+          fallback: { id: 'my33uHU', originalName: 'lever leg extension', gifUrl: 'https://static.exercisedb.dev/media/my33uHU.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.legCurl,
+          nome: 'Mesa / Cadeira Flexora',
+          series: '3',
+          reps: '10-12',
+          descanso: 60,
+          grupoMuscular: 'PERNAS',
+          fallback: { id: '0rHfvy9', originalName: 'inverse leg curl (on pull-up cable machine)', gifUrl: 'https://static.exercisedb.dev/media/0rHfvy9.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.lunge,
+          nome: 'Afundo',
+          series: '3',
+          reps: '10-12',
+          descanso: 60,
+          grupoMuscular: 'PERNAS',
+          fallback: { id: '13VW2VO', originalName: 'weighted stretch lunge', gifUrl: 'https://static.exercisedb.dev/media/13VW2VO.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.hipThrust,
+          nome: 'Elevação Pélvica (Hip Thrust)',
+          series: '3',
+          reps: '10-12',
+          descanso: 60,
+          grupoMuscular: 'PERNAS',
+          fallback: { id: 'Pjbc0Kt', originalName: 'resistance band hip thrusts on knees', gifUrl: 'https://static.exercisedb.dev/media/Pjbc0Kt.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.calfRaise,
+          nome: 'Panturrilha em Pé',
+          series: '3',
+          reps: '12-15',
+          descanso: 60,
+          grupoMuscular: 'PANTURRILHAS',
+          fallback: { id: '6HmFgmx', originalName: 'standing calf raise (on a staircase)', gifUrl: 'https://static.exercisedb.dev/media/6HmFgmx.gif' }
+        }
+      ],
+      'Treino D': [
+        {
+          searchNames: defaultExerciseSearch.shoulderPress,
+          nome: 'Desenvolvimento com Halteres Sentado',
+          series: '3',
+          reps: '8-12',
+          descanso: 60,
+          grupoMuscular: 'OMBROS',
+          fallback: { id: 'f1jf47L', originalName: 'dumbbell seated shoulder press', gifUrl: 'https://static.exercisedb.dev/media/f1jf47L.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.lateralRaise,
+          nome: 'Elevação Lateral com Halteres',
+          series: '3',
+          reps: '10-12',
+          descanso: 60,
+          grupoMuscular: 'OMBROS',
+          fallback: { id: 'DsgkuIt', originalName: 'dumbbell lateral raise', gifUrl: 'https://static.exercisedb.dev/media/DsgkuIt.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.reverseFly,
+          nome: 'Crucifixo Inverso',
+          series: '3',
+          reps: '10-12',
+          descanso: 60,
+          grupoMuscular: 'OMBROS',
+          fallback: { id: 'EAs3xL9', originalName: 'dumbbell reverse fly', gifUrl: 'https://static.exercisedb.dev/media/EAs3xL9.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.shrug,
+          nome: 'Encolhimento com Halteres',
+          series: '3',
+          reps: '10-15',
+          descanso: 60,
+          grupoMuscular: 'TRAPÉZIO',
+          fallback: { id: 'NJzBsGJ', originalName: 'dumbbell shrug', gifUrl: 'https://static.exercisedb.dev/media/NJzBsGJ.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.frontPlank,
+          nome: 'Prancha Abdominal',
+          series: '3',
+          reps: '45s',
+          descanso: 60,
+          grupoMuscular: 'ABDÔMEN',
+          fallback: { id: 'CosupLu', originalName: 'front plank with twist', gifUrl: 'https://static.exercisedb.dev/media/CosupLu.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.crunch,
+          nome: 'Abdominal Tradicional (Crunch)',
+          series: '3',
+          reps: '15-20',
+          descanso: 60,
+          grupoMuscular: 'ABDÔMEN',
+          fallback: { id: '225x2Vd', originalName: 'band kneeling twisting crunch', gifUrl: 'https://static.exercisedb.dev/media/225x2Vd.gif' }
+        },
+        {
+          searchNames: defaultExerciseSearch.kneeRaise,
+          nome: 'Elevação de Joelhos',
+          series: '3',
+          reps: '12-15',
+          descanso: 60,
+          grupoMuscular: 'ABDÔMEN',
+          fallback: { id: '03lzqwk', originalName: 'assisted hanging knee raise', gifUrl: 'https://static.exercisedb.dev/media/03lzqwk.gif' }
+        }
+      ]
+    };
+
+    // Treinos padrão oficiais com exercícios mapeados da ExerciseDB
     const DEFAULT_WORKOUT_DIVISIONS = [
       {
         id: 'treino_default_a',
@@ -5210,13 +5581,19 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         descricao: 'Hipertrofia',
         diasSemana: ['Segunda-feira', 'Quinta-feira'],
         corHex: '#1E88E5',
-        exercicios: [
-          { id: 'ex_a1', nome: 'Supino Reto com Barra', series: '4', reps: '10-12', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/barbell-bench-press.gif' },
-          { id: 'ex_a2', nome: 'Supino Inclinado com Halteres', series: '3', reps: '10-12', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/dumbbell-incline-bench-press.gif' },
-          { id: 'ex_a3', nome: 'Crucifixo no Crossover (Polia Alta)', series: '3', reps: '12-15', grupoMuscular: 'Peito', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/pectorals/cable-middle-fly.gif' },
-          { id: 'ex_a4', nome: 'Tríceps Pulley na Corda', series: '4', reps: '12-15', grupoMuscular: 'Tríceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/cable-rope-pushdown.gif' },
-          { id: 'ex_a5', nome: 'Tríceps Testa com Barra W', series: '3', reps: '10-12', grupoMuscular: 'Tríceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/triceps/barbell-lying-triceps-extension.gif' }
-        ]
+        exercicios: DEFAULT_TRAINING_TEMPLATES['Treino A'].map(t => ({
+          id: t.fallback.id,
+          exercise_id: t.fallback.id,
+          nome: t.nome,
+          name: t.nome,
+          original_name: t.fallback.originalName,
+          series: t.series,
+          reps: t.reps,
+          descanso: t.descanso,
+          initial_load: null,
+          grupoMuscular: t.grupoMuscular,
+          gifUrl: t.fallback.gifUrl
+        }))
       },
       {
         id: 'treino_default_b',
@@ -5224,13 +5601,19 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         descricao: 'Hipertrofia',
         diasSemana: ['Terça-feira', 'Sexta-feira'],
         corHex: '#00D2FF',
-        exercicios: [
-          { id: 'ex_b1', nome: 'Puxada Frontal na Polia', series: '4', reps: '10-12', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/lats/cable-lat-pulldown-full-range-of-motion.gif' },
-          { id: 'ex_b2', nome: 'Remada Curvada com Barra', series: '4', reps: '8-10', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/upper-back/barbell-bent-over-row.gif' },
-          { id: 'ex_b3', nome: 'Remada Unilateral com Halter (Serrote)', series: '3', reps: '10-12', grupoMuscular: 'Costas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/upper-back/dumbbell-one-arm-bent-over-row.gif' },
-          { id: 'ex_b4', nome: 'Rosca Direta com Barra W', series: '4', reps: '10-12', grupoMuscular: 'Bíceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/barbell-curl.gif' },
-          { id: 'ex_b5', nome: 'Rosca Martelo com Halteres', series: '3', reps: '12', grupoMuscular: 'Bíceps', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/biceps/dumbbell-hammer-curl.gif' }
-        ]
+        exercicios: DEFAULT_TRAINING_TEMPLATES['Treino B'].map(t => ({
+          id: t.fallback.id,
+          exercise_id: t.fallback.id,
+          nome: t.nome,
+          name: t.nome,
+          original_name: t.fallback.originalName,
+          series: t.series,
+          reps: t.reps,
+          descanso: t.descanso,
+          initial_load: null,
+          grupoMuscular: t.grupoMuscular,
+          gifUrl: t.fallback.gifUrl
+        }))
       },
       {
         id: 'treino_default_c',
@@ -5238,13 +5621,19 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         descricao: 'Força & Resistência',
         diasSemana: ['Quarta-feira', 'Sábado'],
         corHex: '#4CAF50',
-        exercicios: [
-          { id: 'ex_c1', nome: 'Agachamento Livre com Barra', series: '4', reps: '8-10', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/glutes/barbell-full-squat.gif' },
-          { id: 'ex_c2', nome: 'Leg Press 45º', series: '4', reps: '10-12', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/quads/lever-alternate-leg-press.gif' },
-          { id: 'ex_c3', nome: 'Cadeira Extensora', series: '3', reps: '12-15', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/quads/lever-leg-extension.gif' },
-          { id: 'ex_c4', nome: 'Mesa Flexora', series: '3', reps: '12-15', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/hamstrings/lever-lying-leg-curl.gif' },
-          { id: 'ex_c5', nome: 'Panturrilha Sentado', series: '4', reps: '15-20', grupoMuscular: 'Pernas', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/calves/lever-seated-calf-raise.gif' }
-        ]
+        exercicios: DEFAULT_TRAINING_TEMPLATES['Treino C'].map(t => ({
+          id: t.fallback.id,
+          exercise_id: t.fallback.id,
+          nome: t.nome,
+          name: t.nome,
+          original_name: t.fallback.originalName,
+          series: t.series,
+          reps: t.reps,
+          descanso: t.descanso,
+          initial_load: null,
+          grupoMuscular: t.grupoMuscular,
+          gifUrl: t.fallback.gifUrl
+        }))
       },
       {
         id: 'treino_default_d',
@@ -5252,15 +5641,244 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         descricao: 'Definição & Core',
         diasSemana: ['Sexta-feira'],
         corHex: '#FF9800',
-        exercicios: [
-          { id: 'ex_d1', nome: 'Desenvolvimento com Halteres', series: '4', reps: '10-12', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/delts/dumbbell-shoulder-press.gif' },
-          { id: 'ex_d2', nome: 'Elevação Lateral com Halteres', series: '4', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/delts/dumbbell-lateral-raise.gif' },
-          { id: 'ex_d3', nome: 'Crucifixo Invertido', series: '3', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/delts/dumbbell-rear-lateral-raise.gif' },
-          { id: 'ex_d4', nome: 'Encolhimento com Halteres', series: '4', reps: '12-15', grupoMuscular: 'Ombros', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/upper-back/dumbbell-shrug.gif' },
-          { id: 'ex_d5', nome: 'Prancha Ventral Isométrica', series: '3', reps: '60s', grupoMuscular: 'Abdômen', gifUrl: 'https://cdn.jsdelivr.net/gh/JahelCuadrado/ExerciseGymGifsDB@v1.1.0/abs/bodyweight-plank.gif' }
-        ]
+        exercicios: DEFAULT_TRAINING_TEMPLATES['Treino D'].map(t => ({
+          id: t.fallback.id,
+          exercise_id: t.fallback.id,
+          nome: t.nome,
+          name: t.nome,
+          original_name: t.fallback.originalName,
+          series: t.series,
+          reps: t.reps,
+          descanso: t.descanso,
+          initial_load: null,
+          grupoMuscular: t.grupoMuscular,
+          gifUrl: t.fallback.gifUrl
+        }))
       }
     ];
+
+    async function addDefaultExercisesToWorkout(workoutId, force = false) {
+      const workout = allWorkoutsList.find(w => w.id === workoutId);
+      if (!workout) return;
+
+      if (!force && Array.isArray(workout.exercicios) && workout.exercicios.length > 0) {
+        return;
+      }
+
+      const uid = getEffectiveUserId();
+      if (!force && _supabase && uid) {
+        try {
+          const { count, error } = await _supabase
+            .from("workout_exercises")
+            .select("*", { count: "exact", head: true })
+            .eq("workout_id", workoutId);
+
+          if (!error && count && count > 0) {
+            return;
+          }
+        } catch (_) {}
+      }
+
+      const wName = (workout.nome || '').toLowerCase();
+      let templateKey = 'Treino A';
+      if (wName.includes('b ') || wName.includes('costas') || workoutId.includes('_b')) {
+        templateKey = 'Treino B';
+      } else if (wName.includes('c ') || wName.includes('pernas') || workoutId.includes('_c')) {
+        templateKey = 'Treino C';
+      } else if (wName.includes('d ') || wName.includes('ombros') || workoutId.includes('_d')) {
+        templateKey = 'Treino D';
+      }
+
+      const templateExercises = DEFAULT_TRAINING_TEMPLATES[templateKey] || DEFAULT_TRAINING_TEMPLATES['Treino A'];
+      const populatedList = [];
+
+      for (let i = 0; i < templateExercises.length; i++) {
+        const item = templateExercises[i];
+        let found = await findExercise(item.searchNames);
+        if (!found) {
+          console.warn(`[Exercício Ausente] Não foi possível localizar na API:`, item.searchNames);
+          found = item.fallback;
+        }
+
+        if (found) {
+          populatedList.push({
+            id: found.id || found.exerciseId || item.fallback.id,
+            exercise_id: found.id || found.exerciseId || item.fallback.id,
+            nome: item.nome,
+            name: item.nome,
+            original_name: found.originalName || found.original_name || item.fallback.originalName,
+            series: item.series || '3',
+            reps: item.reps || '8-12',
+            descanso: item.descanso || 60,
+            initial_load: null,
+            grupoMuscular: item.grupoMuscular || found.grupoMuscular || 'GERAL',
+            gifUrl: found.gifUrl || item.fallback.gifUrl || ''
+          });
+        }
+      }
+
+      workout.exercicios = populatedList;
+      workout.exerciciosCount = populatedList.length;
+
+      await saveWorkoutsToStorageAndCloud();
+      renderAllWorkoutsUI();
+      showToastNotification('Exercícios padrão adicionados. Você pode alterar séries, repetições, ordem e exercícios antes de iniciar.');
+    }
+
+    function openManualExerciseSelector(workoutId) {
+      window._targetWorkoutForManualAdd = workoutId;
+      switchTab('screenExercises', document.querySelectorAll('.nav-item')[2]);
+      showToastNotification('Selecione os exercícios desejados na biblioteca e toque em "Adicionar ao Treino".');
+    }
+
+    function reorderWorkoutExercise(workoutId, exIdx, direction) {
+      const workout = allWorkoutsList.find(w => w.id === workoutId);
+      if (!workout || !Array.isArray(workout.exercicios)) return;
+      const targetIdx = exIdx + direction;
+      if (targetIdx < 0 || targetIdx >= workout.exercicios.length) return;
+
+      const temp = workout.exercicios[exIdx];
+      workout.exercicios[exIdx] = workout.exercicios[targetIdx];
+      workout.exercicios[targetIdx] = temp;
+
+      saveWorkoutsToStorageAndCloud();
+      renderAllWorkoutsUI();
+    }
+
+    function removeWorkoutExercise(workoutId, exIdx) {
+      const workout = allWorkoutsList.find(w => w.id === workoutId);
+      if (!workout || !Array.isArray(workout.exercicios) || !workout.exercicios[exIdx]) return;
+      const exName = workout.exercicios[exIdx].nome;
+      if (confirm(`Deseja realmente remover o exercício "${exName}" deste treino?`)) {
+        workout.exercicios.splice(exIdx, 1);
+        workout.exerciciosCount = workout.exercicios.length;
+        saveWorkoutsToStorageAndCloud();
+        renderAllWorkoutsUI();
+        showToastNotification(`"${exName}" removido.`);
+      }
+    }
+
+    let _replacingWorkoutTarget = null;
+    function replaceWorkoutExercise(workoutId, exIdx) {
+      _replacingWorkoutTarget = { workoutId, exIdx };
+      switchTab('screenExercises', document.querySelectorAll('.nav-item')[2]);
+      showToastNotification('Selecione o exercício desejado na biblioteca para substituir.');
+    }
+
+    function confirmReplaceCurrentDetailInWorkout() {
+      if (!_replacingWorkoutTarget) return;
+      const { workoutId, exIdx } = _replacingWorkoutTarget;
+      _replacingWorkoutTarget = null;
+
+      const workout = allWorkoutsList.find(w => w.id === workoutId);
+      if (!workout || !Array.isArray(workout.exercicios) || !workout.exercicios[exIdx]) {
+        closeExerciseDetailModal();
+        return;
+      }
+
+      const ex = exercisesList.find(e => (e.id === currentDetailExerciseId || e.exerciseId === currentDetailExerciseId)) ||
+                 DEFAULT_BASE_EXERCISES.find(e => (e.id === currentDetailExerciseId || e.exerciseId === currentDetailExerciseId));
+
+      if (ex) {
+        const oldName = workout.exercicios[exIdx].nome;
+        const newName = ex.nome || ex.name || ex.originalName;
+        workout.exercicios[exIdx] = {
+          id: ex.id || ex.exerciseId,
+          exercise_id: ex.id || ex.exerciseId,
+          nome: newName,
+          name: newName,
+          original_name: ex.originalName || ex.original_name || '',
+          series: workout.exercicios[exIdx].series || '3',
+          reps: workout.exercicios[exIdx].reps || '8-12',
+          descanso: workout.exercicios[exIdx].descanso || 60,
+          initial_load: null,
+          grupoMuscular: ex.grupoMuscular || 'GERAL',
+          gifUrl: ex.gifUrl || ''
+        };
+        saveWorkoutsToStorageAndCloud();
+        closeExerciseDetailModal();
+        switchTab('screenWorkouts', document.querySelectorAll('.nav-item')[1]);
+        renderAllWorkoutsUI();
+        showToastNotification(`"${oldName}" substituído por "${newName}" com sucesso!`);
+      } else {
+        closeExerciseDetailModal();
+      }
+    }
+
+    function editWorkoutExerciseParams(workoutId, exIdx) {
+      const workout = allWorkoutsList.find(w => w.id === workoutId);
+      if (!workout || !Array.isArray(workout.exercicios) || !workout.exercicios[exIdx]) return;
+      const ex = workout.exercicios[exIdx];
+
+      const newSeries = prompt(`Editar quantidade de séries para "${ex.nome}":`, ex.series || '3');
+      if (newSeries === null) return;
+      const newReps = prompt(`Editar repetições (ex: 8-12, 10, 45s) para "${ex.nome}":`, ex.reps || '8-12');
+      if (newReps === null) return;
+      const newRest = prompt(`Editar tempo de descanso em segundos (ex: 60, 90) para "${ex.nome}":`, ex.descanso || '60');
+      if (newRest === null) return;
+
+      ex.series = newSeries.trim() || '3';
+      ex.reps = newReps.trim() || '8-12';
+      ex.descanso = parseInt(newRest) || 60;
+
+      saveWorkoutsToStorageAndCloud();
+      renderAllWorkoutsUI();
+      showToastNotification(`Configurações de "${ex.nome}" salvas!`);
+    }
+
+    function clearWorkoutExercises(workoutId) {
+      const workout = allWorkoutsList.find(w => w.id === workoutId);
+      if (!workout) return;
+      if (confirm(`Deseja limpar todos os exercícios do "${workout.nome}"?`)) {
+        workout.exercicios = [];
+        workout.exerciciosCount = 0;
+        saveWorkoutsToStorageAndCloud();
+        renderAllWorkoutsUI();
+        showToastNotification(`Exercícios do "${workout.nome}" limpos.`);
+      }
+    }
+
+    async function saveWorkoutsToStorageAndCloud() {
+      const uid = getEffectiveUserId();
+      if (uid) {
+        localStorage.setItem(`titannovafit_workouts_${uid}`, JSON.stringify(allWorkoutsList));
+      }
+      localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
+
+      if (_supabase && uid) {
+        for (const w of allWorkoutsList) {
+          try {
+            await _supabase.from('treinos').upsert({
+              id: w.id,
+              usuario_id: uid,
+              user_id: uid.length === 36 ? uid : null,
+              nome: w.nome,
+              descricao: w.descricao || '',
+              dias_semana: w.diasSemana || [],
+              cor_hex: w.corHex || '#1E88E5',
+              exercicios: w.exercicios || []
+            });
+
+            if (Array.isArray(w.exercicios) && w.exercicios.length > 0) {
+              const rows = w.exercicios.map((ex, idx) => ({
+                id: `we_${w.id}_${idx}_${ex.id}`,
+                user_id: uid.length === 36 ? uid : null,
+                workout_id: w.id,
+                exercise_id: ex.id,
+                order: idx + 1,
+                sets: parseInt(ex.series) || 3,
+                repetitions: String(ex.reps || '8-12'),
+                rest_seconds: parseInt(ex.descanso) || 60,
+                initial_load: null,
+                notes: ''
+              }));
+              await _supabase.from('workout_exercises').upsert(rows);
+            }
+          } catch (_) {}
+        }
+      }
+      updateHomeScreenUI();
+    }
 
     let allWorkoutsList = [];
     const expandedWorkoutIds = new Set();
@@ -5416,10 +6034,15 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
                   }
                   if (Array.isArray(parsedEx)) {
                     exList = parsedEx.map((e, idx) => ({
-                      id: e.id || `ex_${row.id}_${idx}`,
+                      id: e.id || e.exercise_id || `ex_${row.id}_${idx}`,
+                      exercise_id: e.exercise_id || e.id || `ex_${row.id}_${idx}`,
                       nome: e.nome || e.name || 'Exercício',
-                      series: e.series || '4',
-                      reps: e.reps || '10-12',
+                      name: e.nome || e.name || 'Exercício',
+                      original_name: e.original_name || e.originalName || '',
+                      series: e.series || '3',
+                      reps: e.reps || '8-12',
+                      descanso: e.descanso || 60,
+                      initial_load: null,
                       grupoMuscular: e.grupoMuscular || e.grupo_muscular || 'Geral',
                       gifUrl: e.gifUrl || e.gif_url || ''
                     }));
@@ -5445,6 +6068,39 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
                   criadoEm: row.criado_em || new Date().toISOString()
                 };
               });
+
+              // Se algum treino veio sem exercícios, verificar tabela workout_exercises
+              for (const ow of onlineWorkouts) {
+                if ((!ow.exercicios || ow.exercicios.length === 0) && _supabase) {
+                  try {
+                    const { data: weData, error: weErr } = await _supabase
+                      .from('workout_exercises')
+                      .select('*')
+                      .eq('workout_id', ow.id)
+                      .order('order', { ascending: true });
+
+                    if (!weErr && Array.isArray(weData) && weData.length > 0) {
+                      ow.exercicios = weData.map(item => {
+                        const matchEx = exercisesList.find(e => e.id === item.exercise_id || e.exerciseId === item.exercise_id);
+                        return {
+                          id: item.exercise_id,
+                          exercise_id: item.exercise_id,
+                          nome: matchEx ? (matchEx.nome || matchEx.name) : 'Exercício',
+                          name: matchEx ? (matchEx.nome || matchEx.name) : 'Exercício',
+                          original_name: matchEx ? (matchEx.originalName || matchEx.original_name) : '',
+                          series: String(item.sets || 3),
+                          reps: String(item.repetitions || '8-12'),
+                          descanso: item.rest_seconds || 60,
+                          initial_load: null,
+                          grupoMuscular: matchEx ? (matchEx.grupoMuscular || 'Geral') : 'Geral',
+                          gifUrl: matchEx ? (matchEx.gifUrl || '') : ''
+                        };
+                      });
+                      ow.exerciciosCount = ow.exercicios.length;
+                    }
+                  } catch (_) {}
+                }
+              }
 
               allWorkoutsList = onlineWorkouts;
               localStorage.setItem(userStorageKey, JSON.stringify(allWorkoutsList));
@@ -5549,36 +6205,90 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             ${isExpanded ? `
               <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px; animation: fadeIn 0.2s ease-in-out;">
                 ${exercises.length === 0 ? `
-                  <div style="font-size: 11px; color: var(--text-grey); padding: 8px; text-align: center;">Nenhum exercício montado neste treino.</div>
-                ` : exercises.map((ex, idx) => {
-                  const icon = getMuscleGroupIcon(ex.grupoMuscular);
-                  const safeName = (ex.nome || 'Exercício').replace(/'/g, "\\'");
-                  const safeSubtitle = `${ex.grupoMuscular || 'Geral'} • ${ex.series || 4} séries x ${ex.reps || '10-12'} reps`;
-
-                  let gifUrl = ex.gifUrl || ex.gif_url || '';
-                  if (!gifUrl) {
-                    const match = DEFAULT_BASE_EXERCISES.find(b => (b.nome || b.name || '').toLowerCase() === (ex.nome || '').toLowerCase()) ||
-                                  exercisesList.find(e => (e.nome || e.name || '').toLowerCase() === (ex.nome || '').toLowerCase());
-                    if (match) {
-                      gifUrl = match.gifUrl || match.gif_url || '';
-                    }
-                  }
-
-                  return `
-                    <div onclick="event.stopPropagation(); openOnlyGifModal('${safeName}')" style="display: flex; justify-content: space-between; align-items: center; background: #080a0f; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--divider); cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#10141e'" onmouseout="this.style.background='#080a0f'" title="Toque para ver animação ampliada com zoom 3D">
-                      <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                        <span style="font-size: 16px;">${icon}</span>
-                        <div style="min-width: 0;">
-                          <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${idx + 1}. ${ex.nome}</div>
-                          <div style="font-size: 11px; color: var(--accent-cyan);">${ex.series || 4} séries • ${ex.reps || '10-12'} reps</div>
-                        </div>
-                      </div>
-                      <button onclick="event.stopPropagation(); openOnlyGifModal('${safeName}')" style="background: rgba(0,210,255,0.12); border: 1px solid rgba(0,210,255,0.4); color: var(--accent-cyan); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; cursor: pointer; flex-shrink: 0;">
-                        🔍 GIF 3D
+                  <div class="empty-workout-box" style="background: rgba(255,255,255,0.02); border: 1.5px dashed var(--divider); padding: 20px 14px; border-radius: 12px; text-align: center; margin-top: 6px;">
+                    <div style="font-size: 28px; margin-bottom: 6px;">📋</div>
+                    <div style="font-size: 13.5px; font-weight: 800; color: white; margin-bottom: 4px;">Este treino ainda não possui exercícios.</div>
+                    <div style="font-size: 11.5px; color: var(--text-grey); margin-bottom: 14px;">Adicione a divisão padrão oficial da ExerciseDB ou escolha exercícios manualmente na biblioteca.</div>
+                    <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                      <button onclick="event.stopPropagation(); addDefaultExercisesToWorkout('${w.id}')" class="btn btn-primary" style="width: auto; padding: 7px 14px; font-size: 11.5px; font-weight: 800; border-radius: 8px;">
+                        ✨ Adicionar exercícios padrão
+                      </button>
+                      <button onclick="event.stopPropagation(); openManualExerciseSelector('${w.id}')" class="btn btn-outline" style="width: auto; padding: 7px 14px; font-size: 11.5px; font-weight: 700; border-radius: 8px;">
+                        🔍 Selecionar manualmente
                       </button>
                     </div>
-                  `;
-                }).join('')}
+                  </div>
+                ` : `
+                  ${exercises.map((ex, idx) => {
+                    const icon = getMuscleGroupIcon(ex.grupoMuscular);
+                    const safeName = (ex.nome || 'Exercício').replace(/'/g, "\\'");
+                    const safeSubtitle = `${ex.grupoMuscular || 'Geral'} • ${ex.series || 3} séries x ${ex.reps || '8-12'} reps • ${ex.descanso || 60}s descanso`;
+
+                    let gifUrl = ex.gifUrl || ex.gif_url || '';
+                    if (!gifUrl) {
+                      const match = DEFAULT_BASE_EXERCISES.find(b => (b.nome || b.name || '').toLowerCase() === (ex.nome || '').toLowerCase()) ||
+                                    exercisesList.find(e => (e.nome || e.name || '').toLowerCase() === (ex.nome || '').toLowerCase());
+                      if (match) {
+                        gifUrl = match.gifUrl || match.gif_url || '';
+                      }
+                    }
+
+                    return `
+                      <div class="workout-exercise-row" style="background: #080a0f; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--divider); display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                          <div onclick="event.stopPropagation(); openOnlyGifModal('${safeName}')" style="display: flex; align-items: center; gap: 10px; min-width: 0; cursor: pointer; flex: 1;" title="Toque para ver animação ampliada com zoom 3D">
+                            <span style="font-size: 16px;">${icon}</span>
+                            <div style="min-width: 0;">
+                              <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${idx + 1}. ${ex.nome}</div>
+                              <div style="font-size: 11px; color: var(--accent-cyan); font-weight: 600;">${ex.series || 3} séries • ${ex.reps || '8-12'} reps • ${ex.descanso || 60}s descanso</div>
+                            </div>
+                          </div>
+                          <button onclick="event.stopPropagation(); openOnlyGifModal('${safeName}')" style="background: rgba(0,210,255,0.12); border: 1px solid rgba(0,210,255,0.4); color: var(--accent-cyan); font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 6px; cursor: pointer; flex-shrink: 0;" title="Ver demonstração animada">
+                            🔍 GIF 3D
+                          </button>
+                        </div>
+
+                        <!-- Barra de Ações por Exercício (Subir, Descer, Editar, Substituir, Remover) -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 11px;">
+                          <div style="display: flex; gap: 4px; align-items: center;">
+                            <button onclick="event.stopPropagation(); reorderWorkoutExercise('${w.id}', ${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="btn-micro" title="Mover para cima">
+                              ⬆️
+                            </button>
+                            <button onclick="event.stopPropagation(); reorderWorkoutExercise('${w.id}', ${idx}, 1)" ${idx === exercises.length - 1 ? 'disabled' : ''} class="btn-micro" title="Mover para baixo">
+                              ⬇️
+                            </button>
+                          </div>
+                          <div style="display: flex; gap: 6px; align-items: center;">
+                            <button onclick="event.stopPropagation(); editWorkoutExerciseParams('${w.id}', ${idx})" style="background: none; border: none; color: #d0d4dc; cursor: pointer; font-size: 11px; font-weight: 700; padding: 3px 6px;" title="Editar séries, repetições e descanso">
+                              ✏️ Editar
+                            </button>
+                            <button onclick="event.stopPropagation(); replaceWorkoutExercise('${w.id}', ${idx})" style="background: none; border: none; color: var(--accent-cyan); cursor: pointer; font-size: 11px; font-weight: 700; padding: 3px 6px;" title="Substituir por outro exercício">
+                              🔄 Substituir
+                            </button>
+                            <button onclick="event.stopPropagation(); removeWorkoutExercise('${w.id}', ${idx})" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 11px; font-weight: 700; padding: 3px 6px;" title="Remover exercício">
+                              🗑️ Remover
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+
+                  <!-- Ações Inferiores da Lista de Exercícios -->
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--divider); flex-wrap: wrap; gap: 8px;">
+                    <button onclick="event.stopPropagation(); openManualExerciseSelector('${w.id}')" style="background: rgba(0,210,255,0.08); border: 1px dashed rgba(0,210,255,0.4); color: var(--accent-cyan); font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 6px; cursor: pointer;">
+                      + Adicionar Mais Exercícios
+                    </button>
+                    <button onclick="event.stopPropagation(); clearWorkoutExercises('${w.id}')" style="background: none; border: none; color: var(--text-grey); font-size: 11px; cursor: pointer;">
+                      🗑️ Limpar exercícios padrão
+                    </button>
+                  </div>
+
+                  <!-- Aviso Obrigatório de Saúde e Segurança -->
+                  <div style="background: rgba(0,210,255,0.05); border: 1px solid rgba(0,210,255,0.2); border-radius: 8px; padding: 8px 12px; margin-top: 6px; font-size: 10.5px; color: var(--text-grey); line-height: 1.4;">
+                    ⚠️ <strong>Aviso de Saúde e Segurança:</strong> Este é um modelo geral de organização, não uma prescrição individual. Ajuste com orientação qualificada e interrompa o exercício em caso de dor ou mal-estar.
+                  </div>
+                `}
               </div>
             ` : ''}
 
@@ -5699,10 +6409,10 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             <div class="set-row" id="${rowId}" style="margin-bottom: 6px;">
               <div class="set-badge">${s}</div>
               <div style="flex: 1;">
-                <input type="number" class="form-input" value="30" oninput="saveActiveSessionToStorage()" onchange="saveActiveSessionToStorage()" onblur="saveActiveSessionToStorage()" style="padding: 6px 10px; font-size: 12px;" placeholder="Carga kg">
+                <input type="number" class="form-input" value="" oninput="saveActiveSessionToStorage()" onchange="saveActiveSessionToStorage()" onblur="saveActiveSessionToStorage()" style="padding: 6px 10px; font-size: 12px;" placeholder="Carga kg">
               </div>
               <div style="flex: 1;">
-                <input type="number" class="form-input" value="12" oninput="saveActiveSessionToStorage()" onchange="saveActiveSessionToStorage()" onblur="saveActiveSessionToStorage()" style="padding: 6px 10px; font-size: 12px;" placeholder="Reps">
+                <input type="text" class="form-input" value="" oninput="saveActiveSessionToStorage()" onchange="saveActiveSessionToStorage()" onblur="saveActiveSessionToStorage()" style="padding: 6px 10px; font-size: 12px;" placeholder="Reps">
               </div>
               <div class="set-check" onclick="toggleSetDone('${rowId}')">✓</div>
             </div>
@@ -5757,8 +6467,8 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       document.querySelectorAll('#activeWorkoutExercisesContainer .set-row').forEach(row => {
         const isDone = row.classList.contains('done');
         const inputs = row.querySelectorAll('input');
-        const weight = inputs[0] ? inputs[0].value : '30';
-        const reps = inputs[1] ? inputs[1].value : '12';
+        const weight = inputs[0] ? inputs[0].value : '';
+        const reps = inputs[1] ? inputs[1].value : '';
         setsState.push({
           id: row.id,
           done: isDone,
@@ -7463,6 +8173,9 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         }
         optionsHtml += '<option value="__new_workout__">➕ Criar Nova Ficha com estes Exercícios</option>';
         selectDropdown.innerHTML = optionsHtml;
+        if (window._targetWorkoutForManualAdd) {
+          selectDropdown.value = window._targetWorkoutForManualAdd;
+        }
       }
 
       if (modal) modal.style.display = 'flex';
@@ -8134,6 +8847,16 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       }
 
       updateDetailFavButton();
+
+      const btnAdd = document.getElementById('detailBtnAddToWorkout');
+      const btnReplace = document.getElementById('detailBtnReplaceInWorkout');
+      if (_replacingWorkoutTarget) {
+        if (btnAdd) btnAdd.style.display = 'none';
+        if (btnReplace) btnReplace.style.display = 'flex';
+      } else {
+        if (btnAdd) btnAdd.style.display = 'flex';
+        if (btnReplace) btnReplace.style.display = 'none';
+      }
 
       const modal = document.getElementById('modalExerciseDetail');
       if (modal) {
