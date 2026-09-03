@@ -1766,6 +1766,121 @@
     let adminUsersList = [];
     let adminLogsList = [];
 
+    async function syncUserToDatabase(authUser, customName) {
+      if (!_supabase || !authUser || !authUser.id || authUser.id === 'guest_user_1') return;
+      const uid = String(authUser.id);
+      const email = authUser.email || getEffectiveUserEmail() || '';
+      const nome = customName || (authUser.user_metadata && authUser.user_metadata.nome) || email.split('@')[0] || 'Atleta TitanNova';
+
+      // 1. Gravar em public.usuarios (tabela nativa no banco)
+      try {
+        await _supabase.from('usuarios').upsert({
+          id: uid,
+          user_id: uid,
+          nome: nome,
+          email: email,
+          criado_em: authUser.created_at || new Date().toISOString()
+        });
+      } catch (err) {
+        console.warn('[Sync usuarios]:', err);
+      }
+
+      // 2. Gravar em public.profiles (caso a tabela exista)
+      try {
+        await _supabase.from('profiles').upsert({
+          id: uid,
+          nome: nome,
+          email: email,
+          criado_em: authUser.created_at || new Date().toISOString(),
+          atualizado_em: new Date().toISOString()
+        });
+      } catch (_) {}
+    }
+
+    function copySupabaseSyncSqlScript() {
+      const sqlText = `-- TITANNOVA FIT - VINCULAR TODAS AS CONTAS DO SUPABASE AUTH
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    nome TEXT,
+    email TEXT,
+    foto_url TEXT,
+    unidade_carga TEXT DEFAULT 'kg',
+    descanso_padrao INT DEFAULT 60,
+    favoritos JSONB DEFAULT '[]'::jsonb,
+    bloqueado BOOLEAN DEFAULT FALSE,
+    criado_em TIMESTAMPTZ DEFAULT NOW(),
+    atualizado_em TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.usuarios (
+    id TEXT PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    nome TEXT NOT NULL,
+    email TEXT NOT NULL,
+    foto_url TEXT,
+    unidade_carga TEXT DEFAULT 'kg',
+    descanso_padrao INT DEFAULT 60,
+    favoritos JSONB DEFAULT '[]'::jsonb,
+    bloqueado BOOLEAN DEFAULT FALSE,
+    criado_em TIMESTAMPTZ DEFAULT NOW()
+);
+
+INSERT INTO public.profiles (id, nome, email, criado_em, atualizado_em)
+SELECT id, COALESCE(raw_user_meta_data->>'nome', SPLIT_PART(email, '@', 1)), email, created_at, NOW()
+FROM auth.users
+ON CONFLICT (id) DO UPDATE SET nome = COALESCE(EXCLUDED.nome, public.profiles.nome), email = EXCLUDED.email;
+
+INSERT INTO public.usuarios (id, user_id, nome, email, criado_em)
+SELECT id::text, id, COALESCE(raw_user_meta_data->>'nome', SPLIT_PART(email, '@', 1)), email, created_at
+FROM auth.users
+ON CONFLICT (id) DO UPDATE SET user_id = EXCLUDED.user_id, nome = COALESCE(EXCLUDED.nome, public.usuarios.nome), email = EXCLUDED.email;
+
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.profiles (id, nome, email, criado_em)
+    VALUES (NEW.id, COALESCE(NEW.raw_user_meta_data->>'nome', SPLIT_PART(NEW.email, '@', 1)), NEW.email, NEW.created_at)
+    ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email;
+
+    INSERT INTO public.usuarios (id, user_id, nome, email, criado_em)
+    VALUES (NEW.id::text, NEW.id, COALESCE(NEW.raw_user_meta_data->>'nome', SPLIT_PART(NEW.email, '@', 1)), NEW.email, NEW.created_at)
+    ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+CREATE OR REPLACE FUNCTION public.get_all_users()
+RETURNS TABLE (id UUID, email TEXT, nome TEXT, criado_em TIMESTAMPTZ, ultimo_acesso TIMESTAMPTZ, bloqueado BOOLEAN)
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, auth AS $$
+BEGIN
+    RETURN QUERY SELECT u.id, u.email::TEXT, COALESCE(u.raw_user_meta_data->>'nome', SPLIT_PART(u.email, '@', 1))::TEXT, u.created_at, u.last_sign_in_at, COALESCE((u.raw_user_meta_data->>'bloqueado')::BOOLEAN, false) FROM auth.users u ORDER BY u.created_at DESC;
+END;
+$$;
+GRANT EXECUTE ON FUNCTION public.get_all_users() TO authenticated, anon;
+
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Permitir leitura de perfis para admin e autenticados" ON public.profiles;
+CREATE POLICY "Permitir leitura de perfis para admin e autenticados" ON public.profiles FOR ALL TO authenticated, anon USING (true) WITH CHECK (true);
+
+ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Permitir leitura de usuarios para admin e autenticados" ON public.usuarios;
+CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public.usuarios FOR ALL TO authenticated, anon USING (true) WITH CHECK (true);
+`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(sqlText).then(() => {
+          showToastNotification("✅ Script SQL copiado para a área de transferência!");
+          alert("✅ Script SQL copiado com sucesso!\n\nCole e execute no SQL Editor do seu painel Supabase (arquivo supabase_sync_auth_users.sql). Todas as contas do Authentication serão vinculadas e sincronizadas imediatamente!");
+        }).catch(() => {
+          prompt("Copie o script SQL abaixo e execute no SQL Editor do Supabase:", sqlText);
+        });
+      } else {
+        prompt("Copie o script SQL abaixo e execute no SQL Editor do Supabase:", sqlText);
+      }
+    }
+
     async function checkAdminPermission(userId) {
       if (!userId || userId === 'guest_user_1') {
         isCurrentSessionAdmin = false;
@@ -1873,10 +1988,19 @@
         if (_supabase) {
           // Total de Usuários
           try {
-            const { count: pCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true });
-            const { count: uCount } = await _supabase.from('usuarios').select('*', { count: 'exact', head: true });
+            let totalUsers = null;
+            try {
+              const { data: rpcUsers } = await _supabase.rpc('get_all_users');
+              if (Array.isArray(rpcUsers)) totalUsers = rpcUsers.length;
+            } catch (_) {}
+
+            if (totalUsers === null) {
+              const { count: uCount } = await _supabase.from('usuarios').select('*', { count: 'exact', head: true });
+              const { count: pCount } = await _supabase.from('profiles').select('*', { count: 'exact', head: true });
+              if (uCount || pCount) totalUsers = Math.max(uCount || 0, pCount || 0);
+            }
             const uEl = document.getElementById('adminKpiUsers');
-            if (uEl) uEl.innerText = pCount || uCount || '1';
+            if (uEl && totalUsers !== null && totalUsers !== undefined) uEl.innerText = totalUsers;
           } catch (_) {}
 
           // Total de Fichas
@@ -2155,39 +2279,144 @@
     async function loadAdminUsersList() {
       const container = document.getElementById('adminUsersListContainer');
       if (!container) return;
-      container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-grey);">Carregando usuários do banco de dados...</div>';
+      container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-grey);"><div class="spinning" style="display:inline-block; font-size:22px; margin-bottom:8px;">🔄</div><br>Sincronizando usuários do Supabase...</div>';
 
-      let users = [];
+      const userMap = new Map();
+
       if (_supabase) {
+        // 1. Tentar ler do Supabase Auth via RPC get_all_users (Security Definer)
         try {
-          const { data, error } = await _supabase.from('profiles').select('id, nome, email, criado_em, atualizado_em, bloqueado').order('criado_em', { ascending: false });
-          if (!error && Array.isArray(data) && data.length > 0) {
-            users = data;
-          } else {
-            const { data: uData } = await _supabase.from('usuarios').select('id, nome, email, criado_em, bloqueado').order('criado_em', { ascending: false });
-            if (Array.isArray(uData)) users = uData;
+          const { data: rpcUsers, error: rpcErr } = await _supabase.rpc('get_all_users');
+          if (!rpcErr && Array.isArray(rpcUsers)) {
+            rpcUsers.forEach(u => {
+              if (u && u.id) {
+                userMap.set(String(u.id), {
+                  id: String(u.id),
+                  nome: u.nome || (u.email ? u.email.split('@')[0] : 'Atleta'),
+                  email: u.email || '',
+                  criado_em: u.criado_em || u.created_at,
+                  bloqueado: u.bloqueado === true,
+                  source: 'auth.users'
+                });
+              }
+            });
+          }
+        } catch (_) {}
+
+        // 2. Consultar tabela public.usuarios (tabela nativa no banco)
+        try {
+          const { data: uData, error: uErr } = await _supabase.from('usuarios').select('*').order('criado_em', { ascending: false });
+          if (!uErr && Array.isArray(uData)) {
+            uData.forEach(u => {
+              const uid = String(u.id || u.user_id || '');
+              if (uid && !userMap.has(uid)) {
+                userMap.set(uid, {
+                  id: uid,
+                  nome: u.nome || (u.email ? u.email.split('@')[0] : 'Atleta'),
+                  email: u.email || '',
+                  criado_em: u.criado_em,
+                  bloqueado: u.bloqueado === true,
+                  source: 'public.usuarios'
+                });
+              }
+            });
+          }
+        } catch (_) {}
+
+        // 3. Consultar tabela public.profiles (caso exista)
+        try {
+          const { data: pData, error: pErr } = await _supabase.from('profiles').select('*').order('criado_em', { ascending: false });
+          if (!pErr && Array.isArray(pData)) {
+            pData.forEach(u => {
+              const uid = String(u.id || '');
+              if (uid && !userMap.has(uid)) {
+                userMap.set(uid, {
+                  id: uid,
+                  nome: u.nome || (u.email ? u.email.split('@')[0] : 'Atleta'),
+                  email: u.email || '',
+                  criado_em: u.criado_em,
+                  bloqueado: u.bloqueado === true,
+                  source: 'public.profiles'
+                });
+              }
+            });
+          }
+        } catch (_) {}
+
+        // 4. Identificar atletas adicionais a partir de treinos criados
+        try {
+          const { data: tData } = await _supabase.from('treinos').select('usuario_id, user_id, criado_em');
+          if (Array.isArray(tData)) {
+            tData.forEach(t => {
+              const uid = String(t.user_id || t.usuario_id || '');
+              if (uid && uid.length > 10 && !userMap.has(uid)) {
+                userMap.set(uid, {
+                  id: uid,
+                  nome: 'Atleta com Treinos Registrados',
+                  email: `atleta_${uid.substring(0, 8)}@supabase`,
+                  criado_em: t.criado_em,
+                  bloqueado: false,
+                  source: 'public.treinos'
+                });
+              }
+            });
           }
         } catch (_) {}
       }
 
-      if (users.length === 0) {
-        // Exibir usuário atual como fallback
-        users = [{
-          id: getEffectiveUserId(),
-          nome: (currentAuthUser && currentAuthUser.user_metadata && currentAuthUser.user_metadata.nome) || 'Administrador TitanNova',
-          email: getEffectiveUserEmail(),
-          criado_em: new Date().toISOString(),
-          bloqueado: false
-        }];
+      // 5. Garantir inclusão do usuário da sessão atual do admin
+      if (currentAuthUser && currentAuthUser.id && currentAuthUser.id !== 'guest_user_1') {
+        const myUid = String(currentAuthUser.id);
+        const myEmail = currentAuthUser.email || getEffectiveUserEmail();
+        const myNome = (currentAuthUser.user_metadata && currentAuthUser.user_metadata.nome) || 'Administrador TitanNova';
+        if (!userMap.has(myUid)) {
+          userMap.set(myUid, {
+            id: myUid,
+            nome: myNome,
+            email: myEmail,
+            criado_em: currentAuthUser.created_at || new Date().toISOString(),
+            bloqueado: false,
+            source: 'session'
+          });
+        }
+        // Sincronizar o admin imediatamente com a tabela usuarios
+        syncUserToDatabase(currentAuthUser, myNome);
       }
 
-      container.innerHTML = users.map((u, idx) => {
+      const users = Array.from(userMap.values());
+
+      // Atualizar contagem no KPI de Usuários
+      const uEl = document.getElementById('adminKpiUsers');
+      if (uEl) uEl.innerText = users.length;
+
+      const bannerHtml = `
+        <div style="background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.25); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 11.5px; color: var(--text-white);">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+            <div>
+              <strong style="color: var(--accent-cyan);">⚡ Vinculação Total do Supabase Auth:</strong>
+              <div style="color: var(--text-grey); font-size: 10.5px; margin-top: 2px;">
+                Para sincronizar instantaneamente todas as contas registradas no Supabase Authentication, execute o script SQL com 1 clique.
+              </div>
+            </div>
+            <button onclick="copySupabaseSyncSqlScript()" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 10px; color: var(--accent-cyan); border-color: var(--accent-cyan); white-space: nowrap;">
+              📋 Copiar SQL
+            </button>
+          </div>
+        </div>
+      `;
+
+      if (users.length === 0) {
+        container.innerHTML = bannerHtml + '<div style="text-align: center; padding: 20px; color: var(--text-grey);">Nenhum usuário encontrado no banco de dados.</div>';
+        return;
+      }
+
+      container.innerHTML = bannerHtml + users.map((u, idx) => {
         const dateStr = u.criado_em ? new Date(u.criado_em).toLocaleDateString('pt-BR') : 'Hoje';
-        const uidShort = (u.id || '').substring(0, 14) + '...';
+        const uidShort = (u.id || '').length > 14 ? (u.id.substring(0, 14) + '...') : u.id;
         const isBlocked = u.bloqueado === true;
 
         return `
-          <div class="card" style="margin: 0; padding: 12px; background: #121622; border-left: 4px solid ${isBlocked ? '#ff5252' : 'var(--primary-blue)'};">
+          <div class="card" style="margin: 0 0 8px 0; padding: 12px; background: #121622; border-left: 4px solid ${isBlocked ? '#ff5252' : 'var(--primary-blue)'};">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
               <div>
                 <div style="font-size: 13px; font-weight: 800; color: white;">${u.nome || 'Atleta'}</div>
@@ -2975,16 +3204,8 @@
             nome: name
           }));
 
-          // Criar perfil em public.profiles
-          try {
-            await _supabase.from('profiles').upsert({
-              id: authUser.id,
-              nome: name,
-              email: email,
-              criado_em: new Date().toISOString(),
-              atualizado_em: new Date().toISOString()
-            });
-          } catch (_) {}
+          // Criar perfil em public.usuarios e public.profiles
+          await syncUserToDatabase(authUser, name);
 
           // Inicializar fichas padrão no banco para o novo atleta vinculadas ao user_id
           allWorkoutsList = DEFAULT_WORKOUT_DIVISIONS.map((t, idx) => ({
@@ -3042,16 +3263,8 @@
                   email: loginData.user.email,
                   nome: name || loginData.user.email.split('@')[0]
                 }));
-                // Salvar perfil em profiles
-                try {
-                  await _supabase.from('profiles').upsert({
-                    id: loginData.user.id,
-                    nome: name || loginData.user.email.split('@')[0],
-                    email: email,
-                    criado_em: new Date().toISOString(),
-                    atualizado_em: new Date().toISOString()
-                  });
-                } catch (_) {}
+                // Salvar perfil em usuarios e profiles
+                await syncUserToDatabase(loginData.user, name);
 
                 document.getElementById('bottomNav').style.display = 'flex';
                 updateProfileUI();
@@ -3178,19 +3391,8 @@
           nome: userName
         }));
 
-        // Garantir que perfil existe na tabela public.profiles (sem criar outro usuário no Auth)
-        try {
-          const { data: profData } = await _supabase.from('profiles').select('*').eq('id', authUser.id).maybeSingle();
-          if (!profData) {
-            await _supabase.from('profiles').upsert({
-              id: authUser.id,
-              nome: userName,
-              email: authUser.email,
-              criado_em: new Date().toISOString(),
-              atualizado_em: new Date().toISOString()
-            });
-          }
-        } catch (_) {}
+        // Garantir que perfil existe em public.usuarios e public.profiles
+        await syncUserToDatabase(authUser, userName);
 
         document.getElementById('bottomNav').style.display = 'flex';
         await checkAdminPermission(authUser.id);
@@ -6559,6 +6761,7 @@
                 nome: (session.user.user_metadata && session.user.user_metadata.nome) || session.user.email.split('@')[0]
               }));
               await checkAdminPermission(session.user.id);
+              await syncUserToDatabase(session.user);
               updateProfileUI();
             } else if (event === 'SIGNED_OUT') {
               currentAuthUser = null;
