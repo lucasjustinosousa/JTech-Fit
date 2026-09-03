@@ -2320,6 +2320,15 @@
         <button onclick="closeWorkoutPreviewModal()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: var(--text-grey); width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
       </div>
 
+      <!-- Campo para Nome Personalizado do Treino -->
+      <div style="background: rgba(0,210,255,0.06); border: 1px solid rgba(0,210,255,0.3); border-radius: 14px; padding: 12px 14px; margin-bottom: 14px;">
+        <label for="previewCustomWorkoutName" style="font-size: 12px; font-weight: 800; color: var(--accent-cyan); display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+          <span>🏷️</span> Nome deste Treino / Ficha:
+        </label>
+        <input type="text" id="previewCustomWorkoutName" class="form-input" placeholder="ex: Meu Treino PPL, Treino de Hipertrofia..." style="font-size: 14px; font-weight: 700; background: #080a0f; border: 1.5px solid rgba(0,210,255,0.4); color: white; border-radius: 10px; padding: 10px 12px; width: 100%;">
+        <div style="font-size: 11px; color: var(--text-grey); margin-top: 4px;">Você pode personalizar o nome do treino acima antes de salvar.</div>
+      </div>
+
       <!-- Metadados da Divisão -->
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-bottom: 14px;">
         <div style="background: #121622; border: 1px solid var(--divider); border-radius: 8px; padding: 8px 10px;">
@@ -2349,7 +2358,7 @@
       <!-- Botões de Ação do Preview -->
       <div style="display: flex; gap: 8px; flex-wrap: wrap;">
         <button onclick="applyPreviewModelToUserWorkouts(false)" class="btn btn-success" style="flex: 2; min-width: 170px; padding: 11px; font-weight: 900; font-size: 13px;">
-          ✅ Usar Este Modelo
+          ✅ Salvar e Usar Este Modelo
         </button>
         <button onclick="applyPreviewModelToUserWorkouts(true)" class="btn btn-primary" style="flex: 1.5; min-width: 160px; padding: 11px; font-weight: 800; font-size: 12px;">
           ✏️ Personalizar Antes de Salvar
@@ -7369,6 +7378,9 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       const desc = document.getElementById('previewModelDesc');
       if (desc) desc.innerText = tpl.description;
 
+      const nameInput = document.getElementById('previewCustomWorkoutName');
+      if (nameInput) nameInput.value = tpl.name;
+
       const metaDays = document.getElementById('previewMetaDays');
       if (metaDays) metaDays.innerText = `${tpl.days_per_week} dias por semana`;
       const metaEquip = document.getElementById('previewMetaEquip');
@@ -7414,32 +7426,46 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       }
 
       const modal = document.getElementById('modalWorkoutPreview');
-      if (modal) modal.style.display = 'flex';
+      if (modal) {
+        modal.classList.add('active');
+      }
     }
 
     function closeWorkoutPreviewModal() {
       const modal = document.getElementById('modalWorkoutPreview');
-      if (modal) modal.style.display = 'none';
+      if (modal) {
+        modal.classList.remove('active');
+      }
     }
 
     async function applyTemplateDirectly(templateId) {
-      const tpl = WORKOUT_ASSISTANT_CATALOG.find(t => t.id === templateId);
-      if (!tpl) return;
-      _currentPreviewTemplate = tpl;
-      await applyPreviewModelToUserWorkouts(false);
+      openWorkoutPreviewModal(templateId);
+      setTimeout(() => {
+        const input = document.getElementById('previewCustomWorkoutName');
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }, 100);
     }
 
     async function applyPreviewModelToUserWorkouts(customizeBeforeSave = false) {
       if (!_currentPreviewTemplate) return;
 
+      const nameInput = document.getElementById('previewCustomWorkoutName');
+      const customBaseName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : _currentPreviewTemplate.name;
+
       closeWorkoutPreviewModal();
 
       if (customizeBeforeSave) {
-        // Abre o criador manual pré-preenchido com os exercícios do primeiro dia para personalização prévia
         startManualWorkoutCreator();
         const firstDay = _currentPreviewTemplate.days[0];
-        document.getElementById('newWorkoutName').value = firstDay ? firstDay.name : _currentPreviewTemplate.name;
-        document.getElementById('newWorkoutDesc').value = _currentPreviewTemplate.goal;
+        const wNameEl = document.getElementById('newWorkoutName');
+        if (wNameEl) {
+          wNameEl.value = _currentPreviewTemplate.days.length === 1 ? customBaseName : `${customBaseName} — ${firstDay ? firstDay.name : 'Dia 1'}`;
+        }
+        const wDescEl = document.getElementById('newWorkoutDesc');
+        if (wDescEl) wDescEl.value = _currentPreviewTemplate.goal;
 
         if (firstDay && Array.isArray(firstDay.exercises)) {
           newWorkoutExercises = firstDay.exercises.map((e, idx) => {
@@ -7464,6 +7490,10 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       const uid = getEffectiveUserId();
       const newWorkouts = _currentPreviewTemplate.days.map((d, dIdx) => {
         const wId = `treino_${Date.now()}_${dIdx}`;
+        const assignedName = _currentPreviewTemplate.days.length === 1 
+          ? customBaseName 
+          : `${customBaseName} — ${d.name}`;
+
         const mappedEx = d.exercises.map((e, exIdx) => {
           const matched = exercisesList.find(x => x.id === e.id || (x.nome || '').toLowerCase() === e.displayName.toLowerCase()) || {};
           return {
@@ -7482,8 +7512,8 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
         return {
           id: wId,
-          nome: d.name,
-          descricao: `${_currentPreviewTemplate.name} • ${_currentPreviewTemplate.goal}`,
+          nome: assignedName,
+          descricao: `${customBaseName} • ${_currentPreviewTemplate.goal}`,
           diasSemana: [],
           corHex: '#1E88E5',
           exercicios: mappedEx,
@@ -7494,13 +7524,21 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
       allWorkoutsList.unshift(...newWorkouts);
 
-      await saveWorkoutsToStorageAndCloud();
+      // Salvar imediatamente no localStorage
+      if (uid) {
+        localStorage.setItem(`titannovafit_workouts_${uid}`, JSON.stringify(allWorkoutsList));
+      }
+      localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
+      // Fechar modal principal e atualizar a tela imediatamente
       closeCreateWorkoutModal();
       renderAllWorkoutsUI();
       updateHomeScreenUI();
 
-      alert('Exercícios padrão adicionados. Você pode alterar séries, repetições, ordem e exercícios antes de iniciar.');
+      alert(`Treino "${customBaseName}" adicionado aos seus treinos com sucesso!`);
+
+      // Sincronizar em nuvem sem travar a interface
+      saveWorkoutsToStorageAndCloud().catch(err => console.warn('Erro sync nuvem:', err));
     }
 
     function startManualWorkoutCreator() {
@@ -7685,13 +7723,19 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
       allWorkoutsList.unshift(newWorkout);
 
-      await saveWorkoutsToStorageAndCloud();
+      const uid = getEffectiveUserId();
+      if (uid) {
+        localStorage.setItem(`titannovafit_workouts_${uid}`, JSON.stringify(allWorkoutsList));
+      }
+      localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
       closeCreateWorkoutModal();
       renderAllWorkoutsUI();
       updateHomeScreenUI();
 
-      alert('Treino cadastrado com sucesso!');
+      alert(`Treino "${name}" cadastrado com sucesso!`);
+
+      saveWorkoutsToStorageAndCloud().catch(err => console.warn('Erro sync nuvem:', err));
     }
 
     function renderHistoryCardUI(item, prepend = false) {
