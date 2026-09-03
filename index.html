@@ -3296,6 +3296,24 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       DB_NAME: 'TitanNovaDataSyncDB',
       DB_VERSION: 1,
       _db: null,
+      _autoRetryTimer: null,
+
+      scheduleAutoRetry(userId) {
+        if (!userId || this._autoRetryTimer) return;
+        this._autoRetryTimer = setInterval(async () => {
+          if (!navigator.onLine) return;
+          const pending = await this.getPendingOperations(userId);
+          if (!pending || pending.length === 0) {
+            if (this._autoRetryTimer) {
+              clearInterval(this._autoRetryTimer);
+              this._autoRetryTimer = null;
+            }
+            showSyncStatus('cloud_saved');
+            return;
+          }
+          await this.flushQueue(userId);
+        }, 3500);
+      },
 
       async getDB() {
         if (this._db) return this._db;
@@ -3372,6 +3390,8 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         }
         showSyncStatus('pending_offline');
         console.log(`[Offline Queue] Operação pendente gravada: ${table} (${action}) para o atleta ${userId}`);
+        this.scheduleAutoRetry(userId);
+        setTimeout(() => this.flushQueue(userId), 300);
         return op;
       },
 
@@ -3509,8 +3529,13 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
         const remaining = await this.getPendingOperations(userId);
         if (remaining.length === 0) {
+          if (this._autoRetryTimer) {
+            clearInterval(this._autoRetryTimer);
+            this._autoRetryTimer = null;
+          }
           showSyncStatus('cloud_saved');
         } else if (hasError) {
+          this.scheduleAutoRetry(userId);
           showSyncStatus('pending_offline');
         }
       }
@@ -5974,7 +5999,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       renderHistoryCardUI(historyItem, true);
       updateHomeScreenUI();
 
-      alert(`🏆 Treino "${title}" finalizado com sucesso em ${duracao} min!\nSalvo no histórico e registrado no painel semanal e mensal.`);
+      showToastNotification(`🏆 Treino "${title}" finalizado com sucesso (${duracao} min)!`);
       switchTab('screenHistory', document.querySelectorAll('.nav-item')[3]);
     }
 
@@ -6002,7 +6027,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         if (restTimeRemaining <= 0) {
           clearInterval(restTimerInterval);
           playAudioBeep();
-          alert('🔔 Tempo de Descanso Concluído! Inicie sua próxima série.');
+          showToastNotification('🔔 Tempo de Descanso Concluído! Inicie sua próxima série.');
           document.getElementById('restTimerBar').classList.remove('active');
         }
         updateRestUI();
@@ -6311,7 +6336,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       // 3. Atualizar a UI com o novo treino e seus exercícios montados
       renderAllWorkoutsUI();
       closeCreateWorkoutModal();
-      alert(`🎉 Treino "${name}" criado com sucesso com ${newWorkoutExercises.length} exercícios montados!`);
+      showToastNotification(`🎉 Treino "${name}" criado com sucesso!`);
     }
 
     function renderHistoryCardUI(item, prepend = false) {
@@ -8290,7 +8315,8 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       // 5. Ativar sincronização em tempo real (WebSockets)
       setupSupabaseRealtimeSync(userId);
 
-      // 6. Esvaziar fila de sincronização pendente se houver
+      // 6. Esvaziar fila de sincronização pendente se houver e agendar retry automático contínuo
+      TitanNovaOfflineSync.scheduleAutoRetry(userId);
       await TitanNovaOfflineSync.flushQueue(userId);
 
       updateHomeScreenUI();
