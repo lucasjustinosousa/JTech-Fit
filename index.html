@@ -2642,28 +2642,12 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       const uEl = document.getElementById('adminKpiUsers');
       if (uEl) uEl.innerText = users.length;
 
-      const bannerHtml = `
-        <div style="background: rgba(76, 175, 80, 0.08); border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 11.5px; color: var(--text-white);">
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-            <div>
-              <strong style="color: var(--success-green);">✅ Sincronização Automática com Supabase Ativa:</strong>
-              <div style="color: var(--text-grey); font-size: 10.5px; margin-top: 2px;">
-                ${users.length} contas vinculadas do Authentication. Todas as contas são sincronizadas em tempo real sem nenhuma ação manual.
-              </div>
-            </div>
-            <button onclick="loadAdminUsersList()" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 10px; color: var(--success-green); border-color: var(--success-green); white-space: nowrap;">
-              🔄 Atualizar
-            </button>
-          </div>
-        </div>
-      `;
-
       if (users.length === 0) {
-        container.innerHTML = bannerHtml + '<div style="text-align: center; padding: 20px; color: var(--text-grey);">Nenhum usuário encontrado no banco de dados.</div>';
+        container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--text-grey);">Nenhum usuário encontrado no banco de dados.</div>';
         return;
       }
 
-      container.innerHTML = bannerHtml + users.map((u, idx) => {
+      container.innerHTML = users.map((u, idx) => {
         const dateStr = u.criado_em ? new Date(u.criado_em).toLocaleDateString('pt-BR') : 'Hoje';
         const uidShort = (u.id || '').length > 14 ? (u.id.substring(0, 14) + '...') : u.id;
         const isBlocked = u.bloqueado === true;
