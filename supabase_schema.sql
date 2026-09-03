@@ -226,6 +226,50 @@ CREATE TABLE IF NOT EXISTS public.workout_exercises (
 
 ALTER TABLE public.workout_exercises ENABLE ROW LEVEL SECURITY;
 
+-- 8.3 TABELAS OFICIAIS DE MODELOS DE TREINO (WORKOUT TEMPLATES)
+CREATE TABLE IF NOT EXISTS public.workout_templates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  goal TEXT NOT NULL,
+  experience_level TEXT NOT NULL,
+  days_per_week INTEGER NOT NULL,
+  location TEXT,
+  description TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.workout_templates ENABLE ROW LEVEL SECURITY;
+
+CREATE TABLE IF NOT EXISTS public.workout_template_days (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  template_id UUID NOT NULL
+    REFERENCES public.workout_templates(id)
+    ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  day_order INTEGER NOT NULL
+);
+
+ALTER TABLE public.workout_template_days ENABLE ROW LEVEL SECURITY;
+
+CREATE TABLE IF NOT EXISTS public.workout_template_exercises (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  template_day_id UUID NOT NULL
+    REFERENCES public.workout_template_days(id)
+    ON DELETE CASCADE,
+  exercise_id TEXT
+    REFERENCES public.exercises(id)
+    ON DELETE SET NULL,
+  exercise_order INTEGER NOT NULL,
+  default_sets INTEGER,
+  default_repetitions TEXT,
+  default_rest_seconds INTEGER,
+  optional BOOLEAN NOT NULL DEFAULT false
+);
+
+ALTER TABLE public.workout_template_exercises ENABLE ROW LEVEL SECURITY;
+
 CREATE TABLE IF NOT EXISTS public.exercicios_do_treino (
     id TEXT PRIMARY KEY,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -427,6 +471,34 @@ CREATE POLICY "Usuarios gerenciam seus workout_exercises" ON public.workout_exer
     FOR ALL TO authenticated, anon
     USING (auth.uid() = user_id OR public.is_admin() OR auth.role() = 'anon')
     WITH CHECK (auth.uid() = user_id OR public.is_admin() OR auth.role() = 'anon');
+
+-- 13.5.1 POLÍTICAS PARA MODELOS DE TREINO (LEITURA PÚBLICA / ESCRITA ADMIN)
+CREATE POLICY "Leitura publica de workout_templates" ON public.workout_templates
+    FOR SELECT TO authenticated, anon
+    USING (true);
+
+CREATE POLICY "Admin gerencia workout_templates" ON public.workout_templates
+    FOR ALL TO authenticated, anon
+    USING (public.is_admin())
+    WITH CHECK (public.is_admin());
+
+CREATE POLICY "Leitura publica de workout_template_days" ON public.workout_template_days
+    FOR SELECT TO authenticated, anon
+    USING (true);
+
+CREATE POLICY "Admin gerencia workout_template_days" ON public.workout_template_days
+    FOR ALL TO authenticated, anon
+    USING (public.is_admin())
+    WITH CHECK (public.is_admin());
+
+CREATE POLICY "Leitura publica de workout_template_exercises" ON public.workout_template_exercises
+    FOR SELECT TO authenticated, anon
+    USING (true);
+
+CREATE POLICY "Admin gerencia workout_template_exercises" ON public.workout_template_exercises
+    FOR ALL TO authenticated, anon
+    USING (public.is_admin())
+    WITH CHECK (public.is_admin());
 
 CREATE POLICY "Usuarios gerenciam seus exercicios do treino" ON public.exercicios_do_treino
     FOR ALL TO authenticated, anon

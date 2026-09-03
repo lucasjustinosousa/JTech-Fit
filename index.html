@@ -686,6 +686,76 @@
       cursor: not-allowed;
     }
 
+    /* Estilos do Assistente de Montagem de Treinos */
+    .assistant-goals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .assistant-goal-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1.5px solid var(--divider);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      width: 100%;
+    }
+    .assistant-goal-btn:hover {
+      background: rgba(0, 210, 255, 0.08);
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 210, 255, 0.15);
+    }
+    .assistant-goal-btn .goal-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    .assistant-goal-btn .goal-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .assistant-goal-btn-manual {
+      background: rgba(0, 210, 255, 0.06);
+      border-color: rgba(0, 210, 255, 0.4);
+    }
+    .wizard-step-badge {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(0, 210, 255, 0.15);
+      color: var(--accent-cyan);
+      margin-bottom: 6px;
+    }
+    .wizard-option-card {
+      background: #0f131f;
+      border: 1.5px solid var(--divider);
+      border-radius: 14px;
+      padding: 16px;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .wizard-option-card:hover {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 6px 20px rgba(0, 210, 255, 0.15);
+    }
+    .wizard-option-recommended {
+      border-color: var(--accent-cyan);
+      background: linear-gradient(135deg, rgba(0, 210, 255, 0.06) 0%, #0f131f 100%);
+      box-shadow: 0 8px 30px rgba(0, 210, 255, 0.2);
+    }
+
     /* Estilos da Integração ExerciseDB V1 */
     .exercise-bulk-bar {
       position: sticky;
@@ -1957,118 +2027,341 @@
     </div>
   </div>
 
-  <!-- MODAL DE CRIAÇÃO DE TREINOS -->
+  <!-- MODAL PRINCIPAL: ASSISTENTE DE MONTAGEM DE TREINOS -->
   <div id="modalCreateWorkout" class="modal-overlay">
-    <div class="modal-card">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-        <h3 style="font-size: 18px; font-weight: 800; color: white;">🏋️‍♂️ Criar Novo Treino</h3>
-        <button onclick="closeCreateWorkoutModal()" style="background: none; border: none; color: var(--text-grey); font-size: 20px; cursor: pointer;">✕</button>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Nome da Divisão / Ficha *</label>
-        <input type="text" id="newWorkoutName" class="form-input" placeholder="ex: Treino C — Pernas & Ombros">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Foco / Objetivo do Treino (opcional)</label>
-        <div class="chip-container" style="margin-bottom: 8px;">
-          <div class="chip focus-chip" onclick="selectFocusChip(this, 'Hipertrofia')">💪 Hipertrofia</div>
-          <div class="chip focus-chip" onclick="selectFocusChip(this, 'Emagrecimento')">🔥 Emagrecimento</div>
-          <div class="chip focus-chip" onclick="selectFocusChip(this, 'Força Bruta')">🏋️‍♂️ Força Bruta</div>
-          <div class="chip focus-chip" onclick="selectFocusChip(this, 'Resistência')">⚡ Resistência</div>
-          <div class="chip focus-chip" onclick="selectFocusChip(this, 'Iniciante')">🔰 Iniciante</div>
-          <div class="chip focus-chip" onclick="selectFocusChip(this, 'Cardio')">🏃 Cardio</div>
+    <div class="modal-card" style="max-width: 680px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 22px;">
+      
+      <!-- Cabeçalho do Assistente -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 1px solid var(--divider); padding-bottom: 12px;">
+        <div>
+          <span id="wizardHeaderBadge" class="wizard-step-badge">Etapa 1 &bull; Escolha de Objetivo</span>
+          <h3 id="wizardModalTitle" style="font-size: 19px; font-weight: 900; color: white; margin: 2px 0 0 0;">🏋️‍♂️ Assistente de Montagem de Treinos</h3>
+          <p id="wizardModalSubtitle" style="font-size: 11.5px; color: var(--text-grey); margin: 3px 0 0 0;">Selecione seu objetivo para explorar modelos ideais ou monte um treino do seu jeito.</p>
         </div>
-        <input type="hidden" id="newWorkoutDesc" value="">
+        <button onclick="closeCreateWorkoutModal()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--divider); color: var(--text-grey); width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Dias da Semana (opcional)</label>
-        <div class="chip-container" style="margin-bottom: 0;">
-          <div class="chip" onclick="toggleDayChip(this, 'Segunda-feira')">Segunda</div>
-          <div class="chip" onclick="toggleDayChip(this, 'Terça-feira')">Terça</div>
-          <div class="chip" onclick="toggleDayChip(this, 'Quarta-feira')">Quarta</div>
-          <div class="chip" onclick="toggleDayChip(this, 'Quinta-feira')">Quinta</div>
-          <div class="chip" onclick="toggleDayChip(this, 'Sexta-feira')">Sexta</div>
-          <div class="chip" onclick="toggleDayChip(this, 'Sábado')">Sábado</div>
-          <div class="chip" onclick="toggleDayChip(this, 'Domingo')">Domingo</div>
-        </div>
-      </div>
+      <!-- ETAPA 1: SELEÇÃO INTERATIVA DE OBJETIVOS -->
+      <div id="workoutAssistantGoalsSection">
+        <div style="font-size: 13px; font-weight: 700; color: white; margin-bottom: 4px;">Qual é o seu objetivo principal?</div>
+        <div style="font-size: 11px; color: var(--text-grey); margin-bottom: 12px;">Toque em um objetivo para ver recomendações estruturadas para sua rotina:</div>
+        
+        <div class="assistant-goals-grid">
+          <button type="button" class="assistant-goal-btn" onclick="startWorkoutWizard('Hipertrofia')">
+            <span class="goal-icon">💪</span>
+            <div>
+              <div class="goal-title">Hipertrofia</div>
+              <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Ganho de massa muscular com sobrecarga progressiva</div>
+            </div>
+          </button>
 
-      <div class="form-group">
-        <label class="form-label">Exercícios do Treino *</label>
+          <button type="button" class="assistant-goal-btn" onclick="startWorkoutWizard('Condicionamento e controle de peso')">
+            <span class="goal-icon">🔥</span>
+            <div>
+              <div class="goal-title">Condicionamento e controle de peso</div>
+              <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Regularidade, saúde cardiovascular e capacidade física</div>
+            </div>
+          </button>
 
-        <select id="exerciseSelectDropdown" class="form-input" style="margin-bottom: 8px; font-size: 13px;" onchange="handleExerciseSelectChange(this)">
-          <option value="">-- Selecione um Exercício da Biblioteca --</option>
-          <optgroup label="Peito">
-            <option value="Supino Reto com Barra">Supino Reto com Barra</option>
-            <option value="Supino Inclinado com Halteres">Supino Inclinado com Halteres</option>
-            <option value="Crucifixo no Crossover (Polia Alta)">Crucifixo no Crossover (Polia Alta)</option>
-            <option value="Peck Deck / Voador">Peck Deck / Voador</option>
-            <option value="Flexão de Braços">Flexão de Braços</option>
-          </optgroup>
-          <optgroup label="Costas">
-            <option value="Puxada Frontal na Polia">Puxada Frontal na Polia</option>
-            <option value="Remada Curvada com Barra">Remada Curvada com Barra</option>
-            <option value="Remada Unilateral com Halter (Serrote)">Remada Unilateral com Halter (Serrote)</option>
-            <option value="Puxada Articulada">Puxada Articulada</option>
-            <option value="Barra Fixa (Pull-up)">Barra Fixa (Pull-up)</option>
-          </optgroup>
-          <optgroup label="Pernas">
-            <option value="Agachamento Livre com Barra">Agachamento Livre com Barra</option>
-            <option value="Leg Press 45º">Leg Press 45º</option>
-            <option value="Cadeira Extensora">Cadeira Extensora</option>
-            <option value="Mesa Flexora">Mesa Flexora</option>
-            <option value="Stiff com Halteres / Barra">Stiff com Halteres / Barra</option>
-            <option value="Elevação de Gêmeos (Panturrilha)">Elevação de Gêmeos (Panturrilha)</option>
-          </optgroup>
-          <optgroup label="Ombros">
-            <option value="Desenvolvimento com Halteres">Desenvolvimento com Halteres</option>
-            <option value="Elevação Lateral com Halteres">Elevação Lateral com Halteres</option>
-            <option value="Elevação Frontal">Elevação Frontal</option>
-            <option value="Crucifixo Invertido">Crucifixo Invertido</option>
-          </optgroup>
-          <optgroup label="Bíceps">
-            <option value="Rosca Direta com Barra W">Rosca Direta com Barra W</option>
-            <option value="Rosca Martelo com Halteres">Rosca Martelo com Halteres</option>
-            <option value="Rosca Concentrada">Rosca Concentrada</option>
-            <option value="Rosca Scott na Polia">Rosca Scott na Polia</option>
-          </optgroup>
-          <optgroup label="Tríceps">
-            <option value="Tríceps Pulley na Corda">Tríceps Pulley na Corda</option>
-            <option value="Tríceps Testa com Barra W">Tríceps Testa com Barra W</option>
-            <option value="Tríceps Coice com Halter">Tríceps Coice com Halter</option>
-            <option value="Mergulho no Banco (Dips)">Mergulho no Banco (Dips)</option>
-          </optgroup>
-          <optgroup label="Abdômen & Core">
-            <option value="Abdominal Infra no Solo / Elevação de Pernas">Abdominal Infra no Solo</option>
-            <option value="Prancha Ventral Isométrica">Prancha Ventral Isométrica</option>
-            <option value="Abdominal Supra na Polia / Solo">Abdominal Supra</option>
-          </optgroup>
-          <optgroup label="Outros / Personalizado">
-            <option value="__custom__">✏️ Outro (digitar nome personalizado)...</option>
-          </optgroup>
-        </select>
+          <button type="button" class="assistant-goal-btn" onclick="startWorkoutWizard('Força')">
+            <span class="goal-icon">🏋️</span>
+            <div>
+              <div class="goal-title">Força</div>
+              <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Movimentos básicos com técnica e cadência controlada</div>
+            </div>
+          </button>
 
-        <input type="text" id="customExerciseInput" class="form-input" style="display: none; margin-bottom: 8px;" placeholder="Digite o nome do exercício personalizado...">
+          <button type="button" class="assistant-goal-btn" onclick="startWorkoutWizard('Resistência')">
+            <span class="goal-icon">⚡</span>
+            <div>
+              <div class="goal-title">Resistência</div>
+              <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Circuitos funcionais e resistência muscular</div>
+            </div>
+          </button>
 
-        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-          <input type="number" id="newExSeries" class="form-input" style="flex: 1; padding: 8px; font-size: 12px;" placeholder="Séries (opcional, ex: 4)">
-          <input type="text" id="newExReps" class="form-input" style="flex: 1; padding: 8px; font-size: 12px;" placeholder="Reps (opcional, ex: 10-12)">
-        </div>
+          <button type="button" class="assistant-goal-btn" onclick="startWorkoutWizard('Iniciante')">
+            <span class="goal-icon">🌱</span>
+            <div>
+              <div class="goal-title">Iniciante</div>
+              <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Rotinas simples e seguras para começar bem</div>
+            </div>
+          </button>
 
-        <button onclick="addSelectedExerciseToWorkout()" class="btn btn-outline" style="width: 100%; padding: 10px; font-size: 13px; margin-bottom: 12px;">+ Adicionar Exercício ao Treino</button>
+          <button type="button" class="assistant-goal-btn" onclick="startWorkoutWizard('Mobilidade')">
+            <span class="goal-icon">🧘</span>
+            <div>
+              <div class="goal-title">Mobilidade</div>
+              <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Amplitude articular, postura e alívio de tensões</div>
+            </div>
+          </button>
 
-        <div id="selectedExercisesList" style="display: flex; flex-direction: column; gap: 8px;">
-          <!-- Exercícios adicionados aparecem aqui -->
+          <button type="button" class="assistant-goal-btn assistant-goal-btn-manual" onclick="startManualWorkoutCreator()">
+            <span class="goal-icon">🛠️</span>
+            <div>
+              <div class="goal-title" style="color: var(--accent-cyan);">Montar meu próprio treino</div>
+              <div style="font-size: 11px; color: #a0c4dc; margin-top: 2px;">Criar divisão 100% manual e escolher exercícios na biblioteca</div>
+            </div>
+          </button>
         </div>
       </div>
 
-      <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button onclick="closeCreateWorkoutModal()" class="btn btn-text" style="flex: 1;">Cancelar</button>
-        <button onclick="saveNewWorkout()" class="btn btn-success" style="flex: 1.5;">SALVAR TREINO</button>
+      <!-- ETAPA 2: QUESTIONÁRIO DA ROTINA -->
+      <div id="workoutAssistantQuestionSection" style="display: none;">
+        <div style="background: rgba(0,210,255,0.06); border: 1px solid rgba(0,210,255,0.2); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 10.5px; color: var(--text-grey); text-transform: uppercase; font-weight: 700;">Objetivo Selecionado</div>
+            <div id="wizardSelectedGoalTitle" style="font-size: 14px; font-weight: 800; color: var(--accent-cyan); margin-top: 2px;">💪 Hipertrofia</div>
+          </div>
+          <button onclick="backToGoalsStep()" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px;">Trocar</button>
+        </div>
+
+        <div style="font-size: 15px; font-weight: 800; color: white; margin-bottom: 14px;">Qual modelo combina com sua rotina?</div>
+
+        <!-- Pergunta 1: Quantos dias por semana? -->
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label" style="font-size: 12px; font-weight: 700; color: #e0e4ec;">1. Quantos dias por semana você pretende treinar?</label>
+          <div class="chip-container" id="wizardDaysContainer" style="margin-bottom: 4px;">
+            <div class="chip active" onclick="selectWizardChip(this, 'days', '2')">2 dias</div>
+            <div class="chip" onclick="selectWizardChip(this, 'days', '3')">3 dias</div>
+            <div class="chip" onclick="selectWizardChip(this, 'days', '4')">4 dias</div>
+            <div class="chip" onclick="selectWizardChip(this, 'days', '5')">5 dias</div>
+            <div class="chip" onclick="selectWizardChip(this, 'days', '6')">6 dias</div>
+          </div>
+          <div id="wizardDaysWarning" style="display: none; font-size: 11px; color: #ffb74d; margin-top: 4px;">
+            ⚠️ Para iniciantes, recomenda-se começar com 2 a 3 dias por semana para adaptação segura.
+          </div>
+        </div>
+
+        <!-- Pergunta 2: Onde pretende treinar? -->
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label" style="font-size: 12px; font-weight: 700; color: #e0e4ec;">2. Onde pretende treinar?</label>
+          <div class="chip-container" id="wizardLocationContainer" style="margin-bottom: 0;">
+            <div class="chip active" onclick="selectWizardChip(this, 'location', 'Academia')">Academia</div>
+            <div class="chip" onclick="selectWizardChip(this, 'location', 'Casa')">Casa</div>
+            <div class="chip" onclick="selectWizardChip(this, 'location', 'Ao ar livre')">Ao ar livre</div>
+            <div class="chip" onclick="selectWizardChip(this, 'location', 'Misto')">Misto</div>
+          </div>
+        </div>
+
+        <!-- Pergunta 3: Quais equipamentos estão disponíveis? -->
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label" style="font-size: 12px; font-weight: 700; color: #e0e4ec;">3. Quais equipamentos estão disponíveis?</label>
+          <div class="chip-container" id="wizardEquipContainer" style="margin-bottom: 0;">
+            <div class="chip active" onclick="selectWizardChip(this, 'equip', 'Academia completa')">Academia completa</div>
+            <div class="chip" onclick="selectWizardChip(this, 'equip', 'Halteres')">Halteres</div>
+            <div class="chip" onclick="selectWizardChip(this, 'equip', 'Barra e anilhas')">Barra e anilhas</div>
+            <div class="chip" onclick="selectWizardChip(this, 'equip', 'Elásticos')">Elásticos</div>
+            <div class="chip" onclick="selectWizardChip(this, 'equip', 'Máquinas')">Máquinas</div>
+            <div class="chip" onclick="selectWizardChip(this, 'equip', 'Peso corporal')">Peso corporal</div>
+          </div>
+        </div>
+
+        <!-- Pergunta 4: Qual é o nível de experiência? (Avançado NUNCA padrão) -->
+        <div class="form-group" style="margin-bottom: 18px;">
+          <label class="form-label" style="font-size: 12px; font-weight: 700; color: #e0e4ec;">4. Qual é o seu nível de experiência na musculação?</label>
+          <div class="chip-container" id="wizardExpContainer" style="margin-bottom: 0;">
+            <div class="chip active" onclick="selectWizardChip(this, 'experience', 'Iniciante')">Iniciante</div>
+            <div class="chip" onclick="selectWizardChip(this, 'experience', 'Intermediário')">Intermediário</div>
+            <div class="chip" onclick="selectWizardChip(this, 'experience', 'Avançado')">Avançado</div>
+          </div>
+        </div>
+
+        <!-- Botões de Ação do Questionário -->
+        <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+          <button onclick="backToGoalsStep()" class="btn btn-outline" style="flex: 1; min-width: 120px; padding: 10px; font-size: 12px;">
+            ⬅️ Voltar
+          </button>
+          <button onclick="startManualWorkoutCreator()" class="btn btn-outline" style="flex: 1.2; min-width: 140px; padding: 10px; font-size: 12px;">
+            🛠️ Montar Manualmente
+          </button>
+          <button onclick="computeAndShowWizardResults()" class="btn btn-primary" style="flex: 2; min-width: 180px; padding: 10px; font-weight: 800; font-size: 13px;">
+            🔍 Ver Modelos Recomendados
+          </button>
+        </div>
       </div>
+
+      <!-- ETAPA 3: RESULTADOS E MODELOS RECOMENDADOS -->
+      <div id="workoutAssistantResultsSection" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div>
+            <div style="font-size: 14px; font-weight: 800; color: white;">Modelos Disponíveis</div>
+            <div style="font-size: 11px; color: var(--text-grey);">Baseados nas suas preferências de rotina e dias disponíveis:</div>
+          </div>
+          <button onclick="backToQuestionnaireStep()" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px;">
+            ✏️ Alterar Respostas
+          </button>
+        </div>
+
+        <!-- Lista de até 3 cards de opções comparativas -->
+        <div id="wizardOptionsCardsList" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
+          <!-- Renderizado dinamicamente via JS -->
+        </div>
+
+        <div style="background: rgba(0,210,255,0.05); border: 1px solid rgba(0,210,255,0.2); border-radius: 10px; padding: 10px 14px; font-size: 11px; color: var(--text-grey); line-height: 1.4; margin-top: 8px;">
+          ⚠️ <strong>Nota:</strong> As opções acima são sugestões gerais de organização da rotina. Você poderá visualizar, alterar ou substituir qualquer exercício antes de iniciar.
+        </div>
+      </div>
+
+      <!-- ETAPA 4: CRIADOR MANUAL DE TREINOS -->
+      <div id="workoutAssistantManualSection" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <div>
+            <div style="font-size: 14px; font-weight: 800; color: white;">Montagem Manual de Treino</div>
+            <div style="font-size: 11px; color: var(--text-grey);">Adicione os exercícios que desejar diretamente da biblioteca oficial.</div>
+          </div>
+          <button onclick="backToGoalsStep()" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px;">
+            ⬅️ Trocar Modo
+          </button>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label">Nome da Divisão / Ficha *</label>
+          <input type="text" id="newWorkoutName" class="form-input" placeholder="ex: Treino A — Peito & Tríceps">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label">Objetivo do Treino (opcional)</label>
+          <div class="chip-container" style="margin-bottom: 0;">
+            <div class="chip focus-chip" onclick="selectFocusChip(this, 'Hipertrofia')">💪 Hipertrofia</div>
+            <div class="chip focus-chip" onclick="selectFocusChip(this, 'Condicionamento e controle de peso')">🔥 Condicionamento</div>
+            <div class="chip focus-chip" onclick="selectFocusChip(this, 'Força')">🏋️ Força</div>
+            <div class="chip focus-chip" onclick="selectFocusChip(this, 'Resistência')">⚡ Resistência</div>
+            <div class="chip focus-chip" onclick="selectFocusChip(this, 'Iniciante')">🌱 Iniciante</div>
+            <div class="chip focus-chip" onclick="selectFocusChip(this, 'Mobilidade')">🧘 Mobilidade</div>
+          </div>
+          <input type="hidden" id="newWorkoutDesc" value="">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label">Dias da Semana (opcional)</label>
+          <div class="chip-container" style="margin-bottom: 0;">
+            <div class="chip" onclick="toggleDayChip(this, 'Segunda-feira')">Segunda</div>
+            <div class="chip" onclick="toggleDayChip(this, 'Terça-feira')">Terça</div>
+            <div class="chip" onclick="toggleDayChip(this, 'Quarta-feira')">Quarta</div>
+            <div class="chip" onclick="toggleDayChip(this, 'Quinta-feira')">Quinta</div>
+            <div class="chip" onclick="toggleDayChip(this, 'Sexta-feira')">Sexta</div>
+            <div class="chip" onclick="toggleDayChip(this, 'Sábado')">Sábado</div>
+            <div class="chip" onclick="toggleDayChip(this, 'Domingo')">Domingo</div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label">Exercícios Deste Treino *</label>
+          
+          <button type="button" onclick="openExerciseLibraryForManualPick()" class="btn btn-outline" style="width: 100%; padding: 11px; font-size: 12.5px; font-weight: 800; border-style: dashed; border-color: var(--accent-cyan); color: var(--accent-cyan); margin-bottom: 10px;">
+            🔍 Selecionar Exercícios na Biblioteca ExerciseDB (~1.500 GIFs)
+          </button>
+
+          <!-- Dropdown rápido como alternativa -->
+          <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+            <select id="exerciseSelectDropdown" class="form-input" style="flex: 2; font-size: 12.5px;" onchange="handleExerciseSelectChange(this)">
+              <option value="">-- Ou escolha rápido da lista básica --</option>
+              <optgroup label="Peito">
+                <option value="Supino Reto com Barra">Supino Reto com Barra</option>
+                <option value="Supino Inclinado com Halteres">Supino Inclinado com Halteres</option>
+                <option value="Crucifixo no Crossover">Crucifixo no Crossover</option>
+                <option value="Flexão de Braços">Flexão de Braços</option>
+              </optgroup>
+              <optgroup label="Costas">
+                <option value="Puxada Frontal na Polia">Puxada Frontal na Polia</option>
+                <option value="Remada Curvada com Barra">Remada Curvada com Barra</option>
+                <option value="Remada Sentada na Polia">Remada Sentada na Polia</option>
+              </optgroup>
+              <optgroup label="Pernas">
+                <option value="Agachamento com Peso Corporal">Agachamento com Peso Corporal</option>
+                <option value="Leg Press">Leg Press</option>
+                <option value="Cadeira Extensora">Cadeira Extensora</option>
+                <option value="Mesa Flexora">Mesa Flexora</option>
+                <option value="Panturrilha em Pé">Panturrilha em Pé</option>
+              </optgroup>
+              <optgroup label="Ombros & Braços">
+                <option value="Desenvolvimento com Halteres">Desenvolvimento com Halteres</option>
+                <option value="Elevação Lateral com Halteres">Elevação Lateral com Halteres</option>
+                <option value="Rosca Direta com Barra">Rosca Direta com Barra</option>
+                <option value="Tríceps na Polia">Tríceps na Polia</option>
+              </optgroup>
+            </select>
+            <button type="button" onclick="addSelectedExerciseToWorkout()" class="btn btn-primary" style="width: auto; padding: 0 14px; font-size: 12px; font-weight: 700;">
+              + Adicionar
+            </button>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <input type="number" id="newExSeries" class="form-input" style="flex: 1; padding: 7px; font-size: 11.5px;" placeholder="Séries (padrão: 3)">
+            <input type="text" id="newExReps" class="form-input" style="flex: 1; padding: 7px; font-size: 11.5px;" placeholder="Reps (padrão: 8-12)">
+            <input type="number" id="newExRest" class="form-input" style="flex: 1; padding: 7px; font-size: 11.5px;" placeholder="Descanso s (60)">
+          </div>
+
+          <div id="selectedExercisesList" style="display: flex; flex-direction: column; gap: 8px; min-height: 40px;">
+            <!-- Exercícios adicionados aparecem aqui -->
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button onclick="closeCreateWorkoutModal()" class="btn btn-text" style="flex: 1;">Cancelar</button>
+          <button onclick="saveNewWorkout()" class="btn btn-success" style="flex: 1.5; font-weight: 800;">SALVAR TREINO</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL DE PRÉ-VISUALIZAÇÃO COMPLETA DO MODELO (PREVIEW ANTES DE ADICIONAR) -->
+  <div id="modalWorkoutPreview" class="modal-overlay" style="z-index: 100000;">
+    <div class="modal-card" style="max-width: 650px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 22px; background: #0c0e14; border: 2px solid var(--accent-cyan); box-shadow: 0 0 50px rgba(0,210,255,0.3); border-radius: 24px;">
+      
+      <!-- Cabeçalho da Pré-Visualização -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 1px solid var(--divider); padding-bottom: 12px;">
+        <div>
+          <span id="previewGoalBadge" class="wizard-step-badge">Hipertrofia</span>
+          <h3 id="previewModelTitle" style="font-size: 19px; font-weight: 900; color: white; margin: 2px 0 0 0;">Corpo Inteiro A/B (2 Dias)</h3>
+          <p id="previewModelDesc" style="font-size: 11.5px; color: var(--text-grey); margin: 3px 0 0 0;">Modelo simples e equilibrado para iniciar.</p>
+        </div>
+        <button onclick="closeWorkoutPreviewModal()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--divider); color: var(--text-grey); width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+      </div>
+
+      <!-- Metadados da Divisão -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-bottom: 14px;">
+        <div style="background: #121622; border: 1px solid var(--divider); border-radius: 8px; padding: 8px 10px;">
+          <div style="font-size: 10px; color: var(--text-grey); font-weight: 700;">FREQUÊNCIA</div>
+          <div id="previewMetaDays" style="font-size: 12.5px; font-weight: 800; color: white; margin-top: 2px;">2 dias por semana</div>
+        </div>
+        <div style="background: #121622; border: 1px solid var(--divider); border-radius: 8px; padding: 8px 10px;">
+          <div style="font-size: 10px; color: var(--text-grey); font-weight: 700;">EQUIPAMENTOS</div>
+          <div id="previewMetaEquip" style="font-size: 12.5px; font-weight: 800; color: var(--accent-cyan); margin-top: 2px;">Halteres e Polias</div>
+        </div>
+        <div style="background: #121622; border: 1px solid var(--divider); border-radius: 8px; padding: 8px 10px;">
+          <div style="font-size: 10px; color: var(--text-grey); font-weight: 700;">DURAÇÃO MÉDIA</div>
+          <div id="previewMetaDuration" style="font-size: 12.5px; font-weight: 800; color: white; margin-top: 2px;">40-50 min</div>
+        </div>
+      </div>
+
+      <!-- Lista Detalhada de Cada Dia e Exercícios -->
+      <div id="previewDaysListContainer" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px;">
+        <!-- Renderizado dinamicamente via JS -->
+      </div>
+
+      <!-- Texto Obrigatório de Saúde e Segurança -->
+      <div style="background: rgba(0,210,255,0.06); border: 1px solid rgba(0,210,255,0.25); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; font-size: 11px; color: #d0d4dc; line-height: 1.45;">
+        ⚠️ <strong>Aviso de Saúde e Segurança:</strong> Os modelos são sugestões gerais de organização e não substituem orientação individual. Escolha exercícios que você conhece, use técnica adequada e interrompa a atividade se sentir dor ou mal-estar.
+      </div>
+
+      <!-- Botões de Ação do Preview -->
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button onclick="applyPreviewModelToUserWorkouts(false)" class="btn btn-success" style="flex: 2; min-width: 170px; padding: 11px; font-weight: 900; font-size: 13px;">
+          ✅ Usar Este Modelo
+        </button>
+        <button onclick="applyPreviewModelToUserWorkouts(true)" class="btn btn-primary" style="flex: 1.5; min-width: 160px; padding: 11px; font-weight: 800; font-size: 12px;">
+          ✏️ Personalizar Antes de Salvar
+        </button>
+        <button onclick="closeWorkoutPreviewModal()" class="btn btn-outline" style="flex: 1; min-width: 110px; padding: 11px; font-size: 12px;">
+          🔄 Escolher Outro
+        </button>
+        <button onclick="closeWorkoutPreviewModal(); startManualWorkoutCreator();" class="btn btn-outline" style="flex: 1; min-width: 120px; padding: 11px; font-size: 12px;">
+          🛠️ Montar Manual
+        </button>
+      </div>
+
     </div>
   </div>
 
@@ -6816,27 +7109,431 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       select.innerHTML = optionsHtml;
     }
 
-    function openCreateWorkoutModal() {
-      document.getElementById('newWorkoutName').value = '';
-      document.getElementById('newWorkoutDesc').value = '';
-      populateWorkoutExerciseSelect();
-      
-      const customInput = document.getElementById('customExerciseInput');
-      if (customInput) { customInput.value = ''; customInput.style.display = 'none'; }
-      const seriesInput = document.getElementById('newExSeries');
-      if (seriesInput) seriesInput.value = '';
-      const repsInput = document.getElementById('newExReps');
-      if (repsInput) repsInput.value = '';
+// CATÁLOGO OFICIAL DE MODELOS DO ASSISTENTE DE TREINOS (EXERCISEDB V1)
+    const WORKOUT_ASSISTANT_CATALOG = [{"id": "tpl_fullbody_2d", "name": "Corpo Inteiro A/B (2 Dias)", "goal": "Iniciante", "experience_level": "Iniciante", "days_per_week": 2, "location": "Academia ou Casa", "description": "Modelo simples e equilibrado para iniciar, trabalhando todos os principais grupos musculares em dias alternados.", "equipments": "Halteres, Polias ou Peso Corporal", "duration": "40-50 min", "days": [{"name": "Dia A — Corpo Inteiro", "day_order": 1, "exercises": [{"displayName": "Agachamento com Peso Corporal", "searchNames": ["bodyweight squatting row", "squat", "bodyweight squat"], "id": "3xK09Sk", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Supino com Halteres / Flexão", "searchNames": ["dumbbell incline bench press", "dumbbell bench press", "push-up"], "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Sentada na Polia", "searchNames": ["cable seated row with reverse", "cable seated row", "seated row"], "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Desenvolvimento de Ombros com Halteres", "searchNames": ["dumbbell seated shoulder press", "shoulder press"], "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Direta de Bíceps", "searchNames": ["barbell curl", "dumbbell bicep curl"], "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Tríceps na Polia", "searchNames": ["cable pushdown", "triceps pushdown"], "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Prancha Abdominal", "searchNames": ["front plank with twist", "front plank", "plank"], "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}, {"name": "Dia B — Corpo Inteiro", "day_order": 2, "exercises": [{"displayName": "Leg Press", "searchNames": ["sled 45 leg press", "leg press"], "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Mesa / Cadeira Flexora", "searchNames": ["inverse leg curl", "leg curl"], "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Puxada Frontal na Polia", "searchNames": ["gentle style cable pulldown", "cable pulldown"], "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Supino Reto com Barra", "searchNames": ["barbell bench press", "bench press"], "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Elevação Lateral com Halteres", "searchNames": ["dumbbell lateral raise", "lateral raise"], "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "searchNames": ["standing calf raise", "calf raise"], "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}, {"displayName": "Abdominal Crunch", "searchNames": ["band kneeling twisting crunch", "crunch"], "id": "225x2Vd", "sets": 3, "reps": "12-15", "rest": 45}]}]}, {"id": "tpl_fullbody_3d", "name": "Corpo Inteiro (3 Variações A/B/C)", "goal": "Iniciante", "experience_level": "Iniciante", "days_per_week": 3, "location": "Academia ou Misto", "description": "Três variações de corpo inteiro alternando estímulos para recuperação ideal entre treinos.", "equipments": "Academia Completa ou Halteres e Polias", "duration": "45-55 min", "days": [{"name": "Segunda: Corpo Inteiro A", "day_order": 1, "exercises": [{"displayName": "Agachamento com Peso Corporal", "searchNames": ["bodyweight squatting row"], "id": "3xK09Sk", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Supino Reto com Barra", "searchNames": ["barbell bench press"], "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Puxada Frontal na Polia", "searchNames": ["gentle style cable pulldown"], "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Desenvolvimento com Halteres", "searchNames": ["dumbbell seated shoulder press"], "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Tríceps na Polia", "searchNames": ["cable pushdown"], "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Direta com Barra", "searchNames": ["barbell curl"], "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Prancha Abdominal", "searchNames": ["front plank with twist"], "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}, {"name": "Quarta: Corpo Inteiro B", "day_order": 2, "exercises": [{"displayName": "Leg Press", "searchNames": ["sled 45 leg press"], "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Mesa Flexora", "searchNames": ["inverse leg curl"], "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Sentada na Polia", "searchNames": ["cable seated row with reverse"], "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Supino Inclinado com Halteres", "searchNames": ["dumbbell incline bench press"], "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral com Halteres", "searchNames": ["dumbbell lateral raise"], "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "searchNames": ["standing calf raise"], "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}, {"displayName": "Abdominal Crunch", "searchNames": ["band kneeling twisting crunch"], "id": "225x2Vd", "sets": 3, "reps": "12-15", "rest": 45}]}, {"name": "Sexta: Corpo Inteiro C", "day_order": 3, "exercises": [{"displayName": "Afundo Controlado", "searchNames": ["weighted stretch lunge"], "id": "13VW2VO", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Elevação Pélvica", "searchNames": ["resistance band hip thrusts on knees"], "id": "Pjbc0Kt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Remada Curvada com Barra", "searchNames": ["barbell bent over row"], "id": "eZyBC3j", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Crucifixo no Crossover", "searchNames": ["cable cross-over variation"], "id": "0CXGHya", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Rosca Martelo com Halteres", "searchNames": ["dumbbell hammer curl v. 2"], "id": "2NpxjC1", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Tríceps Francês com Halter", "searchNames": ["dumbbell standing triceps extension"], "id": "PdmaD0N", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Elevação de Joelhos", "searchNames": ["assisted hanging knee raise"], "id": "03lzqwk", "sets": 3, "reps": "12-15", "rest": 45}]}]}, {"id": "tpl_ppl_3d", "name": "Push / Pull / Legs (3 Dias)", "goal": "Hipertrofia", "experience_level": "Intermediário", "days_per_week": 3, "location": "Academia", "description": "Divisão por padrões de movimento: empurrar (peito/ombro/tríceps), puxar (costas/bíceps) e pernas completas.", "equipments": "Academia Completa", "duration": "50-60 min", "days": [{"name": "Dia 1: Push (Peito, Ombros e Tríceps)", "day_order": 1, "exercises": [{"displayName": "Supino Reto com Barra", "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Supino Inclinado com Halteres", "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Desenvolvimento com Halteres", "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral com Halteres", "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Tríceps na Polia", "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Tríceps Francês com Halter", "id": "PdmaD0N", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Dia 2: Pull (Costas e Bíceps)", "day_order": 2, "exercises": [{"displayName": "Puxada Frontal na Polia", "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Curvada com Barra", "id": "eZyBC3j", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Remada Sentada na Polia", "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Crucifixo Inverso com Halteres", "id": "EAs3xL9", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Rosca Direta com Barra", "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Martelo com Halteres", "id": "2NpxjC1", "sets": 3, "reps": "10-12", "rest": 60}]}, {"name": "Dia 3: Legs (Pernas, Panturrilhas e Abdômen)", "day_order": 3, "exercises": [{"displayName": "Leg Press", "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Cadeira Extensora", "id": "my33uHU", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Mesa Flexora", "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}, {"displayName": "Prancha Abdominal", "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}]}, {"id": "tpl_upper_lower_4d", "name": "Superior / Inferior (4 Dias)", "goal": "Hipertrofia", "experience_level": "Intermediário", "days_per_week": 4, "location": "Academia", "description": "Opção altamente equilibrada com 2 sessões superiores e 2 sessões inferiores por semana.", "equipments": "Academia Completa", "duration": "50-60 min", "days": [{"name": "Dia 1: Parte Superior A", "day_order": 1, "exercises": [{"displayName": "Supino Reto com Barra", "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Remada Curvada com Barra", "id": "eZyBC3j", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Desenvolvimento com Halteres", "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Puxada Frontal na Polia", "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Tríceps na Polia", "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Direta com Barra", "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Dia 2: Parte Inferior A", "day_order": 2, "exercises": [{"displayName": "Leg Press", "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Mesa Flexora", "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Cadeira Extensora", "id": "my33uHU", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}, {"displayName": "Prancha Abdominal", "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}, {"name": "Dia 3: Parte Superior B", "day_order": 3, "exercises": [{"displayName": "Supino Inclinado com Halteres", "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Sentada na Polia", "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral com Halteres", "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Crucifixo no Crossover", "id": "0CXGHya", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Tríceps Francês com Halter", "id": "PdmaD0N", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Martelo com Halteres", "id": "2NpxjC1", "sets": 3, "reps": "10-12", "rest": 60}]}, {"name": "Dia 4: Parte Inferior B", "day_order": 4, "exercises": [{"displayName": "Agachamento com Peso Corporal", "id": "3xK09Sk", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Afundo Controlado", "id": "13VW2VO", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}, {"displayName": "Abdominal Crunch", "id": "225x2Vd", "sets": 3, "reps": "15-20", "rest": 45}]}]}, {"id": "tpl_abcd_4d", "name": "Divisão A/B/C/D Tradicional (4 Dias)", "goal": "Hipertrofia", "experience_level": "Intermediário", "days_per_week": 4, "location": "Academia", "description": "Foco aprofundado em peito/tríceps, costas/bíceps, pernas e ombros/abdômen.", "equipments": "Academia Completa", "duration": "50-60 min", "days": [{"name": "Treino A: Peito e Tríceps", "day_order": 1, "exercises": [{"displayName": "Supino Reto com Barra", "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Supino Inclinado com Halteres", "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Crucifixo no Crossover", "id": "0CXGHya", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Flexão de Braços", "id": "0br45wL", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Tríceps na Polia", "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Tríceps Francês com Halter", "id": "PdmaD0N", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Treino B: Costas e Bíceps", "day_order": 2, "exercises": [{"displayName": "Puxada Frontal na Polia", "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Sentada na Polia", "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Curvada com Barra", "id": "eZyBC3j", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Remada Unilateral com Halter", "id": "g9AsZ8P", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Direta com Barra", "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Martelo com Halteres", "id": "2NpxjC1", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Treino C: Pernas e Panturrilhas", "day_order": 3, "exercises": [{"displayName": "Agachamento com Peso Corporal", "id": "3xK09Sk", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Leg Press", "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Cadeira Extensora", "id": "my33uHU", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Mesa Flexora", "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Afundo Controlado", "id": "13VW2VO", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}]}, {"name": "Treino D: Ombros, Trapézio e Abdômen", "day_order": 4, "exercises": [{"displayName": "Desenvolvimento com Halteres", "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral com Halteres", "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Crucifixo Inverso", "id": "EAs3xL9", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Encolhimento com Halteres", "id": "NJzBsGJ", "sets": 3, "reps": "10-15", "rest": 60}, {"displayName": "Prancha Abdominal", "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}, {"displayName": "Abdominal Tradicional", "id": "225x2Vd", "sets": 3, "reps": "15-20", "rest": 45}, {"displayName": "Elevação de Joelhos", "id": "03lzqwk", "sets": 3, "reps": "12-15", "rest": 45}]}]}, {"id": "tpl_conditioning_circuit", "name": "Circuito Geral Leve", "goal": "Condicionamento e controle de peso", "experience_level": "Iniciante", "days_per_week": 3, "location": "Casa ou Academia", "description": "Circuito focado em condicionamento, regularidade e resistência muscular suave.", "equipments": "Peso Corporal e Elásticos / Halteres Leves", "duration": "35-45 min", "medical_note": "Este modelo prioriza condicionamento, força e regularidade. Resultados variam e não são garantidos.", "days": [{"name": "Circuito Funcional A", "day_order": 1, "exercises": [{"displayName": "Agachamento com Peso Corporal", "id": "3xK09Sk", "sets": 3, "reps": "10-15", "rest": 60}, {"displayName": "Remada Sentada / Elástico", "id": "A3P4O0R", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Flexão de Braços Adaptada", "id": "0br45wL", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Afundo Controlado", "id": "13VW2VO", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Prancha Abdominal", "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}]}, {"id": "tpl_strength_basics", "name": "Força Fundamental e Técnica", "goal": "Força", "experience_level": "Intermediário", "days_per_week": 3, "location": "Academia", "description": "Foco no aprendizado e consolidação de movimentos básicos com técnica controlada, descanso amplo e sem falha.", "equipments": "Barra, Halteres e Máquinas", "duration": "45-60 min", "days": [{"name": "Dia 1: Força Base A", "day_order": 1, "exercises": [{"displayName": "Leg Press / Agachamento", "id": "10Z2DXU", "sets": 3, "reps": "5-8", "rest": 120}, {"displayName": "Supino Reto com Barra", "id": "EIeI8Vf", "sets": 3, "reps": "5-8", "rest": 120}, {"displayName": "Remada Curvada com Barra", "id": "eZyBC3j", "sets": 3, "reps": "5-8", "rest": 120}, {"displayName": "Desenvolvimento com Halteres", "id": "f1jf47L", "sets": 3, "reps": "5-8", "rest": 120}]}, {"name": "Dia 2: Força Base B", "day_order": 2, "exercises": [{"displayName": "Puxada Frontal na Polia", "id": "0MlxeMn", "sets": 3, "reps": "5-8", "rest": 120}, {"displayName": "Mesa Flexora", "id": "0rHfvy9", "sets": 3, "reps": "6-8", "rest": 90}, {"displayName": "Supino Inclinado com Halteres", "id": "ns0SIbU", "sets": 3, "reps": "6-8", "rest": 90}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 3, "reps": "6-8", "rest": 90}]}]}, {"id": "tpl_mobility_active", "name": "Mobilidade e Postura", "goal": "Mobilidade", "experience_level": "Iniciante", "days_per_week": 2, "location": "Casa ou Ao Ar Livre", "description": "Amplitude articular suave, alívio de tensões posturais e flexibilidade funcional.", "equipments": "Peso Corporal / Colchonete", "duration": "25-35 min", "days": [{"name": "Sessão de Mobilidade e Coluna", "day_order": 1, "exercises": [{"displayName": "Prancha Abdominal com Rotação", "id": "CosupLu", "sets": 2, "reps": "30s", "rest": 45}, {"displayName": "Agachamento com Peso Corporal", "id": "3xK09Sk", "sets": 2, "reps": "10-12", "rest": 45}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 2, "reps": "10-12", "rest": 45}, {"displayName": "Elevação de Joelhos", "id": "03lzqwk", "sets": 2, "reps": "10-12", "rest": 45}]}]}, {"id": "tpl_ppl_upper_lower_5d", "name": "Push/Pull/Legs + Superior/Inferior (5 Dias)", "goal": "Hipertrofia", "experience_level": "Intermediário", "days_per_week": 5, "location": "Academia", "description": "Estrutura híbrida completa combinando 3 dias de PPL com 2 dias de estímulo Upper/Lower.", "equipments": "Academia Completa", "duration": "50-60 min", "days": [{"name": "Dia 1: Peito, Ombros e Tríceps", "day_order": 1, "exercises": [{"displayName": "Supino Reto com Barra", "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Supino Inclinado com Halteres", "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Desenvolvimento com Halteres", "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral", "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Tríceps na Polia", "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Dia 2: Costas e Bíceps", "day_order": 2, "exercises": [{"displayName": "Puxada Frontal na Polia", "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Curvada com Barra", "id": "eZyBC3j", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Remada Sentada na Polia", "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Direta com Barra", "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Martelo com Halteres", "id": "2NpxjC1", "sets": 3, "reps": "10-12", "rest": 60}]}, {"name": "Dia 3: Pernas Completas", "day_order": 3, "exercises": [{"displayName": "Leg Press", "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Cadeira Extensora", "id": "my33uHU", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Mesa Flexora", "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}]}, {"name": "Dia 4: Parte Superior", "day_order": 4, "exercises": [{"displayName": "Crucifixo no Crossover", "id": "0CXGHya", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Remada Unilateral com Halter", "id": "g9AsZ8P", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral com Halteres", "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Tríceps Francês com Halter", "id": "PdmaD0N", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Dia 5: Parte Inferior e Abdômen", "day_order": 5, "exercises": [{"displayName": "Agachamento com Peso Corporal", "id": "3xK09Sk", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}, {"displayName": "Prancha Abdominal", "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}]}, {"id": "tpl_bodypart_5d", "name": "Divisão por Grupos Musculares (5 Dias)", "goal": "Hipertrofia", "experience_level": "Intermediário", "days_per_week": 5, "location": "Academia", "description": "Estímulo focado por grupo muscular, permitindo alta concentração em cada treino sem excessos.", "equipments": "Academia Completa", "duration": "45-55 min", "days": [{"name": "Dia 1: Peito e Tríceps", "day_order": 1, "exercises": [{"displayName": "Supino Reto com Barra", "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Supino Inclinado com Halteres", "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Crucifixo no Crossover", "id": "0CXGHya", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Tríceps na Polia", "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Dia 2: Costas e Bíceps", "day_order": 2, "exercises": [{"displayName": "Puxada Frontal na Polia", "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Curvada com Barra", "id": "eZyBC3j", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Remada Sentada na Polia", "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Direta com Barra", "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Dia 3: Pernas e Panturrilhas", "day_order": 3, "exercises": [{"displayName": "Leg Press", "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Cadeira Extensora", "id": "my33uHU", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Mesa Flexora", "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}]}, {"name": "Dia 4: Ombros e Abdômen", "day_order": 4, "exercises": [{"displayName": "Desenvolvimento com Halteres", "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral com Halteres", "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Crucifixo Inverso", "id": "EAs3xL9", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Prancha Abdominal", "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}, {"name": "Dia 5: Mobilidade e Core Ativo", "day_order": 5, "exercises": [{"displayName": "Agachamento com Peso Corporal", "id": "3xK09Sk", "sets": 2, "reps": "10-12", "rest": 45}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 2, "reps": "10-12", "rest": 45}, {"displayName": "Elevação de Joelhos", "id": "03lzqwk", "sets": 2, "reps": "10-12", "rest": 45}]}]}];
 
-      selectedDays = [];
-      newWorkoutExercises = [];
-      document.querySelectorAll('#modalCreateWorkout .chip').forEach(c => c.classList.remove('active'));
-      renderNewWorkoutExercisesList();
+    let _wizardState = {
+      goal: 'Hipertrofia',
+      days: '3',
+      location: 'Academia',
+      equip: 'Academia completa',
+      experience: 'Iniciante'
+    };
+
+    let _currentPreviewTemplate = null;
+
+    function openCreateWorkoutModal() {
+      _wizardState = {
+        goal: 'Hipertrofia',
+        days: '3',
+        location: 'Academia',
+        equip: 'Academia completa',
+        experience: 'Iniciante'
+      };
+
+      const goalsSec = document.getElementById('workoutAssistantGoalsSection');
+      const questSec = document.getElementById('workoutAssistantQuestionSection');
+      const resSec = document.getElementById('workoutAssistantResultsSection');
+      const manSec = document.getElementById('workoutAssistantManualSection');
+
+      if (goalsSec) goalsSec.style.display = 'block';
+      if (questSec) questSec.style.display = 'none';
+      if (resSec) resSec.style.display = 'none';
+      if (manSec) manSec.style.display = 'none';
+
+      const badge = document.getElementById('wizardHeaderBadge');
+      if (badge) badge.innerText = 'Etapa 1 • Escolha de Objetivo';
+      const title = document.getElementById('wizardModalTitle');
+      if (title) title.innerText = '🏋️‍♂️ Assistente de Montagem de Treinos';
+      const sub = document.getElementById('wizardModalSubtitle');
+      if (sub) sub.innerText = 'Selecione seu objetivo para explorar modelos ideais ou monte um treino do seu jeito.';
+
       document.getElementById('modalCreateWorkout').classList.add('active');
     }
 
     function closeCreateWorkoutModal() {
       document.getElementById('modalCreateWorkout').classList.remove('active');
+    }
+
+    function startWorkoutWizard(goalName) {
+      _wizardState.goal = goalName;
+
+      const titleEl = document.getElementById('wizardSelectedGoalTitle');
+      if (titleEl) {
+        let icon = '💪';
+        if (goalName.includes('Condicionamento')) icon = '🔥';
+        else if (goalName === 'Força') icon = '🏋️';
+        else if (goalName === 'Resistência') icon = '⚡';
+        else if (goalName === 'Iniciante') icon = '🌱';
+        else if (goalName === 'Mobilidade') icon = '🧘';
+        titleEl.innerText = `${icon} ${goalName}`;
+      }
+
+      // Regra de segurança: se Iniciante ou Mobilidade, sugerir 2 ou 3 dias
+      if (goalName === 'Iniciante' || goalName === 'Mobilidade') {
+        _wizardState.days = '2';
+      } else if (_wizardState.days === '2') {
+        _wizardState.days = '3';
+      }
+
+      // Atualizar chips da UI
+      document.querySelectorAll('#wizardDaysContainer .chip').forEach(c => {
+        const txt = c.innerText.trim();
+        if (txt.startsWith(_wizardState.days)) c.classList.add('active');
+        else c.classList.remove('active');
+      });
+
+      // Validar aviso se 6 dias para iniciantes
+      checkInicianteDaysWarning();
+
+      const goalsSec = document.getElementById('workoutAssistantGoalsSection');
+      const questSec = document.getElementById('workoutAssistantQuestionSection');
+      const resSec = document.getElementById('workoutAssistantResultsSection');
+      const manSec = document.getElementById('workoutAssistantManualSection');
+
+      if (goalsSec) goalsSec.style.display = 'none';
+      if (questSec) questSec.style.display = 'block';
+      if (resSec) resSec.style.display = 'none';
+      if (manSec) manSec.style.display = 'none';
+
+      const badge = document.getElementById('wizardHeaderBadge');
+      if (badge) badge.innerText = 'Etapa 2 • Rotina e Dias';
+    }
+
+    function backToGoalsStep() {
+      const goalsSec = document.getElementById('workoutAssistantGoalsSection');
+      const questSec = document.getElementById('workoutAssistantQuestionSection');
+      const resSec = document.getElementById('workoutAssistantResultsSection');
+      const manSec = document.getElementById('workoutAssistantManualSection');
+
+      if (goalsSec) goalsSec.style.display = 'block';
+      if (questSec) questSec.style.display = 'none';
+      if (resSec) resSec.style.display = 'none';
+      if (manSec) manSec.style.display = 'none';
+
+      const badge = document.getElementById('wizardHeaderBadge');
+      if (badge) badge.innerText = 'Etapa 1 • Escolha de Objetivo';
+    }
+
+    function selectWizardChip(chipEl, field, val) {
+      const parent = chipEl.parentElement;
+      if (parent) {
+        parent.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      }
+      chipEl.classList.add('active');
+      _wizardState[field] = val;
+
+      checkInicianteDaysWarning();
+    }
+
+    function checkInicianteDaysWarning() {
+      const warningEl = document.getElementById('wizardDaysWarning');
+      if (!warningEl) return;
+      const is6Days = _wizardState.days === '6';
+      const isIniciante = _wizardState.experience === 'Iniciante' || _wizardState.goal === 'Iniciante';
+      if (is6Days && isIniciante) {
+        warningEl.style.display = 'block';
+      } else {
+        warningEl.style.display = 'none';
+      }
+    }
+
+    function backToQuestionnaireStep() {
+      const goalsSec = document.getElementById('workoutAssistantGoalsSection');
+      const questSec = document.getElementById('workoutAssistantQuestionSection');
+      const resSec = document.getElementById('workoutAssistantResultsSection');
+      const manSec = document.getElementById('workoutAssistantManualSection');
+
+      if (goalsSec) goalsSec.style.display = 'none';
+      if (questSec) questSec.style.display = 'block';
+      if (resSec) resSec.style.display = 'none';
+      if (manSec) manSec.style.display = 'none';
+
+      const badge = document.getElementById('wizardHeaderBadge');
+      if (badge) badge.innerText = 'Etapa 2 • Rotina e Dias';
+    }
+
+    function computeAndShowWizardResults() {
+      const requestedDays = parseInt(_wizardState.days) || 3;
+      const goal = _wizardState.goal;
+      const isBeginner = _wizardState.experience === 'Iniciante' || goal === 'Iniciante';
+
+      // Ordenar e selecionar os 2 melhores templates compatíveis
+      const scored = WORKOUT_ASSISTANT_CATALOG.map(tpl => {
+        let score = 0;
+        if (tpl.goal.toLowerCase() === goal.toLowerCase()) score += 50;
+        if (isBeginner && tpl.experience_level === 'Iniciante') score += 30;
+        if (tpl.days_per_week === requestedDays) score += 40;
+        else score -= Math.abs(tpl.days_per_week - requestedDays) * 15;
+        return { tpl, score };
+      }).sort((a, b) => b.score - a.score);
+
+      const top1 = scored[0] ? scored[0].tpl : WORKOUT_ASSISTANT_CATALOG[0];
+      const top2 = scored[1] ? scored[1].tpl : WORKOUT_ASSISTANT_CATALOG[1];
+
+      renderWizardResultsCards(top1, top2);
+
+      const goalsSec = document.getElementById('workoutAssistantGoalsSection');
+      const questSec = document.getElementById('workoutAssistantQuestionSection');
+      const resSec = document.getElementById('workoutAssistantResultsSection');
+      const manSec = document.getElementById('workoutAssistantManualSection');
+
+      if (goalsSec) goalsSec.style.display = 'none';
+      if (questSec) questSec.style.display = 'none';
+      if (resSec) resSec.style.display = 'block';
+      if (manSec) manSec.style.display = 'none';
+
+      const badge = document.getElementById('wizardHeaderBadge');
+      if (badge) badge.innerText = 'Etapa 3 • Modelos Disponíveis';
+    }
+
+    function renderWizardResultsCards(top1, top2) {
+      const container = document.getElementById('wizardOptionsCardsList');
+      if (!container) return;
+
+      const buildCard = (tpl, tagLabel, isRec = false) => {
+        const totalExercises = tpl.days.reduce((acc, d) => acc + d.exercises.length, 0);
+        const musclesSummary = tpl.days.map(d => d.name.replace(/^Dia \w+: /i, '').replace(/^Treino \w+: /i, '')).join(' • ');
+
+        return `
+          <div class="wizard-option-card ${isRec ? 'wizard-option-recommended' : ''}">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+              <div>
+                <span style="display: inline-block; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; background: ${isRec ? 'rgba(0,210,255,0.2)' : 'rgba(255,255,255,0.06)'}; color: ${isRec ? 'var(--accent-cyan)' : '#b0b8c6'};">
+                  ${tagLabel}
+                </span>
+                <h4 style="font-size: 16px; font-weight: 800; color: white; margin: 4px 0 2px 0;">${tpl.name}</h4>
+                <p style="font-size: 11.5px; color: var(--text-grey); margin: 0;">${tpl.description}</p>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; font-size: 11px; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 8px;">
+              <div><span style="color: var(--text-grey);">Frequência:</span> <strong>${tpl.days_per_week} dias/sem</strong></div>
+              <div><span style="color: var(--text-grey);">Exercícios:</span> <strong>~${totalExercises} no total</strong></div>
+              <div><span style="color: var(--text-grey);">Duração:</span> <strong>${tpl.duration || '45-60 min'}</strong></div>
+              <div><span style="color: var(--text-grey);">Nível:</span> <strong>${tpl.experience_level}</strong></div>
+            </div>
+
+            <div style="font-size: 11px; color: #a0aab8;">
+              <strong>Divisão:</strong> ${musclesSummary}
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+              <button onclick="openWorkoutPreviewModal('${tpl.id}')" class="btn btn-outline" style="flex: 1; padding: 8px 12px; font-size: 11.5px; font-weight: 700;">
+                👁️ Ver Treino
+              </button>
+              <button onclick="applyTemplateDirectly('${tpl.id}')" class="btn btn-primary" style="flex: 1.3; padding: 8px 12px; font-size: 11.5px; font-weight: 800;">
+                ✅ Usar Este Modelo
+              </button>
+            </div>
+          </div>
+        `;
+      };
+
+      const manualCard = `
+        <div class="wizard-option-card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <span style="display: inline-block; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; background: rgba(0,210,255,0.1); color: var(--accent-cyan);">
+                🛠️ Montagem Manual
+              </span>
+              <h4 style="font-size: 16px; font-weight: 800; color: white; margin: 4px 0 2px 0;">Montar Meu Próprio Treino do Zero</h4>
+              <p style="font-size: 11.5px; color: var(--text-grey); margin: 0;">Você escolhe os nomes das fichas, os dias e seleciona cada exercício diretamente na biblioteca.</p>
+            </div>
+          </div>
+          <div style="margin-top: 6px;">
+            <button onclick="startManualWorkoutCreator()" class="btn btn-outline" style="width: 100%; padding: 9px; font-size: 12px; font-weight: 700; border-color: rgba(0,210,255,0.4); color: var(--accent-cyan);">
+              🛠️ Abrir Montagem Manual
+            </button>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = `
+        ${buildCard(top1, 'Recomendado para sua seleção', true)}
+        ${top2 && top2.id !== top1.id ? buildCard(top2, 'Outra opção', false) : ''}
+        ${manualCard}
+      `;
+    }
+
+    function openWorkoutPreviewModal(templateId) {
+      const tpl = WORKOUT_ASSISTANT_CATALOG.find(t => t.id === templateId);
+      if (!tpl) return;
+
+      _currentPreviewTemplate = tpl;
+
+      const badge = document.getElementById('previewGoalBadge');
+      if (badge) badge.innerText = tpl.goal;
+      const title = document.getElementById('previewModelTitle');
+      if (title) title.innerText = tpl.name;
+      const desc = document.getElementById('previewModelDesc');
+      if (desc) desc.innerText = tpl.description;
+
+      const metaDays = document.getElementById('previewMetaDays');
+      if (metaDays) metaDays.innerText = `${tpl.days_per_week} dias por semana`;
+      const metaEquip = document.getElementById('previewMetaEquip');
+      if (metaEquip) metaEquip.innerText = tpl.equipments || 'Academia / Halteres';
+      const metaDuration = document.getElementById('previewMetaDuration');
+      if (metaDuration) metaDuration.innerText = tpl.duration || '45-60 min';
+
+      const daysContainer = document.getElementById('previewDaysListContainer');
+      if (daysContainer) {
+        daysContainer.innerHTML = tpl.days.map((d, dIdx) => `
+          <div style="background: #10141f; border: 1px solid var(--divider); border-radius: 12px; padding: 14px;">
+            <div style="font-size: 14px; font-weight: 800; color: var(--accent-cyan); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+              <span>📅</span> ${d.name} (${d.exercises.length} exercícios)
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              ${d.exercises.map((ex, exIdx) => {
+                const matched = exercisesList.find(x => x.id === ex.id || (x.nome || '').toLowerCase() === ex.displayName.toLowerCase()) || {};
+                const icon = getMuscleGroupIcon(matched.grupoMuscular || 'Geral');
+                const safeName = (ex.displayName || 'Exercício').replace(/'/g, "\\'");
+                let gifUrl = matched.gifUrl || matched.gif_url || '';
+                return `
+                  <div style="display: flex; justify-content: space-between; align-items: center; background: #080a0f; padding: 9px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                      <span style="font-size: 16px;">${icon}</span>
+                      <div style="min-width: 0;">
+                        <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                          ${exIdx + 1}. ${ex.displayName}
+                        </div>
+                        <div style="font-size: 11px; color: var(--accent-cyan); font-weight: 600;">
+                          ${ex.sets || 3} séries • ${ex.reps || '8-12'} reps • ${ex.rest || 60}s descanso
+                        </div>
+                      </div>
+                    </div>
+                    <button onclick="event.stopPropagation(); openOnlyGifModal('${safeName}')" style="background: rgba(0,210,255,0.12); border: 1px solid rgba(0,210,255,0.4); color: var(--accent-cyan); font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 6px; cursor: pointer; flex-shrink: 0;" title="Ver demonstração animada">
+                      🔍 GIF 3D
+                    </button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const modal = document.getElementById('modalWorkoutPreview');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeWorkoutPreviewModal() {
+      const modal = document.getElementById('modalWorkoutPreview');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function applyTemplateDirectly(templateId) {
+      const tpl = WORKOUT_ASSISTANT_CATALOG.find(t => t.id === templateId);
+      if (!tpl) return;
+      _currentPreviewTemplate = tpl;
+      await applyPreviewModelToUserWorkouts(false);
+    }
+
+    async function applyPreviewModelToUserWorkouts(customizeBeforeSave = false) {
+      if (!_currentPreviewTemplate) return;
+
+      closeWorkoutPreviewModal();
+
+      if (customizeBeforeSave) {
+        // Abre o criador manual pré-preenchido com os exercícios do primeiro dia para personalização prévia
+        startManualWorkoutCreator();
+        const firstDay = _currentPreviewTemplate.days[0];
+        document.getElementById('newWorkoutName').value = firstDay ? firstDay.name : _currentPreviewTemplate.name;
+        document.getElementById('newWorkoutDesc').value = _currentPreviewTemplate.goal;
+
+        if (firstDay && Array.isArray(firstDay.exercises)) {
+          newWorkoutExercises = firstDay.exercises.map((e, idx) => {
+            const matched = exercisesList.find(x => x.id === e.id || (x.nome || '').toLowerCase() === e.displayName.toLowerCase()) || {};
+            return {
+              id: e.id || `ex_${Date.now()}_${idx}`,
+              nome: e.displayName,
+              series: String(e.sets || 3),
+              reps: String(e.reps || '8-12'),
+              descanso: e.rest || 60,
+              initial_load: null,
+              grupoMuscular: matched.grupoMuscular || 'Geral',
+              gifUrl: matched.gifUrl || ''
+            };
+          });
+          renderNewWorkoutExercisesList();
+        }
+        return;
+      }
+
+      // Adição direta: cria uma ficha para cada dia do modelo
+      const uid = getEffectiveUserId();
+      const newWorkouts = _currentPreviewTemplate.days.map((d, dIdx) => {
+        const wId = `treino_${Date.now()}_${dIdx}`;
+        const mappedEx = d.exercises.map((e, exIdx) => {
+          const matched = exercisesList.find(x => x.id === e.id || (x.nome || '').toLowerCase() === e.displayName.toLowerCase()) || {};
+          return {
+            id: e.id || `ex_${wId}_${exIdx}`,
+            exercise_id: e.id,
+            nome: e.displayName,
+            name: e.displayName,
+            series: String(e.sets || 3),
+            reps: String(e.reps || '8-12'),
+            descanso: e.rest || 60,
+            initial_load: null,
+            grupoMuscular: matched.grupoMuscular || 'Geral',
+            gifUrl: matched.gifUrl || ''
+          };
+        });
+
+        return {
+          id: wId,
+          nome: d.name,
+          descricao: `${_currentPreviewTemplate.name} • ${_currentPreviewTemplate.goal}`,
+          diasSemana: [],
+          corHex: '#1E88E5',
+          exercicios: mappedEx,
+          exerciciosCount: mappedEx.length,
+          criadoEm: new Date().toISOString()
+        };
+      });
+
+      allWorkoutsList.unshift(...newWorkouts);
+
+      await saveWorkoutsToStorageAndCloud();
+
+      closeCreateWorkoutModal();
+      renderAllWorkoutsUI();
+      updateHomeScreenUI();
+
+      alert('Exercícios padrão adicionados. Você pode alterar séries, repetições, ordem e exercícios antes de iniciar.');
+    }
+
+    function startManualWorkoutCreator() {
+      const goalsSec = document.getElementById('workoutAssistantGoalsSection');
+      const questSec = document.getElementById('workoutAssistantQuestionSection');
+      const resSec = document.getElementById('workoutAssistantResultsSection');
+      const manSec = document.getElementById('workoutAssistantManualSection');
+
+      if (goalsSec) goalsSec.style.display = 'none';
+      if (questSec) questSec.style.display = 'none';
+      if (resSec) resSec.style.display = 'none';
+      if (manSec) manSec.style.display = 'block';
+
+      const badge = document.getElementById('wizardHeaderBadge');
+      if (badge) badge.innerText = 'Montagem Manual';
+      const title = document.getElementById('wizardModalTitle');
+      if (title) title.innerText = '🛠️ Montar Meu Próprio Treino';
+      const sub = document.getElementById('wizardModalSubtitle');
+      if (sub) sub.innerText = 'Configure o nome, dias e adicione exercícios da biblioteca.';
+
+      document.getElementById('newWorkoutName').value = '';
+      document.getElementById('newWorkoutDesc').value = '';
+      selectedDays = [];
+      newWorkoutExercises = [];
+      document.querySelectorAll('#workoutAssistantManualSection .chip').forEach(c => c.classList.remove('active'));
+      renderNewWorkoutExercisesList();
+    }
+
+    function openExerciseLibraryForManualPick() {
+      window._targetWorkoutForManualAdd = '__new_workout__';
+      closeCreateWorkoutModal();
+      switchTab('exercises');
+      alert('Selecione os exercícios marcando as caixas de seleção na biblioteca e clique em "Adicionar ao Treino" no rodapé.');
     }
 
     function selectFocusChip(chipEl, focusName) {
@@ -6845,10 +7542,8 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       });
       chipEl.classList.toggle('active');
       const input = document.getElementById('newWorkoutDesc');
-      if (chipEl.classList.contains('active')) {
-        input.value = focusName;
-      } else {
-        if (input.value === focusName) input.value = '';
+      if (input) {
+        input.value = chipEl.classList.contains('active') ? focusName : '';
       }
     }
 
@@ -6862,37 +7557,26 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     }
 
     function handleExerciseSelectChange(selectEl) {
-      const customInput = document.getElementById('customExerciseInput');
-      if (selectEl.value === '__custom__') {
-        customInput.style.display = 'block';
-        customInput.focus();
-      } else {
-        customInput.style.display = 'none';
-      }
+      // Dropdown de escolha rápida
     }
 
     function addSelectedExerciseToWorkout() {
       const dropdown = document.getElementById('exerciseSelectDropdown');
-      const customInput = document.getElementById('customExerciseInput');
       const seriesInput = document.getElementById('newExSeries');
       const repsInput = document.getElementById('newExReps');
+      const restInput = document.getElementById('newExRest');
 
-      let exerciseName = '';
-      if (dropdown.value === '__custom__') {
-        exerciseName = customInput.value.trim();
-      } else {
-        exerciseName = dropdown.value.trim();
-      }
+      const exerciseName = dropdown ? dropdown.value.trim() : '';
 
       if (!exerciseName) {
-        alert('Por favor, selecione um exercício da biblioteca ou digite o nome personalizado.');
+        alert('Por favor, selecione um exercício na lista.');
         return;
       }
 
-      const seriesVal = seriesInput.value.trim() ? seriesInput.value.trim() : '4';
-      const repsVal = repsInput.value.trim() ? repsInput.value.trim() : '10-12';
+      const seriesVal = seriesInput && seriesInput.value.trim() ? seriesInput.value.trim() : '3';
+      const repsVal = repsInput && repsInput.value.trim() ? repsInput.value.trim() : '8-12';
+      const restVal = restInput && restInput.value.trim() ? parseInt(restInput.value) : 60;
 
-      // Localizar o exercício correspondente na biblioteca para herdar GIF e grupo muscular
       const matchedEx = exercisesList.find(e => (e.name || e.nome || '').toLowerCase() === exerciseName.toLowerCase()) || {};
 
       newWorkoutExercises.push({
@@ -6900,16 +7584,16 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         nome: exerciseName,
         series: seriesVal,
         reps: repsVal,
+        descanso: restVal,
+        initial_load: null,
         grupoMuscular: matchedEx.grupoMuscular || 'Geral',
         gifUrl: matchedEx.gifUrl || matchedEx.gif_url || ''
       });
 
-      // Reset dos campos de exercício
-      dropdown.value = '';
-      customInput.value = '';
-      customInput.style.display = 'none';
-      seriesInput.value = '';
-      repsInput.value = '';
+      if (dropdown) dropdown.value = '';
+      if (seriesInput) seriesInput.value = '';
+      if (repsInput) repsInput.value = '';
+      if (restInput) restInput.value = '';
 
       renderNewWorkoutExercisesList();
     }
@@ -6921,36 +7605,52 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
     function renderNewWorkoutExercisesList() {
       const container = document.getElementById('selectedExercisesList');
+      if (!container) return;
+
       if (newWorkoutExercises.length === 0) {
-        container.innerHTML = `<div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px; border: 1px dashed var(--divider); border-radius: 10px;">
-          Nenhum exercício adicionado ainda. Escolha no seletor acima e clique em + Adicionar.
+        container.innerHTML = `<div style="font-size: 12px; color: var(--text-grey); text-align: center; padding: 14px; border: 1px dashed var(--divider); border-radius: 10px;">
+          Nenhum exercício adicionado ainda. Escolha no seletor acima ou toque em "Selecionar Exercícios na Biblioteca".
         </div>`;
         return;
       }
+
       container.innerHTML = newWorkoutExercises.map((ex, idx) => {
         const icon = getMuscleGroupIcon(ex.grupoMuscular);
         return `
-          <div style="display: flex; justify-content: space-between; align-items: center; background: var(--card-dark); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--divider);">
+          <div style="display: flex; justify-content: space-between; align-items: center; background: #080a0f; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--divider);">
             <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
               <span>${icon}</span>
               <div style="min-width: 0;">
-                <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ex.nome}</div>
-                <div style="font-size: 11px; color: var(--accent-cyan);">${ex.series} séries • ${ex.reps} reps</div>
+                <div style="font-size: 13px; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${idx + 1}. ${ex.nome}</div>
+                <div style="font-size: 11px; color: var(--accent-cyan);">${ex.series} séries • ${ex.reps} reps • ${ex.descanso || 60}s descanso</div>
               </div>
             </div>
-            <button onclick="removeExerciseFromNewWorkout(${idx})" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 16px; padding: 2px 6px;">🗑️</button>
+            <div style="display: flex; gap: 4px; align-items: center;">
+              <button onclick="reorderNewWorkoutExercise(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="btn-micro" title="Mover para cima">⬆️</button>
+              <button onclick="reorderNewWorkoutExercise(${idx}, 1)" ${idx === newWorkoutExercises.length - 1 ? 'disabled' : ''} class="btn-micro" title="Mover para baixo">⬇️</button>
+              <button onclick="removeExerciseFromNewWorkout(${idx})" style="background: none; border: none; color: var(--error-red); cursor: pointer; font-size: 15px; padding: 2px 4px;" title="Remover">🗑️</button>
+            </div>
           </div>
         `;
       }).join('');
     }
 
+    function reorderNewWorkoutExercise(idx, direction) {
+      const targetIdx = idx + direction;
+      if (targetIdx < 0 || targetIdx >= newWorkoutExercises.length) return;
+      const temp = newWorkoutExercises[idx];
+      newWorkoutExercises[idx] = newWorkoutExercises[targetIdx];
+      newWorkoutExercises[targetIdx] = temp;
+      renderNewWorkoutExercisesList();
+    }
+
     async function saveNewWorkout() {
       const nameInput = document.getElementById('newWorkoutName');
       const descInput = document.getElementById('newWorkoutDesc');
-      const name = nameInput.value.trim();
+      const name = nameInput ? nameInput.value.trim() : '';
 
       if (!name) {
-        alert('Por favor, digite o nome do treino (ex: Treino C — Pernas & Ombros).');
+        alert('Por favor, digite o nome do treino (ex: Treino A — Peito & Tríceps).');
         return;
       }
 
@@ -6964,95 +7664,34 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       const newWorkout = {
         id: workoutId,
         nome: name,
-        descricao: descInput.value.trim(),
+        descricao: descInput ? descInput.value.trim() : '',
         diasSemana: [...selectedDays],
         corHex: '#1E88E5',
-        exercicios: [...newWorkoutExercises],
+        exercicios: newWorkoutExercises.map((e, idx) => ({
+          id: e.id || `ex_${workoutId}_${idx}`,
+          exercise_id: e.id,
+          nome: e.nome,
+          name: e.nome,
+          series: String(e.series || 3),
+          reps: String(e.reps || '8-12'),
+          descanso: parseInt(e.descanso) || 60,
+          initial_load: null,
+          grupoMuscular: e.grupoMuscular || 'Geral',
+          gifUrl: e.gifUrl || ''
+        })),
         exerciciosCount: newWorkoutExercises.length,
         criadoEm: new Date().toISOString()
       };
 
-      // 1. Salvar na lista em memória e no localStorage por usuário
       allWorkoutsList.unshift(newWorkout);
-      const uid = getEffectiveUserId();
-      if (uid) {
-        localStorage.setItem(`titannovafit_workouts_${uid}`, JSON.stringify(allWorkoutsList));
-      }
-      localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
-      // 2. Sincronizar com Supabase se online
-      if (_supabase && uid) {
-        const clientId = (newWorkout.client_id || TitanNovaOfflineSync.generateClientId());
-        newWorkout.client_id = clientId;
+      await saveWorkoutsToStorageAndCloud();
 
-        const payload = {
-          id: workoutId,
-          user_id: uid,
-          usuario_id: uid,
-          client_id: clientId,
-          nome: name,
-          descricao: descInput.value.trim(),
-          dias_semana: selectedDays,
-          cor_hex: '#1E88E5',
-          exercicios: newWorkoutExercises.map(e => ({
-            id: e.id,
-            nome: e.nome,
-            series: e.series,
-            reps: e.reps,
-            grupoMuscular: e.grupoMuscular || 'Geral',
-            gifUrl: e.gifUrl || ''
-          })),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-
-        try {
-          showSyncStatus('saving');
-          const outcome = await TitanNovaOfflineSync.syncOperationToSupabase({
-            table: 'treinos',
-            action: 'insert',
-            payload: payload
-          }, uid);
-
-          if (outcome && outcome.success) {
-            // Sincronizar também com a tabela relacional exercicios_do_treino
-            const exRows = newWorkoutExercises.map((ex, idx) => ({
-              id: ex.id || `ex_${workoutId}_${idx}`,
-              treino_id: workoutId,
-              usuario_id: uid,
-              exercicio_id: ex.id || `ex_${idx}`,
-              ordem: idx + 1,
-              quantidade_series: parseInt(ex.series) || 4,
-              repeticoes: ex.reps || '10-12',
-              carga_inicial: 0.0,
-              descanso_segundos: 60
-            }));
-            try {
-              await _supabase.from('exercicios_do_treino').upsert(exRows);
-            } catch (_) {}
-
-            showSyncStatus('cloud_saved');
-            console.log('[Supabase] Treino salvo na nuvem com sucesso:', name);
-          } else {
-            throw outcome.error || new Error('Falha no envio do treino ao Supabase');
-          }
-        } catch (e) {
-          console.warn('[Supabase] Treino enfileirado para envio offline:', e);
-          await TitanNovaOfflineSync.enqueueOperation({
-            userId: uid,
-            table: 'treinos',
-            action: 'insert',
-            clientId: clientId,
-            payload: payload
-          });
-          showSyncStatus('pending_offline');
-        }
-      }
-
-      // 3. Atualizar a UI com o novo treino e seus exercícios montados
-      renderAllWorkoutsUI();
       closeCreateWorkoutModal();
-      showToastNotification(`🎉 Treino "${name}" criado com sucesso!`);
+      renderAllWorkoutsUI();
+      updateHomeScreenUI();
+
+      alert('Treino cadastrado com sucesso!');
     }
 
     function renderHistoryCardUI(item, prepend = false) {
