@@ -1003,33 +1003,19 @@
             <input type="password" id="authRegisterConfirmPasswordInput" class="form-input" placeholder="Repita a senha">
           </div>
 
-          <!-- CAIXAS INDEPENDENTES DE ACEITE E TERMOS LEGAIS (INICIALMENTE DESMARCADAS) -->
+          <!-- CAIXAS DE ACEITE DOS TERMOS DE USO E POLÍTICA DE PRIVACIDADE -->
           <div style="background: rgba(22, 26, 36, 0.8); border: 1px solid var(--divider); border-radius: 10px; padding: 12px; margin: 14px 0; display: flex; flex-direction: column; gap: 10px;">
             <div style="display: flex; align-items: flex-start; gap: 8px;">
               <input type="checkbox" id="authTermsCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
-              <label for="authTermsCheck" style="font-size: 11.5px; color: var(--text-white); cursor: pointer; line-height: 1.4;">
+              <label for="authTermsCheck" style="font-size: 12px; color: var(--text-white); cursor: pointer; line-height: 1.4;">
                 Li e aceito os <a href="javascript:void(0)" onclick="openTermsModal()" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700;">Termos de Uso</a>.
               </label>
             </div>
 
             <div style="display: flex; align-items: flex-start; gap: 8px;">
               <input type="checkbox" id="authPrivacyCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
-              <label for="authPrivacyCheck" style="font-size: 11.5px; color: var(--text-white); cursor: pointer; line-height: 1.4;">
-                Li a <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700;">Política de Privacidade</a>.
-              </label>
-            </div>
-
-            <div style="display: flex; align-items: flex-start; gap: 8px;">
-              <input type="checkbox" id="authAgeCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
-              <label for="authAgeCheck" style="font-size: 11.5px; color: var(--text-white); cursor: pointer; line-height: 1.4;">
-                Declaro ter pelo menos 16 anos.
-              </label>
-            </div>
-
-            <div style="display: flex; align-items: flex-start; gap: 8px;">
-              <input type="checkbox" id="authGuardianCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
-              <label for="authGuardianCheck" style="font-size: 11px; color: var(--text-grey); cursor: pointer; line-height: 1.4;">
-                Se tenho 16 ou 17 anos, confirmo que possuo autorização do meu responsável legal.
+              <label for="authPrivacyCheck" style="font-size: 12px; color: var(--text-white); cursor: pointer; line-height: 1.4;">
+                Li e aceito a <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700;">Política de Privacidade</a>.
               </label>
             </div>
           </div>
@@ -1883,13 +1869,7 @@
           <div style="display: flex; align-items: flex-start; gap: 8px;">
             <input type="checkbox" id="mandatoryPrivacyCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px;">
             <label for="mandatoryPrivacyCheck" style="font-size: 12px; color: white; cursor: pointer;">
-              Li a <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700;">Política de Privacidade</a>.
-            </label>
-          </div>
-          <div style="display: flex; align-items: flex-start; gap: 8px;">
-            <input type="checkbox" id="mandatoryAgeCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px;">
-            <label for="mandatoryAgeCheck" style="font-size: 12px; color: white; cursor: pointer;">
-              Declaro ter pelo menos 16 anos (ou possuo autorização legal se tenho 16 ou 17 anos).
+              Li e aceito a <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700;">Política de Privacidade</a>.
             </label>
           </div>
         </div>
@@ -3685,10 +3665,8 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         if (err) err.style.display = 'none';
         const t = document.getElementById('mandatoryTermsCheck');
         const p = document.getElementById('mandatoryPrivacyCheck');
-        const a = document.getElementById('mandatoryAgeCheck');
         if (t) t.checked = false;
         if (p) p.checked = false;
-        if (a) a.checked = false;
         m.style.display = 'flex';
       }
     }
@@ -3696,12 +3674,11 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     async function submitMandatoryLegalAcceptance() {
       const t = document.getElementById('mandatoryTermsCheck');
       const p = document.getElementById('mandatoryPrivacyCheck');
-      const a = document.getElementById('mandatoryAgeCheck');
       const err = document.getElementById('mandatoryLegalError');
 
-      if (!t || !t.checked || !p || !p.checked || !a || !a.checked) {
+      if (!t || !t.checked || !p || !p.checked) {
         if (err) {
-          err.innerText = 'É obrigatório marcar todas as confirmações para prosseguir.';
+          err.innerText = 'É obrigatório aceitar os Termos de Uso e a Política de Privacidade para prosseguir.';
           err.style.display = 'block';
         }
         return;
@@ -3951,8 +3928,6 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         }
 
         const privacyCheck = document.getElementById('authPrivacyCheck');
-        const ageCheck = document.getElementById('authAgeCheck');
-        const guardianCheck = document.getElementById('authGuardianCheck');
 
         if (!termsCheck || !termsCheck.checked) {
           if (regErrEl) {
@@ -3965,14 +3940,6 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         if (!privacyCheck || !privacyCheck.checked) {
           if (regErrEl) {
             regErrEl.innerText = 'É obrigatório ler e aceitar a Política de Privacidade para criar sua conta.';
-            regErrEl.style.display = 'block';
-          }
-          return;
-        }
-
-        if (!ageCheck || !ageCheck.checked) {
-          if (regErrEl) {
-            regErrEl.innerText = 'É obrigatório declarar ter pelo menos 16 anos para criar sua conta.';
             regErrEl.style.display = 'block';
           }
           return;
