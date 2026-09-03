@@ -2027,27 +2027,27 @@
     </div>
   </div>
 
-  <!-- MODAL PRINCIPAL: ASSISTENTE DE MONTAGEM DE TREINOS -->
+  <!-- MODAL PRINCIPAL: ASSISTENTE DE MONTAGEM DE TREINOS (5 ETAPAS) -->
   <div id="modalCreateWorkout" class="modal-overlay">
     <div class="modal-card" style="max-width: 680px; width: 95%; max-height: 90vh; overflow-y: auto; padding: 22px;">
       
       <!-- Cabeçalho do Assistente -->
       <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 1px solid var(--divider); padding-bottom: 12px;">
         <div>
-          <span id="wizardHeaderBadge" class="wizard-step-badge">Etapa 1 &bull; Escolha de Objetivo</span>
+          <span id="wizardHeaderBadge" class="wizard-step-badge">Etapa 1 &bull; Objetivo</span>
           <h3 id="wizardModalTitle" style="font-size: 19px; font-weight: 900; color: white; margin: 2px 0 0 0;">🏋️‍♂️ Assistente de Montagem de Treinos</h3>
-          <p id="wizardModalSubtitle" style="font-size: 11.5px; color: var(--text-grey); margin: 3px 0 0 0;">Selecione seu objetivo para explorar modelos ideais ou monte um treino do seu jeito.</p>
+          <p id="wizardModalSubtitle" style="font-size: 11.5px; color: var(--text-grey); margin: 3px 0 0 0;">Modelos compatíveis com sua seleção</p>
         </div>
         <button onclick="closeCreateWorkoutModal()" style="background: rgba(255,255,255,0.06); border: 1px solid var(--divider); color: var(--text-grey); width: 32px; height: 32px; border-radius: 50%; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
       </div>
 
-      <!-- ETAPA 1: SELEÇÃO INTERATIVA DE OBJETIVOS -->
-      <div id="workoutAssistantGoalsSection">
-        <div style="font-size: 13px; font-weight: 700; color: white; margin-bottom: 4px;">Qual é o seu objetivo principal?</div>
-        <div style="font-size: 11px; color: var(--text-grey); margin-bottom: 12px;">Toque em um objetivo para ver recomendações estruturadas para sua rotina:</div>
+      <!-- ETAPA 1: OBJETIVO (Iniciante removido!) -->
+      <div id="wizardStep1Section">
+        <div style="font-size: 13.5px; font-weight: 800; color: white; margin-bottom: 4px;">Qual é o seu objetivo principal?</div>
+        <div style="font-size: 11.5px; color: var(--text-grey); margin-bottom: 14px;">Selecione seu foco de treino para explorar modelos compatíveis:</div>
         
         <div class="assistant-goals-grid">
-          <button type="button" class="assistant-goal-btn" onclick="startWorkoutWizard('Hipertrofia')">
+          <button type="button" class="assistant-goal-btn" onclick="wizardSelectGoal('Hipertrofia')">
             <span class="goal-icon">💪</span>
             <div>
               <div class="goal-title">Hipertrofia</div>
@@ -2055,39 +2055,31 @@
             </div>
           </button>
 
-          <button type="button" class="assistant-goal-btn" onclick="startWorkoutWizard('Condicionamento e controle de peso')">
+          <button type="button" class="assistant-goal-btn" onclick="wizardSelectGoal('Condicionamento físico')">
             <span class="goal-icon">🔥</span>
             <div>
-              <div class="goal-title">Condicionamento e controle de peso</div>
-              <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Regularidade, saúde cardiovascular e capacidade física</div>
+              <div class="goal-title">Condicionamento físico</div>
+              <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Aptidão cardiorrespiratória, resistência geral e bem-estar</div>
             </div>
           </button>
 
-          <button type="button" class="assistant-goal-btn" onclick="startWorkoutWizard('Força')">
+          <button type="button" class="assistant-goal-btn" onclick="wizardSelectGoal('Força')">
             <span class="goal-icon">🏋️</span>
             <div>
               <div class="goal-title">Força</div>
-              <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Movimentos básicos com técnica e cadência controlada</div>
+              <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Técnica e movimentos básicos com cadência controlada</div>
             </div>
           </button>
 
-          <button type="button" class="assistant-goal-btn" onclick="startWorkoutWizard('Resistência')">
+          <button type="button" class="assistant-goal-btn" onclick="wizardSelectGoal('Resistência muscular')">
             <span class="goal-icon">⚡</span>
             <div>
-              <div class="goal-title">Resistência</div>
-              <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Circuitos funcionais e resistência muscular</div>
+              <div class="goal-title">Resistência muscular</div>
+              <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Capacidade de repetições e circuitos funcionais</div>
             </div>
           </button>
 
-          <button type="button" class="assistant-goal-btn" onclick="startWorkoutWizard('Iniciante')">
-            <span class="goal-icon">🌱</span>
-            <div>
-              <div class="goal-title">Iniciante</div>
-              <div style="font-size: 11px; color: var(--text-grey); margin-top: 2px;">Rotinas simples e seguras para começar bem</div>
-            </div>
-          </button>
-
-          <button type="button" class="assistant-goal-btn" onclick="startWorkoutWizard('Mobilidade')">
+          <button type="button" class="assistant-goal-btn" onclick="wizardSelectGoal('Mobilidade')">
             <span class="goal-icon">🧘</span>
             <div>
               <div class="goal-title">Mobilidade</div>
@@ -2105,111 +2097,226 @@
         </div>
       </div>
 
-      <!-- ETAPA 2: QUESTIONÁRIO DA ROTINA -->
-      <div id="workoutAssistantQuestionSection" style="display: none;">
-        <div style="background: rgba(0,210,255,0.06); border: 1px solid rgba(0,210,255,0.2); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <div style="font-size: 10.5px; color: var(--text-grey); text-transform: uppercase; font-weight: 700;">Objetivo Selecionado</div>
-            <div id="wizardSelectedGoalTitle" style="font-size: 14px; font-weight: 800; color: var(--accent-cyan); margin-top: 2px;">💪 Hipertrofia</div>
-          </div>
-          <button onclick="backToGoalsStep()" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px;">Trocar</button>
+      <!-- ETAPA 2: NÍVEL DE EXPERIÊNCIA -->
+      <div id="wizardStep2Section" style="display: none;">
+        <!-- Aviso Obrigatório de Segurança -->
+        <div style="background: rgba(0,210,255,0.06); border: 1px solid rgba(0,210,255,0.25); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; font-size: 11px; color: #d0d4dc; line-height: 1.45;">
+          🛡️ <strong>Aviso Importante:</strong> O nível indica experiência com treinamento, não capacidade física ou valor pessoal. Os modelos são sugestões gerais e podem ser modificados. Interrompa o exercício em caso de dor ou mal-estar e procure orientação qualificada quando necessário.
         </div>
 
-        <div style="font-size: 15px; font-weight: 800; color: white; margin-bottom: 14px;">Qual modelo combina com sua rotina?</div>
+        <div style="font-size: 14px; font-weight: 800; color: white; margin-bottom: 4px;">Qual é seu nível atual de experiência?</div>
+        <div style="font-size: 11.5px; color: var(--text-grey); margin-bottom: 14px;">Isso garante um volume semanal, quantidade de séries e descansos adequados:</div>
 
-        <!-- Pergunta 1: Quantos dias por semana? -->
-        <div class="form-group" style="margin-bottom: 16px;">
-          <label class="form-label" style="font-size: 12px; font-weight: 700; color: #e0e4ec;">1. Quantos dias por semana você pretende treinar?</label>
-          <div class="chip-container" id="wizardDaysContainer" style="margin-bottom: 4px;">
-            <div class="chip active" onclick="selectWizardChip(this, 'days', '2')">2 dias</div>
-            <div class="chip" onclick="selectWizardChip(this, 'days', '3')">3 dias</div>
-            <div class="chip" onclick="selectWizardChip(this, 'days', '4')">4 dias</div>
-            <div class="chip" onclick="selectWizardChip(this, 'days', '5')">5 dias</div>
-            <div class="chip" onclick="selectWizardChip(this, 'days', '6')">6 dias</div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+          <div class="wizard-option-card" onclick="wizardSelectExperience('beginner')" style="cursor: pointer;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h4 style="font-size: 15px; font-weight: 800; color: white; margin: 0;">🌱 Iniciante</h4>
+              <span class="wizard-step-badge" style="margin: 0;">2 a 4 dias</span>
+            </div>
+            <p style="font-size: 11.5px; color: var(--text-grey); margin: 6px 0 0 0; line-height: 1.4;">
+              Está começando, retornando após uma pausa ou ainda está aprendendo a execução dos principais exercícios.
+            </p>
           </div>
-          <div id="wizardDaysWarning" style="display: none; font-size: 11px; color: #ffb74d; margin-top: 4px;">
-            ⚠️ Para iniciantes, recomenda-se começar com 2 a 3 dias por semana para adaptação segura.
-          </div>
-        </div>
 
-        <!-- Pergunta 2: Onde pretende treinar? -->
-        <div class="form-group" style="margin-bottom: 16px;">
-          <label class="form-label" style="font-size: 12px; font-weight: 700; color: #e0e4ec;">2. Onde pretende treinar?</label>
-          <div class="chip-container" id="wizardLocationContainer" style="margin-bottom: 0;">
-            <div class="chip active" onclick="selectWizardChip(this, 'location', 'Academia')">Academia</div>
-            <div class="chip" onclick="selectWizardChip(this, 'location', 'Casa')">Casa</div>
-            <div class="chip" onclick="selectWizardChip(this, 'location', 'Ao ar livre')">Ao ar livre</div>
-            <div class="chip" onclick="selectWizardChip(this, 'location', 'Misto')">Misto</div>
+          <div class="wizard-option-card" onclick="wizardSelectExperience('intermediate')" style="cursor: pointer;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h4 style="font-size: 15px; font-weight: 800; color: white; margin: 0;">🏋️‍♂️ Intermediário</h4>
+              <span class="wizard-step-badge" style="margin: 0;">2 a 5 dias</span>
+            </div>
+            <p style="font-size: 11.5px; color: var(--text-grey); margin: 6px 0 0 0; line-height: 1.4;">
+              Treina regularmente, conhece os exercícios básicos e consegue manter uma rotina com boa execução.
+            </p>
           </div>
-        </div>
 
-        <!-- Pergunta 3: Quais equipamentos estão disponíveis? -->
-        <div class="form-group" style="margin-bottom: 16px;">
-          <label class="form-label" style="font-size: 12px; font-weight: 700; color: #e0e4ec;">3. Quais equipamentos estão disponíveis?</label>
-          <div class="chip-container" id="wizardEquipContainer" style="margin-bottom: 0;">
-            <div class="chip active" onclick="selectWizardChip(this, 'equip', 'Academia completa')">Academia completa</div>
-            <div class="chip" onclick="selectWizardChip(this, 'equip', 'Halteres')">Halteres</div>
-            <div class="chip" onclick="selectWizardChip(this, 'equip', 'Barra e anilhas')">Barra e anilhas</div>
-            <div class="chip" onclick="selectWizardChip(this, 'equip', 'Elásticos')">Elásticos</div>
-            <div class="chip" onclick="selectWizardChip(this, 'equip', 'Máquinas')">Máquinas</div>
-            <div class="chip" onclick="selectWizardChip(this, 'equip', 'Peso corporal')">Peso corporal</div>
+          <div class="wizard-option-card" onclick="wizardSelectExperience('advanced')" style="cursor: pointer;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h4 style="font-size: 15px; font-weight: 800; color: white; margin: 0;">⚡ Avançado</h4>
+              <span class="wizard-step-badge" style="margin: 0;">3 a 6 dias</span>
+            </div>
+            <p style="font-size: 11.5px; color: var(--text-grey); margin: 6px 0 0 0; line-height: 1.4;">
+              Possui experiência consistente, boa técnica e conhece como controlar volume, recuperação e intensidade.
+            </p>
           </div>
-        </div>
 
-        <!-- Pergunta 4: Qual é o nível de experiência? (Avançado NUNCA padrão) -->
-        <div class="form-group" style="margin-bottom: 18px;">
-          <label class="form-label" style="font-size: 12px; font-weight: 700; color: #e0e4ec;">4. Qual é o seu nível de experiência na musculação?</label>
-          <div class="chip-container" id="wizardExpContainer" style="margin-bottom: 0;">
-            <div class="chip active" onclick="selectWizardChip(this, 'experience', 'Iniciante')">Iniciante</div>
-            <div class="chip" onclick="selectWizardChip(this, 'experience', 'Intermediário')">Intermediário</div>
-            <div class="chip" onclick="selectWizardChip(this, 'experience', 'Avançado')">Avançado</div>
+          <div class="wizard-option-card" onclick="openExperienceQuiz()" style="cursor: pointer; border-color: rgba(0,210,255,0.4); background: rgba(0,210,255,0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h4 style="font-size: 15px; font-weight: 800; color: var(--accent-cyan); margin: 0;">❓ Não sei meu nível</h4>
+              <span class="wizard-step-badge" style="background: rgba(0,210,255,0.2); color: var(--accent-cyan); margin: 0;">Quiz Rápido</span>
+            </div>
+            <p style="font-size: 11.5px; color: #a0c4dc; margin: 6px 0 0 0; line-height: 1.4;">
+              Responder algumas perguntas para receber uma indicação.
+            </p>
           </div>
         </div>
 
-        <!-- Botões de Ação do Questionário -->
-        <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
-          <button onclick="backToGoalsStep()" class="btn btn-outline" style="flex: 1; min-width: 120px; padding: 10px; font-size: 12px;">
+        <button onclick="wizardGoToStep(1)" class="btn btn-outline" style="width: 100%; padding: 10px; font-size: 12px;">
+          ⬅️ Voltar aos Objetivos
+        </button>
+      </div>
+
+      <!-- SUB-ETAPA: QUIZ DE IDENTIFICAÇÃO DE NÍVEL -->
+      <div id="wizardQuizSection" style="display: none;">
+        <div style="font-size: 14px; font-weight: 800; color: white; margin-bottom: 4px;">Identificação de Nível de Experiência</div>
+        <div style="font-size: 11px; color: var(--text-grey); margin-bottom: 14px;">Responda às 5 perguntas abaixo (sem perguntas sobre peso, medidas ou fotos):</div>
+
+        <!-- Pergunta 1 -->
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label" style="font-size: 11.5px; font-weight: 700;">1. Há quanto tempo treina regularmente?</label>
+          <div class="chip-container" id="quizQ1Container">
+            <div class="chip active" onclick="selectQuizChip(this, 'trainingMonths', 3)">Menos de 6 meses</div>
+            <div class="chip" onclick="selectQuizChip(this, 'trainingMonths', 12)">6 a 23 meses</div>
+            <div class="chip" onclick="selectQuizChip(this, 'trainingMonths', 36)">24 meses ou mais</div>
+          </div>
+        </div>
+
+        <!-- Pergunta 2 -->
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label" style="font-size: 11.5px; font-weight: 700;">2. Quantos dias por semana costuma treinar?</label>
+          <div class="chip-container" id="quizQ2Container">
+            <div class="chip active" onclick="selectQuizChip(this, 'daysPerWeek', 2)">1 a 2 dias</div>
+            <div class="chip" onclick="selectQuizChip(this, 'daysPerWeek', 4)">3 a 4 dias</div>
+            <div class="chip" onclick="selectQuizChip(this, 'daysPerWeek', 5)">5 ou mais dias</div>
+          </div>
+        </div>
+
+        <!-- Pergunta 3 -->
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label" style="font-size: 11.5px; font-weight: 700;">3. Conhece a execução dos exercícios básicos?</label>
+          <div class="chip-container" id="quizQ3Container">
+            <div class="chip" onclick="selectQuizChip(this, 'knowsBasicTechnique', true)">Sim, executo com boa técnica</div>
+            <div class="chip active" onclick="selectQuizChip(this, 'knowsBasicTechnique', false)">Não, ainda estou aprendendo</div>
+          </div>
+        </div>
+
+        <!-- Pergunta 4 -->
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label" style="font-size: 11.5px; font-weight: 700;">4. Consegue manter uma rotina sem dores ou desconfortos?</label>
+          <div class="chip-container" id="quizQ4Container">
+            <div class="chip active" onclick="selectQuizChip(this, 'controlsVolumeAndRecovery', true)">Sim, rotina confortável</div>
+            <div class="chip" onclick="selectQuizChip(this, 'controlsVolumeAndRecovery', false)">Não, sinto dores frequentes</div>
+          </div>
+        </div>
+
+        <!-- Pergunta 5 -->
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" style="font-size: 11.5px; font-weight: 700;">5. Está retornando depois de uma pausa superior a dois meses?</label>
+          <div class="chip-container" id="quizQ5Container">
+            <div class="chip active" onclick="selectQuizChip(this, 'returningAfterLongBreak', true)">Sim, estou retornando</div>
+            <div class="chip" onclick="selectQuizChip(this, 'returningAfterLongBreak', false)">Não, treino contínuo</div>
+          </div>
+        </div>
+
+        <!-- Área de Resultado do Quiz -->
+        <div id="quizResultBox" style="background: rgba(0,210,255,0.08); border: 1px solid rgba(0,210,255,0.3); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px;">
+          <div style="font-size: 11px; color: var(--text-grey); font-weight: 700; text-transform: uppercase;">Indicação Inicial Sugerida</div>
+          <div id="quizSuggestedLevelText" style="font-size: 15px; font-weight: 900; color: var(--accent-cyan); margin: 3px 0;">🌱 Iniciante</div>
+          <p style="font-size: 11px; color: #d0d4dc; margin: 0; line-height: 1.4;">
+            Apresentamos isso apenas como uma sugestão para sua adaptação com segurança. Você pode confirmar ou alterar manualmente.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button onclick="wizardGoToStep(2)" class="btn btn-outline" style="flex: 1; min-width: 100px; padding: 10px; font-size: 12px;">
             ⬅️ Voltar
           </button>
-          <button onclick="startManualWorkoutCreator()" class="btn btn-outline" style="flex: 1.2; min-width: 140px; padding: 10px; font-size: 12px;">
-            🛠️ Montar Manualmente
-          </button>
-          <button onclick="computeAndShowWizardResults()" class="btn btn-primary" style="flex: 2; min-width: 180px; padding: 10px; font-weight: 800; font-size: 13px;">
-            🔍 Ver Modelos Recomendados
+          <button onclick="confirmQuizLevel()" class="btn btn-primary" style="flex: 2; min-width: 180px; padding: 10px; font-weight: 800; font-size: 12.5px;">
+            ✅ Confirmar Nível e Continuar
           </button>
         </div>
       </div>
 
-      <!-- ETAPA 3: RESULTADOS E MODELOS RECOMENDADOS -->
-      <div id="workoutAssistantResultsSection" style="display: none;">
+      <!-- ETAPA 3: DIAS DISPONÍVEIS (Coerentes por nível!) -->
+      <div id="wizardStep3Section" style="display: none;">
+        <div style="font-size: 14px; font-weight: 800; color: white; margin-bottom: 4px;">Quantos dias por semana pretende treinar?</div>
+        <div style="font-size: 11.5px; color: var(--text-grey); margin-bottom: 14px;">Opções coerentes com seu nível de experiência:</div>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <div class="chip-container" id="wizardCoherentDaysContainer">
+            <!-- Renderizado dinamicamente pelo nível -->
+          </div>
+          <div id="wizard6DaysNotice" style="display: none; font-size: 11px; color: #ffb74d; margin-top: 6px; background: rgba(255,183,77,0.1); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,183,77,0.3);">
+            ⚠️ Para 6 dias, a recuperação planejada e o controle de fadiga são essenciais. Não force se sentir cansaço acumulado.
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 20px;">
+          <button onclick="wizardGoToStep(2)" class="btn btn-outline" style="flex: 1; padding: 10px; font-size: 12px;">
+            ⬅️ Voltar
+          </button>
+          <button onclick="wizardGoToStep(4)" class="btn btn-primary" style="flex: 1.5; padding: 10px; font-weight: 800; font-size: 12.5px;">
+            Avançar ➡️
+          </button>
+        </div>
+      </div>
+
+      <!-- ETAPA 4: LOCAL E EQUIPAMENTOS -->
+      <div id="wizardStep4Section" style="display: none;">
+        <div style="font-size: 14px; font-weight: 800; color: white; margin-bottom: 4px;">Onde e com quais equipamentos?</div>
+        <div style="font-size: 11.5px; color: var(--text-grey); margin-bottom: 14px;">Os exercícios serão adaptados aos equipamentos que você tem:</div>
+
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Local do Treino</label>
+          <div class="chip-container" id="wizardLocationContainer">
+            <div class="chip active" onclick="selectWizardSingleChip(this, 'location', 'Academia completa')">Academia completa</div>
+            <div class="chip" onclick="selectWizardSingleChip(this, 'location', 'Casa')">Casa</div>
+            <div class="chip" onclick="selectWizardSingleChip(this, 'location', 'Ar livre')">Ar livre</div>
+            <div class="chip" onclick="selectWizardSingleChip(this, 'location', 'Misto')">Misto</div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label" style="font-size: 11.5px; font-weight: 700;">Equipamentos Disponíveis (selecione quantos desejar)</label>
+          <div class="chip-container" id="wizardEquipmentMultiContainer">
+            <div class="chip active" onclick="toggleWizardEquipment(this, 'Peso corporal')">Peso corporal</div>
+            <div class="chip active" onclick="toggleWizardEquipment(this, 'Halteres')">Halteres</div>
+            <div class="chip active" onclick="toggleWizardEquipment(this, 'Barra')">Barra</div>
+            <div class="chip active" onclick="toggleWizardEquipment(this, 'Polias')">Polias</div>
+            <div class="chip active" onclick="toggleWizardEquipment(this, 'Máquinas')">Máquinas</div>
+            <div class="chip" onclick="toggleWizardEquipment(this, 'Elásticos')">Elásticos</div>
+            <div class="chip active" onclick="toggleWizardEquipment(this, 'Banco')">Banco</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 20px;">
+          <button onclick="wizardGoToStep(3)" class="btn btn-outline" style="flex: 1; padding: 10px; font-size: 12px;">
+            ⬅️ Voltar
+          </button>
+          <button onclick="computeAndShowWizardResultsV2()" class="btn btn-primary" style="flex: 2; padding: 10px; font-weight: 800; font-size: 13px;">
+            🔍 Ver Modelos Compatíveis
+          </button>
+        </div>
+      </div>
+
+      <!-- ETAPA 5: RESULTADOS (MODELOS COMPATÍVEIS COM SUA SELEÇÃO) -->
+      <div id="wizardStep5Section" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
           <div>
-            <div style="font-size: 14px; font-weight: 800; color: white;">Modelos Disponíveis</div>
-            <div style="font-size: 11px; color: var(--text-grey);">Baseados nas suas preferências de rotina e dias disponíveis:</div>
+            <div style="font-size: 14px; font-weight: 800; color: white;">Modelos compatíveis com sua seleção</div>
+            <div style="font-size: 11px; color: var(--text-grey);">Baseados nas escolhas de objetivo, nível e dias disponíveis:</div>
           </div>
-          <button onclick="backToQuestionnaireStep()" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px;">
-            ✏️ Alterar Respostas
+          <button onclick="wizardGoToStep(4)" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px;">
+            ✏️ Alterar
           </button>
         </div>
 
-        <!-- Lista de até 3 cards de opções comparativas -->
+        <!-- Lista com até 3 cards de modelos estruturados -->
         <div id="wizardOptionsCardsList" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
           <!-- Renderizado dinamicamente via JS -->
         </div>
 
-        <div style="background: rgba(0,210,255,0.05); border: 1px solid rgba(0,210,255,0.2); border-radius: 10px; padding: 10px 14px; font-size: 11px; color: var(--text-grey); line-height: 1.4; margin-top: 8px;">
-          ⚠️ <strong>Nota:</strong> As opções acima são sugestões gerais de organização da rotina. Você poderá visualizar, alterar ou substituir qualquer exercício antes de iniciar.
+        <div style="background: rgba(0,210,255,0.05); border: 1px solid rgba(0,210,255,0.2); border-radius: 10px; padding: 10px 14px; font-size: 11px; color: var(--text-grey); line-height: 1.4;">
+          🛡️ <strong>Lembrete Ético:</strong> Os modelos são pontos de partida editáveis. Você pode visualizar e personalizar qualquer série, exercício ou repetição antes de iniciar.
         </div>
       </div>
 
-      <!-- ETAPA 4: CRIADOR MANUAL DE TREINOS -->
+      <!-- ETAPA EXTRA: MONTAGEM MANUAL LIVRE -->
       <div id="workoutAssistantManualSection" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
           <div>
             <div style="font-size: 14px; font-weight: 800; color: white;">Montagem Manual de Treino</div>
-            <div style="font-size: 11px; color: var(--text-grey);">Adicione os exercícios que desejar diretamente da biblioteca oficial.</div>
+            <div style="font-size: 11px; color: var(--text-grey);">Crie sua ficha do zero e adicione exercícios da biblioteca oficial.</div>
           </div>
-          <button onclick="backToGoalsStep()" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px;">
+          <button onclick="wizardGoToStep(1)" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px;">
             ⬅️ Trocar Modo
           </button>
         </div>
@@ -2223,10 +2330,9 @@
           <label class="form-label">Objetivo do Treino (opcional)</label>
           <div class="chip-container" style="margin-bottom: 0;">
             <div class="chip focus-chip" onclick="selectFocusChip(this, 'Hipertrofia')">💪 Hipertrofia</div>
-            <div class="chip focus-chip" onclick="selectFocusChip(this, 'Condicionamento e controle de peso')">🔥 Condicionamento</div>
+            <div class="chip focus-chip" onclick="selectFocusChip(this, 'Condicionamento físico')">🔥 Condicionamento</div>
             <div class="chip focus-chip" onclick="selectFocusChip(this, 'Força')">🏋️ Força</div>
-            <div class="chip focus-chip" onclick="selectFocusChip(this, 'Resistência')">⚡ Resistência</div>
-            <div class="chip focus-chip" onclick="selectFocusChip(this, 'Iniciante')">🌱 Iniciante</div>
+            <div class="chip focus-chip" onclick="selectFocusChip(this, 'Resistência muscular')">⚡ Resistência</div>
             <div class="chip focus-chip" onclick="selectFocusChip(this, 'Mobilidade')">🧘 Mobilidade</div>
           </div>
           <input type="hidden" id="newWorkoutDesc" value="">
@@ -2252,7 +2358,6 @@
             🔍 Selecionar Exercícios na Biblioteca ExerciseDB (~1.500 GIFs)
           </button>
 
-          <!-- Dropdown rápido como alternativa -->
           <div style="display: flex; gap: 8px; margin-bottom: 8px;">
             <select id="exerciseSelectDropdown" class="form-input" style="flex: 2; font-size: 12.5px;" onchange="handleExerciseSelectChange(this)">
               <option value="">-- Ou escolha rápido da lista básica --</option>
@@ -7118,45 +7223,39 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       select.innerHTML = optionsHtml;
     }
 
-// CATÁLOGO OFICIAL DE MODELOS DO ASSISTENTE DE TREINOS (EXERCISEDB V1)
-    const WORKOUT_ASSISTANT_CATALOG = [{"id": "tpl_fullbody_2d", "name": "Corpo Inteiro A/B (2 Dias)", "goal": "Iniciante", "experience_level": "Iniciante", "days_per_week": 2, "location": "Academia ou Casa", "description": "Modelo simples e equilibrado para iniciar, trabalhando todos os principais grupos musculares em dias alternados.", "equipments": "Halteres, Polias ou Peso Corporal", "duration": "40-50 min", "days": [{"name": "Dia A — Corpo Inteiro", "day_order": 1, "exercises": [{"displayName": "Agachamento com Peso Corporal", "searchNames": ["bodyweight squatting row", "squat", "bodyweight squat"], "id": "3xK09Sk", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Supino com Halteres / Flexão", "searchNames": ["dumbbell incline bench press", "dumbbell bench press", "push-up"], "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Sentada na Polia", "searchNames": ["cable seated row with reverse", "cable seated row", "seated row"], "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Desenvolvimento de Ombros com Halteres", "searchNames": ["dumbbell seated shoulder press", "shoulder press"], "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Direta de Bíceps", "searchNames": ["barbell curl", "dumbbell bicep curl"], "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Tríceps na Polia", "searchNames": ["cable pushdown", "triceps pushdown"], "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Prancha Abdominal", "searchNames": ["front plank with twist", "front plank", "plank"], "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}, {"name": "Dia B — Corpo Inteiro", "day_order": 2, "exercises": [{"displayName": "Leg Press", "searchNames": ["sled 45 leg press", "leg press"], "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Mesa / Cadeira Flexora", "searchNames": ["inverse leg curl", "leg curl"], "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Puxada Frontal na Polia", "searchNames": ["gentle style cable pulldown", "cable pulldown"], "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Supino Reto com Barra", "searchNames": ["barbell bench press", "bench press"], "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Elevação Lateral com Halteres", "searchNames": ["dumbbell lateral raise", "lateral raise"], "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "searchNames": ["standing calf raise", "calf raise"], "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}, {"displayName": "Abdominal Crunch", "searchNames": ["band kneeling twisting crunch", "crunch"], "id": "225x2Vd", "sets": 3, "reps": "12-15", "rest": 45}]}]}, {"id": "tpl_fullbody_3d", "name": "Corpo Inteiro (3 Variações A/B/C)", "goal": "Iniciante", "experience_level": "Iniciante", "days_per_week": 3, "location": "Academia ou Misto", "description": "Três variações de corpo inteiro alternando estímulos para recuperação ideal entre treinos.", "equipments": "Academia Completa ou Halteres e Polias", "duration": "45-55 min", "days": [{"name": "Segunda: Corpo Inteiro A", "day_order": 1, "exercises": [{"displayName": "Agachamento com Peso Corporal", "searchNames": ["bodyweight squatting row"], "id": "3xK09Sk", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Supino Reto com Barra", "searchNames": ["barbell bench press"], "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Puxada Frontal na Polia", "searchNames": ["gentle style cable pulldown"], "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Desenvolvimento com Halteres", "searchNames": ["dumbbell seated shoulder press"], "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Tríceps na Polia", "searchNames": ["cable pushdown"], "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Direta com Barra", "searchNames": ["barbell curl"], "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Prancha Abdominal", "searchNames": ["front plank with twist"], "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}, {"name": "Quarta: Corpo Inteiro B", "day_order": 2, "exercises": [{"displayName": "Leg Press", "searchNames": ["sled 45 leg press"], "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Mesa Flexora", "searchNames": ["inverse leg curl"], "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Sentada na Polia", "searchNames": ["cable seated row with reverse"], "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Supino Inclinado com Halteres", "searchNames": ["dumbbell incline bench press"], "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral com Halteres", "searchNames": ["dumbbell lateral raise"], "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "searchNames": ["standing calf raise"], "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}, {"displayName": "Abdominal Crunch", "searchNames": ["band kneeling twisting crunch"], "id": "225x2Vd", "sets": 3, "reps": "12-15", "rest": 45}]}, {"name": "Sexta: Corpo Inteiro C", "day_order": 3, "exercises": [{"displayName": "Afundo Controlado", "searchNames": ["weighted stretch lunge"], "id": "13VW2VO", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Elevação Pélvica", "searchNames": ["resistance band hip thrusts on knees"], "id": "Pjbc0Kt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Remada Curvada com Barra", "searchNames": ["barbell bent over row"], "id": "eZyBC3j", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Crucifixo no Crossover", "searchNames": ["cable cross-over variation"], "id": "0CXGHya", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Rosca Martelo com Halteres", "searchNames": ["dumbbell hammer curl v. 2"], "id": "2NpxjC1", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Tríceps Francês com Halter", "searchNames": ["dumbbell standing triceps extension"], "id": "PdmaD0N", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Elevação de Joelhos", "searchNames": ["assisted hanging knee raise"], "id": "03lzqwk", "sets": 3, "reps": "12-15", "rest": 45}]}]}, {"id": "tpl_ppl_3d", "name": "Push / Pull / Legs (3 Dias)", "goal": "Hipertrofia", "experience_level": "Intermediário", "days_per_week": 3, "location": "Academia", "description": "Divisão por padrões de movimento: empurrar (peito/ombro/tríceps), puxar (costas/bíceps) e pernas completas.", "equipments": "Academia Completa", "duration": "50-60 min", "days": [{"name": "Dia 1: Push (Peito, Ombros e Tríceps)", "day_order": 1, "exercises": [{"displayName": "Supino Reto com Barra", "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Supino Inclinado com Halteres", "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Desenvolvimento com Halteres", "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral com Halteres", "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Tríceps na Polia", "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Tríceps Francês com Halter", "id": "PdmaD0N", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Dia 2: Pull (Costas e Bíceps)", "day_order": 2, "exercises": [{"displayName": "Puxada Frontal na Polia", "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Curvada com Barra", "id": "eZyBC3j", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Remada Sentada na Polia", "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Crucifixo Inverso com Halteres", "id": "EAs3xL9", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Rosca Direta com Barra", "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Martelo com Halteres", "id": "2NpxjC1", "sets": 3, "reps": "10-12", "rest": 60}]}, {"name": "Dia 3: Legs (Pernas, Panturrilhas e Abdômen)", "day_order": 3, "exercises": [{"displayName": "Leg Press", "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Cadeira Extensora", "id": "my33uHU", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Mesa Flexora", "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}, {"displayName": "Prancha Abdominal", "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}]}, {"id": "tpl_upper_lower_4d", "name": "Superior / Inferior (4 Dias)", "goal": "Hipertrofia", "experience_level": "Intermediário", "days_per_week": 4, "location": "Academia", "description": "Opção altamente equilibrada com 2 sessões superiores e 2 sessões inferiores por semana.", "equipments": "Academia Completa", "duration": "50-60 min", "days": [{"name": "Dia 1: Parte Superior A", "day_order": 1, "exercises": [{"displayName": "Supino Reto com Barra", "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Remada Curvada com Barra", "id": "eZyBC3j", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Desenvolvimento com Halteres", "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Puxada Frontal na Polia", "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Tríceps na Polia", "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Direta com Barra", "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Dia 2: Parte Inferior A", "day_order": 2, "exercises": [{"displayName": "Leg Press", "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Mesa Flexora", "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Cadeira Extensora", "id": "my33uHU", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}, {"displayName": "Prancha Abdominal", "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}, {"name": "Dia 3: Parte Superior B", "day_order": 3, "exercises": [{"displayName": "Supino Inclinado com Halteres", "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Sentada na Polia", "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral com Halteres", "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Crucifixo no Crossover", "id": "0CXGHya", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Tríceps Francês com Halter", "id": "PdmaD0N", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Martelo com Halteres", "id": "2NpxjC1", "sets": 3, "reps": "10-12", "rest": 60}]}, {"name": "Dia 4: Parte Inferior B", "day_order": 4, "exercises": [{"displayName": "Agachamento com Peso Corporal", "id": "3xK09Sk", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Afundo Controlado", "id": "13VW2VO", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}, {"displayName": "Abdominal Crunch", "id": "225x2Vd", "sets": 3, "reps": "15-20", "rest": 45}]}]}, {"id": "tpl_abcd_4d", "name": "Divisão A/B/C/D Tradicional (4 Dias)", "goal": "Hipertrofia", "experience_level": "Intermediário", "days_per_week": 4, "location": "Academia", "description": "Foco aprofundado em peito/tríceps, costas/bíceps, pernas e ombros/abdômen.", "equipments": "Academia Completa", "duration": "50-60 min", "days": [{"name": "Treino A: Peito e Tríceps", "day_order": 1, "exercises": [{"displayName": "Supino Reto com Barra", "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Supino Inclinado com Halteres", "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Crucifixo no Crossover", "id": "0CXGHya", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Flexão de Braços", "id": "0br45wL", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Tríceps na Polia", "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Tríceps Francês com Halter", "id": "PdmaD0N", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Treino B: Costas e Bíceps", "day_order": 2, "exercises": [{"displayName": "Puxada Frontal na Polia", "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Sentada na Polia", "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Curvada com Barra", "id": "eZyBC3j", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Remada Unilateral com Halter", "id": "g9AsZ8P", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Direta com Barra", "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Martelo com Halteres", "id": "2NpxjC1", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Treino C: Pernas e Panturrilhas", "day_order": 3, "exercises": [{"displayName": "Agachamento com Peso Corporal", "id": "3xK09Sk", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Leg Press", "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Cadeira Extensora", "id": "my33uHU", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Mesa Flexora", "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Afundo Controlado", "id": "13VW2VO", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}]}, {"name": "Treino D: Ombros, Trapézio e Abdômen", "day_order": 4, "exercises": [{"displayName": "Desenvolvimento com Halteres", "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral com Halteres", "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Crucifixo Inverso", "id": "EAs3xL9", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Encolhimento com Halteres", "id": "NJzBsGJ", "sets": 3, "reps": "10-15", "rest": 60}, {"displayName": "Prancha Abdominal", "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}, {"displayName": "Abdominal Tradicional", "id": "225x2Vd", "sets": 3, "reps": "15-20", "rest": 45}, {"displayName": "Elevação de Joelhos", "id": "03lzqwk", "sets": 3, "reps": "12-15", "rest": 45}]}]}, {"id": "tpl_conditioning_circuit", "name": "Circuito Geral Leve", "goal": "Condicionamento e controle de peso", "experience_level": "Iniciante", "days_per_week": 3, "location": "Casa ou Academia", "description": "Circuito focado em condicionamento, regularidade e resistência muscular suave.", "equipments": "Peso Corporal e Elásticos / Halteres Leves", "duration": "35-45 min", "medical_note": "Este modelo prioriza condicionamento, força e regularidade. Resultados variam e não são garantidos.", "days": [{"name": "Circuito Funcional A", "day_order": 1, "exercises": [{"displayName": "Agachamento com Peso Corporal", "id": "3xK09Sk", "sets": 3, "reps": "10-15", "rest": 60}, {"displayName": "Remada Sentada / Elástico", "id": "A3P4O0R", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Flexão de Braços Adaptada", "id": "0br45wL", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Afundo Controlado", "id": "13VW2VO", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Prancha Abdominal", "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}]}, {"id": "tpl_strength_basics", "name": "Força Fundamental e Técnica", "goal": "Força", "experience_level": "Intermediário", "days_per_week": 3, "location": "Academia", "description": "Foco no aprendizado e consolidação de movimentos básicos com técnica controlada, descanso amplo e sem falha.", "equipments": "Barra, Halteres e Máquinas", "duration": "45-60 min", "days": [{"name": "Dia 1: Força Base A", "day_order": 1, "exercises": [{"displayName": "Leg Press / Agachamento", "id": "10Z2DXU", "sets": 3, "reps": "5-8", "rest": 120}, {"displayName": "Supino Reto com Barra", "id": "EIeI8Vf", "sets": 3, "reps": "5-8", "rest": 120}, {"displayName": "Remada Curvada com Barra", "id": "eZyBC3j", "sets": 3, "reps": "5-8", "rest": 120}, {"displayName": "Desenvolvimento com Halteres", "id": "f1jf47L", "sets": 3, "reps": "5-8", "rest": 120}]}, {"name": "Dia 2: Força Base B", "day_order": 2, "exercises": [{"displayName": "Puxada Frontal na Polia", "id": "0MlxeMn", "sets": 3, "reps": "5-8", "rest": 120}, {"displayName": "Mesa Flexora", "id": "0rHfvy9", "sets": 3, "reps": "6-8", "rest": 90}, {"displayName": "Supino Inclinado com Halteres", "id": "ns0SIbU", "sets": 3, "reps": "6-8", "rest": 90}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 3, "reps": "6-8", "rest": 90}]}]}, {"id": "tpl_mobility_active", "name": "Mobilidade e Postura", "goal": "Mobilidade", "experience_level": "Iniciante", "days_per_week": 2, "location": "Casa ou Ao Ar Livre", "description": "Amplitude articular suave, alívio de tensões posturais e flexibilidade funcional.", "equipments": "Peso Corporal / Colchonete", "duration": "25-35 min", "days": [{"name": "Sessão de Mobilidade e Coluna", "day_order": 1, "exercises": [{"displayName": "Prancha Abdominal com Rotação", "id": "CosupLu", "sets": 2, "reps": "30s", "rest": 45}, {"displayName": "Agachamento com Peso Corporal", "id": "3xK09Sk", "sets": 2, "reps": "10-12", "rest": 45}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 2, "reps": "10-12", "rest": 45}, {"displayName": "Elevação de Joelhos", "id": "03lzqwk", "sets": 2, "reps": "10-12", "rest": 45}]}]}, {"id": "tpl_ppl_upper_lower_5d", "name": "Push/Pull/Legs + Superior/Inferior (5 Dias)", "goal": "Hipertrofia", "experience_level": "Intermediário", "days_per_week": 5, "location": "Academia", "description": "Estrutura híbrida completa combinando 3 dias de PPL com 2 dias de estímulo Upper/Lower.", "equipments": "Academia Completa", "duration": "50-60 min", "days": [{"name": "Dia 1: Peito, Ombros e Tríceps", "day_order": 1, "exercises": [{"displayName": "Supino Reto com Barra", "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Supino Inclinado com Halteres", "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Desenvolvimento com Halteres", "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral", "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Tríceps na Polia", "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Dia 2: Costas e Bíceps", "day_order": 2, "exercises": [{"displayName": "Puxada Frontal na Polia", "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Curvada com Barra", "id": "eZyBC3j", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Remada Sentada na Polia", "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Direta com Barra", "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Martelo com Halteres", "id": "2NpxjC1", "sets": 3, "reps": "10-12", "rest": 60}]}, {"name": "Dia 3: Pernas Completas", "day_order": 3, "exercises": [{"displayName": "Leg Press", "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Cadeira Extensora", "id": "my33uHU", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Mesa Flexora", "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}]}, {"name": "Dia 4: Parte Superior", "day_order": 4, "exercises": [{"displayName": "Crucifixo no Crossover", "id": "0CXGHya", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Remada Unilateral com Halter", "id": "g9AsZ8P", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral com Halteres", "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Tríceps Francês com Halter", "id": "PdmaD0N", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Dia 5: Parte Inferior e Abdômen", "day_order": 5, "exercises": [{"displayName": "Agachamento com Peso Corporal", "id": "3xK09Sk", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}, {"displayName": "Prancha Abdominal", "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}]}, {"id": "tpl_bodypart_5d", "name": "Divisão por Grupos Musculares (5 Dias)", "goal": "Hipertrofia", "experience_level": "Intermediário", "days_per_week": 5, "location": "Academia", "description": "Estímulo focado por grupo muscular, permitindo alta concentração em cada treino sem excessos.", "equipments": "Academia Completa", "duration": "45-55 min", "days": [{"name": "Dia 1: Peito e Tríceps", "day_order": 1, "exercises": [{"displayName": "Supino Reto com Barra", "id": "EIeI8Vf", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Supino Inclinado com Halteres", "id": "ns0SIbU", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Crucifixo no Crossover", "id": "0CXGHya", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Tríceps na Polia", "id": "3ZflifB", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Dia 2: Costas e Bíceps", "day_order": 2, "exercises": [{"displayName": "Puxada Frontal na Polia", "id": "0MlxeMn", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Remada Curvada com Barra", "id": "eZyBC3j", "sets": 3, "reps": "8-10", "rest": 60}, {"displayName": "Remada Sentada na Polia", "id": "A3P4O0R", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Rosca Direta com Barra", "id": "25GPyDY", "sets": 3, "reps": "8-12", "rest": 60}]}, {"name": "Dia 3: Pernas e Panturrilhas", "day_order": 3, "exercises": [{"displayName": "Leg Press", "id": "10Z2DXU", "sets": 3, "reps": "8-12", "rest": 75}, {"displayName": "Cadeira Extensora", "id": "my33uHU", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Mesa Flexora", "id": "0rHfvy9", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Panturrilha em Pé", "id": "6HmFgmx", "sets": 3, "reps": "12-15", "rest": 45}]}, {"name": "Dia 4: Ombros e Abdômen", "day_order": 4, "exercises": [{"displayName": "Desenvolvimento com Halteres", "id": "f1jf47L", "sets": 3, "reps": "8-12", "rest": 60}, {"displayName": "Elevação Lateral com Halteres", "id": "DsgkuIt", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Crucifixo Inverso", "id": "EAs3xL9", "sets": 3, "reps": "10-12", "rest": 60}, {"displayName": "Prancha Abdominal", "id": "CosupLu", "sets": 3, "reps": "30-45s", "rest": 45}]}, {"name": "Dia 5: Mobilidade e Core Ativo", "day_order": 5, "exercises": [{"displayName": "Agachamento com Peso Corporal", "id": "3xK09Sk", "sets": 2, "reps": "10-12", "rest": 45}, {"displayName": "Elevação Pélvica", "id": "Pjbc0Kt", "sets": 2, "reps": "10-12", "rest": 45}, {"displayName": "Elevação de Joelhos", "id": "03lzqwk", "sets": 2, "reps": "10-12", "rest": 45}]}]}];
+// CATÁLOGO OFICIAL DE MODELOS DO ASSISTENTE DE TREINOS (EXERCISEDB V1 POR MODALIDADE & NÍVEL)
+    const WORKOUT_ASSISTANT_CATALOG = [{"id": "tpl_hip_ini_fb2d", "name": "Corpo Inteiro Adaptativo A/B (2 Dias)", "goal": "Hipertrofia", "experience_level": "beginner", "days_per_week": 2, "minimum_days": 2, "maximum_days": 3, "weekly_volume_min": 6, "weekly_volume_max": 8, "location": "Academia completa", "equipments": "Máquinas, Halteres e Peso Corporal", "duration": "40-50 min", "description": "Rotina suave com 2 séries por exercício e foco no aprendizado motor sem sobrecarga excessiva.", "requires_supervision": false, "days": [{"name": "Treino A — Membros Inferiores & Empurrar", "day_order": 1, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 2, "reps": "8-12", "rest": 75, "equipment": "Máquinas", "initial_load": null}, {"id": "my33uHU", "displayName": "Cadeira Extensora", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 2, "reps": "8-12", "rest": 75, "equipment": "Halteres", "initial_load": null}, {"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "3ZflifB", "displayName": "Tríceps na Polia", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 2, "reps": "30s", "rest": 60, "equipment": "Peso corporal", "initial_load": null}]}, {"name": "Treino B — Membros Inferiores & Puxar", "day_order": 2, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 2, "reps": "8-12", "rest": 75, "equipment": "Polias", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 2, "reps": "8-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "25GPyDY", "displayName": "Rosca Direta com Barra", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Barra", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 2, "reps": "12-15", "rest": 60, "equipment": "Máquinas", "initial_load": null}]}]}, {"id": "tpl_hip_ini_fb3d", "name": "Corpo Inteiro 3 Variações A/B/C (3 Dias)", "goal": "Hipertrofia", "experience_level": "beginner", "days_per_week": 3, "minimum_days": 2, "maximum_days": 3, "weekly_volume_min": 6, "weekly_volume_max": 8, "location": "Academia completa", "equipments": "Máquinas e Halteres", "duration": "40-50 min", "description": "Três estímulos semanais com dias de descanso intercalados, 2 séries por movimento.", "requires_supervision": false, "days": [{"name": "Treino A — Segunda", "day_order": 1, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 2, "reps": "8-12", "rest": 75, "equipment": "Máquinas", "initial_load": null}, {"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 2, "reps": "8-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 2, "reps": "8-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "3ZflifB", "displayName": "Tríceps na Polia", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}]}, {"name": "Treino B — Quarta", "day_order": 2, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 2, "reps": "8-12", "rest": 75, "equipment": "Polias", "initial_load": null}, {"id": "DsgkuIt", "displayName": "Elevação Lateral com Halteres", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "2NpxjC1", "displayName": "Rosca Martelo com Halteres", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}]}, {"name": "Treino C — Sexta", "day_order": 3, "exercises": [{"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "my33uHU", "displayName": "Cadeira Extensora", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "0br45wL", "displayName": "Flexão de Braços", "sets": 2, "reps": "8-10", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "EAs3xL9", "displayName": "Crucifixo Inverso", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 2, "reps": "30s", "rest": 60, "equipment": "Peso corporal", "initial_load": null}]}]}, {"id": "tpl_hip_ini_ul4d", "name": "Superior / Inferior Básico (4 Dias)", "goal": "Hipertrofia", "experience_level": "beginner", "days_per_week": 4, "minimum_days": 3, "maximum_days": 4, "weekly_volume_min": 6, "weekly_volume_max": 8, "location": "Academia completa", "equipments": "Máquinas e Halteres", "duration": "40-50 min", "description": "Divisão equilibrada de 4 dias com 2 séries por exercício e recuperação otimizada.", "requires_supervision": false, "days": [{"name": "Dia 1: Membros Superiores A", "day_order": 1, "exercises": [{"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 2, "reps": "8-12", "rest": 75, "equipment": "Halteres", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 2, "reps": "8-12", "rest": 75, "equipment": "Polias", "initial_load": null}, {"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 2, "reps": "8-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "3ZflifB", "displayName": "Tríceps na Polia", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}]}, {"name": "Dia 2: Membros Inferiores A", "day_order": 2, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 2, "reps": "8-12", "rest": 75, "equipment": "Máquinas", "initial_load": null}, {"id": "my33uHU", "displayName": "Cadeira Extensora", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 2, "reps": "12-15", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 2, "reps": "30s", "rest": 60, "equipment": "Peso corporal", "initial_load": null}]}, {"name": "Dia 3: Membros Superiores B", "day_order": 3, "exercises": [{"id": "0br45wL", "displayName": "Flexão de Braços", "sets": 2, "reps": "8-10", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "g9AsZ8P", "displayName": "Remada Unilateral com Halter", "sets": 2, "reps": "8-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "DsgkuIt", "displayName": "Elevação Lateral com Halteres", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "2NpxjC1", "displayName": "Rosca Martelo com Halteres", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "PdmaD0N", "displayName": "Tríceps Francês com Halter", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}]}, {"name": "Dia 4: Membros Inferiores B", "day_order": 4, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "my33uHU", "displayName": "Cadeira Extensora", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 2, "reps": "12-15", "rest": 60, "equipment": "Máquinas", "initial_load": null}]}]}, {"id": "tpl_hip_int_ppl3d", "name": "Push / Pull / Legs Clássico (3 Dias)", "goal": "Hipertrofia", "experience_level": "intermediate", "days_per_week": 3, "minimum_days": 3, "maximum_days": 4, "weekly_volume_min": 8, "weekly_volume_max": 12, "location": "Academia completa", "equipments": "Academia Completa", "duration": "50-60 min", "description": "Divisão por padrões de movimento: empurrar, puxar e pernas completas com 3 séries por exercício.", "requires_supervision": false, "days": [{"name": "Push (Peito, Ombros e Tríceps)", "day_order": 1, "exercises": [{"id": "EIeI8Vf", "displayName": "Supino Reto com Barra", "sets": 3, "reps": "8-12", "rest": 75, "equipment": "Barra", "initial_load": null}, {"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "0CXGHya", "displayName": "Crucifixo no Crossover", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "DsgkuIt", "displayName": "Elevação Lateral com Halteres", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "3ZflifB", "displayName": "Tríceps na Polia", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Polias", "initial_load": null}]}, {"name": "Pull (Costas, Bíceps e Trapézio)", "day_order": 2, "exercises": [{"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 3, "reps": "8-12", "rest": 75, "equipment": "Polias", "initial_load": null}, {"id": "eZyBC3j", "displayName": "Remada Curvada com Barra", "sets": 3, "reps": "8-10", "rest": 75, "equipment": "Barra", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "EAs3xL9", "displayName": "Crucifixo Inverso", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "25GPyDY", "displayName": "Rosca Direta com Barra", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Barra", "initial_load": null}, {"id": "2NpxjC1", "displayName": "Rosca Martelo com Halteres", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}]}, {"name": "Legs (Pernas, Panturrilhas e Core)", "day_order": 3, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 3, "reps": "8-12", "rest": 90, "equipment": "Máquinas", "initial_load": null}, {"id": "my33uHU", "displayName": "Cadeira Extensora", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Máquinas", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 3, "reps": "30-45s", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}]}, {"id": "tpl_hip_int_ul4d", "name": "Superior / Inferior Frequência (4 Dias)", "goal": "Hipertrofia", "experience_level": "intermediate", "days_per_week": 4, "minimum_days": 3, "maximum_days": 5, "weekly_volume_min": 8, "weekly_volume_max": 12, "location": "Academia completa", "equipments": "Academia Completa", "duration": "50-60 min", "description": "Estimula cada grupo muscular 2 vezes por semana com volume moderado e ótima recuperação.", "requires_supervision": false, "days": [{"name": "Dia 1: Superior A", "day_order": 1, "exercises": [{"id": "EIeI8Vf", "displayName": "Supino Reto com Barra", "sets": 3, "reps": "8-10", "rest": 75, "equipment": "Barra", "initial_load": null}, {"id": "eZyBC3j", "displayName": "Remada Curvada com Barra", "sets": 3, "reps": "8-10", "rest": 75, "equipment": "Barra", "initial_load": null}, {"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "3ZflifB", "displayName": "Tríceps na Polia", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "25GPyDY", "displayName": "Rosca Direta com Barra", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Barra", "initial_load": null}]}, {"name": "Dia 2: Inferior A", "day_order": 2, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 3, "reps": "8-12", "rest": 90, "equipment": "Máquinas", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "my33uHU", "displayName": "Cadeira Extensora", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Máquinas", "initial_load": null}]}, {"name": "Dia 3: Superior B", "day_order": 3, "exercises": [{"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 3, "reps": "8-12", "rest": 75, "equipment": "Halteres", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "0CXGHya", "displayName": "Crucifixo no Crossover", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "DsgkuIt", "displayName": "Elevação Lateral com Halteres", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "PdmaD0N", "displayName": "Tríceps Francês com Halter", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "2NpxjC1", "displayName": "Rosca Martelo com Halteres", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}]}, {"name": "Dia 4: Inferior B", "day_order": 4, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 3, "reps": "10-12", "rest": 75, "equipment": "Máquinas", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Máquinas", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 3, "reps": "30-45s", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}]}, {"id": "tpl_hip_int_abcd4d", "name": "Divisão A/B/C/D Tradicional (4 Dias)", "goal": "Hipertrofia", "experience_level": "intermediate", "days_per_week": 4, "minimum_days": 4, "maximum_days": 5, "weekly_volume_min": 8, "weekly_volume_max": 12, "location": "Academia completa", "equipments": "Academia Completa", "duration": "45-55 min", "description": "Separação clássica em Peito/Tríceps, Costas/Bíceps, Pernas e Ombros/Abdômen.", "requires_supervision": false, "days": [{"name": "Treino A — Peito e Tríceps", "day_order": 1, "exercises": [{"id": "EIeI8Vf", "displayName": "Supino Reto com Barra", "sets": 3, "reps": "8-12", "rest": 75, "equipment": "Barra", "initial_load": null}, {"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "0CXGHya", "displayName": "Crucifixo no Crossover", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "3ZflifB", "displayName": "Tríceps na Polia", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "PdmaD0N", "displayName": "Tríceps Francês com Halter", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}]}, {"name": "Treino B — Costas e Bíceps", "day_order": 2, "exercises": [{"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 3, "reps": "8-12", "rest": 75, "equipment": "Polias", "initial_load": null}, {"id": "eZyBC3j", "displayName": "Remada Curvada com Barra", "sets": 3, "reps": "8-10", "rest": 75, "equipment": "Barra", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "25GPyDY", "displayName": "Rosca Direta com Barra", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Barra", "initial_load": null}, {"id": "2NpxjC1", "displayName": "Rosca Martelo com Halteres", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}]}, {"name": "Treino C — Pernas Completas", "day_order": 3, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 3, "reps": "8-12", "rest": 90, "equipment": "Máquinas", "initial_load": null}, {"id": "my33uHU", "displayName": "Cadeira Extensora", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Máquinas", "initial_load": null}]}, {"name": "Treino D — Ombros e Abdômen", "day_order": 4, "exercises": [{"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "DsgkuIt", "displayName": "Elevação Lateral com Halteres", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "EAs3xL9", "displayName": "Crucifixo Inverso", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 3, "reps": "30-45s", "rest": 45, "equipment": "Peso corporal", "initial_load": null}, {"id": "225x2Vd", "displayName": "Abdominal Crunch", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}]}, {"id": "tpl_hip_adv_ppl6d", "name": "Push / Pull / Legs Frequência 2x (6 Dias)", "goal": "Hipertrofia", "experience_level": "advanced", "days_per_week": 6, "minimum_days": 5, "maximum_days": 6, "weekly_volume_min": 12, "weekly_volume_max": 16, "location": "Academia completa", "equipments": "Academia Completa", "duration": "50-60 min", "description": "Estrutura de alta frequência para atletas experientes, com volume controlado sem técnicas extenuantes.", "requires_supervision": false, "days": [{"name": "Push 1 (Peito, Ombros e Tríceps)", "day_order": 1, "exercises": [{"id": "EIeI8Vf", "displayName": "Supino Reto com Barra", "sets": 3, "reps": "6-8", "rest": 90, "equipment": "Barra", "initial_load": null}, {"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "0CXGHya", "displayName": "Crucifixo no Crossover", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 3, "reps": "8-10", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "3ZflifB", "displayName": "Tríceps na Polia", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Polias", "initial_load": null}]}, {"name": "Pull 1 (Costas, Bíceps e Trapézio)", "day_order": 2, "exercises": [{"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 3, "reps": "8-10", "rest": 75, "equipment": "Polias", "initial_load": null}, {"id": "eZyBC3j", "displayName": "Remada Curvada com Barra", "sets": 3, "reps": "6-8", "rest": 75, "equipment": "Barra", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "25GPyDY", "displayName": "Rosca Direta com Barra", "sets": 3, "reps": "8-10", "rest": 60, "equipment": "Barra", "initial_load": null}, {"id": "2NpxjC1", "displayName": "Rosca Martelo com Halteres", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}]}, {"name": "Legs 1 (Quadríceps e Panturrilhas)", "day_order": 3, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 4, "reps": "8-12", "rest": 90, "equipment": "Máquinas", "initial_load": null}, {"id": "my33uHU", "displayName": "Cadeira Extensora", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 4, "reps": "12-15", "rest": 45, "equipment": "Máquinas", "initial_load": null}]}, {"name": "Push 2 (Ênfase Ombros e Peito Superior)", "day_order": 4, "exercises": [{"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 3, "reps": "8-10", "rest": 75, "equipment": "Halteres", "initial_load": null}, {"id": "0br45wL", "displayName": "Flexão de Braços", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "DsgkuIt", "displayName": "Elevação Lateral com Halteres", "sets": 4, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "PdmaD0N", "displayName": "Tríceps Francês com Halter", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}]}, {"name": "Pull 2 (Ênfase Espessura e Bíceps)", "day_order": 5, "exercises": [{"id": "g9AsZ8P", "displayName": "Remada Unilateral com Halter", "sets": 3, "reps": "8-10", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "EAs3xL9", "displayName": "Crucifixo Inverso", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "2NpxjC1", "displayName": "Rosca Martelo com Halteres", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}]}, {"name": "Legs 2 (Posteriores e Glúteos)", "day_order": 6, "exercises": [{"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 4, "reps": "10-12", "rest": 75, "equipment": "Halteres", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 4, "reps": "8-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 3, "reps": "12-15", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 3, "reps": "45s", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}]}, {"id": "tpl_forca_ini_fb2d", "name": "Força Técnica Fundamental (2 Dias)", "goal": "Força", "experience_level": "beginner", "days_per_week": 2, "minimum_days": 2, "maximum_days": 3, "weekly_volume_min": 6, "weekly_volume_max": 8, "location": "Academia completa", "equipments": "Máquinas, Halteres e Barra", "duration": "45-55 min", "description": "Aprendizado motor e técnica estrita nos movimentos de empurrar, puxar e agachar sem teste de carga máxima.", "requires_supervision": false, "days": [{"name": "Dia 1: Técnica Base A", "day_order": 1, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 2, "reps": "6-10", "rest": 90, "equipment": "Máquinas", "initial_load": null}, {"id": "EIeI8Vf", "displayName": "Supino Reto com Barra", "sets": 2, "reps": "6-10", "rest": 90, "equipment": "Barra", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 2, "reps": "8-10", "rest": 90, "equipment": "Polias", "initial_load": null}, {"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 2, "reps": "8-10", "rest": 90, "equipment": "Halteres", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 2, "reps": "30s", "rest": 60, "equipment": "Peso corporal", "initial_load": null}]}, {"name": "Dia 2: Técnica Base B", "day_order": 2, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 2, "reps": "8-10", "rest": 90, "equipment": "Peso corporal", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 2, "reps": "8-10", "rest": 90, "equipment": "Máquinas", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 2, "reps": "6-10", "rest": 90, "equipment": "Polias", "initial_load": null}, {"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 2, "reps": "8-10", "rest": 90, "equipment": "Halteres", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}]}]}, {"id": "tpl_forca_int_ul4d", "name": "Força & Movimentos Principais (4 Dias)", "goal": "Força", "experience_level": "intermediate", "days_per_week": 4, "minimum_days": 3, "maximum_days": 4, "weekly_volume_min": 8, "weekly_volume_max": 12, "location": "Academia completa", "equipments": "Academia Completa", "duration": "55-65 min", "description": "Faixa de 4 a 8 repetições nos exercícios básicos com descanso de 2 a 3 minutos para reposição de ATP.", "requires_supervision": false, "days": [{"name": "Superior Força A", "day_order": 1, "exercises": [{"id": "EIeI8Vf", "displayName": "Supino Reto com Barra", "sets": 4, "reps": "4-8", "rest": 120, "equipment": "Barra", "initial_load": null}, {"id": "eZyBC3j", "displayName": "Remada Curvada com Barra", "sets": 4, "reps": "4-8", "rest": 120, "equipment": "Barra", "initial_load": null}, {"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 3, "reps": "6-8", "rest": 90, "equipment": "Halteres", "initial_load": null}, {"id": "3ZflifB", "displayName": "Tríceps na Polia", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Polias", "initial_load": null}]}, {"name": "Inferior Força A", "day_order": 2, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 4, "reps": "4-8", "rest": 150, "equipment": "Máquinas", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 3, "reps": "6-8", "rest": 90, "equipment": "Máquinas", "initial_load": null}, {"id": "my33uHU", "displayName": "Cadeira Extensora", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}]}, {"name": "Superior Força B", "day_order": 3, "exercises": [{"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 4, "reps": "4-8", "rest": 120, "equipment": "Polias", "initial_load": null}, {"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 3, "reps": "6-8", "rest": 90, "equipment": "Halteres", "initial_load": null}, {"id": "g9AsZ8P", "displayName": "Remada Unilateral com Halter", "sets": 3, "reps": "6-8", "rest": 90, "equipment": "Halteres", "initial_load": null}, {"id": "25GPyDY", "displayName": "Rosca Direta com Barra", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Barra", "initial_load": null}]}, {"name": "Inferior Força B", "day_order": 4, "exercises": [{"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 4, "reps": "6-8", "rest": 120, "equipment": "Halteres", "initial_load": null}, {"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 3, "reps": "8-10", "rest": 90, "equipment": "Máquinas", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 3, "reps": "8-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 3, "reps": "40s", "rest": 60, "equipment": "Peso corporal", "initial_load": null}]}]}, {"id": "tpl_forca_adv_ul4d", "name": "Força com Periodização Ondulatória (4 Dias)", "goal": "Força", "experience_level": "advanced", "days_per_week": 4, "minimum_days": 4, "maximum_days": 5, "weekly_volume_min": 10, "weekly_volume_max": 14, "location": "Academia completa", "equipments": "Academia Completa", "duration": "60-70 min", "description": "Faixas variadas entre 3 e 8 repetições com dias pesados e moderados sem atingir a falha muscular.", "requires_supervision": true, "days": [{"name": "Superior Pesado", "day_order": 1, "exercises": [{"id": "EIeI8Vf", "displayName": "Supino Reto com Barra", "sets": 4, "reps": "3-6", "rest": 150, "equipment": "Barra", "initial_load": null}, {"id": "eZyBC3j", "displayName": "Remada Curvada com Barra", "sets": 4, "reps": "4-6", "rest": 150, "equipment": "Barra", "initial_load": null}, {"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 3, "reps": "6-8", "rest": 120, "equipment": "Halteres", "initial_load": null}, {"id": "3ZflifB", "displayName": "Tríceps na Polia", "sets": 3, "reps": "8-10", "rest": 60, "equipment": "Polias", "initial_load": null}]}, {"name": "Inferior Pesado", "day_order": 2, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 4, "reps": "4-6", "rest": 180, "equipment": "Máquinas", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 4, "reps": "6-8", "rest": 90, "equipment": "Máquinas", "initial_load": null}, {"id": "my33uHU", "displayName": "Cadeira Extensora", "sets": 3, "reps": "8-10", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 4, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}]}, {"name": "Superior Moderado", "day_order": 3, "exercises": [{"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 4, "reps": "6-8", "rest": 120, "equipment": "Polias", "initial_load": null}, {"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 4, "reps": "6-8", "rest": 90, "equipment": "Halteres", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 3, "reps": "8-10", "rest": 90, "equipment": "Polias", "initial_load": null}, {"id": "25GPyDY", "displayName": "Rosca Direta com Barra", "sets": 3, "reps": "8-10", "rest": 60, "equipment": "Barra", "initial_load": null}]}, {"name": "Inferior Moderado", "day_order": 4, "exercises": [{"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 4, "reps": "6-8", "rest": 120, "equipment": "Halteres", "initial_load": null}, {"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 3, "reps": "8-10", "rest": 90, "equipment": "Máquinas", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 3, "reps": "8-10", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 3, "reps": "45s", "rest": 60, "equipment": "Peso corporal", "initial_load": null}]}]}, {"id": "tpl_res_ini_fb2d", "name": "Resistência Muscular Básica (2 Dias)", "goal": "Resistência muscular", "experience_level": "beginner", "days_per_week": 2, "minimum_days": 2, "maximum_days": 3, "weekly_volume_min": 4, "weekly_volume_max": 6, "location": "Academia completa", "equipments": "Peso Corporal e Máquinas", "duration": "35-45 min", "description": "Circuitos leves com 10 a 15 repetições e pausas controladas para adaptação cardiovascular e muscular.", "requires_supervision": false, "days": [{"name": "Circuito Resistência A", "day_order": 1, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 2, "reps": "12-15", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "0br45wL", "displayName": "Flexão de Braços", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 2, "reps": "12-15", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "DsgkuIt", "displayName": "Elevação Lateral com Halteres", "sets": 2, "reps": "12-15", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 2, "reps": "30s", "rest": 60, "equipment": "Peso corporal", "initial_load": null}]}, {"name": "Circuito Resistência B", "day_order": 2, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 2, "reps": "12-15", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 2, "reps": "12-15", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 2, "reps": "12-15", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "3ZflifB", "displayName": "Tríceps na Polia", "sets": 2, "reps": "12-15", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "225x2Vd", "displayName": "Abdominal Crunch", "sets": 2, "reps": "15-20", "rest": 60, "equipment": "Peso corporal", "initial_load": null}]}]}, {"id": "tpl_res_int_fb3d", "name": "Circuito Resistência & Densidade (3 Dias)", "goal": "Resistência muscular", "experience_level": "intermediate", "days_per_week": 3, "minimum_days": 3, "maximum_days": 4, "weekly_volume_min": 8, "weekly_volume_max": 12, "location": "Academia completa", "equipments": "Academia Completa", "duration": "40-50 min", "description": "2 a 3 séries de 12 a 20 repetições com descansos de 45 a 90 segundos entre exercícios.", "requires_supervision": false, "days": [{"name": "Sessão 1: Empurrar & Pernas", "day_order": 1, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 3, "reps": "15-20", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 3, "reps": "12-15", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "my33uHU", "displayName": "Cadeira Extensora", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Máquinas", "initial_load": null}, {"id": "DsgkuIt", "displayName": "Elevação Lateral com Halteres", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "3ZflifB", "displayName": "Tríceps na Polia", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Polias", "initial_load": null}]}, {"name": "Sessão 2: Puxar & Posterior", "day_order": 2, "exercises": [{"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 3, "reps": "12-15", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Máquinas", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 3, "reps": "12-15", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "2NpxjC1", "displayName": "Rosca Martelo com Halteres", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "EAs3xL9", "displayName": "Crucifixo Inverso", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Halteres", "initial_load": null}]}, {"name": "Sessão 3: Corpo Inteiro & Core", "day_order": 3, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 3, "reps": "15-20", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "0br45wL", "displayName": "Flexão de Braços", "sets": 3, "reps": "12-15", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Máquinas", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 3, "reps": "40s", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}]}, {"id": "tpl_res_adv_blk4d", "name": "Blocos de Resistência Muscular e Capacidade (4 Dias)", "goal": "Resistência muscular", "experience_level": "advanced", "days_per_week": 4, "minimum_days": 4, "maximum_days": 5, "weekly_volume_min": 10, "weekly_volume_max": 14, "location": "Academia completa", "equipments": "Academia Completa", "duration": "45-55 min", "description": "Circuitos avançados por tempo e repetições sem obrigar execução até a falha nem pausas extremas.", "requires_supervision": false, "days": [{"name": "Bloco A: Membros Superiores", "day_order": 1, "exercises": [{"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 3, "reps": "15-20", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 3, "reps": "15-20", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "0CXGHya", "displayName": "Crucifixo no Crossover", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Polias", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Polias", "initial_load": null}]}, {"name": "Bloco B: Membros Inferiores", "day_order": 2, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 3, "reps": "15-20", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Máquinas", "initial_load": null}, {"id": "my33uHU", "displayName": "Cadeira Extensora", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Máquinas", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 3, "reps": "20-25", "rest": 45, "equipment": "Máquinas", "initial_load": null}]}, {"name": "Bloco C: Ombros & Braços", "day_order": 3, "exercises": [{"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 3, "reps": "12-15", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "DsgkuIt", "displayName": "Elevação Lateral com Halteres", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "3ZflifB", "displayName": "Tríceps na Polia", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Polias", "initial_load": null}, {"id": "2NpxjC1", "displayName": "Rosca Martelo com Halteres", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Halteres", "initial_load": null}]}, {"name": "Bloco D: Core & Dinâmico", "day_order": 4, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 3, "reps": "20", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "0br45wL", "displayName": "Flexão de Braços", "sets": 3, "reps": "12-15", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 3, "reps": "45s", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}]}, {"id": "tpl_cond_ini_fb2d", "name": "Condicionamento Inicial e Baixo Impacto (2 Dias)", "goal": "Condicionamento físico", "experience_level": "beginner", "days_per_week": 2, "minimum_days": 2, "maximum_days": 3, "weekly_volume_min": 4, "weekly_volume_max": 6, "location": "Academia completa", "equipments": "Máquinas e Peso Corporal", "duration": "30-40 min", "description": "Sessões curtas e progressivas com pausas confortáveis, estimulando a aptidão cardiorrespiratória.", "requires_supervision": false, "days": [{"name": "Dia 1: Ativação Cardiorrespiratória A", "day_order": 1, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 2, "reps": "25s", "rest": 60, "equipment": "Peso corporal", "initial_load": null}]}, {"name": "Dia 2: Ativação Cardiorrespiratória B", "day_order": 2, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 2, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 2, "reps": "12-15", "rest": 60, "equipment": "Máquinas", "initial_load": null}]}]}, {"id": "tpl_cond_int_3d", "name": "Circuito Combinado Força & Cardio (3 Dias)", "goal": "Condicionamento físico", "experience_level": "intermediate", "days_per_week": 3, "minimum_days": 3, "maximum_days": 4, "weekly_volume_min": 8, "weekly_volume_max": 10, "location": "Academia completa", "equipments": "Academia Completa", "duration": "40-50 min", "description": "Combinação equilibrada entre exercícios resistidos e trabalho cardiovascular contínuo.", "requires_supervision": false, "days": [{"name": "Circuito A", "day_order": 1, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 3, "reps": "12-15", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "EIeI8Vf", "displayName": "Supino Reto com Barra", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Barra", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 3, "reps": "35s", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}, {"name": "Circuito B", "day_order": 2, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 3, "reps": "12-15", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "DsgkuIt", "displayName": "Elevação Lateral com Halteres", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 3, "reps": "10-12", "rest": 45, "equipment": "Máquinas", "initial_load": null}]}, {"name": "Circuito C", "day_order": 3, "exercises": [{"id": "0br45wL", "displayName": "Flexão de Braços", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "g9AsZ8P", "displayName": "Remada Unilateral com Halter", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "225x2Vd", "displayName": "Abdominal Crunch", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}]}, {"id": "tpl_cond_adv_4d", "name": "Treino Concorrente Força & Condicionamento (4 Dias)", "goal": "Condicionamento físico", "experience_level": "advanced", "days_per_week": 4, "minimum_days": 4, "maximum_days": 5, "weekly_volume_min": 10, "weekly_volume_max": 14, "location": "Academia completa", "equipments": "Academia Completa", "duration": "45-55 min", "description": "Intercalação de intensidade com foco na capacidade atlética geral sem promessas estéticas.", "requires_supervision": false, "days": [{"name": "Dia 1: Força Inferior & Intervalos", "day_order": 1, "exercises": [{"id": "10Z2DXU", "displayName": "Leg Press 45º", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Máquinas", "initial_load": null}, {"id": "0rHfvy9", "displayName": "Mesa Flexora", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Máquinas", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Máquinas", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 3, "reps": "40s", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}, {"name": "Dia 2: Força Superior & Densidade", "day_order": 2, "exercises": [{"id": "ns0SIbU", "displayName": "Supino Inclinado com Halteres", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "DsgkuIt", "displayName": "Elevação Lateral com Halteres", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "3ZflifB", "displayName": "Tríceps na Polia", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Polias", "initial_load": null}]}, {"name": "Dia 3: Potência & Core", "day_order": 3, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 3, "reps": "12-15", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "0br45wL", "displayName": "Flexão de Braços", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Peso corporal", "initial_load": null}, {"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "225x2Vd", "displayName": "Abdominal Crunch", "sets": 3, "reps": "15-20", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}, {"name": "Dia 4: Puxar & Estabilidade", "day_order": 4, "exercises": [{"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Polias", "initial_load": null}, {"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 3, "reps": "10-12", "rest": 60, "equipment": "Halteres", "initial_load": null}, {"id": "2NpxjC1", "displayName": "Rosca Martelo com Halteres", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 3, "reps": "45s", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}]}, {"id": "tpl_mob_ini_2d", "name": "Mobilidade Geral e Postura (2 Dias)", "goal": "Mobilidade", "experience_level": "beginner", "days_per_week": 2, "minimum_days": 2, "maximum_days": 3, "weekly_volume_min": 4, "weekly_volume_max": 6, "location": "Academia completa", "equipments": "Peso Corporal e Halteres", "duration": "25-35 min", "description": "Movimentos confortáveis para quadril, ombros e coluna vertebral sem forçar amplitudes extremas.", "requires_supervision": false, "days": [{"name": "Dia 1: Quadril, Tornozelos e Coluna", "day_order": 1, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 2, "reps": "10-12", "rest": 45, "equipment": "Peso corporal", "initial_load": null}, {"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 2, "reps": "10-12", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "03lzqwk", "displayName": "Elevação de Joelhos", "sets": 2, "reps": "10-12", "rest": 45, "equipment": "Peso corporal", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 2, "reps": "25s", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}, {"name": "Dia 2: Ombros, Cintura Escapular e Peito", "day_order": 2, "exercises": [{"id": "EAs3xL9", "displayName": "Crucifixo Inverso", "sets": 2, "reps": "10-12", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "f1jf47L", "displayName": "Desenvolvimento com Halteres", "sets": 2, "reps": "8-10", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 2, "reps": "10-12", "rest": 45, "equipment": "Polias", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 2, "reps": "12-15", "rest": 45, "equipment": "Máquinas", "initial_load": null}]}]}, {"id": "tpl_mob_int_3d", "name": "Mobilidade Funcional de Corpo Inteiro (3 Dias)", "goal": "Mobilidade", "experience_level": "intermediate", "days_per_week": 3, "minimum_days": 2, "maximum_days": 3, "weekly_volume_min": 6, "weekly_volume_max": 8, "location": "Academia completa", "equipments": "Peso Corporal e Polias", "duration": "30-40 min", "description": "Amplitude articular dinâmica e equilíbrio postural para antes ou depois das sessões principais.", "requires_supervision": false, "days": [{"name": "Rotina A: Cintura Pélvica & Membros Inferiores", "day_order": 1, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 3, "reps": "10-12", "rest": 45, "equipment": "Peso corporal", "initial_load": null}, {"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 3, "reps": "10-12", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "6HmFgmx", "displayName": "Panturrilha em Pé", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Máquinas", "initial_load": null}]}, {"name": "Rotina B: Cintura Escapular & Coluna Torácica", "day_order": 2, "exercises": [{"id": "EAs3xL9", "displayName": "Crucifixo Inverso", "sets": 3, "reps": "10-12", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 3, "reps": "10-12", "rest": 45, "equipment": "Polias", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 3, "reps": "30s", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}, {"name": "Rotina C: Integração Postural Global", "day_order": 3, "exercises": [{"id": "0br45wL", "displayName": "Flexão de Braços", "sets": 2, "reps": "8-10", "rest": 45, "equipment": "Peso corporal", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 2, "reps": "10-12", "rest": 45, "equipment": "Polias", "initial_load": null}, {"id": "03lzqwk", "displayName": "Elevação de Joelhos", "sets": 2, "reps": "10-12", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}]}, {"id": "tpl_mob_adv_3d", "name": "Controle Motor e Amplitude Específica (3 Dias)", "goal": "Mobilidade", "experience_level": "advanced", "days_per_week": 3, "minimum_days": 2, "maximum_days": 4, "weekly_volume_min": 6, "weekly_volume_max": 8, "location": "Academia completa", "equipments": "Peso Corporal e Halteres", "duration": "30-40 min", "description": "Trabalho focado na estabilidade articular em amplitudes completas para suporte a treinos intensos.", "requires_supervision": false, "days": [{"name": "Dia 1: Estabilidade Escapuloumeral", "day_order": 1, "exercises": [{"id": "EAs3xL9", "displayName": "Crucifixo Inverso", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "DsgkuIt", "displayName": "Elevação Lateral com Halteres", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "0MlxeMn", "displayName": "Puxada Frontal na Polia", "sets": 3, "reps": "10-12", "rest": 45, "equipment": "Polias", "initial_load": null}]}, {"name": "Dia 2: Estabilidade Lombo-Pélvica", "day_order": 2, "exercises": [{"id": "3xK09Sk", "displayName": "Agachamento com Peso Corporal", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Peso corporal", "initial_load": null}, {"id": "Pjbc0Kt", "displayName": "Elevação Pélvica", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Halteres", "initial_load": null}, {"id": "CosupLu", "displayName": "Prancha Abdominal", "sets": 3, "reps": "40s", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}, {"name": "Dia 3: Cadeias Cruzadas", "day_order": 3, "exercises": [{"id": "0br45wL", "displayName": "Flexão de Braços", "sets": 3, "reps": "10-12", "rest": 45, "equipment": "Peso corporal", "initial_load": null}, {"id": "A3P4O0R", "displayName": "Remada Sentada na Polia", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Polias", "initial_load": null}, {"id": "03lzqwk", "displayName": "Elevação de Joelhos", "sets": 3, "reps": "12-15", "rest": 45, "equipment": "Peso corporal", "initial_load": null}]}]}];
 
     let _wizardState = {
+      step: 1,
       goal: 'Hipertrofia',
-      days: '3',
-      location: 'Academia',
-      equip: 'Academia completa',
-      experience: 'Iniciante'
+      experience: 'beginner', // 'beginner', 'intermediate', 'advanced'
+      days: 3,
+      location: 'Academia completa',
+      equipments: ['Peso corporal', 'Halteres', 'Barra', 'Polias', 'Máquinas', 'Banco']
+    };
+
+    let _quizAnswers = {
+      trainingMonths: 3,
+      daysPerWeek: 2,
+      knowsBasicTechnique: false,
+      controlsVolumeAndRecovery: true,
+      returningAfterLongBreak: true
     };
 
     let _currentPreviewTemplate = null;
 
     function openCreateWorkoutModal() {
       _wizardState = {
+        step: 1,
         goal: 'Hipertrofia',
-        days: '3',
-        location: 'Academia',
-        equip: 'Academia completa',
-        experience: 'Iniciante'
+        experience: 'beginner',
+        days: 3,
+        location: 'Academia completa',
+        equipments: ['Peso corporal', 'Halteres', 'Barra', 'Polias', 'Máquinas', 'Banco']
       };
 
-      const goalsSec = document.getElementById('workoutAssistantGoalsSection');
-      const questSec = document.getElementById('workoutAssistantQuestionSection');
-      const resSec = document.getElementById('workoutAssistantResultsSection');
-      const manSec = document.getElementById('workoutAssistantManualSection');
-
-      if (goalsSec) goalsSec.style.display = 'block';
-      if (questSec) questSec.style.display = 'none';
-      if (resSec) resSec.style.display = 'none';
-      if (manSec) manSec.style.display = 'none';
-
-      const badge = document.getElementById('wizardHeaderBadge');
-      if (badge) badge.innerText = 'Etapa 1 • Escolha de Objetivo';
-      const title = document.getElementById('wizardModalTitle');
-      if (title) title.innerText = '🏋️‍♂️ Assistente de Montagem de Treinos';
-      const sub = document.getElementById('wizardModalSubtitle');
-      if (sub) sub.innerText = 'Selecione seu objetivo para explorar modelos ideais ou monte um treino do seu jeito.';
-
+      wizardGoToStep(1);
       document.getElementById('modalCreateWorkout').classList.add('active');
     }
 
@@ -7164,145 +7263,210 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       document.getElementById('modalCreateWorkout').classList.remove('active');
     }
 
-    function startWorkoutWizard(goalName) {
+    function wizardGoToStep(stepNumber) {
+      _wizardState.step = stepNumber;
+
+      const s1 = document.getElementById('wizardStep1Section');
+      const s2 = document.getElementById('wizardStep2Section');
+      const sq = document.getElementById('wizardQuizSection');
+      const s3 = document.getElementById('wizardStep3Section');
+      const s4 = document.getElementById('wizardStep4Section');
+      const s5 = document.getElementById('wizardStep5Section');
+      const sm = document.getElementById('workoutAssistantManualSection');
+
+      if (s1) s1.style.display = (stepNumber === 1) ? 'block' : 'none';
+      if (s2) s2.style.display = (stepNumber === 2) ? 'block' : 'none';
+      if (sq) sq.style.display = (stepNumber === 'quiz') ? 'block' : 'none';
+      if (s3) s3.style.display = (stepNumber === 3) ? 'block' : 'none';
+      if (s4) s4.style.display = (stepNumber === 4) ? 'block' : 'none';
+      if (s5) s5.style.display = (stepNumber === 5) ? 'block' : 'none';
+      if (sm) sm.style.display = (stepNumber === 'manual') ? 'block' : 'none';
+
+      const badge = document.getElementById('wizardHeaderBadge');
+      const sub = document.getElementById('wizardModalSubtitle');
+      if (sub) sub.innerText = 'Modelos compatíveis com sua seleção';
+
+      if (badge) {
+        if (stepNumber === 1) badge.innerText = 'Etapa 1 • Objetivo';
+        else if (stepNumber === 2) badge.innerText = 'Etapa 2 • Nível de Experiência';
+        else if (stepNumber === 'quiz') badge.innerText = 'Etapa 2 • Quiz de Nivelamento';
+        else if (stepNumber === 3) badge.innerText = 'Etapa 3 • Dias por Semana';
+        else if (stepNumber === 4) badge.innerText = 'Etapa 4 • Local e Equipamentos';
+        else if (stepNumber === 5) badge.innerText = 'Etapa 5 • Modelos Compatíveis';
+        else if (stepNumber === 'manual') badge.innerText = 'Montagem Manual';
+      }
+
+      if (stepNumber === 3) {
+        renderCoherentDaysOptions();
+      }
+    }
+
+    function wizardSelectGoal(goalName) {
       _wizardState.goal = goalName;
-
-      const titleEl = document.getElementById('wizardSelectedGoalTitle');
-      if (titleEl) {
-        let icon = '💪';
-        if (goalName.includes('Condicionamento')) icon = '🔥';
-        else if (goalName === 'Força') icon = '🏋️';
-        else if (goalName === 'Resistência') icon = '⚡';
-        else if (goalName === 'Iniciante') icon = '🌱';
-        else if (goalName === 'Mobilidade') icon = '🧘';
-        titleEl.innerText = `${icon} ${goalName}`;
-      }
-
-      // Regra de segurança: se Iniciante ou Mobilidade, sugerir 2 ou 3 dias
-      if (goalName === 'Iniciante' || goalName === 'Mobilidade') {
-        _wizardState.days = '2';
-      } else if (_wizardState.days === '2') {
-        _wizardState.days = '3';
-      }
-
-      // Atualizar chips da UI
-      document.querySelectorAll('#wizardDaysContainer .chip').forEach(c => {
-        const txt = c.innerText.trim();
-        if (txt.startsWith(_wizardState.days)) c.classList.add('active');
-        else c.classList.remove('active');
-      });
-
-      // Validar aviso se 6 dias para iniciantes
-      checkInicianteDaysWarning();
-
-      const goalsSec = document.getElementById('workoutAssistantGoalsSection');
-      const questSec = document.getElementById('workoutAssistantQuestionSection');
-      const resSec = document.getElementById('workoutAssistantResultsSection');
-      const manSec = document.getElementById('workoutAssistantManualSection');
-
-      if (goalsSec) goalsSec.style.display = 'none';
-      if (questSec) questSec.style.display = 'block';
-      if (resSec) resSec.style.display = 'none';
-      if (manSec) manSec.style.display = 'none';
-
-      const badge = document.getElementById('wizardHeaderBadge');
-      if (badge) badge.innerText = 'Etapa 2 • Rotina e Dias';
+      wizardGoToStep(2);
     }
 
-    function backToGoalsStep() {
-      const goalsSec = document.getElementById('workoutAssistantGoalsSection');
-      const questSec = document.getElementById('workoutAssistantQuestionSection');
-      const resSec = document.getElementById('workoutAssistantResultsSection');
-      const manSec = document.getElementById('workoutAssistantManualSection');
-
-      if (goalsSec) goalsSec.style.display = 'block';
-      if (questSec) questSec.style.display = 'none';
-      if (resSec) resSec.style.display = 'none';
-      if (manSec) manSec.style.display = 'none';
-
-      const badge = document.getElementById('wizardHeaderBadge');
-      if (badge) badge.innerText = 'Etapa 1 • Escolha de Objetivo';
+    function wizardSelectExperience(level) {
+      _wizardState.experience = level;
+      wizardGoToStep(3);
     }
 
-    function selectWizardChip(chipEl, field, val) {
-      const parent = chipEl.parentElement;
+    function openExperienceQuiz() {
+      wizardGoToStep('quiz');
+      recalculateQuizSuggestion();
+    }
+
+    function selectQuizChip(el, field, val) {
+      const parent = el.parentElement;
       if (parent) {
         parent.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
       }
-      chipEl.classList.add('active');
-      _wizardState[field] = val;
-
-      checkInicianteDaysWarning();
+      el.classList.add('active');
+      _quizAnswers[field] = val;
+      recalculateQuizSuggestion();
     }
 
-    function checkInicianteDaysWarning() {
-      const warningEl = document.getElementById('wizardDaysWarning');
-      if (!warningEl) return;
-      const is6Days = _wizardState.days === '6';
-      const isIniciante = _wizardState.experience === 'Iniciante' || _wizardState.goal === 'Iniciante';
-      if (is6Days && isIniciante) {
-        warningEl.style.display = 'block';
+    function suggestExperienceLevel(answers) {
+      if (
+        answers.returningAfterLongBreak ||
+        answers.trainingMonths < 6 ||
+        answers.knowsBasicTechnique === false
+      ) {
+        return "beginner";
+      }
+
+      if (
+        answers.trainingMonths >= 24 &&
+        answers.knowsBasicTechnique &&
+        answers.controlsVolumeAndRecovery
+      ) {
+        return "advanced";
+      }
+
+      return "intermediate";
+    }
+
+    function recalculateQuizSuggestion() {
+      const level = suggestExperienceLevel(_quizAnswers);
+      const textEl = document.getElementById('quizSuggestedLevelText');
+      if (!textEl) return;
+
+      if (level === 'beginner') {
+        textEl.innerText = '🌱 Iniciante';
+      } else if (level === 'intermediate') {
+        textEl.innerText = '🏋️‍♂️ Intermediário';
       } else {
-        warningEl.style.display = 'none';
+        textEl.innerText = '⚡ Avançado';
       }
     }
 
-    function backToQuestionnaireStep() {
-      const goalsSec = document.getElementById('workoutAssistantGoalsSection');
-      const questSec = document.getElementById('workoutAssistantQuestionSection');
-      const resSec = document.getElementById('workoutAssistantResultsSection');
-      const manSec = document.getElementById('workoutAssistantManualSection');
-
-      if (goalsSec) goalsSec.style.display = 'none';
-      if (questSec) questSec.style.display = 'block';
-      if (resSec) resSec.style.display = 'none';
-      if (manSec) manSec.style.display = 'none';
-
-      const badge = document.getElementById('wizardHeaderBadge');
-      if (badge) badge.innerText = 'Etapa 2 • Rotina e Dias';
+    function confirmQuizLevel() {
+      const level = suggestExperienceLevel(_quizAnswers);
+      _wizardState.experience = level;
+      wizardGoToStep(3);
     }
 
-    function computeAndShowWizardResults() {
-      const requestedDays = parseInt(_wizardState.days) || 3;
-      const goal = _wizardState.goal;
-      const isBeginner = _wizardState.experience === 'Iniciante' || goal === 'Iniciante';
+    function renderCoherentDaysOptions() {
+      const container = document.getElementById('wizardCoherentDaysContainer');
+      const notice = document.getElementById('wizard6DaysNotice');
+      if (!container) return;
 
-      // Ordenar e selecionar os 2 melhores templates compatíveis
+      const level = _wizardState.experience;
+      let allowedDays = [2, 3, 4];
+      let defaultDay = 3;
+
+      if (level === 'intermediate') {
+        allowedDays = [2, 3, 4, 5];
+        defaultDay = 4;
+      } else if (level === 'advanced') {
+        allowedDays = [3, 4, 5, 6];
+        defaultDay = 4; // Nunca 6 dias como primeira opção!
+      }
+
+      if (!allowedDays.includes(_wizardState.days)) {
+        _wizardState.days = defaultDay;
+      }
+
+      container.innerHTML = allowedDays.map(d => `
+        <div class="chip ${d === _wizardState.days ? 'active' : ''}" onclick="selectWizardDayOption(${d}, this)">
+          ${d} dias por semana
+        </div>
+      `).join('');
+
+      if (notice) {
+        notice.style.display = (_wizardState.days === 6) ? 'block' : 'none';
+      }
+    }
+
+    function selectWizardDayOption(d, el) {
+      const parent = el.parentElement;
+      if (parent) {
+        parent.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      }
+      el.classList.add('active');
+      _wizardState.days = d;
+
+      const notice = document.getElementById('wizard6DaysNotice');
+      if (notice) {
+        notice.style.display = (d === 6) ? 'block' : 'none';
+      }
+    }
+
+    function selectWizardSingleChip(el, field, val) {
+      const parent = el.parentElement;
+      if (parent) {
+        parent.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      }
+      el.classList.add('active');
+      _wizardState[field] = val;
+    }
+
+    function toggleWizardEquipment(el, equipName) {
+      el.classList.toggle('active');
+      const isActive = el.classList.contains('active');
+      if (isActive) {
+        if (!_wizardState.equipments.includes(equipName)) _wizardState.equipments.push(equipName);
+      } else {
+        _wizardState.equipments = _wizardState.equipments.filter(e => e !== equipName);
+      }
+    }
+
+    function computeAndShowWizardResultsV2() {
+      const requestedDays = parseInt(_wizardState.days) || 3;
+      const requestedGoal = _wizardState.goal;
+      const requestedLevel = _wizardState.experience; // 'beginner', 'intermediate', 'advanced'
+
+      // Filtrar e pontuar modelos
       const scored = WORKOUT_ASSISTANT_CATALOG.map(tpl => {
         let score = 0;
-        if (tpl.goal.toLowerCase() === goal.toLowerCase()) score += 50;
-        if (isBeginner && tpl.experience_level === 'Iniciante') score += 30;
-        if (tpl.days_per_week === requestedDays) score += 40;
-        else score -= Math.abs(tpl.days_per_week - requestedDays) * 15;
+        if (tpl.goal.toLowerCase() === requestedGoal.toLowerCase()) score += 60;
+        if (tpl.experience_level === requestedLevel) score += 40;
+        if (tpl.days_per_week === requestedDays) score += 30;
+        else score -= Math.abs(tpl.days_per_week - requestedDays) * 10;
         return { tpl, score };
       }).sort((a, b) => b.score - a.score);
 
       const top1 = scored[0] ? scored[0].tpl : WORKOUT_ASSISTANT_CATALOG[0];
-      const top2 = scored[1] ? scored[1].tpl : WORKOUT_ASSISTANT_CATALOG[1];
+      const top2 = (scored[1] && scored[1].tpl.id !== top1.id) ? scored[1].tpl : (scored[2] ? scored[2].tpl : null);
 
-      renderWizardResultsCards(top1, top2);
-
-      const goalsSec = document.getElementById('workoutAssistantGoalsSection');
-      const questSec = document.getElementById('workoutAssistantQuestionSection');
-      const resSec = document.getElementById('workoutAssistantResultsSection');
-      const manSec = document.getElementById('workoutAssistantManualSection');
-
-      if (goalsSec) goalsSec.style.display = 'none';
-      if (questSec) questSec.style.display = 'none';
-      if (resSec) resSec.style.display = 'block';
-      if (manSec) manSec.style.display = 'none';
-
-      const badge = document.getElementById('wizardHeaderBadge');
-      if (badge) badge.innerText = 'Etapa 3 • Modelos Disponíveis';
+      renderWizardResultsCardsV2(top1, top2);
+      wizardGoToStep(5);
     }
 
-    function renderWizardResultsCards(top1, top2) {
+    function renderWizardResultsCardsV2(top1, top2) {
       const container = document.getElementById('wizardOptionsCardsList');
       if (!container) return;
 
+      const levelLabelMap = {
+        'beginner': 'Iniciante',
+        'intermediate': 'Intermediário',
+        'advanced': 'Avançado'
+      };
+
       const buildCard = (tpl, tagLabel, isRec = false) => {
         const totalExercises = tpl.days.reduce((acc, d) => acc + d.exercises.length, 0);
-        const musclesSummary = tpl.days.map(d => d.name.replace(/^Dia \w+: /i, '').replace(/^Treino \w+: /i, '')).join(' • ');
+        const musclesSummary = tpl.days.map(d => d.name.replace(/^(Dia|Treino|Rotina|Push|Pull|Legs|Sessão|Bloco) [^:]+: /i, '')).join(' • ');
+        const levelDisplay = levelLabelMap[tpl.experience_level] || tpl.experience_level;
 
         return `
           <div class="wizard-option-card ${isRec ? 'wizard-option-recommended' : ''}">
@@ -7316,23 +7480,28 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
               </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; font-size: 11px; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 8px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; font-size: 11px; background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 8px; margin-top: 8px;">
+              <div><span style="color: var(--text-grey);">Objetivo:</span> <strong>${tpl.goal}</strong></div>
+              <div><span style="color: var(--text-grey);">Nível:</span> <strong>${levelDisplay}</strong></div>
               <div><span style="color: var(--text-grey);">Frequência:</span> <strong>${tpl.days_per_week} dias/sem</strong></div>
               <div><span style="color: var(--text-grey);">Exercícios:</span> <strong>~${totalExercises} no total</strong></div>
-              <div><span style="color: var(--text-grey);">Duração:</span> <strong>${tpl.duration || '45-60 min'}</strong></div>
-              <div><span style="color: var(--text-grey);">Nível:</span> <strong>${tpl.experience_level}</strong></div>
+              <div><span style="color: var(--text-grey);">Duração:</span> <strong>${tpl.duration || '40-50 min'}</strong></div>
+              <div><span style="color: var(--text-grey);">Equipamentos:</span> <strong>${tpl.equipments || 'Academia'}</strong></div>
             </div>
 
-            <div style="font-size: 11px; color: #a0aab8;">
-              <strong>Divisão:</strong> ${musclesSummary}
+            <div style="font-size: 11px; color: #a0aab8; margin-top: 6px;">
+              <strong>Divisão:</strong> ${musclesSummary || tpl.name}
             </div>
 
-            <div style="display: flex; gap: 8px; margin-top: 4px;">
-              <button onclick="openWorkoutPreviewModal('${tpl.id}')" class="btn btn-outline" style="flex: 1; padding: 8px 12px; font-size: 11.5px; font-weight: 700;">
-                👁️ Ver Treino
+            <div style="display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;">
+              <button onclick="openWorkoutPreviewModal('${tpl.id}')" class="btn btn-outline" style="flex: 1; min-width: 90px; padding: 8px 10px; font-size: 11.5px; font-weight: 700;">
+                👁️ Visualizar
               </button>
-              <button onclick="applyTemplateDirectly('${tpl.id}')" class="btn btn-primary" style="flex: 1.3; padding: 8px 12px; font-size: 11.5px; font-weight: 800;">
-                ✅ Usar Este Modelo
+              <button onclick="applyTemplateDirectly('${tpl.id}')" class="btn btn-primary" style="flex: 1.2; min-width: 110px; padding: 8px 10px; font-size: 11.5px; font-weight: 800;">
+                ✅ Usar modelo
+              </button>
+              <button onclick="openWorkoutPreviewModal('${tpl.id}'); applyPreviewModelToUserWorkouts(true);" class="btn btn-outline" style="flex: 1; min-width: 100px; padding: 8px 10px; font-size: 11.5px; font-weight: 700; color: var(--accent-cyan);">
+                ✏️ Personalizar
               </button>
             </div>
           </div>
@@ -7344,13 +7513,13 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
               <span style="display: inline-block; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 4px; background: rgba(0,210,255,0.1); color: var(--accent-cyan);">
-                🛠️ Montagem Manual
+                🛠️ Montar manualmente
               </span>
               <h4 style="font-size: 16px; font-weight: 800; color: white; margin: 4px 0 2px 0;">Montar Meu Próprio Treino do Zero</h4>
               <p style="font-size: 11.5px; color: var(--text-grey); margin: 0;">Você escolhe os nomes das fichas, os dias e seleciona cada exercício diretamente na biblioteca.</p>
             </div>
           </div>
-          <div style="margin-top: 6px;">
+          <div style="margin-top: 8px;">
             <button onclick="startManualWorkoutCreator()" class="btn btn-outline" style="width: 100%; padding: 9px; font-size: 12px; font-weight: 700; border-color: rgba(0,210,255,0.4); color: var(--accent-cyan);">
               🛠️ Abrir Montagem Manual
             </button>
@@ -7359,8 +7528,8 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       `;
 
       container.innerHTML = `
-        ${buildCard(top1, 'Recomendado para sua seleção', true)}
-        ${top2 && top2.id !== top1.id ? buildCard(top2, 'Outra opção', false) : ''}
+        ${buildCard(top1, 'Mais compatível com suas escolhas', true)}
+        ${top2 ? buildCard(top2, 'Alternativa com outra divisão', false) : ''}
         ${manualCard}
       `;
     }
@@ -7386,7 +7555,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       const metaEquip = document.getElementById('previewMetaEquip');
       if (metaEquip) metaEquip.innerText = tpl.equipments || 'Academia / Halteres';
       const metaDuration = document.getElementById('previewMetaDuration');
-      if (metaDuration) metaDuration.innerText = tpl.duration || '45-60 min';
+      if (metaDuration) metaDuration.innerText = tpl.duration || '40-50 min';
 
       const daysContainer = document.getElementById('previewDaysListContainer');
       if (daysContainer) {
@@ -7399,8 +7568,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
               ${d.exercises.map((ex, exIdx) => {
                 const matched = exercisesList.find(x => x.id === ex.id || (x.nome || '').toLowerCase() === ex.displayName.toLowerCase()) || {};
                 const icon = getMuscleGroupIcon(matched.grupoMuscular || 'Geral');
-                const safeName = (ex.displayName || 'Exercício').replace(/'/g, "\\'");
-                let gifUrl = matched.gifUrl || matched.gif_url || '';
+                const safeName = (ex.displayName || 'Exercício').replace(/'/g, "\'");
                 return `
                   <div style="display: flex; justify-content: space-between; align-items: center; background: #080a0f; padding: 9px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); gap: 10px;">
                     <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
@@ -7542,18 +7710,8 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     }
 
     function startManualWorkoutCreator() {
-      const goalsSec = document.getElementById('workoutAssistantGoalsSection');
-      const questSec = document.getElementById('workoutAssistantQuestionSection');
-      const resSec = document.getElementById('workoutAssistantResultsSection');
-      const manSec = document.getElementById('workoutAssistantManualSection');
+      wizardGoToStep('manual');
 
-      if (goalsSec) goalsSec.style.display = 'none';
-      if (questSec) questSec.style.display = 'none';
-      if (resSec) resSec.style.display = 'none';
-      if (manSec) manSec.style.display = 'block';
-
-      const badge = document.getElementById('wizardHeaderBadge');
-      if (badge) badge.innerText = 'Montagem Manual';
       const title = document.getElementById('wizardModalTitle');
       if (title) title.innerText = '🛠️ Montar Meu Próprio Treino';
       const sub = document.getElementById('wizardModalSubtitle');

@@ -242,6 +242,14 @@ CREATE TABLE IF NOT EXISTS public.workout_templates (
 
 ALTER TABLE public.workout_templates ENABLE ROW LEVEL SECURITY;
 
+-- Colunas adicionais de controle de experiência e volume
+ALTER TABLE public.workout_templates ADD COLUMN IF NOT EXISTS experience_level TEXT;
+ALTER TABLE public.workout_templates ADD COLUMN IF NOT EXISTS minimum_days INTEGER;
+ALTER TABLE public.workout_templates ADD COLUMN IF NOT EXISTS maximum_days INTEGER;
+ALTER TABLE public.workout_templates ADD COLUMN IF NOT EXISTS weekly_volume_min INTEGER;
+ALTER TABLE public.workout_templates ADD COLUMN IF NOT EXISTS weekly_volume_max INTEGER;
+ALTER TABLE public.workout_templates ADD COLUMN IF NOT EXISTS requires_supervision BOOLEAN NOT NULL DEFAULT false;
+
 CREATE TABLE IF NOT EXISTS public.workout_template_days (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   template_id UUID NOT NULL
