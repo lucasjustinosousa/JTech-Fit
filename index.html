@@ -2576,7 +2576,7 @@
           <span style="font-size: 11px; color: var(--accent-cyan); font-weight: 700;">Carregando animação 3D...</span>
         </div>
 
-        <img id="onlyGifImg" src="" alt="GIF Exercício" onload="handleOnlyGifLoaded(this)" onerror="handleOnlyGifError(this)" style="width: 100%; height: 100%; object-fit: contain; display: block;">
+        <img id="onlyGifImg" src="" alt="GIF Exercício" onload="if(typeof handleOnlyGifLoaded==='function')handleOnlyGifLoaded(this)" onerror="if(typeof handleOnlyGifError==='function')handleOnlyGifError(this)" style="width: 100%; height: 100%; object-fit: contain; display: block;">
         
         <div id="onlyGifFallback" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; color: var(--text-grey);">
           <div style="font-size: 54px; margin-bottom: 8px;">🏋️‍♂️</div>
@@ -2655,6 +2655,7 @@
   </div>
 
   <script>
+    console.log("[BOOT 1] App iniciou");
     // Migração automática transparente de dados legados (jtech_fit_* -> titannovafit_*)
     (function migrateLegacyStorage() {
       const keysToMigrate = [
@@ -2674,6 +2675,8 @@
     // Inicialização do Supabase JS Client com Persistência Oficial de Sessão
     const SUPABASE_URL = 'https://gplgywrvejefulsjpkax.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_em6WHZt2Ol8JZ16fe_Lcyg_ETq_kIPY';
+    console.log("[ENV] Supabase URL:", Boolean(SUPABASE_URL));
+    console.log("[ENV] Supabase Key:", Boolean(SUPABASE_ANON_KEY));
     let _supabase = null;
     if (window.supabase) {
       _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -2683,7 +2686,10 @@
           detectSessionInUrl: true
         }
       });
+      console.log("[BOOT 2] Supabase client criado");
       console.log('[PWA] Supabase conectado com sucesso com persistência de sessão!');
+    } else {
+      console.error("[AUTH ERROR] window.supabase não está disponível");
     }
 
     // Registro do Service Worker do PWA
@@ -6615,9 +6621,8 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           if (!silent) showSyncStatus('idle');
         }
       }
-        // Garantir que o canal Realtime esteja ativo para este usuário
-        setupSupabaseRealtimeSync(uid);
-      }
+      // Garantir que o canal Realtime esteja ativo para este usuário
+      setupSupabaseRealtimeSync(uid);
       renderAllWorkoutsUI();
     }
 
@@ -8686,6 +8691,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     let currentExerciseState = 'SUCESSO';
     let visibleExercisesLimit = 35;
     let isSyncInProgress = false;
+    const expandedCardsSet = new Set();
 
     async function loadExercisesLibrary() {
       try {
@@ -8934,8 +8940,6 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         if (syncIcon) syncIcon.classList.remove('spinning');
       }
     }
-
-    const expandedCardsSet = new Set();
 
     function toggleCardExpansion(id, event) {
       if (event) event.stopPropagation();
@@ -9989,161 +9993,188 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       alert('Nenhum dado de conta salvo previamente neste aparelho. Por favor, conecte-se à internet para entrar.');
     }
 
+    // Flag e função para remoção garantida da Splash Screen
+    let isSplashScreenRemoved = false;
+    function hideInitialSplashScreen() {
+      if (isSplashScreenRemoved) return;
+      isSplashScreenRemoved = true;
+      console.log("[BOOT 9] Removendo Splash Screen");
+      const loadingOverlay = document.getElementById('appInitialLoadingOverlay');
+      if (loadingOverlay) loadingOverlay.style.display = 'none';
+    }
+
     // Carregar sessão de usuário, treinos sincronizados na nuvem, histórico e restaurar estado
     window.addEventListener('load', async () => {
-      const loadingOverlay = document.getElementById('appInitialLoadingOverlay');
-      const sessionErrorBox = document.getElementById('appSessionErrorBox');
       const continueOfflineBtn = document.getElementById('appContinueOfflineBtn');
+      const sessionErrorBox = document.getElementById('appSessionErrorBox');
 
-      let sessionErrorOccurred = false;
+      // Proteção de timeout absoluto de 8 segundos (Passo 8)
+      const bootSafetyTimeout = setTimeout(() => {
+        if (!isSplashScreenRemoved) {
+          console.error("[AUTH ERROR] Timeout de 8 segundos excedido ao verificar sessão no Supabase. Destravando aplicação...");
+          hideInitialSplashScreen();
+          if (!currentAuthUser) {
+            const navEl = document.getElementById('bottomNav');
+            if (navEl) navEl.style.display = 'none';
+            switchTab('screenAuth');
+            switchAuthMode('login');
+          }
+        }
+      }, 8000);
 
-      // 1. Restaurar sessão do Supabase Authentication
-      if (_supabase) {
-        try {
-          const { data: { session }, error: sessionError } = await _supabase.auth.getSession();
-          if (sessionError) {
-            console.error("Erro ao recuperar sessão:", sessionError);
-            sessionErrorOccurred = true;
-          } else if (session && session.user) {
-            currentAuthUser = session.user;
-            localStorage.setItem('titannovafit_user', JSON.stringify({
-              id: session.user.id,
-              email: session.user.email,
-              nome: (session.user.user_metadata && session.user.user_metadata.nome) || session.user.email.split('@')[0]
-            }));
-            await checkAdminPermission(session.user.id);
-          } else {
-            // Nenhuma sessão Supabase ativa: limpar qualquer dado residual e exigir login/cadastro
-            currentAuthUser = null;
-            localStorage.removeItem('titannovafit_user');
+      try {
+        console.log("[BOOT 3] Iniciando getSession");
+        let session = null;
+
+        if (_supabase) {
+          try {
+            // Timeout individual de 7.5 segundos para getSession
+            const sessionPromise = _supabase.auth.getSession();
+            const timeoutPromise = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Timeout na chamada de getSession")), 7500)
+            );
+            const { data, error: sessionError } = await Promise.race([sessionPromise, timeoutPromise]);
+            console.log("[BOOT 4] getSession respondeu");
+
+            if (sessionError) {
+              console.error("[AUTH ERROR] Erro ao recuperar sessão:", sessionError);
+            } else if (data && data.session) {
+              session = data.session;
+            }
+          } catch (err) {
+            console.error("[AUTH ERROR] Exceção em getSession:", err);
           }
 
-          // Monitorar mudanças contínuas de autenticação
-          _supabase.auth.onAuthStateChange(async (event, session) => {
-            if (session && session.user) {
-              const previousId = currentAuthUser ? currentAuthUser.id : null;
-              currentAuthUser = session.user;
-              localStorage.setItem('titannovafit_user', JSON.stringify({
-                id: session.user.id,
-                email: session.user.email,
-                nome: (session.user.user_metadata && session.user.user_metadata.nome) || session.user.email.split('@')[0]
-              }));
-              await checkAdminPermission(session.user.id);
-              await syncUserToDatabase(session.user);
-              updateProfileUI();
-
-              if (event === 'SIGNED_IN' || previousId !== session.user.id) {
-                await carregarDadosDoUsuario(session.user.id);
+          // Monitorar mudanças contínuas de autenticação (Passo 6: desobstruído e limpo)
+          try {
+            _supabase.auth.onAuthStateChange((event, newSession) => {
+              if (event === 'SIGNED_IN' && newSession && newSession.user) {
+                const isDifferentUser = !currentAuthUser || currentAuthUser.id !== newSession.user.id;
+                currentAuthUser = newSession.user;
+                localStorage.setItem('titannovafit_user', JSON.stringify({
+                  id: newSession.user.id,
+                  email: newSession.user.email,
+                  nome: (newSession.user.user_metadata && newSession.user.user_metadata.nome) || newSession.user.email.split('@')[0]
+                }));
+                updateProfileUI();
+                if (isDifferentUser) {
+                  carregarDadosDoUsuario(newSession.user.id).catch(e => console.error("[AUTH ERROR]", e));
+                }
+              } else if (event === 'SIGNED_OUT') {
+                currentAuthUser = null;
+                isCurrentSessionAdmin = false;
+                localStorage.removeItem('titannovafit_user');
+                const navEl = document.getElementById('bottomNav');
+                if (navEl) navEl.style.display = 'none';
+                switchTab('screenAuth');
+                switchAuthMode('login');
               }
-            } else if (event === 'SIGNED_OUT') {
-              currentAuthUser = null;
-              isCurrentSessionAdmin = false;
-              localStorage.removeItem('titannovafit_user');
-              const navEl = document.getElementById('bottomNav');
-              if (navEl) navEl.style.display = 'none';
-              switchTab('screenAuth');
-              switchAuthMode('login');
+            });
+          } catch (authListenerErr) {
+            console.error("[AUTH ERROR] onAuthStateChange listener error:", authListenerErr);
+          }
+        } else {
+          console.error("[AUTH ERROR] Supabase client indisponível");
+        }
+
+        console.log("[BOOT 5] Sessão:", !!session);
+
+        if (session && session.user) {
+          console.log("[BOOT 6] Iniciando carregamento do perfil");
+          currentAuthUser = session.user;
+          localStorage.setItem('titannovafit_user', JSON.stringify({
+            id: session.user.id,
+            email: session.user.email,
+            nome: (session.user.user_metadata && session.user.user_metadata.nome) || session.user.email.split('@')[0]
+          }));
+          try {
+            updateProfileUI();
+          } catch (e) {
+            console.error("[AUTH ERROR] updateProfileUI:", e);
+          }
+          console.log("[BOOT 7] Perfil carregado");
+          console.log("[BOOT 8] Auth finalizado");
+
+          // PASSO 7: Libera imediatamente o app e remove a Splash Screen ANTES de dados secundários!
+          clearTimeout(bootSafetyTimeout);
+          hideInitialSplashScreen();
+
+          const navEl = document.getElementById('bottomNav');
+          if (navEl) navEl.style.display = 'flex';
+
+          // Roteamento imediato
+          const hash = (window.location.hash || '').toLowerCase();
+          const savedTab = localStorage.getItem('titannovafit_active_tab');
+          let targetScreen = 'screenHome';
+          if (hash.includes('admin')) targetScreen = 'screenAdmin';
+          else if (hash.includes('history') || hash.includes('historico')) targetScreen = 'screenHistory';
+          else if (hash.includes('exercises') || hash.includes('exercicios')) targetScreen = 'screenExercises';
+          else if (hash.includes('workouts') || hash.includes('treinos')) targetScreen = 'screenWorkouts';
+          else if (hash.includes('profile') || hash.includes('perfil')) targetScreen = 'screenProfile';
+          else if (savedTab && document.getElementById(savedTab)) targetScreen = savedTab;
+
+          if (targetScreen === 'screenAdmin') {
+            navigateToAdminPanel().catch(e => console.error("[AUTH ERROR]", e));
+          } else {
+            switchTab(targetScreen);
+          }
+
+          // Carga secundária assíncrona em background (NÃO bloqueia o app)
+          (async () => {
+            try {
+              await checkAdminPermission(session.user.id);
+            } catch (err) {
+              console.error("[AUTH ERROR] checkAdminPermission:", err);
             }
-          });
-        } catch (e) {
-          console.warn('[Session Recovery Notice]:', e);
-          sessionErrorOccurred = true;
+            try {
+              await carregarDadosDoUsuario(session.user.id);
+            } catch (err) {
+              console.error("[AUTH ERROR] carregarDadosDoUsuario:", err);
+            }
+            try {
+              restoreActiveSessionFromStorage();
+              updateHomeScreenUI();
+            } catch (err) {
+              console.error("[AUTH ERROR] restoreActiveSession:", err);
+            }
+            try {
+              const hasAccepted = await checkUserLegalAcceptance(session.user.id);
+              if (!hasAccepted) openMandatoryLegalModal();
+            } catch (err) {
+              console.error("[AUTH ERROR] checkUserLegalAcceptance:", err);
+            }
+          })();
+
+        } else {
+          // Sessão não encontrada -> vai para Login
+          currentAuthUser = null;
+          localStorage.removeItem('titannovafit_user');
+          console.log("[BOOT 8] Auth finalizado");
+          clearTimeout(bootSafetyTimeout);
+          hideInitialSplashScreen();
+
+          const navEl = document.getElementById('bottomNav');
+          if (navEl) navEl.style.display = 'none';
+          switchTab('screenAuth');
+          switchAuthMode('login');
         }
-      }
 
-      // Tratar falha de rede na recuperação de sessão
-      if (sessionErrorOccurred && !currentAuthUser) {
-        const cachedUser = localStorage.getItem('titannovafit_user');
-        if (cachedUser) {
-          if (continueOfflineBtn) continueOfflineBtn.style.display = 'inline-block';
-        }
-        if (sessionErrorBox) sessionErrorBox.style.display = 'block';
-        const spinner = document.getElementById('appInitialLoadingSpinner');
-        if (spinner) spinner.style.display = 'none';
-        const statusText = document.getElementById('appInitialLoadingStatus');
-        if (statusText) statusText.style.display = 'none';
-        return;
-      }
+        // Carregar catálogo de exercícios em background sem travar
+        loadExercisesLibrary().catch(err => console.error("[AUTH ERROR] loadExercisesLibrary:", err));
 
-      // 1. Carregar a biblioteca de 1.500 exercícios da ExerciseDB V1 imediatamente para todos os modos
-      try {
-        await loadExercisesLibrary();
-      } catch (err) {
-        console.warn("[Biblioteca] Aviso na carga inicial:", err);
-      }
+        // Roteamento direto por hash público (termos, politica, etc.)
+        const currentHash = (window.location.hash || '').toLowerCase();
+        if (currentHash.includes('termos')) openTermsModal();
+        else if (currentHash.includes('politica') || currentHash.includes('privacidade')) openPrivacyModal();
+        else if (currentHash.includes('cookies') || currentHash.includes('configuracoes-de-privacidade')) openPrivacySettingsModal();
+        else if (currentHash.includes('excluir-conta')) openDeleteAccountModal();
 
-      // Se usuário não tiver sessão ativa, exibir tela de Login
-      if (!currentAuthUser) {
-        if (loadingOverlay) loadingOverlay.style.display = 'none';
-        const navEl = document.getElementById('bottomNav');
-        if (navEl) navEl.style.display = 'none';
+      } catch (fatalBootErr) {
+        console.error("[AUTH ERROR] Erro crítico no boot:", fatalBootErr);
+        clearTimeout(bootSafetyTimeout);
+        hideInitialSplashScreen();
         switchTab('screenAuth');
         switchAuthMode('login');
-        return;
-      }
-
-      const navEl = document.getElementById('bottomNav');
-      if (navEl) navEl.style.display = 'flex';
-      updateProfileUI();
-
-      // 2. Carregar treinos, histórico e dados sincronizados na nuvem
-      await carregarDadosDoUsuario(currentAuthUser.id);
-      const hasActiveWorkout = restoreActiveSessionFromStorage();
-      updateHomeScreenUI();
-
-      // Esconder overlay inicial suavemente
-      if (loadingOverlay) loadingOverlay.style.display = 'none';
-
-      // 3. Roteamento Inteligente e Persistência de Tela ao Atualizar a Página
-      const hash = (window.location.hash || '').toLowerCase();
-      const savedTab = localStorage.getItem('titannovafit_active_tab');
-
-      let targetScreen = 'screenHome';
-
-      if (hash.includes('admin')) {
-        targetScreen = 'screenAdmin';
-      } else if (hash.includes('history') || hash.includes('historico')) {
-        targetScreen = 'screenHistory';
-      } else if (hash.includes('exercises') || hash.includes('exercicios')) {
-        targetScreen = 'screenExercises';
-      } else if (hash.includes('workouts') || hash.includes('treinos')) {
-        targetScreen = 'screenWorkouts';
-      } else if (hash.includes('profile') || hash.includes('perfil')) {
-        targetScreen = 'screenProfile';
-      } else if (hash.includes('active') || hash.includes('treino-ativo')) {
-        targetScreen = hasActiveWorkout ? 'screenActiveWorkout' : 'screenWorkouts';
-      } else if (hasActiveWorkout) {
-        targetScreen = 'screenActiveWorkout';
-      } else if (savedTab && document.getElementById(savedTab)) {
-        // Restaurar exatamente a última tela onde o usuário estava ao dar F5
-        targetScreen = savedTab;
-      }
-
-      if (targetScreen === 'screenAdmin') {
-        await navigateToAdminPanel();
-      } else {
-        switchTab(targetScreen);
-      }
-
-      // 4. Verificação de Aceite Obrigatório dos Termos Vigentes (1.0)
-      if (currentAuthUser && currentAuthUser.id) {
-        try {
-          const hasAccepted = await checkUserLegalAcceptance(currentAuthUser.id);
-          if (!hasAccepted) {
-            openMandatoryLegalModal();
-          }
-        } catch (_) {}
-      }
-
-      // 5. Abertura direta de documentos por rota/hash público
-      if (hash.includes('termos')) {
-        openTermsModal();
-      } else if (hash.includes('politica') || hash.includes('privacidade')) {
-        openPrivacyModal();
-      } else if (hash.includes('cookies') || hash.includes('configuracoes-de-privacidade')) {
-        openPrivacySettingsModal();
-      } else if (hash.includes('excluir-conta')) {
-        openDeleteAccountModal();
       }
     });
 
