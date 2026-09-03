@@ -2147,9 +2147,12 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
       switchTab('screenAdmin');
       await loadAdminDashboardData();
+      const lastSubTab = localStorage.getItem('titannovafit_admin_subtab') || 'exercises';
+      switchAdminSubTab(lastSubTab);
     }
 
     function switchAdminSubTab(tab) {
+      localStorage.setItem('titannovafit_admin_subtab', tab);
       const btnEx = document.getElementById('adminTabExercisesBtn');
       const btnUsers = document.getElementById('adminTabUsersBtn');
       const btnLogs = document.getElementById('adminTabLogsBtn');
@@ -2744,9 +2747,25 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         navItems[navMap[screenId]].classList.add('active');
       }
 
-      // Salvar aba ativa no localStorage
+      // Salvar aba ativa no localStorage para persistência completa ao atualizar a página
       if (screenId && screenId !== 'screenAuth') {
         localStorage.setItem('titannovafit_active_tab', screenId);
+
+        const hashMap = {
+          'screenHome': 'home',
+          'screenWorkouts': 'treinos',
+          'screenExercises': 'exercicios',
+          'screenHistory': 'historico',
+          'screenProfile': 'perfil',
+          'screenAdmin': 'admin',
+          'screenActiveWorkout': 'treino-ativo'
+        };
+        const hashVal = hashMap[screenId] || '';
+        if (hashVal && window.location.hash !== '#' + hashVal) {
+          try {
+            history.replaceState(null, '', '#' + hashVal);
+          } catch (_) {}
+        }
       }
 
       // Gerenciar barra flutuante de treino em andamento
@@ -6984,8 +7003,23 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             }));
             await checkAdminPermission(session.user.id);
           } else {
-            currentAuthUser = null;
-            localStorage.removeItem('titannovafit_user');
+            // Verificar se há uma sessão de convidado salva no localStorage
+            const localUser = localStorage.getItem('titannovafit_user');
+            if (localUser) {
+              try {
+                const parsed = JSON.parse(localUser);
+                if (parsed && (parsed.role === 'guest' || (parsed.id && String(parsed.id).startsWith('guest_')))) {
+                  currentAuthUser = parsed;
+                } else {
+                  currentAuthUser = null;
+                  localStorage.removeItem('titannovafit_user');
+                }
+              } catch (_) {
+                currentAuthUser = null;
+              }
+            } else {
+              currentAuthUser = null;
+            }
           }
 
           // Monitorar mudanças contínuas de autenticação
@@ -7044,15 +7078,48 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       const hasActiveWorkout = restoreActiveSessionFromStorage();
       updateHomeScreenUI();
 
-      // 3. Roteamento por URL / Hash
-      const hash = window.location.hash || '';
+      // 3. Roteamento Inteligente e Persistência de Tela ao Atualizar a Página
+      const hash = (window.location.hash || '').toLowerCase();
+      const savedTab = localStorage.getItem('titannovafit_active_tab');
+
+      let targetScreen = 'screenHome';
+
       if (hash.includes('admin')) {
-        await navigateToAdminPanel();
+        targetScreen = 'screenAdmin';
+      } else if (hash.includes('history') || hash.includes('historico')) {
+        targetScreen = 'screenHistory';
+      } else if (hash.includes('exercises') || hash.includes('exercicios')) {
+        targetScreen = 'screenExercises';
+      } else if (hash.includes('workouts') || hash.includes('treinos')) {
+        targetScreen = 'screenWorkouts';
+      } else if (hash.includes('profile') || hash.includes('perfil')) {
+        targetScreen = 'screenProfile';
+      } else if (hash.includes('active') || hash.includes('treino-ativo')) {
+        targetScreen = hasActiveWorkout ? 'screenActiveWorkout' : 'screenWorkouts';
       } else if (hasActiveWorkout) {
-        switchTab('screenActiveWorkout');
-      } else {
-        switchTab('screenHome');
+        targetScreen = 'screenActiveWorkout';
+      } else if (savedTab && document.getElementById(savedTab)) {
+        // Restaurar exatamente a última tela onde o usuário estava ao dar F5
+        targetScreen = savedTab;
       }
+
+      if (targetScreen === 'screenAdmin') {
+        await navigateToAdminPanel();
+      } else {
+        switchTab(targetScreen);
+      }
+    });
+
+    // Navegação com botões Voltar/Avançar do Navegador
+    window.addEventListener('hashchange', () => {
+      if (!currentAuthUser) return;
+      const h = (window.location.hash || '').toLowerCase();
+      if (h.includes('admin')) navigateToAdminPanel();
+      else if (h.includes('historico') || h.includes('history')) switchTab('screenHistory');
+      else if (h.includes('exercicios') || h.includes('exercises')) switchTab('screenExercises');
+      else if (h.includes('treinos') || h.includes('workouts')) switchTab('screenWorkouts');
+      else if (h.includes('perfil') || h.includes('profile')) switchTab('screenProfile');
+      else if (h.includes('home') || h === '' || h === '#') switchTab('screenHome');
     });
 
     // Sincronizar dados automaticamente ao voltar para a aba do navegador
