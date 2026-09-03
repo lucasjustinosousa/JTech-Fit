@@ -42,6 +42,22 @@
       "destination": "/api/$1"
     },
     {
+      "source": "/termos-de-uso",
+      "destination": "/termos-de-uso.html"
+    },
+    {
+      "source": "/politica-de-privacidade",
+      "destination": "/politica-de-privacidade.html"
+    },
+    {
+      "source": "/configuracoes-de-privacidade",
+      "destination": "/configuracoes-de-privacidade.html"
+    },
+    {
+      "source": "/excluir-conta",
+      "destination": "/excluir-conta.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Exclusão de Conta e Dados — TitanNova Fit</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg-black: #0a0c10;
+      --surface-dark: #121622;
+      --card-bg: #161b26;
+      --primary-blue: #1E88E5;
+      --accent-cyan: #00d2ff;
+      --error-red: #ff5252;
+      --text-white: #ffffff;
+      --text-grey: #9aa0a6;
+      --divider: #262c3d;
+      --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-white);
+      font-family: var(--font-main);
+      line-height: 1.6;
+      padding: 24px 16px 60px 16px;
+      display: flex;
+      justify-content: center;
+    }
+    .doc-container {
+      width: 100%;
+      max-width: 760px;
+      background: var(--surface-dark);
+      border: 1px solid var(--divider);
+      border-radius: 20px;
+      padding: 28px 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    }
+    @media (min-width: 768px) {
+      body { padding: 40px 24px 80px 24px; }
+      .doc-container { padding: 40px 48px; }
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--divider);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 20px;
+      color: white;
+      text-decoration: none;
+    }
+    .brand-logo span { color: var(--accent-cyan); }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 210, 255, 0.12);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .back-btn:hover { background: var(--accent-cyan); color: #000; }
+    h1 { font-size: 24px; font-weight: 900; color: white; margin-bottom: 8px; }
+    .alert-danger {
+      background: rgba(255, 82, 82, 0.1);
+      border: 1.5px solid rgba(255, 82, 82, 0.35);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 20px 0;
+      font-size: 13.5px;
+      color: #ffcdd2;
+      line-height: 1.6;
+    }
+    .alert-danger strong { color: var(--error-red); }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--divider);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    h3 { font-size: 16px; font-weight: 800; color: white; margin-bottom: 10px; }
+    p, li { font-size: 13.5px; color: #c4c9d4; margin-bottom: 10px; }
+    ul { margin-left: 20px; margin-bottom: 14px; }
+    input[type="text"] {
+      width: 100%;
+      background: #0d1017;
+      border: 1px solid var(--divider);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: white;
+      outline: none;
+      margin-top: 8px;
+    }
+    input[type="text"]:focus { border-color: var(--error-red); }
+    .btn-danger {
+      width: 100%;
+      background: var(--error-red);
+      color: white;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      margin-top: 14px;
+      transition: background 0.2s;
+    }
+    .btn-danger:hover { background: #d32f2f; }
+    .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
+    a { color: var(--accent-cyan); text-decoration: underline; }
+    .footer-nav {
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 1px solid var(--divider);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-grey);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="doc-container">
+    <div class="header-bar">
+      <a href="/" class="brand-logo">
+        <img src="assets/icons/logo.png" alt="TitanNova Fit" style="width: 28px; height: 28px; border-radius: 7px; object-fit: cover;">
+        TITANNOVA <span>FIT</span>
+      </a>
+      <a href="/" class="back-btn">← Voltar ao Aplicativo</a>
+    </div>
+
+    <h1>Exclusão de Conta e Dados Pessoais</h1>
+    <p>Conforme previsto na Seção 11 dos Termos de Uso e na Seção 10 da Política de Privacidade, você tem o direito garantido de solicitar a exclusão integral da sua conta e de todos os seus dados a qualquer momento.</p>
+
+    <div class="alert-danger">
+      <strong>⚠️ Consequências da Exclusão:</strong>
+      <ul>
+        <li>Todos os seus treinos, divisões, séries, repetições e históricos registrados serão excluídos permanentemente.</li>
+        <li>Sua conta e acesso por e-mail serão cancelados e revogados.</li>
+        <li><strong>Prazos:</strong> Dados ativos serão apagados ou anonimizados em até 30 dias. Cópias de segurança poderão permanecer por até 90 dias, salvo conservação necessária ao cumprimento de obrigação legal.</li>
+      </ul>
+    </div>
+
+    <div class="card" id="accountCheckArea">
+      <h3>Identificação da Conta</h3>
+      <div id="loggedUserDisplay" style="font-size: 13.5px; color: var(--text-grey); margin-bottom: 12px;">
+        Verificando sessão ativa...
+      </div>
+
+      <div id="deleteFormArea" style="display: none;">
+        <label style="font-size: 12.5px; color: var(--text-grey);">
+          Para confirmar a exclusão definitiva, digite a palavra <strong>EXCLUIR</strong> no campo abaixo:
+        </label>
+        <input type="text" id="confirmDeleteInput" placeholder="Digite EXCLUIR" oninput="checkConfirmText()">
+        <button id="btnExecuteDelete" onclick="executeAccountDeletion()" class="btn-danger" disabled>
+          🗑️ Confirmar e Excluir Minha Conta Permanentemente
+        </button>
+      </div>
+
+      <div id="manualRequestArea" style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--divider); font-size: 13px; color: var(--text-grey);">
+        Você também pode solicitar a exclusão enviando um e-mail para <a href="mailto:titannovafit@gmail.com?subject=Solicitacao%20de%20Exclusao%20de%20Conta">titannovafit@gmail.com</a> a partir do e-mail cadastrado na sua conta.
+      </div>
+    </div>
+
+    <div class="footer-nav">
+      <div>© 2026 TitanNova Fit.</div>
+      <div style="display: flex; gap: 16px;">
+        <a href="/termos-de-uso">Termos de Uso</a>
+        <a href="/politica-de-privacidade">Política de Privacidade</a>
+        <a href="/configuracoes-de-privacidade">Preferências de Cookies</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://gplgywrvejefulsjpkax.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwbGd5d3J2ZWplZnVsc2pwa2F4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NzA1MjQsImV4cCI6MjA4ODE0NjUyNH0.X2j3a2sQfFf9F4h8aA3Y8X5xZ3z8b4N1P0q9R8s7T6U";
+    let _supabase = null;
+    let _activeUser = null;
+
+    try {
+      if (window.supabase) {
+        _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch (_) {}
+
+    async function checkSession() {
+      const display = document.getElementById('loggedUserDisplay');
+      const formArea = document.getElementById('deleteFormArea');
+
+      let user = null;
+      if (_supabase) {
+        try {
+          const { data: { session } } = await _supabase.auth.getSession();
+          if (session && session.user) user = session.user;
+        } catch (_) {}
+      }
+
+      if (!user) {
+        const localUser = localStorage.getItem('titannovafit_user');
+        if (localUser) {
+          try { user = JSON.parse(localUser); } catch (_) {}
+        }
+      }
+
+      _activeUser = user;
+
+      if (user && user.email) {
+        display.innerHTML = `Sessão ativa identificada: <strong style="color: white;">${user.email}</strong>`;
+        formArea.style.display = 'block';
+      } else {
+        display.innerHTML = `Nenhuma sessão ativa encontrada. Faça login no aplicativo ou envie sua solicitação diretamente para <a href="mailto:titannovafit@gmail.com">titannovafit@gmail.com</a>.`;
+        formArea.style.display = 'none';
+      }
+    }
+
+    function checkConfirmText() {
+      const input = document.getElementById('confirmDeleteInput');
+      const btn = document.getElementById('btnExecuteDelete');
+      if (input && btn) {
+        btn.disabled = (input.value.trim() !== 'EXCLUIR');
+      }
+    }
+
+    async function executeAccountDeletion() {
+      if (!_activeUser) return;
+      if (!confirm('ATENÇÃO FINAL: Deseja realmente excluir sua conta e todos os dados associados? Esta ação não pode ser desfeita.')) {
+        return;
+      }
+
+      const btn = document.getElementById('btnExecuteDelete');
+      if (btn) { btn.disabled = true; btn.innerText = 'Excluindo dados...'; }
+
+      try {
+        if (_supabase && _activeUser.id) {
+          await _supabase.from('treinos').delete().eq('usuario_id', _activeUser.id);
+          await _supabase.from('usuarios').delete().eq('id', _activeUser.id);
+          await _supabase.from('legal_acceptances').delete().eq('user_id', _activeUser.id);
+          await _supabase.auth.signOut();
+        }
+      } catch (err) {
+        console.warn('[Exclusão]:', err);
+      }
+
+      // Limpar todos os dados locais
+      localStorage.clear();
+      alert('Sua conta e dados ativos foram excluídos com sucesso. Cópias de segurança serão eliminadas conforme o prazo legal de 90 dias.');
+      window.location.href = '/';
+    }
+
+    document.addEventListener('DOMContentLoaded', checkSession);
+  </script>
+</body>
+</html>

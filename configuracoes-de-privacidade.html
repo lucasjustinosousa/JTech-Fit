@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Configurações de Privacidade e Cookies — TitanNova Fit</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-black: #0a0c10;
+      --surface-dark: #121622;
+      --card-bg: #161b26;
+      --primary-blue: #1E88E5;
+      --accent-cyan: #00d2ff;
+      --success-green: #4CAF50;
+      --text-white: #ffffff;
+      --text-grey: #9aa0a6;
+      --divider: #262c3d;
+      --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-white);
+      font-family: var(--font-main);
+      line-height: 1.6;
+      padding: 24px 16px 60px 16px;
+      display: flex;
+      justify-content: center;
+    }
+    .doc-container {
+      width: 100%;
+      max-width: 760px;
+      background: var(--surface-dark);
+      border: 1px solid var(--divider);
+      border-radius: 20px;
+      padding: 28px 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    }
+    @media (min-width: 768px) {
+      body { padding: 40px 24px 80px 24px; }
+      .doc-container { padding: 40px 48px; }
+    }
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--divider);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 20px;
+      color: white;
+      text-decoration: none;
+    }
+    .brand-logo span { color: var(--accent-cyan); }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 210, 255, 0.12);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 210, 255, 0.3);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .back-btn:hover { background: var(--accent-cyan); color: #000; }
+    h1 {
+      font-size: 24px;
+      font-weight: 900;
+      color: white;
+      margin-bottom: 10px;
+    }
+    p { font-size: 14px; color: #c4c9d4; margin-bottom: 14px; }
+    .preference-card {
+      background: var(--card-bg);
+      border: 1px solid var(--divider);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .pref-info h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pref-info p {
+      font-size: 12.5px;
+      color: var(--text-grey);
+      margin: 0;
+      line-height: 1.5;
+    }
+    .badge-always {
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(76, 175, 80, 0.18);
+      color: var(--success-green);
+      border: 1px solid rgba(76, 175, 80, 0.4);
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #2c3344;
+      transition: .3s;
+      border-radius: 26px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--accent-cyan); }
+    input:checked + .slider:before { transform: translateX(22px); }
+    .actions-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      flex: 1;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      border: none;
+      min-width: 140px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #00d2ff 0%, #1E88E5 100%);
+      color: white;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--divider);
+      color: var(--text-white);
+    }
+    .btn-outline:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+    .status-alert {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      display: none;
+      text-align: center;
+      font-weight: 700;
+    }
+    .footer-nav {
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 1px solid var(--divider);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-grey);
+    }
+    a { color: var(--accent-cyan); text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <div class="doc-container">
+    <div class="header-bar">
+      <a href="/" class="brand-logo">
+        <img src="assets/icons/logo.png" alt="TitanNova Fit" style="width: 28px; height: 28px; border-radius: 7px; object-fit: cover;">
+        TITANNOVA <span>FIT</span>
+      </a>
+      <a href="/" class="back-btn">← Voltar ao Aplicativo</a>
+    </div>
+
+    <h1>Configurações de Privacidade e Cookies</h1>
+    <p>Nós valorizamos sua privacidade e garantimos total transparência. Abaixo você pode gerenciar suas preferências de armazenamento e telemetria.</p>
+
+    <!-- Card 1: Cookies Necessários -->
+    <div class="preference-card">
+      <div class="pref-info">
+        <h3>🔒 Cookies e Armazenamento Necessários</h3>
+        <p>Essenciais para o funcionamento básico da aplicação: autenticação de login, sessões ativas, armazenamento de treinos em modo offline (IndexedDB) e sincronização segura com Supabase. Não podem ser desativados.</p>
+      </div>
+      <div class="badge-always">Sempre Ativos</div>
+    </div>
+
+    <!-- Card 2: Análise / Telemetria -->
+    <div class="preference-card">
+      <div class="pref-info">
+        <h3>📊 Google Analytics (Métricas de Uso)</h3>
+        <p>Permite coletar estatísticas agregadas e anônimas sobre páginas visitadas e eventuais erros, ajudando a aprimorar o desempenho e a estabilidade do TitanNova Fit. Permanece desativado até sua autorização expressa.</p>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="analyticsToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <!-- Botões de Ação Conforme Especificado -->
+    <div class="actions-row">
+      <button onclick="savePreference(false)" class="btn btn-outline">Recusar</button>
+      <button onclick="savePreference(true)" class="btn btn-outline" style="border-color: var(--accent-cyan); color: var(--accent-cyan);">Aceitar análise</button>
+      <button onclick="saveCurrentToggle()" class="btn btn-primary">Salvar preferências</button>
+    </div>
+
+    <div id="statusAlert" class="status-alert"></div>
+
+    <div class="footer-nav">
+      <div>© 2026 TitanNova Fit.</div>
+      <div style="display: flex; gap: 16px;">
+        <a href="/termos-de-uso">Termos de Uso</a>
+        <a href="/politica-de-privacidade">Política de Privacidade</a>
+        <a href="/excluir-conta">Exclusão de Conta</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function loadSavedPreference() {
+      const consent = localStorage.getItem('titannovafit_analytics_consent');
+      const toggle = document.getElementById('analyticsToggle');
+      if (toggle) {
+        // Inicialmente desativado, a menos que o usuário tenha aceitado expressamente
+        toggle.checked = (consent === 'true');
+      }
+    }
+
+    function savePreference(val) {
+      localStorage.setItem('titannovafit_analytics_consent', val ? 'true' : 'false');
+      const toggle = document.getElementById('analyticsToggle');
+      if (toggle) toggle.checked = val;
+      showFeedback(val ? 'Preferência salva: Análise permitida.' : 'Preferência salva: Análise recusada.');
+    }
+
+    function saveCurrentToggle() {
+      const toggle = document.getElementById('analyticsToggle');
+      const val = toggle ? toggle.checked : false;
+      savePreference(val);
+    }
+
+    function showFeedback(msg) {
+      const el = document.getElementById('statusAlert');
+      if (el) {
+        el.innerText = '✅ ' + msg;
+        el.style.background = 'rgba(76, 175, 80, 0.15)';
+        el.style.color = '#81c784';
+        el.style.border = '1px solid rgba(76, 175, 80, 0.4)';
+        el.style.display = 'block';
+        setTimeout(() => { el.style.display = 'none'; }, 3500);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSavedPreference);
+  </script>
+</body>
+</html>

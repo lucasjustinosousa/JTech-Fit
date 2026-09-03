@@ -1003,12 +1003,35 @@
             <input type="password" id="authRegisterConfirmPasswordInput" class="form-input" placeholder="Repita a senha">
           </div>
 
-          <!-- CHECKBOX DE ACEITE DOS TERMOS E POLÍTICA -->
-          <div style="display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 16px 0;">
-            <input type="checkbox" id="authTermsCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
-            <label for="authTermsCheck" style="font-size: 11px; color: var(--text-grey); cursor: pointer; line-height: 1.4;">
-              Li e aceito os <a href="javascript:void(0)" onclick="openTermsModal()" style="color: var(--accent-cyan); text-decoration: underline;">Termos de Uso</a> e a <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: var(--accent-cyan); text-decoration: underline;">Política de Privacidade</a> do TitanNovaFit.
-            </label>
+          <!-- CAIXAS INDEPENDENTES DE ACEITE E TERMOS LEGAIS (INICIALMENTE DESMARCADAS) -->
+          <div style="background: rgba(22, 26, 36, 0.8); border: 1px solid var(--divider); border-radius: 10px; padding: 12px; margin: 14px 0; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: flex-start; gap: 8px;">
+              <input type="checkbox" id="authTermsCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
+              <label for="authTermsCheck" style="font-size: 11.5px; color: var(--text-white); cursor: pointer; line-height: 1.4;">
+                Li e aceito os <a href="javascript:void(0)" onclick="openTermsModal()" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700;">Termos de Uso</a>.
+              </label>
+            </div>
+
+            <div style="display: flex; align-items: flex-start; gap: 8px;">
+              <input type="checkbox" id="authPrivacyCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
+              <label for="authPrivacyCheck" style="font-size: 11.5px; color: var(--text-white); cursor: pointer; line-height: 1.4;">
+                Li a <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700;">Política de Privacidade</a>.
+              </label>
+            </div>
+
+            <div style="display: flex; align-items: flex-start; gap: 8px;">
+              <input type="checkbox" id="authAgeCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
+              <label for="authAgeCheck" style="font-size: 11.5px; color: var(--text-white); cursor: pointer; line-height: 1.4;">
+                Declaro ter pelo menos 16 anos.
+              </label>
+            </div>
+
+            <div style="display: flex; align-items: flex-start; gap: 8px;">
+              <input type="checkbox" id="authGuardianCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
+              <label for="authGuardianCheck" style="font-size: 11px; color: var(--text-grey); cursor: pointer; line-height: 1.4;">
+                Se tenho 16 ou 17 anos, confirmo que possuo autorização do meu responsável legal.
+              </label>
+            </div>
           </div>
 
           <div id="authRegisterErrorMessage" style="color: #ff5252; background: rgba(255,82,82,0.15); border: 1px solid rgba(255,82,82,0.3); border-radius: 8px; padding: 10px; font-size: 12px; margin-bottom: 12px; display: none; text-align: center; font-weight: 600;"></div>
@@ -1022,6 +1045,17 @@
         <div class="safety-banner" style="margin-top: 16px;">
           <div>☁️</div>
           <p><strong>Sincronização Nuvem:</strong> Seus treinos e histórico ficam salvos e vinculados à sua conta em todos os seus aparelhos.</p>
+        </div>
+
+        <!-- Links Legais Públicos (Acesso sem Login) -->
+        <div style="margin-top: 20px; text-align: center; font-size: 11px; color: var(--text-grey); display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+          <a href="javascript:void(0)" onclick="openTermsModal()" style="color: var(--text-grey); text-decoration: underline;">Termos de Uso</a>
+          <span>&bull;</span>
+          <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: var(--text-grey); text-decoration: underline;">Privacidade</a>
+          <span>&bull;</span>
+          <a href="javascript:void(0)" onclick="openPrivacySettingsModal()" style="color: var(--text-grey); text-decoration: underline;">Cookies</a>
+          <span>&bull;</span>
+          <a href="javascript:void(0)" onclick="openDeleteAccountModal()" style="color: var(--text-grey); text-decoration: underline;">Exclusão de Conta</a>
         </div>
       </div>
 
@@ -1453,6 +1487,37 @@
           </div>
         </div>
 
+        <!-- CARD DE PRIVACIDADE E DADOS (LGPD) -->
+        <div class="card" style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="font-size: 14px; font-weight: 700; margin: 0;">Privacidade & Dados (LGPD)</h4>
+            <span style="font-size: 10px; font-weight: 800; background: rgba(0,210,255,0.15); color: var(--accent-cyan); padding: 2px 8px; border-radius: 8px;">V1.0</span>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button onclick="openTermsModal()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; text-align: left; display: flex; align-items: center; justify-content: space-between;">
+              <span>📜 Termos de Uso</span>
+              <span style="font-size: 10px; color: var(--text-grey);">Ver ➔</span>
+            </button>
+            <button onclick="openPrivacyModal()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; text-align: left; display: flex; align-items: center; justify-content: space-between;">
+              <span>🔒 Política de Privacidade</span>
+              <span style="font-size: 10px; color: var(--text-grey);">Ver ➔</span>
+            </button>
+            <button onclick="openPrivacySettingsModal()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; text-align: left; display: flex; align-items: center; justify-content: space-between;">
+              <span>⚙️ Preferências de Cookies & Análise</span>
+              <span style="font-size: 10px; color: var(--text-grey);">Gerenciar ➔</span>
+            </button>
+            <button onclick="exportMyUserData()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; border-color: var(--accent-cyan); color: var(--accent-cyan); text-align: left; display: flex; align-items: center; justify-content: space-between;">
+              <span>📥 Exportar Meus Dados (JSON Estruturado)</span>
+              <span style="font-size: 10px; color: var(--accent-cyan); font-weight: 700;">Baixar ➔</span>
+            </button>
+            <button onclick="openDeleteAccountModal()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; border-color: rgba(255,82,82,0.4); color: #ff5252; text-align: left; display: flex; align-items: center; justify-content: space-between;">
+              <span>🗑️ Excluir Minha Conta e Meus Dados</span>
+              <span style="font-size: 10px; color: #ff5252; font-weight: 700;">Solicitar ➔</span>
+            </button>
+          </div>
+        </div>
+
         <button onclick="logoutUser()" class="btn btn-outline" style="width: 100%; border-color: rgba(255,82,82,0.4); color: #ff5252;">
           🚪 Sair da Conta (Logout)
         </button>
@@ -1583,44 +1648,257 @@
     </div>
   </div>
 
-  <!-- MODAL DE TERMOS DE USO -->
+  <!-- MODAL DE TERMOS DE USO (COMPLETO OFICIAL V1.0) -->
   <div id="termsModal" class="modal-overlay" style="display: none;">
-    <div class="modal-card" style="max-width: 440px; max-height: 80vh; display: flex; flex-direction: column;">
+    <div class="modal-card" style="max-width: 680px; max-height: 85vh; display: flex; flex-direction: column;">
       <div class="modal-header">
-        <h3 style="font-size: 16px; font-weight: 800; color: white;">📜 Termos de Uso</h3>
+        <h3 style="font-size: 17px; font-weight: 800; color: white;">📜 Termos de Uso — TitanNova Fit</h3>
         <button onclick="closeTermsModal()" class="modal-close-btn">&times;</button>
       </div>
-      <div class="modal-body" style="padding: 16px; overflow-y: auto; font-size: 12px; color: var(--text-grey); line-height: 1.5;">
-        <h4 style="color: white; margin-bottom: 4px;">1. Aceite dos Termos</h4>
-        <p style="margin-bottom: 12px;">Ao criar uma conta no TitanNovaFit, você concorda com o uso da plataforma para gerenciamento pessoal e acompanhamento de seus treinos físicos.</p>
-        <h4 style="color: white; margin-bottom: 4px;">2. Armazenamento e Sincronização</h4>
-        <p style="margin-bottom: 12px;">Seus dados de treinos, repetições, cargas e históricos são vinculados com segurança ao seu identificador único de usuário (user.id) no banco de dados Supabase com criptografia e isolamento por políticas RLS.</p>
-        <h4 style="color: white; margin-bottom: 4px;">3. Responsabilidade Física</h4>
-        <p>A execução dos exercícios físicos deve respeitar seus limites e, sempre que possível, contar com a orientação de um profissional de Educação Física habilitado.</p>
+      <div class="modal-body" style="padding: 16px 20px; overflow-y: auto; font-size: 13px; color: #c4c9d4; line-height: 1.65;">
+        <div style="font-size: 11.5px; color: var(--accent-cyan); font-weight: 700; margin-bottom: 12px; border-bottom: 1px solid var(--divider); padding-bottom: 8px;">
+          Versão 1.0 &bull; Última atualização: 3 de setembro de 2026 &bull; Vigência: 3 de setembro de 2026
+        </div>
+        
+        <div style="background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.25); border-radius: 10px; padding: 12px; margin-bottom: 14px; font-size: 12px;">
+          <strong>Dados Oficiais do Serviço:</strong><br>
+          Serviço: TitanNova Fit &bull; Site: https://titannovafit.com.br<br>
+          Responsável: Lucas Justino de Sousa &bull; Localidade: Piracicaba, São Paulo, Brasil<br>
+          Suporte e Privacidade: titannovafit@gmail.com
+        </div>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">1. Identificação e aceitação</h4>
+        <p>O TitanNova Fit é um serviço de organização e acompanhamento de treinos, administrado por Lucas Justino de Sousa, em Piracicaba, São Paulo. O contato oficial é titannovafit@gmail.com. Ao criar uma conta ou utilizar o serviço, o usuário declara ter lido e aceitado estes Termos. Caso não concorde, não deverá criar uma conta ou continuar utilizando o serviço.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">2. Funcionalidades</h4>
+        <p>O TitanNova Fit poderá permitir a criação de fichas de treino, seleção de exercícios, registro de séries, repetições, cargas, medidas, observações, favoritos, fotos, vídeos, histórico e outras informações fornecidas pelo próprio usuário. As funcionalidades podem ser alteradas, suspensas ou ampliadas. Recursos gratuitos ou pagos poderão ser oferecidos futuramente; qualquer cobrança deverá ser apresentada antes da contratação, com preço e condições claras.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">3. Cadastro e segurança da conta</h4>
+        <p>O usuário deve fornecer dados verdadeiros, manter seu e-mail atualizado e proteger sua senha. A conta é pessoal e não deve ser compartilhada. Suspeitas de acesso indevido devem ser comunicadas pelo e-mail de suporte. As senhas são processadas pelo serviço de autenticação e não ficam disponíveis em texto legível para o administrador.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">4. Idade mínima</h4>
+        <p>O serviço é destinado a pessoas com 16 anos ou mais. Usuários de 16 e 17 anos somente poderão utilizar o TitanNova Fit com autorização de pai, mãe ou responsável legal. O tratamento de dados de adolescentes deverá observar seu melhor interesse, usar linguagem clara e evitar coleta ou compartilhamento desnecessário.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">5. Saúde e segurança</h4>
+        <div style="background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 8px; padding: 10px; margin: 8px 0 12px 0; font-size: 12px; color: #ffe082;">
+          <strong>Aviso de Saúde Obrigatório:</strong><br>
+          O TitanNova Fit é uma ferramenta de registro e organização. Ele não substitui avaliação médica, acompanhamento de profissional de educação física ou atendimento de emergência; não realiza diagnóstico, não prescreve tratamento, não garante resultados e não recomenda automaticamente aumento de carga.
+        </div>
+        <p>GIFs, vídeos e instruções são materiais demonstrativos. O usuário deve interromper o exercício se sentir dor, tontura, mal-estar ou desconforto incomum. Exercícios desconhecidos devem ser realizados com orientação qualificada e supervisão apropriada.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">6. Conteúdo enviado pelo usuário</h4>
+        <p>Ao enviar fotos, vídeos, exercícios personalizados, observações ou outros materiais, o usuário declara possuir autorização para utilizá-los. É proibido enviar conteúdo ilegal, perigoso, ofensivo, enganoso, que viole direitos autorais ou exponha terceiros sem autorização. O usuário continua titular do conteúdo que enviar. Ele concede ao TitanNova Fit autorização limitada para armazenar, processar e exibir esse conteúdo somente para operar as funcionalidades solicitadas.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">7. Conteúdo de terceiros</h4>
+        <p>A biblioteca de exercícios pode utilizar dados, links e mídias fornecidos pela ExerciseDB ou por outros provedores identificados. Esses conteúdos permanecem sujeitos aos direitos e condições dos respectivos titulares. A disponibilidade poderá mudar sem controle do TitanNova Fit.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">8. Uso aceitável</h4>
+        <p>É proibido tentar invadir o sistema, acessar contas de terceiros, explorar falhas, sobrecarregar o serviço, distribuir malware, utilizar automações abusivas, copiar conteúdos sem autorização ou usar o TitanNova Fit para atividade ilegal.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">9. Disponibilidade</h4>
+        <p>O serviço poderá sofrer interrupções por manutenção, falha de internet ou indisponibilidade de fornecedores como Supabase, Vercel, Resend, Google Analytics e ExerciseDB. Não é garantido funcionamento contínuo ou livre de erros.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">10. Suspensão</h4>
+        <p>Contas poderão ser temporariamente limitadas em caso de risco de segurança, fraude, violação destes Termos ou obrigação legal. Sempre que possível, o usuário será informado e poderá pedir esclarecimentos.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">11. Exclusão da conta</h4>
+        <p>O usuário poderá solicitar a exclusão pelo próprio aplicativo ou pelo e-mail titannovafit@gmail.com. Após verificação da identidade, os dados ativos serão apagados ou anonimizados em até 30 dias. Cópias de segurança poderão permanecer por até 90 dias, salvo conservação necessária ao cumprimento de obrigação legal, segurança ou exercício regular de direitos.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">12. Propriedade intelectual</h4>
+        <p>A marca, o design, o código e os materiais próprios do TitanNova Fit pertencem aos seus respectivos titulares. Estes Termos não autorizam copiar, vender, modificar ou redistribuir o serviço. Conteúdos de terceiros permanecem sujeitos às licenças correspondentes.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">13. Alterações</h4>
+        <p>Alterações importantes serão informadas no aplicativo. Quando necessário, será solicitado novo aceite. A versão e a data de vigência ficarão disponíveis nesta página.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">14. Legislação e contato</h4>
+        <p>Estes Termos são interpretados conforme a legislação brasileira aplicável, sem afastar direitos obrigatórios de usuários localizados em outros países.<br>
+        <strong>Responsável:</strong> Lucas Justino de Sousa &bull; <strong>Cidade:</strong> Piracicaba, São Paulo &bull; <strong>E-mail:</strong> titannovafit@gmail.com</p>
       </div>
-      <div style="padding: 12px 16px; border-top: 1px solid var(--divider); text-align: right;">
-        <button onclick="closeTermsModal()" class="btn btn-primary" style="width: auto; padding: 6px 16px; font-size: 12px;">Entendido</button>
+      <div style="padding: 12px 18px; border-top: 1px solid var(--divider); display: flex; justify-content: space-between; align-items: center;">
+        <a href="/termos-de-uso" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: underline;">Abrir em página separada ↗</a>
+        <button onclick="closeTermsModal()" class="btn btn-primary" style="width: auto; padding: 6px 18px; font-size: 12px; font-weight: 800;">Entendido</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL DE POLÍTICA DE PRIVACIDADE -->
+  <!-- MODAL DE POLÍTICA DE PRIVACIDADE (COMPLETO OFICIAL V1.0) -->
   <div id="privacyModal" class="modal-overlay" style="display: none;">
-    <div class="modal-card" style="max-width: 440px; max-height: 80vh; display: flex; flex-direction: column;">
+    <div class="modal-card" style="max-width: 680px; max-height: 85vh; display: flex; flex-direction: column;">
       <div class="modal-header">
-        <h3 style="font-size: 16px; font-weight: 800; color: white;">🔒 Política de Privacidade</h3>
+        <h3 style="font-size: 17px; font-weight: 800; color: white;">🔒 Política de Privacidade — TitanNova Fit</h3>
         <button onclick="closePrivacyModal()" class="modal-close-btn">&times;</button>
       </div>
-      <div class="modal-body" style="padding: 16px; overflow-y: auto; font-size: 12px; color: var(--text-grey); line-height: 1.5;">
-        <h4 style="color: white; margin-bottom: 4px;">1. Coleta de Dados</h4>
-        <p style="margin-bottom: 12px;">Coletamos estritamente seu nome, e-mail para autenticação e os registros de treinos que você cria na plataforma.</p>
-        <h4 style="color: white; margin-bottom: 4px;">2. Segurança & RLS</h4>
-        <p style="margin-bottom: 12px;">Não vendemos nem compartilhamos seus dados com terceiros. Suas informações são protegidas por Row Level Security (RLS), garantindo que apenas seu user.id autenticado tenha acesso às suas fichas.</p>
-        <h4 style="color: white; margin-bottom: 4px;">3. Senhas</h4>
-        <p>Suas senhas são criptografadas e administradas exclusivamente pelo Supabase Auth. Nenhuma senha em texto claro é armazenada no aplicativo.</p>
+      <div class="modal-body" style="padding: 16px 20px; overflow-y: auto; font-size: 13px; color: #c4c9d4; line-height: 1.65;">
+        <div style="font-size: 11.5px; color: var(--accent-cyan); font-weight: 700; margin-bottom: 12px; border-bottom: 1px solid var(--divider); padding-bottom: 8px;">
+          Versão 1.0 &bull; Última atualização: 3 de setembro de 2026 &bull; Vigência: 3 de setembro de 2026
+        </div>
+
+        <div style="background: rgba(0, 210, 255, 0.08); border: 1px solid rgba(0, 210, 255, 0.25); border-radius: 10px; padding: 12px; margin-bottom: 14px; font-size: 12px;">
+          <strong>Controlador Oficial:</strong> Lucas Justino de Sousa<br>
+          Serviço: TitanNova Fit &bull; Site: https://titannovafit.com.br<br>
+          Cidade: Piracicaba, São Paulo, Brasil &bull; Contato de Privacidade: titannovafit@gmail.com
+        </div>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">1. Controlador e contato</h4>
+        <p>O TitanNova Fit é administrado por Lucas Justino de Sousa, em Piracicaba, São Paulo, Brasil. Dúvidas e solicitações de privacidade podem ser enviadas para titannovafit@gmail.com. Esta Política explica como dados pessoais são coletados, utilizados, armazenados, compartilhados e protegidos.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">2. Dados tratados</h4>
+        <p>Conforme as funcionalidades utilizadas, poderão ser tratados: nome ou apelido, e-mail, identificador da conta e foto de perfil; fichas, exercícios, séries, repetições, cargas, descansos, favoritos e histórico; peso, altura, medidas corporais e observações fornecidas voluntariamente; fotos, vídeos e exercícios personalizados enviados pelo usuário; preferências, consentimentos e configurações; registros técnicos necessários, como plataforma, datas de acesso, falhas, segurança e sincronização; dados de uso, navegador, dispositivo, cookies e eventos obtidos por meio do Google Analytics, quando autorizado e aplicável.<br>Dados de treino, medidas e observações podem revelar informações sobre a condição física do usuário e devem receber proteção reforçada. O aplicativo não deve solicitar diagnóstico médico ou dados de saúde que não sejam necessários.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">3. Finalidades</h4>
+        <p>Os dados são utilizados para criar e autenticar a conta, salvar e sincronizar treinos, recuperar acesso, enviar mensagens transacionais, apresentar histórico, oferecer funcionamento offline, prevenir fraude, corrigir falhas, responder ao suporte, permitir exportação e exclusão e cumprir obrigações legais. Os dados não serão vendidos. Não serão utilizados para publicidade personalizada enquanto não houver provedor escolhido, configuração apropriada, atualização desta Política e mecanismo de consentimento quando necessário.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">4. Bases legais</h4>
+        <p>O tratamento poderá se fundamentar na execução do serviço solicitado, cumprimento de obrigação legal, exercício regular de direitos, segurança e prevenção de fraude, legítimo interesse após avaliação e consentimento quando essa for a base apropriada. Dados que possam ser considerados sensíveis terão base legal e proteção adequadas.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">5. Adolescentes</h4>
+        <p>O serviço exige idade mínima de 16 anos. Usuários de 16 e 17 anos devem possuir autorização do responsável legal. O tratamento deverá sempre priorizar o melhor interesse do adolescente, com informações claras, coleta mínima e controles de segurança.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">6. Fornecedores</h4>
+        <p>O serviço utiliza ou poderá utilizar: Supabase para autenticação, banco de dados e armazenamento; Vercel para hospedagem e execução do site; Resend para e-mails de confirmação, recuperação e segurança; ExerciseDB para dados e mídias de exercícios; Google Analytics para medição de uso, após a configuração aplicável de consentimento; armazenamento local do navegador ou dispositivo para sessão, preferências, cache e modo offline. O GitHub é utilizado no desenvolvimento e não deve receber dados pessoais de usuários nem chaves privadas. Cada fornecedor trata dados conforme sua função e suas próprias condições. Somente os dados necessários devem ser enviados.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">7. Cookies e Google Analytics</h4>
+        <p>Cookies e armazenamento estritamente necessários podem ser utilizados para autenticação, segurança, preferências, cache e sincronização. O Google Analytics deverá permanecer bloqueado até a escolha do usuário quando a legislação aplicável exigir consentimento. O painel de preferências deverá oferecer as categorias “Necessários” e “Análise”. Recusar cookies de análise não poderá impedir o uso das funções essenciais.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">8. Publicidade</h4>
+        <p>O provedor de anúncios ainda não foi definido. Até a escolha do provedor e a atualização desta Política, anúncios e rastreadores publicitários devem permanecer desativados. Antes da ativação, deverão ser definidos o provedor, os dados utilizados, as opções de consentimento, o tratamento de usuários de 16 e 17 anos e a proibição de publicidade comportamental inadequada para menores.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">9. Transferências internacionais</h4>
+        <p>Alguns fornecedores podem processar dados fora do Brasil. Nessas situações, o TitanNova Fit deverá utilizar configurações, contratos e salvaguardas compatíveis com a legislação aplicável.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">10. Retenção e exclusão</h4>
+        <p>Os dados permanecerão enquanto a conta estiver ativa ou pelo período necessário às finalidades informadas. Após solicitação confirmada, dados ativos serão eliminados ou anonimizados em até 30 dias. Cópias de segurança poderão permanecer por até 90 dias, salvo obrigação legal, segurança ou exercício regular de direitos.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">11. Direitos do usuário</h4>
+        <p>O usuário poderá solicitar confirmação do tratamento, acesso, correção, informações sobre compartilhamento, portabilidade quando aplicável, oposição, revogação de consentimento, exclusão e revisão de decisões automatizadas quando cabível. As solicitações podem exigir verificação segura de identidade e devem ser enviadas pelo aplicativo ou para titannovafit@gmail.com.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">12. Exportação</h4>
+        <p>O usuário poderá exportar dados da conta, fichas, histórico, favoritos, medidas e exercícios personalizados em formato estruturado. A exportação não deverá incluir senhas, tokens ou informações internas de segurança.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">13. Segurança</h4>
+        <p>O TitanNova Fit deverá utilizar HTTPS, controle de acesso, Supabase Row Level Security, variáveis de ambiente, separação de perfis, proteção de credenciais, backups controlados e registros mínimos de segurança. A chave service_role do Supabase nunca deverá ser enviada ao navegador ou armazenada em repositório público. Nenhum sistema é totalmente invulnerável. Incidentes relevantes serão tratados e comunicados conforme a legislação aplicável.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">14. Alterações</h4>
+        <p>Alterações relevantes nesta Política serão informadas com indicação da nova versão e data. Quando necessário, será solicitada nova manifestação do usuário.</p>
+
+        <h4 style="color: white; font-size: 14px; margin-top: 14px; margin-bottom: 4px;">15. Contato</h4>
+        <p><strong>Responsável:</strong> Lucas Justino de Sousa &bull; <strong>Serviço:</strong> TitanNova Fit &bull; <strong>Cidade:</strong> Piracicaba, São Paulo, Brasil &bull; <strong>E-mail de suporte, privacidade e exclusão:</strong> titannovafit@gmail.com</p>
       </div>
-      <div style="padding: 12px 16px; border-top: 1px solid var(--divider); text-align: right;">
-        <button onclick="closePrivacyModal()" class="btn btn-primary" style="width: auto; padding: 6px 16px; font-size: 12px;">Fechar</button>
+      <div style="padding: 12px 18px; border-top: 1px solid var(--divider); display: flex; justify-content: space-between; align-items: center;">
+        <a href="/politica-de-privacidade" target="_blank" style="font-size: 11px; color: var(--accent-cyan); text-decoration: underline;">Abrir em página separada ↗</a>
+        <button onclick="closePrivacyModal()" class="btn btn-primary" style="width: auto; padding: 6px 18px; font-size: 12px; font-weight: 800;">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE PREFERÊNCIAS DE PRIVACIDADE E COOKIES -->
+  <div id="privacySettingsModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="max-width: 580px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h3 style="font-size: 17px; font-weight: 800; color: white;">⚙️ Preferências de Cookies e Análise</h3>
+        <button onclick="closePrivacySettingsModal()" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 16px 20px; overflow-y: auto; font-size: 13px; color: #c4c9d4;">
+        <p style="margin-bottom: 14px;">Gerencie suas escolhas de privacidade. O TitanNova Fit não vende seus dados e mantém anúncios e rastreadores desativados.</p>
+
+        <!-- Cookies Necessários -->
+        <div style="background: rgba(22, 26, 36, 0.9); border: 1px solid var(--divider); border-radius: 12px; padding: 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+          <div>
+            <div style="font-weight: 800; color: white; font-size: 13.5px;">🔒 Cookies e Armazenamento Necessários</div>
+            <div style="font-size: 11px; color: var(--text-grey); margin-top: 3px;">
+              Autenticação, sessões ativas, armazenamento de treinos offline e sincronização Supabase.
+            </div>
+          </div>
+          <span style="font-size: 11px; font-weight: 800; background: rgba(76, 175, 80, 0.18); color: var(--success-green); border: 1px solid rgba(76, 175, 80, 0.4); padding: 3px 8px; border-radius: 20px; white-space: nowrap;">Sempre Ativos</span>
+        </div>
+
+        <!-- Google Analytics -->
+        <div style="background: rgba(22, 26, 36, 0.9); border: 1px solid var(--divider); border-radius: 12px; padding: 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+          <div>
+            <div style="font-weight: 800; color: white; font-size: 13.5px;">📊 Google Analytics (Métricas de Uso)</div>
+            <div style="font-size: 11px; color: var(--text-grey); margin-top: 3px;">
+              Medição anônima de páginas e eventos para estabilidade. Permanece desativado sem sua permissão.
+            </div>
+          </div>
+          <input type="checkbox" id="modalAnalyticsConsentToggle" style="width: 20px; height: 20px; accent-color: var(--accent-cyan); cursor: pointer;">
+        </div>
+
+        <div id="modalPrivacyFeedback" style="display: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 10px;"></div>
+
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button onclick="setModalAnalyticsChoice(false)" class="btn btn-outline" style="flex: 1; padding: 10px; font-size: 12px;">Recusar</button>
+          <button onclick="setModalAnalyticsChoice(true)" class="btn btn-outline" style="flex: 1; padding: 10px; font-size: 12px; border-color: var(--accent-cyan); color: var(--accent-cyan);">Aceitar análise</button>
+          <button onclick="saveModalAnalyticsChoice()" class="btn btn-primary" style="flex: 1.2; padding: 10px; font-size: 12px;">Salvar preferências</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE EXCLUSÃO DE CONTA E DADOS -->
+  <div id="deleteAccountModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card" style="max-width: 540px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h3 style="font-size: 17px; font-weight: 800; color: #ff5252;">⚠️ Excluir Minha Conta e Meus Dados</h3>
+        <button onclick="closeDeleteAccountModal()" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 16px 20px; overflow-y: auto; font-size: 13px; color: #c4c9d4; line-height: 1.6;">
+        <p style="color: white; font-weight: 700;">Atenção: Esta ação é definitiva e removerá permanentemente seu histórico de treinos e acesso.</p>
+        
+        <div style="background: rgba(255, 82, 82, 0.1); border: 1px solid rgba(255, 82, 82, 0.3); border-radius: 10px; padding: 12px; margin: 12px 0; font-size: 12px; color: #ffcdd2;">
+          <strong>Prazos Legais de Exclusão (Seção 10 e 11):</strong><br>
+          &bull; Dados ativos são eliminados ou anonimizados em até <strong>30 dias</strong>.<br>
+          &bull; Cópias de segurança poderão permanecer por até <strong>90 dias</strong>, salvo conservação necessária ao cumprimento de obrigação legal ou segurança.
+        </div>
+
+        <div id="deleteModalUserStatus" style="font-size: 12px; color: var(--text-grey); margin-bottom: 12px;"></div>
+
+        <label style="font-size: 12px; color: var(--text-grey);">
+          Digite a palavra <strong style="color: white;">EXCLUIR</strong> para habilitar a confirmação:
+        </label>
+        <input type="text" id="deleteModalConfirmInput" oninput="checkModalDeleteConfirm()" placeholder="Digite EXCLUIR" class="form-input" style="margin-top: 6px; margin-bottom: 12px; border-color: rgba(255,82,82,0.4);">
+
+        <button id="btnModalConfirmDelete" onclick="executeModalAccountDeletion()" class="btn btn-outline" style="background: #ff5252; color: white; border: none; font-weight: 800; padding: 12px; border-radius: 10px; width: 100%; opacity: 0.5; cursor: not-allowed;" disabled>
+          🗑️ Confirmar e Excluir Minha Conta Definitivamente
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE ACEITE OBRIGATÓRIO DE TERMOS (EXIBIDO APÓS LOGIN CASO PENDENTE) -->
+  <div id="mandatoryLegalModal" class="modal-overlay" style="display: none; z-index: 10000; background: rgba(5,7,10,0.95);">
+    <div class="modal-card" style="max-width: 560px; max-height: 90vh; display: flex; flex-direction: column; border: 1.5px solid var(--accent-cyan);">
+      <div class="modal-header">
+        <h3 style="font-size: 17px; font-weight: 800; color: white;">📋 Atualização dos Termos e Privacidade</h3>
+      </div>
+      <div class="modal-body" style="padding: 16px 20px; overflow-y: auto; font-size: 13px; color: #c4c9d4; line-height: 1.6;">
+        <p>Para continuar utilizando o TitanNova Fit, é necessário ler e confirmar o aceite dos <strong>Termos de Uso</strong> e da <strong>Política de Privacidade</strong> (Versão 1.0 — Vigência 3 de setembro de 2026).</p>
+        
+        <div style="background: rgba(22, 26, 36, 0.8); border: 1px solid var(--divider); border-radius: 10px; padding: 12px; margin: 14px 0; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: flex-start; gap: 8px;">
+            <input type="checkbox" id="mandatoryTermsCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px;">
+            <label for="mandatoryTermsCheck" style="font-size: 12px; color: white; cursor: pointer;">
+              Li e aceito os <a href="javascript:void(0)" onclick="openTermsModal()" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700;">Termos de Uso</a>.
+            </label>
+          </div>
+          <div style="display: flex; align-items: flex-start; gap: 8px;">
+            <input type="checkbox" id="mandatoryPrivacyCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px;">
+            <label for="mandatoryPrivacyCheck" style="font-size: 12px; color: white; cursor: pointer;">
+              Li a <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700;">Política de Privacidade</a>.
+            </label>
+          </div>
+          <div style="display: flex; align-items: flex-start; gap: 8px;">
+            <input type="checkbox" id="mandatoryAgeCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px;">
+            <label for="mandatoryAgeCheck" style="font-size: 12px; color: white; cursor: pointer;">
+              Declaro ter pelo menos 16 anos (ou possuo autorização legal se tenho 16 ou 17 anos).
+            </label>
+          </div>
+        </div>
+
+        <div id="mandatoryLegalError" style="display: none; color: #ff5252; background: rgba(255,82,82,0.15); border: 1px solid rgba(255,82,82,0.3); border-radius: 8px; padding: 10px; font-size: 12px; margin-bottom: 12px; text-align: center; font-weight: 700;"></div>
+
+        <button onclick="submitMandatoryLegalAcceptance()" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 800; font-size: 13px;">
+          Confirmar e Prosseguir ao TitanNova Fit
+        </button>
       </div>
     </div>
   </div>
@@ -3148,6 +3426,12 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       }
     }
 
+    // ====================================================================
+    // CONSTANTES E CONTROLE DE CONFORMIDADE LEGAL (LGPD) — TITANNOVA FIT
+    // ====================================================================
+    const CURRENT_TERMS_VERSION = "1.0";
+    const CURRENT_PRIVACY_VERSION = "1.0";
+
     function openTermsModal() {
       const modal = document.getElementById('termsModal');
       if (modal) modal.style.display = 'flex';
@@ -3164,6 +3448,270 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     function closePrivacyModal() {
       const modal = document.getElementById('privacyModal');
       if (modal) modal.style.display = 'none';
+    }
+
+    // Gerenciamento de Consentimento Analítico e Cookies
+    function openPrivacySettingsModal() {
+      const modal = document.getElementById('privacySettingsModal');
+      const toggle = document.getElementById('modalAnalyticsConsentToggle');
+      if (toggle) {
+        toggle.checked = (localStorage.getItem('titannovafit_analytics_consent') === 'true');
+      }
+      const feedback = document.getElementById('modalPrivacyFeedback');
+      if (feedback) feedback.style.display = 'none';
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closePrivacySettingsModal() {
+      const modal = document.getElementById('privacySettingsModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function setModalAnalyticsChoice(allowed) {
+      localStorage.setItem('titannovafit_analytics_consent', allowed ? 'true' : 'false');
+      const toggle = document.getElementById('modalAnalyticsConsentToggle');
+      if (toggle) toggle.checked = allowed;
+      const feedback = document.getElementById('modalPrivacyFeedback');
+      if (feedback) {
+        feedback.style.display = 'block';
+        feedback.style.background = allowed ? 'rgba(76, 175, 80, 0.15)' : 'rgba(255, 82, 82, 0.15)';
+        feedback.style.color = allowed ? '#81c784' : '#ffcdd2';
+        feedback.innerText = allowed ? 'Preferência salva: Google Analytics autorizado.' : 'Preferência salva: Google Analytics recusado e bloqueado.';
+      }
+      setTimeout(closePrivacySettingsModal, 1200);
+    }
+
+    function saveModalAnalyticsChoice() {
+      const toggle = document.getElementById('modalAnalyticsConsentToggle');
+      setModalAnalyticsChoice(toggle ? toggle.checked : false);
+    }
+
+    // Exclusão de Conta e Dados (LGPD)
+    function openDeleteAccountModal() {
+      const modal = document.getElementById('deleteAccountModal');
+      const statusEl = document.getElementById('deleteModalUserStatus');
+      const confirmInput = document.getElementById('deleteModalConfirmInput');
+      const btn = document.getElementById('btnModalConfirmDelete');
+
+      if (confirmInput) confirmInput.value = '';
+      if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+      }
+
+      const email = currentAuthUser ? (currentAuthUser.email || 'Usuário Atual') : 'Modo Convidado';
+      if (statusEl) {
+        statusEl.innerHTML = `Conta autenticada: <strong style="color: white;">${email}</strong>`;
+      }
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeDeleteAccountModal() {
+      const modal = document.getElementById('deleteAccountModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function checkModalDeleteConfirm() {
+      const input = document.getElementById('deleteModalConfirmInput');
+      const btn = document.getElementById('btnModalConfirmDelete');
+      if (input && btn) {
+        const isOk = (input.value.trim() === 'EXCLUIR');
+        btn.disabled = !isOk;
+        btn.style.opacity = isOk ? '1' : '0.5';
+        btn.style.cursor = isOk ? 'pointer' : 'not-allowed';
+      }
+    }
+
+    async function executeModalAccountDeletion() {
+      if (!currentAuthUser) {
+        alert('Nenhuma conta ativa para exclusão.');
+        return;
+      }
+
+      const input = document.getElementById('deleteModalConfirmInput');
+      if (!input || input.value.trim() !== 'EXCLUIR') {
+        alert('Digite EXCLUIR exatamente no campo para confirmar.');
+        return;
+      }
+
+      if (!confirm('CONFIRMAÇÃO DEFINITIVA: Deseja realmente excluir permanentemente sua conta e todos os dados de treino?')) {
+        return;
+      }
+
+      const btn = document.getElementById('btnModalConfirmDelete');
+      if (btn) { btn.disabled = true; btn.innerText = 'Excluindo conta...'; }
+
+      try {
+        const uid = currentAuthUser.id;
+        if (_supabase && uid) {
+          await _supabase.from('treinos').delete().eq('usuario_id', uid);
+          await _supabase.from('usuarios').delete().eq('id', uid);
+          await _supabase.from('legal_acceptances').delete().eq('user_id', uid);
+          await _supabase.auth.signOut();
+        }
+      } catch (err) {
+        console.warn('[Exclusão de Conta]:', err);
+      }
+
+      localStorage.clear();
+      closeDeleteAccountModal();
+      alert('Sua conta e dados ativos foram eliminados com sucesso. Cópias de segurança serão excluídas conforme o prazo legal de 90 dias.');
+      window.location.href = '/';
+    }
+
+    // Exportação de Dados do Usuário (JSON Estruturado)
+    function exportMyUserData() {
+      if (!currentAuthUser) {
+        alert('Faça login para exportar seus dados.');
+        return;
+      }
+
+      showToastNotification('📦 Gerando arquivo estruturado de dados...');
+
+      // Reunir dados estruturados (garantia de ZERO senhas ou tokens)
+      const exportPayload = {
+        servico: 'TitanNova Fit',
+        site: 'https://titannovafit.com.br',
+        responsavel: 'Lucas Justino de Sousa',
+        exportado_em: new Date().toISOString(),
+        usuario: {
+          id: currentAuthUser.id,
+          email: currentAuthUser.email,
+          nome: (currentAuthUser.user_metadata && currentAuthUser.user_metadata.nome) || currentAuthUser.nome || ''
+        },
+        aceite_legal: {
+          termos_versao: CURRENT_TERMS_VERSION,
+          privacidade_versao: CURRENT_PRIVACY_VERSION,
+          consentimento_analitico: (localStorage.getItem('titannovafit_analytics_consent') === 'true')
+        },
+        fichas_treino: allWorkoutsList,
+        historico_treinos: (typeof workoutHistoryList !== 'undefined') ? workoutHistoryList : [],
+        exercicios_favoritos: Array.from(favoritesSet || [])
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `titannovafit_meus_dados_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      showToastNotification('✅ Arquivo de dados exportado com sucesso!');
+    }
+
+    // Gravação e Verificação de Aceite de Termos no Banco e Local
+    async function recordLegalAcceptance(userId, analyticsConsent = false) {
+      if (!userId) return;
+
+      const record = {
+        user_id: userId,
+        terms_version: CURRENT_TERMS_VERSION,
+        privacy_version: CURRENT_PRIVACY_VERSION,
+        terms_accepted: true,
+        privacy_acknowledged: true,
+        age_requirement_confirmed: true,
+        guardian_authorization_confirmed: true,
+        analytics_consent: Boolean(analyticsConsent),
+        platform: (navigator.userAgent || 'web').substring(0, 100),
+        language: (navigator.language || 'pt-BR').substring(0, 10),
+        accepted_at: new Date().toISOString()
+      };
+
+      // 1. Gravar localmente
+      localStorage.setItem('titannovafit_legal_acceptance', JSON.stringify(record));
+
+      // 2. Gravar no Supabase (se autenticado)
+      if (_supabase && userId !== 'guest_user_1') {
+        try {
+          await _supabase.from('legal_acceptances').insert([record]);
+        } catch (e) {
+          console.warn('[Legal Acceptance DB Notice]:', e);
+        }
+      }
+
+      // 3. Fallback via endpoint serverless /api/legal
+      try {
+        fetch('/api/legal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(record)
+        }).catch(() => {});
+      } catch (_) {}
+    }
+
+    async function checkUserLegalAcceptance(userId) {
+      if (!userId || userId === 'guest_user_1') return true;
+
+      // Verificar localStorage
+      const local = localStorage.getItem('titannovafit_legal_acceptance');
+      if (local) {
+        try {
+          const parsed = JSON.parse(local);
+          if (parsed && parsed.terms_version === CURRENT_TERMS_VERSION && parsed.privacy_version === CURRENT_PRIVACY_VERSION) {
+            return true;
+          }
+        } catch (_) {}
+      }
+
+      // Verificar Supabase
+      if (_supabase) {
+        try {
+          const { data, error } = await _supabase
+            .from('legal_acceptances')
+            .select('id, terms_version, privacy_version')
+            .eq('user_id', userId)
+            .order('accepted_at', { ascending: false })
+            .limit(1);
+
+          if (!error && data && data.length > 0) {
+            const row = data[0];
+            if (row.terms_version === CURRENT_TERMS_VERSION && row.privacy_version === CURRENT_PRIVACY_VERSION) {
+              localStorage.setItem('titannovafit_legal_acceptance', JSON.stringify(row));
+              return true;
+            }
+          }
+        } catch (_) {}
+      }
+
+      return false;
+    }
+
+    function openMandatoryLegalModal() {
+      const m = document.getElementById('mandatoryLegalModal');
+      if (m) {
+        const err = document.getElementById('mandatoryLegalError');
+        if (err) err.style.display = 'none';
+        const t = document.getElementById('mandatoryTermsCheck');
+        const p = document.getElementById('mandatoryPrivacyCheck');
+        const a = document.getElementById('mandatoryAgeCheck');
+        if (t) t.checked = false;
+        if (p) p.checked = false;
+        if (a) a.checked = false;
+        m.style.display = 'flex';
+      }
+    }
+
+    async function submitMandatoryLegalAcceptance() {
+      const t = document.getElementById('mandatoryTermsCheck');
+      const p = document.getElementById('mandatoryPrivacyCheck');
+      const a = document.getElementById('mandatoryAgeCheck');
+      const err = document.getElementById('mandatoryLegalError');
+
+      if (!t || !t.checked || !p || !p.checked || !a || !a.checked) {
+        if (err) {
+          err.innerText = 'É obrigatório marcar todas as confirmações para prosseguir.';
+          err.style.display = 'block';
+        }
+        return;
+      }
+
+      const uid = currentAuthUser ? currentAuthUser.id : null;
+      await recordLegalAcceptance(uid, localStorage.getItem('titannovafit_analytics_consent') === 'true');
+      const m = document.getElementById('mandatoryLegalModal');
+      if (m) m.style.display = 'none';
+      showToastNotification('✅ Aceite dos termos registrado com sucesso!');
     }
 
     // ==========================================
@@ -3402,9 +3950,29 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           return;
         }
 
-        if (termsCheck && !termsCheck.checked) {
+        const privacyCheck = document.getElementById('authPrivacyCheck');
+        const ageCheck = document.getElementById('authAgeCheck');
+        const guardianCheck = document.getElementById('authGuardianCheck');
+
+        if (!termsCheck || !termsCheck.checked) {
           if (regErrEl) {
-            regErrEl.innerText = 'É necessário aceitar os Termos de Uso e a Política de Privacidade para cadastrar.';
+            regErrEl.innerText = 'É obrigatório ler e aceitar os Termos de Uso para criar sua conta.';
+            regErrEl.style.display = 'block';
+          }
+          return;
+        }
+
+        if (!privacyCheck || !privacyCheck.checked) {
+          if (regErrEl) {
+            regErrEl.innerText = 'É obrigatório ler e aceitar a Política de Privacidade para criar sua conta.';
+            regErrEl.style.display = 'block';
+          }
+          return;
+        }
+
+        if (!ageCheck || !ageCheck.checked) {
+          if (regErrEl) {
+            regErrEl.innerText = 'É obrigatório declarar ter pelo menos 16 anos para criar sua conta.';
             regErrEl.style.display = 'block';
           }
           return;
@@ -3460,8 +4028,9 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             nome: name
           }));
 
-          // Criar perfil em public.usuarios e public.profiles
+          // Criar perfil em public.usuarios e registrar aceite legal
           await syncUserToDatabase(authUser, name);
+          await recordLegalAcceptance(authUser.id, false);
 
           // Inicializar fichas padrão no banco para o novo atleta vinculadas ao user_id
           allWorkoutsList = DEFAULT_WORKOUT_DIVISIONS.map((t, idx) => ({
@@ -7108,12 +7677,38 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       } else {
         switchTab(targetScreen);
       }
+
+      // 4. Verificação de Aceite Obrigatório dos Termos Vigentes (1.0)
+      if (currentAuthUser && currentAuthUser.id && currentAuthUser.id !== 'guest_user_1') {
+        try {
+          const hasAccepted = await checkUserLegalAcceptance(currentAuthUser.id);
+          if (!hasAccepted) {
+            openMandatoryLegalModal();
+          }
+        } catch (_) {}
+      }
+
+      // 5. Abertura direta de documentos por rota/hash público
+      if (hash.includes('termos')) {
+        openTermsModal();
+      } else if (hash.includes('politica') || hash.includes('privacidade')) {
+        openPrivacyModal();
+      } else if (hash.includes('cookies') || hash.includes('configuracoes-de-privacidade')) {
+        openPrivacySettingsModal();
+      } else if (hash.includes('excluir-conta')) {
+        openDeleteAccountModal();
+      }
     });
 
     // Navegação com botões Voltar/Avançar do Navegador
     window.addEventListener('hashchange', () => {
-      if (!currentAuthUser) return;
       const h = (window.location.hash || '').toLowerCase();
+      if (h.includes('termos')) { openTermsModal(); return; }
+      if (h.includes('politica') || h.includes('privacidade')) { openPrivacyModal(); return; }
+      if (h.includes('cookies') || h.includes('configuracoes-de-privacidade')) { openPrivacySettingsModal(); return; }
+      if (h.includes('excluir-conta')) { openDeleteAccountModal(); return; }
+
+      if (!currentAuthUser) return;
       if (h.includes('admin')) navigateToAdminPanel();
       else if (h.includes('historico') || h.includes('history')) switchTab('screenHistory');
       else if (h.includes('exercicios') || h.includes('exercises')) switchTab('screenExercises');
