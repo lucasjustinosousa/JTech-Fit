@@ -1066,8 +1066,6 @@
           <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: var(--text-grey); text-decoration: underline;">Privacidade</a>
           <span>&bull;</span>
           <a href="javascript:void(0)" onclick="openPrivacySettingsModal()" style="color: var(--text-grey); text-decoration: underline;">Cookies</a>
-          <span>&bull;</span>
-          <a href="javascript:void(0)" onclick="openDeleteAccountModal()" style="color: var(--text-grey); text-decoration: underline;">Exclusão de Conta</a>
         </div>
       </div>
 
@@ -1522,10 +1520,6 @@
             <button onclick="exportMyUserData()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; border-color: var(--accent-cyan); color: var(--accent-cyan); text-align: left; display: flex; align-items: center; justify-content: space-between;">
               <span>📥 Exportar Meus Dados (JSON Estruturado)</span>
               <span style="font-size: 10px; color: var(--accent-cyan); font-weight: 700;">Baixar ➔</span>
-            </button>
-            <button onclick="openDeleteAccountModal()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; border-color: rgba(255,82,82,0.4); color: #ff5252; text-align: left; display: flex; align-items: center; justify-content: space-between;">
-              <span>🗑️ Excluir Minha Conta e Meus Dados</span>
-              <span style="font-size: 10px; color: #ff5252; font-weight: 700;">Solicitar ➔</span>
             </button>
           </div>
         </div>
@@ -2951,9 +2945,14 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
                 <span style="font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 6px; background: ${isBlocked ? 'rgba(255,82,82,0.18)' : 'rgba(76,175,80,0.18)'}; color: ${isBlocked ? '#ff5252' : 'var(--success-green)'};">
                   ${isBlocked ? 'BLOQUEADO' : 'ATIVO'}
                 </span>
-                <button onclick="toggleBlockUser('${u.id}', '${u.nome || u.email}', ${isBlocked})" class="btn btn-outline" style="width: auto; padding: 3px 8px; font-size: 10px; color: ${isBlocked ? 'var(--success-green)' : '#ff5252'}; border-color: rgba(255,82,82,0.35);">
-                  ${isBlocked ? 'Desbloquear' : 'Bloquear'}
-                </button>
+                <div style="display: flex; gap: 4px; margin-top: 2px;">
+                  <button onclick="toggleBlockUser('${u.id}', '${u.nome || u.email}', ${isBlocked})" class="btn btn-outline" style="width: auto; padding: 3px 8px; font-size: 10px; color: ${isBlocked ? 'var(--success-green)' : '#ff5252'}; border-color: rgba(255,82,82,0.35);">
+                    ${isBlocked ? 'Desbloquear' : 'Bloquear'}
+                  </button>
+                  <button onclick="adminDeleteUserAccount('${u.id}', '${u.nome || u.email}')" class="btn btn-outline" style="width: auto; padding: 3px 8px; font-size: 10px; color: #ff5252; border-color: rgba(255,82,82,0.4);">
+                    🗑️ Excluir
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -2973,6 +2972,50 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         await logAdminAction(currentBlocked ? 'Usuário Desbloqueado' : 'Usuário Bloqueado', 'profiles', userId, { nome: userName });
         showToastNotification(`Usuário "${userName}" ${currentBlocked ? 'desbloqueado' : 'bloqueado'}.`);
         loadAdminUsersList();
+      }
+    }
+
+    async function adminDeleteUserAccount(userId, userDisplay) {
+      if (!isCurrentSessionAdmin) {
+        alert('Acesso negado: Somente o administrador master pode excluir contas.');
+        return;
+      }
+
+      if (currentAuthUser && currentAuthUser.id === userId) {
+        alert('Você não pode excluir a sua própria conta de administrador master por segurança.');
+        return;
+      }
+
+      const confirmMsg = `ATENÇÃO ADMINISTRADOR:\n\nDeseja realmente excluir permanentemente a conta de "${userDisplay}" (ID: ${userId})?\n\nEsta operação é irreversível e removerá todos os treinos, históricos e o acesso no Supabase Auth.`;
+      if (!confirm(confirmMsg)) {
+        return;
+      }
+
+      showSyncStatus('saving');
+      showToastNotification('Excluindo conta do usuário...');
+
+      try {
+        const resp = await fetch(`/api/users?userId=${encodeURIComponent(userId)}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (_supabase) {
+          try {
+            await _supabase.from('treinos').delete().eq('usuario_id', userId);
+            await _supabase.from('usuarios').delete().eq('id', userId);
+            await _supabase.from('legal_acceptances').delete().eq('user_id', userId);
+          } catch (_) {}
+        }
+
+        await logAdminAction('Conta de Atleta Excluída pelo Administrador', 'usuarios', userId);
+        showSyncStatus('saved');
+        showToastNotification(`Conta de "${userDisplay}" excluída com sucesso!`);
+        await loadAdminUsersList();
+      } catch (err) {
+        console.error('[Admin Delete User Error]:', err);
+        showSyncStatus('idle');
+        alert(`Erro ao excluir usuário: ${err.message}`);
       }
     }
 

@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   const origin = req.headers?.origin || "*";
   const corsHeaders = {
     "Access-Control-Allow-Origin": origin,
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization",
   };
 
@@ -21,6 +21,59 @@ export default async function handler(req, res) {
       return;
     }
     return new Response(null, { status: 204, headers: corsHeaders });
+  }
+
+  // EXCLUSÃO DE CONTA PELO ADMINISTRADOR
+  if (req.method === "DELETE") {
+    const userId = (req.query && req.query.userId) || (req.body && req.body.userId);
+    if (!userId) {
+      const errRes = { success: false, error: "userId obrigatório para exclusão." };
+      if (res && typeof res.status === "function") return res.status(400).json(errRes);
+      return new Response(JSON.stringify(errRes), { status: 400, headers: corsHeaders });
+    }
+
+    try {
+      // 1. Excluir treinos vinculados
+      await fetch(`${SUPABASE_URL}/rest/v1/treinos?usuario_id=eq.${encodeURIComponent(userId)}`, {
+        method: "DELETE",
+        headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}` }
+      });
+      // 2. Excluir aceites legais
+      await fetch(`${SUPABASE_URL}/rest/v1/legal_acceptances?user_id=eq.${encodeURIComponent(userId)}`, {
+        method: "DELETE",
+        headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}` }
+      });
+      // 3. Excluir da tabela usuarios
+      await fetch(`${SUPABASE_URL}/rest/v1/usuarios?id=eq.${encodeURIComponent(userId)}`, {
+        method: "DELETE",
+        headers: { apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}` }
+      });
+      // 4. Excluir permanentemente do Supabase Auth (admin delete user)
+      await fetch(`${SUPABASE_URL}/auth/v1/admin/users/${encodeURIComponent(userId)}`, {
+        method: "DELETE",
+        headers: {
+          apikey: SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+          "Content-Type": "application/json"
+        }
+      });
+
+      const delResPayload = {
+        success: true,
+        message: "Conta e dados do usuário excluídos com sucesso pelo Administrador.",
+        userId
+      };
+
+      if (res && typeof res.status === "function") {
+        Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+        return res.status(200).json(delResPayload);
+      }
+      return new Response(JSON.stringify(delResPayload), { status: 200, headers: corsHeaders });
+    } catch (delErr) {
+      const errRes = { success: false, error: delErr.message };
+      if (res && typeof res.status === "function") return res.status(500).json(errRes);
+      return new Response(JSON.stringify(errRes), { status: 500, headers: corsHeaders });
+    }
   }
 
   try {
