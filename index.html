@@ -2259,7 +2259,7 @@
     let adminLogsList = [];
 
     async function syncUserToDatabase(authUser, customName) {
-      if (!_supabase || !authUser || !authUser.id || authUser.id === 'guest_user_1') return;
+      if (!_supabase || !authUser || !authUser.id) return;
       const uid = String(authUser.id);
       const email = authUser.email || getEffectiveUserEmail() || '';
       const nome = customName || (authUser.user_metadata && authUser.user_metadata.nome) || email.split('@')[0] || 'Atleta TitanNova';
@@ -2373,7 +2373,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     }
 
     async function checkAdminPermission(userId) {
-      if (!userId || userId === 'guest_user_1') {
+      if (!userId) {
         isCurrentSessionAdmin = false;
         return false;
       }
@@ -2894,7 +2894,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       }
 
       // 5. Garantir inclusão do usuário da sessão atual do admin
-      if (currentAuthUser && currentAuthUser.id && currentAuthUser.id !== 'guest_user_1') {
+      if (currentAuthUser && currentAuthUser.id) {
         const myUid = String(currentAuthUser.id);
         const myEmail = currentAuthUser.email || getEffectiveUserEmail();
         const myNome = (currentAuthUser.user_metadata && currentAuthUser.user_metadata.nome) || 'Administrador TitanNova';
@@ -3742,7 +3742,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       localStorage.setItem('titannovafit_legal_acceptance', JSON.stringify(record));
 
       // 2. Gravar no Supabase (se autenticado)
-      if (_supabase && userId !== 'guest_user_1') {
+      if (_supabase && userId) {
         try {
           await _supabase.from('legal_acceptances').insert([record]);
         } catch (e) {
@@ -3761,7 +3761,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     }
 
     async function checkUserLegalAcceptance(userId) {
-      if (!userId || userId === 'guest_user_1') return true;
+      if (!userId) return true;
 
       // Verificar localStorage
       const local = localStorage.getItem('titannovafit_legal_acceptance');
@@ -4148,6 +4148,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             exerciciosCount: t.exercicios.length,
             criadoEm: new Date().toISOString()
           }));
+          localStorage.setItem(`titannovafit_workouts_${authUser.id}`, JSON.stringify(allWorkoutsList));
           localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
           for (const localW of allWorkoutsList) {
@@ -4328,7 +4329,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         switchTab('screenHome');
         showSyncStatus('saved');
         showToastNotification(`✅ Conectado como ${authUser.email}!`);
-
+        setupSupabaseRealtimeSync(authUser.id);
         await refreshAppData();
       } catch (err) {
         const errStatus = err.status || err.code || 'UNKNOWN';
@@ -4351,6 +4352,12 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         if (_supabase) {
           try {
             await _supabase.auth.signOut();
+          } catch (_) {}
+        }
+        if (_realtimeSyncChannel && _supabase) {
+          try {
+            _supabase.removeChannel(_realtimeSyncChannel);
+            _realtimeSyncChannel = null;
           } catch (_) {}
         }
         currentAuthUser = null;
@@ -4957,98 +4964,177 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     let allWorkoutsList = [];
     const expandedWorkoutIds = new Set();
 
-    async function loadWorkoutsFromStorage() {
-      // 1. Carregar treinos locais
+    let _realtimeSyncChannel = null;
+
+    function setupSupabaseRealtimeSync(uid) {
+      if (!_supabase || !uid) return;
       try {
-        const savedRaw = localStorage.getItem('titannovafit_custom_workouts');
-        if (savedRaw === null) {
-          // Primeira vez abrindo o app: inicializa com os treinos padrão
-          allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
-          localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
-        } else {
-          const saved = JSON.parse(savedRaw || '[]');
-          if (Array.isArray(saved) && saved.length > 0) {
-            allWorkoutsList = saved;
-            // Atualizar URLs de GIFs para corresponder aos novos GIFs de alta precisão
-            allWorkoutsList.forEach(w => {
-              if (Array.isArray(w.exercicios)) {
-                w.exercicios.forEach(ex => {
-                  const match = DEFAULT_BASE_EXERCISES.find(b => (b.nome || b.name || '').trim().toLowerCase() === (ex.nome || '').trim().toLowerCase());
-                  if (match && match.gifUrl) {
-                    ex.gifUrl = match.gifUrl;
-                  }
-                });
-              }
-            });
-            localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
-          } else if (Array.isArray(saved) && saved.length === 0 && savedRaw.trim() === '[]') {
-            allWorkoutsList = [];
-          } else {
-            allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
+        if (_realtimeSyncChannel) {
+          _supabase.removeChannel(_realtimeSyncChannel);
+          _realtimeSyncChannel = null;
+        }
+
+        _realtimeSyncChannel = _supabase
+          .channel(`titannova-sync-${uid}`)
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'treinos',
+              filter: `usuario_id=eq.${uid}`
+            },
+            async (payload) => {
+              console.log('[Supabase Realtime] Alteração detectada em treinos em outro aparelho:', payload.eventType);
+              await loadWorkoutsFromStorage(true);
+            }
+          )
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'sessoes_de_treino',
+              filter: `usuario_id=eq.${uid}`
+            },
+            async (payload) => {
+              console.log('[Supabase Realtime] Alteração detectada no histórico em outro aparelho:', payload.eventType);
+              await loadHistoryFromStorage(true);
+            }
+          )
+          .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              console.log('[Supabase Realtime] Sincronização contínua ativa para o usuário:', uid);
+            }
+          });
+      } catch (err) {
+        console.warn('[Supabase Realtime Setup Warning]:', err);
+      }
+    }
+
+    let _lastContinuousSync = 0;
+    async function triggerContinuousSync() {
+      const uid = getEffectiveUserId();
+      if (!_supabase || !uid) return;
+
+      const now = Date.now();
+      if (now - _lastContinuousSync < 3000) return;
+      _lastContinuousSync = now;
+
+      try {
+        await loadWorkoutsFromStorage(true);
+        await loadHistoryFromStorage(true);
+      } catch (e) {
+        console.warn('[Continuous Sync Background Notice]:', e);
+      }
+    }
+
+    // Ouvintes contínuos de foco e atividade para qualquer aparelho (Mobile / Desktop / PWA)
+    window.addEventListener('focus', triggerContinuousSync);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') triggerContinuousSync();
+    });
+    window.addEventListener('online', triggerContinuousSync);
+    setInterval(() => {
+      if (document.visibilityState === 'visible') triggerContinuousSync();
+    }, 25000);
+
+    async function loadWorkoutsFromStorage(silent = false) {
+      const uid = getEffectiveUserId();
+      if (!uid) {
+        allWorkoutsList = [];
+        renderAllWorkoutsUI();
+        return;
+      }
+
+      const userStorageKey = `titannovafit_workouts_${uid}`;
+
+      // 1. Carregar cache local rápido do usuário atual para exibição imediata
+      try {
+        const cached = localStorage.getItem(userStorageKey);
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            allWorkoutsList = parsed;
+            renderAllWorkoutsUI();
           }
         }
-      } catch (e) {
-        allWorkoutsList = [...DEFAULT_WORKOUT_DIVISIONS];
-      }
-      renderAllWorkoutsUI();
+      } catch (_) {}
 
-      // 2. Buscar treinos no Supabase (Nuvem / Sincronizados com Mobile e outros aparelhos)
+      // 2. Buscar no Supabase diretamente para a conta autenticada (sincronização contínua entre aparelhos)
       if (_supabase) {
         try {
-          const uid = getEffectiveUserId();
+          if (!silent) showSyncStatus('saving');
+          const isUuid = (uid.length === 36 && uid.includes('-'));
+          const queryFilter = isUuid ? `user_id.eq.${uid},usuario_id.eq.${uid}` : `usuario_id.eq.${uid}`;
+
           const { data, error } = await _supabase
             .from('treinos')
             .select('*')
-            .or(`usuario_id.eq.${uid},usuario_id.eq.guest_user_1,usuario_id.is.null`)
+            .or(queryFilter)
             .order('criado_em', { ascending: false });
 
-          if (!error && Array.isArray(data) && data.length > 0) {
-            const onlineWorkouts = data.map(row => {
-              let exList = [];
-              if (row.exercicios) {
-                let parsedEx = row.exercicios;
-                if (typeof parsedEx === 'string') {
-                  try { parsedEx = JSON.parse(parsedEx); } catch (_) {}
+          if (!error && Array.isArray(data)) {
+            if (data.length > 0) {
+              // Os treinos da nuvem vinculados a este login são a verdade definitiva
+              const onlineWorkouts = data.map(row => {
+                let exList = [];
+                if (row.exercicios) {
+                  let parsedEx = row.exercicios;
+                  if (typeof parsedEx === 'string') {
+                    try { parsedEx = JSON.parse(parsedEx); } catch (_) {}
+                  }
+                  if (Array.isArray(parsedEx)) {
+                    exList = parsedEx.map((e, idx) => ({
+                      id: e.id || `ex_${row.id}_${idx}`,
+                      nome: e.nome || e.name || 'Exercício',
+                      series: e.series || '4',
+                      reps: e.reps || '10-12',
+                      grupoMuscular: e.grupoMuscular || e.grupo_muscular || 'Geral',
+                      gifUrl: e.gifUrl || e.gif_url || ''
+                    }));
+                  }
                 }
-                if (Array.isArray(parsedEx)) {
-                  exList = parsedEx.map((e, idx) => ({
-                    id: e.id || `ex_${row.id}_${idx}`,
-                    nome: e.nome || e.name || 'Exercício',
-                    series: e.series || '4',
-                    reps: e.reps || '10-12',
-                    grupoMuscular: e.grupoMuscular || e.grupo_muscular || 'Geral',
-                    gifUrl: e.gifUrl || e.gif_url || ''
-                  }));
+                let days = [];
+                if (row.dias_semana) {
+                  let rawDays = row.dias_semana;
+                  if (typeof rawDays === 'string') {
+                    try { rawDays = JSON.parse(rawDays); } catch (_) {}
+                  }
+                  if (Array.isArray(rawDays)) days = rawDays;
                 }
-              }
-              let days = [];
-              if (row.dias_semana) {
-                let rawDays = row.dias_semana;
-                if (typeof rawDays === 'string') {
-                  try { rawDays = JSON.parse(rawDays); } catch (_) {}
-                }
-                if (Array.isArray(rawDays)) days = rawDays;
-              }
 
-              return {
-                id: row.id,
-                nome: row.nome || 'Treino',
-                descricao: row.descricao || '',
-                diasSemana: days,
-                corHex: row.cor_hex || '#1E88E5',
-                exercicios: exList,
-                exerciciosCount: exList.length,
-                criadoEm: row.criado_em || new Date().toISOString()
-              };
-            });
+                return {
+                  id: row.id,
+                  nome: row.nome || 'Treino',
+                  descricao: row.descricao || '',
+                  diasSemana: days,
+                  corHex: row.cor_hex || '#1E88E5',
+                  exercicios: exList,
+                  exerciciosCount: exList.length,
+                  criadoEm: row.criado_em || new Date().toISOString()
+                };
+              });
 
-            // Enviar para o Supabase quaisquer treinos locais que ainda não estejam na nuvem com o usuario_id atual
-            const onlineIds = new Set(onlineWorkouts.map(w => w.id));
-            for (const localW of allWorkoutsList) {
-              if (!onlineIds.has(localW.id)) {
+              allWorkoutsList = onlineWorkouts;
+              localStorage.setItem(userStorageKey, JSON.stringify(allWorkoutsList));
+              renderAllWorkoutsUI();
+            } else {
+              // Conta nova sem treinos na nuvem: inicializa os treinos padrão e envia ao Supabase
+              const defaultWorkoutsForUser = DEFAULT_WORKOUT_DIVISIONS.map(d => ({
+                ...d,
+                id: `treino_${uid.substring(0, 8)}_${d.id || Date.now()}`,
+                criadoEm: new Date().toISOString()
+              }));
+              allWorkoutsList = defaultWorkoutsForUser;
+              localStorage.setItem(userStorageKey, JSON.stringify(allWorkoutsList));
+              renderAllWorkoutsUI();
+
+              for (const localW of defaultWorkoutsForUser) {
                 try {
                   await _supabase.from('treinos').upsert({
                     id: localW.id,
+                    user_id: isUuid ? uid : null,
                     usuario_id: uid,
                     nome: localW.nome,
                     descricao: localW.descricao || '',
@@ -5060,57 +5146,18 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
                 } catch (_) {}
               }
             }
-
-            // Consolidar treinos da nuvem
-            const mapById = new Map();
-            onlineWorkouts.forEach(w => mapById.set(w.id, w));
-            allWorkoutsList.forEach(w => {
-              if (!mapById.has(w.id)) mapById.set(w.id, w);
-            });
-            allWorkoutsList = Array.from(mapById.values());
-
-            localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
-            renderAllWorkoutsUI();
-            console.log(`[Supabase] Total consolidado: ${allWorkoutsList.length} treinos sincronizados para o usuário ${uid}.`);
-          } else if (!error && Array.isArray(data) && data.length === 0 && allWorkoutsList.length > 0) {
-            // Inicializar conta na nuvem com os treinos locais vinculados ao ID do usuário
-            const uid = getEffectiveUserId();
-            for (const localW of allWorkoutsList) {
-              try {
-                await _supabase.from('treinos').upsert({
-                  id: localW.id,
-                  usuario_id: uid,
-                  nome: localW.nome,
-                  descricao: localW.descricao || '',
-                  dias_semana: localW.diasSemana || [],
-                  cor_hex: localW.corHex || '#1E88E5',
-                  exercicios: localW.exercicios || [],
-                  criado_em: localW.criadoEm || new Date().toISOString()
-                });
-              } catch (_) {}
-            }
           }
+          if (!silent) showSyncStatus('saved');
         } catch (e) {
-          console.log('[Supabase] Erro ao sincronizar treinos da nuvem:', e);
+          console.warn('[Supabase Sync Treinos Warning]:', e);
+          if (!silent) showSyncStatus('idle');
         }
 
-        // Subscrição em Tempo Real: Atualiza a lista automaticamente se outro dispositivo criar/excluir treinos
-        if (!_supabaseRealtimeSubscribed) {
-          _supabaseRealtimeSubscribed = true;
-          try {
-            _supabase
-              .channel('realtime_treinos_web')
-              .on('postgres_changes', { event: '*', schema: 'public', table: 'treinos' }, () => {
-                console.log('[Supabase Realtime] Mudança detectada nos treinos! Recarregando...');
-                loadWorkoutsFromStorage();
-              })
-              .subscribe();
-          } catch (_) {}
-        }
+        // Garantir que o canal Realtime esteja ativo para este usuário
+        setupSupabaseRealtimeSync(uid);
       }
+      renderAllWorkoutsUI();
     }
-
-    let _supabaseRealtimeSubscribed = false;
 
     function toggleWorkoutCardExpand(workoutId, event) {
       if (event) event.stopPropagation();
@@ -5211,6 +5258,10 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     async function deleteWorkoutCard(workoutId) {
       if (confirm('Deseja realmente excluir este treino?')) {
         allWorkoutsList = allWorkoutsList.filter(w => w.id !== workoutId && w.nome !== workoutId);
+        const uid = getEffectiveUserId();
+        if (uid) {
+          localStorage.setItem(`titannovafit_workouts_${uid}`, JSON.stringify(allWorkoutsList));
+        }
         localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
         renderAllWorkoutsUI();
 
@@ -5510,22 +5561,27 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         concluido: true
       };
 
-      // 1. Salvar no localStorage
+      // 1. Salvar no localStorage por usuário
+      const uid = getEffectiveUserId();
+      const historyStorageKey = `titannovafit_history_${uid}`;
       let historyList = [];
       try {
-        historyList = JSON.parse(localStorage.getItem('titannovafit_history') || '[]');
+        historyList = JSON.parse(localStorage.getItem(historyStorageKey) || '[]');
       } catch (e) {}
       historyList.unshift(historyItem);
+      if (uid) {
+        localStorage.setItem(historyStorageKey, JSON.stringify(historyList));
+      }
       localStorage.setItem('titannovafit_history', JSON.stringify(historyList));
 
       // 2. Sincronizar com Supabase se online
       if (_supabase) {
         try {
           showSyncStatus('saving');
-          const uid = getEffectiveUserId();
+          const isUuid = (uid && uid.length === 36 && uid.includes('-'));
           await _supabase.from('sessoes_de_treino').upsert({
             id: historyItem.id,
-            user_id: uid.startsWith('user_') || uid.startsWith('admin_') || uid.startsWith('guest_') ? null : uid,
+            user_id: isUuid ? uid : null,
             usuario_id: uid,
             nome_treino: title,
             inicio: historyItem.inicioIso,
@@ -5812,18 +5868,22 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         criadoEm: new Date().toISOString()
       };
 
-      // 1. Salvar na lista em memória e no localStorage
+      // 1. Salvar na lista em memória e no localStorage por usuário
       allWorkoutsList.unshift(newWorkout);
+      const uid = getEffectiveUserId();
+      if (uid) {
+        localStorage.setItem(`titannovafit_workouts_${uid}`, JSON.stringify(allWorkoutsList));
+      }
       localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
       // 2. Sincronizar com Supabase se online
       if (_supabase) {
         try {
           showSyncStatus('saving');
-          const uid = getEffectiveUserId();
+          const isUuid = (uid && uid.length === 36 && uid.includes('-'));
           const payload = {
             id: workoutId,
-            user_id: uid.startsWith('user_') || uid.startsWith('admin_') || uid.startsWith('guest_') ? null : uid,
+            user_id: isUuid ? uid : null,
             usuario_id: uid,
             nome: name,
             descricao: descInput.value.trim(),
@@ -5902,25 +5962,34 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       }
     }
 
-    async function loadHistoryFromStorage() {
+    async function loadHistoryFromStorage(silent = false) {
       const container = document.getElementById('historyListContainer');
+      const uid = getEffectiveUserId();
+      if (!uid) {
+        if (container) container.innerHTML = '';
+        return;
+      }
+
+      const historyStorageKey = `titannovafit_history_${uid}`;
 
       let historyList = [];
       try {
-        historyList = JSON.parse(localStorage.getItem('titannovafit_history') || '[]');
+        historyList = JSON.parse(localStorage.getItem(historyStorageKey) || '[]');
       } catch (e) {}
 
-      // Sincronizar com Supabase (Nuvem / Mobile e outros aparelhos) se online
+      // Sincronizar com Supabase (Nuvem / Mobile e outros aparelhos)
       if (_supabase) {
         try {
-          const uid = getEffectiveUserId();
+          const isUuid = (uid.length === 36 && uid.includes('-'));
+          const queryFilter = isUuid ? `user_id.eq.${uid},usuario_id.eq.${uid}` : `usuario_id.eq.${uid}`;
+
           const { data, error } = await _supabase
             .from('sessoes_de_treino')
             .select('*')
-            .or(`usuario_id.eq.${uid},usuario_id.eq.guest_user_1,usuario_id.is.null`)
+            .or(queryFilter)
             .order('fim', { ascending: false });
 
-          if (!error && Array.isArray(data) && data.length > 0) {
+          if (!error && Array.isArray(data)) {
             const onlineHistory = data.map(row => {
               const fimDate = row.fim ? new Date(row.fim) : new Date();
               const inicioDate = row.inicio ? new Date(row.inicio) : fimDate;
@@ -5939,22 +6008,11 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
               };
             });
 
-            // Mesclar mantendo todos os registros únicos
-            const mapById = new Map();
-            onlineHistory.forEach(h => mapById.set(h.id, h));
-            historyList.forEach(h => {
-              if (!mapById.has(h.id)) mapById.set(h.id, h);
-            });
-            historyList = Array.from(mapById.values()).sort((a, b) => {
-              const timeA = a.timestamp || (a.fimIso ? new Date(a.fimIso).getTime() : 0);
-              const timeB = b.timestamp || (b.fimIso ? new Date(b.fimIso).getTime() : 0);
-              return timeB - timeA;
-            });
-
-            localStorage.setItem('titannovafit_history', JSON.stringify(historyList));
+            historyList = onlineHistory;
+            localStorage.setItem(historyStorageKey, JSON.stringify(historyList));
           }
         } catch (e) {
-          console.log('[Supabase] Erro ao sincronizar histórico da nuvem:', e);
+          console.warn('[Supabase Sync Histórico Warning]:', e);
         }
       }
 
@@ -5981,10 +6039,13 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         const card = document.getElementById(`history_${id}`);
         if (card) card.remove();
 
+        const uid = getEffectiveUserId();
+        const historyStorageKey = `titannovafit_history_${uid}`;
+
         try {
-          let historyList = JSON.parse(localStorage.getItem('titannovafit_history') || '[]');
+          let historyList = JSON.parse(localStorage.getItem(historyStorageKey) || '[]');
           historyList = historyList.filter(h => h.id !== id);
-          localStorage.setItem('titannovafit_history', JSON.stringify(historyList));
+          localStorage.setItem(historyStorageKey, JSON.stringify(historyList));
         } catch (e) {}
 
         if (_supabase) {
@@ -7042,15 +7103,19 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         };
 
         allWorkoutsList.unshift(newW);
+        const uid = getEffectiveUserId();
+        if (uid) {
+          localStorage.setItem(`titannovafit_workouts_${uid}`, JSON.stringify(allWorkoutsList));
+        }
         localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
         if (_supabase) {
           try {
-            const uid = getEffectiveUserId();
+            const isUuid = (uid && uid.length === 36 && uid.includes('-'));
             await _supabase.from('treinos').upsert({
               id: newId,
               usuario_id: uid,
-              user_id: uid.startsWith('user_') || uid.startsWith('admin_') || uid.startsWith('guest_') ? null : uid,
+              user_id: isUuid ? uid : null,
               nome: newW.nome,
               descricao: newW.descricao,
               dias_semana: newW.diasSemana,
@@ -7066,12 +7131,19 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           if (!Array.isArray(workout.exercicios)) workout.exercicios = [];
           workout.exercicios.push(...selectedExercisesObjects);
           workout.exerciciosCount = workout.exercicios.length;
+          const uid = getEffectiveUserId();
+          if (uid) {
+            localStorage.setItem(`titannovafit_workouts_${uid}`, JSON.stringify(allWorkoutsList));
+          }
           localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
           if (_supabase) {
             try {
+              const isUuid = (uid && uid.length === 36 && uid.includes('-'));
               await _supabase.from('treinos').upsert({
                 id: workout.id,
+                usuario_id: uid,
+                user_id: isUuid ? uid : null,
                 exercicios: workout.exercicios
               });
             } catch (_) {}
@@ -7729,6 +7801,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       const navEl = document.getElementById('bottomNav');
       if (navEl) navEl.style.display = 'flex';
       updateProfileUI();
+      setupSupabaseRealtimeSync(currentAuthUser.id);
 
       // 2. Carregar treinos, histórico e biblioteca sincronizados na nuvem
       await loadExercisesLibrary();
@@ -7769,7 +7842,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       }
 
       // 4. Verificação de Aceite Obrigatório dos Termos Vigentes (1.0)
-      if (currentAuthUser && currentAuthUser.id && currentAuthUser.id !== 'guest_user_1') {
+      if (currentAuthUser && currentAuthUser.id) {
         try {
           const hasAccepted = await checkUserLegalAcceptance(currentAuthUser.id);
           if (!hasAccepted) {
