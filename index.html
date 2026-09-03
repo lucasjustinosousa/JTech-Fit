@@ -1776,7 +1776,6 @@
       try {
         await _supabase.from('usuarios').upsert({
           id: uid,
-          user_id: uid,
           nome: nome,
           email: email,
           criado_em: authUser.created_at || new Date().toISOString()
