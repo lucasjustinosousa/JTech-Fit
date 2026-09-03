@@ -5293,6 +5293,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
               if (!row || row.usuario_id === uid || row.user_id === uid) {
                 console.log('[Supabase Realtime] Alteração detectada em treinos em outro aparelho:', payload.eventType);
                 await loadWorkoutsFromStorage(true);
+                updateHomeScreenUI();
               }
             }
           )
@@ -5308,6 +5309,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
               if (!row || row.usuario_id === uid || row.user_id === uid) {
                 console.log('[Supabase Realtime] Alteração detectada no histórico em outro aparelho:', payload.eventType);
                 await loadHistoryFromStorage(true);
+                updateHomeScreenUI();
               }
             }
           )
@@ -5322,6 +5324,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             async () => {
               console.log('[Supabase Realtime] Alteração de perfil em outro aparelho.');
               updateProfileUI();
+              updateHomeScreenUI();
             }
           )
           .subscribe((status) => {
@@ -5347,6 +5350,10 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         await TitanNovaOfflineSync.flushQueue(uid);
         await loadWorkoutsFromStorage(true);
         await loadHistoryFromStorage(true);
+        updateHomeScreenUI();
+        updateProfileUI();
+        if (typeof updateFavoriteButtons === 'function') updateFavoriteButtons();
+        if (typeof renderFavoriteExercisesTab === 'function') renderFavoriteExercisesTab();
       } catch (e) {
         console.warn('[Continuous Sync Background Notice]:', e);
       }
@@ -5380,6 +5387,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           if (Array.isArray(parsed) && parsed.length > 0) {
             allWorkoutsList = parsed;
             renderAllWorkoutsUI();
+            updateHomeScreenUI();
           }
         }
       } catch (_) {}
@@ -5445,6 +5453,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
               allWorkoutsList = onlineWorkouts;
               localStorage.setItem(userStorageKey, JSON.stringify(allWorkoutsList));
               renderAllWorkoutsUI();
+              updateHomeScreenUI();
             } else {
               // Conta nova sem treinos na nuvem: inicializa os treinos padrão e envia ao Supabase
               const defaultWorkoutsForUser = DEFAULT_WORKOUT_DIVISIONS.map(d => ({
@@ -5455,6 +5464,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
               allWorkoutsList = defaultWorkoutsForUser;
               localStorage.setItem(userStorageKey, JSON.stringify(allWorkoutsList));
               renderAllWorkoutsUI();
+              updateHomeScreenUI();
 
               for (const localW of defaultWorkoutsForUser) {
                 try {
@@ -6500,10 +6510,22 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         }
       }
 
+      const uid = getEffectiveUserId();
       let historyList = [];
       try {
-        historyList = JSON.parse(localStorage.getItem('titannovafit_history') || '[]');
+        if (uid) {
+          historyList = JSON.parse(localStorage.getItem(`titannovafit_history_${uid}`) || '[]');
+        }
+        if (!historyList || historyList.length === 0) {
+          historyList = JSON.parse(localStorage.getItem('titannovafit_history') || '[]');
+        }
       } catch (e) {}
+
+      if (historyList && historyList.length > 0) {
+        try {
+          localStorage.setItem('titannovafit_history', JSON.stringify(historyList));
+        } catch (_) {}
+      }
 
       const now = new Date();
 
@@ -8296,8 +8318,12 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       TitanNovaOfflineSync.scheduleAutoRetry(userId);
       await TitanNovaOfflineSync.flushQueue(userId);
 
+      // 7. Atualizar todos os conteúdos da página imediatamente
       updateHomeScreenUI();
+      renderAllWorkoutsUI();
       updateProfileUI();
+      if (typeof updateFavoriteButtons === 'function') updateFavoriteButtons();
+      if (typeof renderFavoriteExercisesTab === 'function') renderFavoriteExercisesTab();
     }
 
     function continueOfflineMode() {
@@ -8351,6 +8377,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           // Monitorar mudanças contínuas de autenticação
           _supabase.auth.onAuthStateChange(async (event, session) => {
             if (session && session.user) {
+              const previousId = currentAuthUser ? currentAuthUser.id : null;
               currentAuthUser = session.user;
               localStorage.setItem('titannovafit_user', JSON.stringify({
                 id: session.user.id,
@@ -8360,6 +8387,10 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
               await checkAdminPermission(session.user.id);
               await syncUserToDatabase(session.user);
               updateProfileUI();
+
+              if (event === 'SIGNED_IN' || previousId !== session.user.id) {
+                await carregarDadosDoUsuario(session.user.id);
+              }
             } else if (event === 'SIGNED_OUT') {
               currentAuthUser = null;
               isCurrentSessionAdmin = false;
