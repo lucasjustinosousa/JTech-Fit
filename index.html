@@ -1054,8 +1054,6 @@
           <button onclick="switchAuthMode('login')" class="btn btn-outline" style="margin-top: 10px;">Já possui conta? Fazer Login</button>
         </div>
 
-        <button onclick="handleAuthAction('guest')" class="btn btn-text" style="margin-top: 12px; font-size: 12px; color: var(--text-grey);">Continuar sem cadastro (Modo Convidado)</button>
-
         <div class="safety-banner" style="margin-top: 16px;">
           <div>☁️</div>
           <p><strong>Sincronização Nuvem:</strong> Seus treinos e histórico ficam salvos e vinculados à sua conta em todos os seus aparelhos.</p>
@@ -3205,7 +3203,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         const saved = JSON.parse(localStorage.getItem('titannovafit_user') || 'null');
         if (saved && saved.id) return saved.id;
       } catch (_) {}
-      return 'guest_user_1';
+      return '';
     }
 
     function getEffectiveUserEmail() {
@@ -3248,11 +3246,6 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           badgeEl.style.background = 'rgba(255,215,0,0.18)';
           badgeEl.style.color = '#ffd700';
           badgeEl.style.border = '1px solid rgba(255,215,0,0.4)';
-        } else if (uid === 'guest_user_1') {
-          badgeEl.innerText = 'Modo Convidado';
-          badgeEl.style.background = 'rgba(255,152,0,0.15)';
-          badgeEl.style.color = 'var(--warning-orange)';
-          badgeEl.style.border = 'none';
         } else {
           badgeEl.innerText = 'Conta Sincronizada ☁️';
           badgeEl.style.background = 'rgba(0,210,255,0.15)';
@@ -3576,7 +3569,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         btn.style.cursor = 'not-allowed';
       }
 
-      const email = currentAuthUser ? (currentAuthUser.email || 'Usuário Atual') : 'Modo Convidado';
+      const email = currentAuthUser ? (currentAuthUser.email || 'Usuário Atual') : 'Não autenticado';
       if (statusEl) {
         statusEl.innerHTML = `Conta autenticada: <strong style="color: white;">${email}</strong>`;
       }
@@ -3965,21 +3958,8 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       if (regErrEl) { regErrEl.style.display = 'none'; regErrEl.innerHTML = ''; }
 
       if (mode === 'guest') {
-        currentAuthUser = {
-          id: 'guest_user_1',
-          email: 'convidado@titannovafit.com',
-          user_metadata: { nome: 'Atleta Convidado', role: 'guest' }
-        };
-        localStorage.setItem('titannovafit_user', JSON.stringify({
-          id: currentAuthUser.id,
-          email: currentAuthUser.email,
-          nome: 'Atleta Convidado',
-          role: 'guest'
-        }));
-        document.getElementById('bottomNav').style.display = 'flex';
-        updateProfileUI();
-        switchTab('screenHome');
-        await refreshAppData();
+        alert('O acesso como convidado foi desativado. Por favor, crie uma conta ou faça login com seu e-mail e senha.');
+        switchAuthMode('login');
         return;
       }
 
@@ -4354,7 +4334,8 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     }
 
     function loginUser() {
-      handleAuthAction('guest');
+      switchTab('screenAuth');
+      switchAuthMode('login');
     }
 
     // ==========================================
@@ -7657,23 +7638,9 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             }));
             await checkAdminPermission(session.user.id);
           } else {
-            // Verificar se há uma sessão de convidado salva no localStorage
-            const localUser = localStorage.getItem('titannovafit_user');
-            if (localUser) {
-              try {
-                const parsed = JSON.parse(localUser);
-                if (parsed && (parsed.role === 'guest' || (parsed.id && String(parsed.id).startsWith('guest_')))) {
-                  currentAuthUser = parsed;
-                } else {
-                  currentAuthUser = null;
-                  localStorage.removeItem('titannovafit_user');
-                }
-              } catch (_) {
-                currentAuthUser = null;
-              }
-            } else {
-              currentAuthUser = null;
-            }
+            // Nenhuma sessão Supabase ativa: limpar qualquer dado residual e exigir login/cadastro
+            currentAuthUser = null;
+            localStorage.removeItem('titannovafit_user');
           }
 
           // Monitorar mudanças contínuas de autenticação
