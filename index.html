@@ -640,6 +640,18 @@
     .sync-retry-btn:hover {
       background: #ff1744;
     }
+    .sync-pill-pending {
+      font-size: 11px;
+      background: rgba(255, 179, 0, 0.18);
+      color: #ffb300;
+      border: 1px solid rgba(255, 179, 0, 0.4);
+      padding: 4px 10px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 700;
+    }
     .sync-pill-idle {
       font-size: 11px;
       background: rgba(76, 175, 80, 0.15);
@@ -900,6 +912,19 @@
   </style>
 </head>
 <body>
+
+  <!-- TELA INICIAL DE CARREGAMENTO / VERIFICAÇÃO DE SESSÃO SEGURA -->
+  <div id="appInitialLoadingOverlay" style="position: fixed; inset: 0; background: var(--bg-black); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center;">
+    <img src="assets/icons/logo.png" alt="TitanNova Fit" style="width: 76px; height: 76px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,210,255,0.4); margin-bottom: 18px;">
+    <div style="font-size: 22px; font-weight: 900; letter-spacing: 1px; color: white;">TITANNOVA <span style="color: var(--accent-cyan);">FIT</span></div>
+    <div id="appInitialLoadingStatus" style="font-size: 13px; color: var(--text-grey); margin-top: 8px; font-weight: 600;">Verificando sessão segura no Supabase...</div>
+    <div id="appInitialLoadingSpinner" style="margin-top: 18px; font-size: 26px; animation: spinIcon 1s linear infinite;">🔄</div>
+    <div id="appSessionErrorBox" style="display: none; margin-top: 20px; max-width: 330px; background: rgba(255,82,82,0.12); border: 1px solid rgba(255,82,82,0.35); border-radius: 12px; padding: 16px;">
+      <p style="color: #ff8080; font-size: 13px; line-height: 1.4; margin-bottom: 12px; font-weight: 600;">Não foi possível verificar sua sessão. Verifique sua conexão e tente novamente.</p>
+      <button onclick="window.location.reload()" class="btn btn-outline" style="font-size: 12px; padding: 8px 16px; border-color: var(--accent-cyan); color: var(--accent-cyan);">Tentar novamente</button>
+      <button id="appContinueOfflineBtn" onclick="continueOfflineMode()" class="btn btn-text" style="font-size: 11px; color: var(--text-grey); margin-top: 8px; display: none;">Continuar em Modo Offline</button>
+    </div>
+  </div>
 
   <div class="app-frame">
     <!-- Header -->
@@ -1519,8 +1544,11 @@
           </div>
         </div>
 
-        <button onclick="logoutUser()" class="btn btn-outline" style="width: 100%; border-color: rgba(255,82,82,0.4); color: #ff5252;">
-          🚪 Sair da Conta (Logout)
+        <button onclick="logoutUser()" class="btn btn-outline" style="width: 100%; border-color: rgba(255,82,82,0.4); color: #ff5252; font-weight: 700;">
+          🚪 Sair deste aparelho
+        </button>
+        <button onclick="logoutAllDevices()" class="btn btn-text" style="width: 100%; margin-top: 10px; font-size: 11px; color: var(--text-grey);">
+          🌐 Desconectar de todos os aparelhos
         </button>
       </div>
 
@@ -3196,22 +3224,42 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
       if (retryFn) _lastFailedSyncAction = retryFn;
 
+      if (statusEl._savedTimeout) {
+        clearTimeout(statusEl._savedTimeout);
+        statusEl._savedTimeout = null;
+      }
+
       if (status === 'saving') {
         statusEl.className = 'sync-pill-saving';
         statusEl.innerHTML = '<span class="sync-spinner">🔄</span> Salvando...';
         statusEl.style.display = 'inline-flex';
-      } else if (status === 'saved') {
+      } else if (status === 'saved' || status === 'cloud_saved') {
         statusEl.className = 'sync-pill-saved';
-        statusEl.innerHTML = '✓ Alterações salvas';
+        statusEl.innerHTML = '☁️ Salvo na nuvem';
         statusEl.style.display = 'inline-flex';
-        if (statusEl._savedTimeout) clearTimeout(statusEl._savedTimeout);
         statusEl._savedTimeout = setTimeout(() => {
           statusEl.className = 'sync-pill-idle';
           statusEl.innerHTML = '● Nuvem Conectada';
-        }, 3000);
+        }, 3500);
+      } else if (status === 'pending_offline' || status === 'pending') {
+        statusEl.className = 'sync-pill-pending';
+        statusEl.innerHTML = '⏳ Alterações aguardando sincronização';
+        statusEl.style.display = 'inline-flex';
+      } else if (status === 'syncing') {
+        statusEl.className = 'sync-pill-saving';
+        statusEl.innerHTML = '<span class="sync-spinner">🔄</span> Sincronizando...';
+        statusEl.style.display = 'inline-flex';
+      } else if (status === 'sync_complete') {
+        statusEl.className = 'sync-pill-saved';
+        statusEl.innerHTML = '✅ Sincronização concluída';
+        statusEl.style.display = 'inline-flex';
+        statusEl._savedTimeout = setTimeout(() => {
+          statusEl.className = 'sync-pill-idle';
+          statusEl.innerHTML = '● Nuvem Conectada';
+        }, 3500);
       } else if (status === 'error') {
         statusEl.className = 'sync-pill-error';
-        statusEl.innerHTML = `⚠️ Não foi possível salvar <button onclick="retryLastSyncAction(event)" class="sync-retry-btn">Tentar novamente</button>`;
+        statusEl.innerHTML = `⚠️ Não foi possível sincronizar <button onclick="retryLastSyncAction(event)" class="sync-retry-btn">Tentar novamente</button>`;
         statusEl.style.display = 'inline-flex';
       } else {
         statusEl.className = 'sync-pill-idle';
@@ -3227,9 +3275,198 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         _lastFailedSyncAction = null;
         await fn();
       } else {
+        const uid = getEffectiveUserId();
+        if (uid) {
+          await TitanNovaOfflineSync.flushQueue(uid);
+        }
         await refreshAppData();
       }
     }
+
+    // ====================================================================
+    // GERENCIADOR OFFLINE COM IndexedDB E FILA DE SINCRONIZAÇÃO PENDENTE
+    // ====================================================================
+    const TitanNovaOfflineSync = {
+      DB_NAME: 'TitanNovaDataSyncDB',
+      DB_VERSION: 1,
+      _db: null,
+
+      async getDB() {
+        if (this._db) return this._db;
+        return new Promise((resolve) => {
+          if (!window.indexedDB) return resolve(null);
+          try {
+            const req = indexedDB.open(this.DB_NAME, this.DB_VERSION);
+            req.onupgradeneeded = (e) => {
+              const db = e.target.result;
+              if (!db.objectStoreNames.contains('pending_queue')) {
+                const queueStore = db.createObjectStore('pending_queue', { keyPath: 'operationId' });
+                queueStore.createIndex('userId', 'userId', { unique: false });
+                queueStore.createIndex('updatedAt', 'updatedAt', { unique: false });
+              }
+              if (!db.objectStoreNames.contains('workouts_cache')) {
+                const wStore = db.createObjectStore('workouts_cache', { keyPath: 'id' });
+                wStore.createIndex('user_id', 'user_id', { unique: false });
+              }
+              if (!db.objectStoreNames.contains('history_cache')) {
+                const hStore = db.createObjectStore('history_cache', { keyPath: 'id' });
+                hStore.createIndex('user_id', 'user_id', { unique: false });
+              }
+              if (!db.objectStoreNames.contains('profiles_cache')) {
+                db.createObjectStore('profiles_cache', { keyPath: 'id' });
+              }
+            };
+            req.onsuccess = (e) => {
+              this._db = e.target.result;
+              resolve(this._db);
+            };
+            req.onerror = () => resolve(null);
+          } catch (_) {
+            resolve(null);
+          }
+        });
+      },
+
+      generateClientId() {
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+          return crypto.randomUUID();
+        }
+        return 'c_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+      },
+
+      async enqueueOperation({ userId, table, action, clientId, payload }) {
+        if (!userId) return null;
+        const op = {
+          operationId: (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'op_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9)),
+          userId: String(userId),
+          table: table,
+          action: action, // 'insert' | 'update' | 'delete'
+          clientId: clientId || this.generateClientId(),
+          payload: payload,
+          updatedAt: new Date().toISOString(),
+          attempts: 0
+        };
+
+        const db = await this.getDB();
+        if (db) {
+          try {
+            await new Promise((resolve) => {
+              const tx = db.transaction('pending_queue', 'readwrite');
+              tx.objectStore('pending_queue').put(op);
+              tx.oncomplete = () => resolve();
+              tx.onerror = () => resolve();
+            });
+          } catch (_) {}
+        } else {
+          try {
+            const queue = JSON.parse(localStorage.getItem(`titannovafit_queue_${userId}`) || '[]');
+            queue.push(op);
+            localStorage.setItem(`titannovafit_queue_${userId}`, JSON.stringify(queue));
+          } catch (_) {}
+        }
+        showSyncStatus('pending_offline');
+        console.log(`[Offline Queue] Operação pendente gravada: ${table} (${action}) para o atleta ${userId}`);
+        return op;
+      },
+
+      async getPendingOperations(userId) {
+        if (!userId) return [];
+        const db = await this.getDB();
+        if (db) {
+          return new Promise((resolve) => {
+            try {
+              const tx = db.transaction('pending_queue', 'readonly');
+              const store = tx.objectStore('pending_queue');
+              const index = store.index('userId');
+              const req = index.getAll(IDBKeyRange.only(String(userId)));
+              req.onsuccess = () => resolve(req.result || []);
+              req.onerror = () => resolve([]);
+            } catch (_) {
+              resolve([]);
+            }
+          });
+        }
+        try {
+          return JSON.parse(localStorage.getItem(`titannovafit_queue_${userId}`) || '[]');
+        } catch (_) {
+          return [];
+        }
+      },
+
+      async removeOperation(operationId, userId) {
+        const db = await this.getDB();
+        if (db) {
+          try {
+            await new Promise((resolve) => {
+              const tx = db.transaction('pending_queue', 'readwrite');
+              tx.objectStore('pending_queue').delete(operationId);
+              tx.oncomplete = () => resolve();
+              tx.onerror = () => resolve();
+            });
+          } catch (_) {}
+        }
+        if (userId) {
+          try {
+            let queue = JSON.parse(localStorage.getItem(`titannovafit_queue_${userId}`) || '[]');
+            queue = queue.filter(o => o.operationId !== operationId);
+            localStorage.setItem(`titannovafit_queue_${userId}`, JSON.stringify(queue));
+          } catch (_) {}
+        }
+      },
+
+      async flushQueue(userId) {
+        if (!_supabase || !userId) return;
+        const currentUid = getEffectiveUserId();
+        if (String(currentUid) !== String(userId)) return;
+
+        const pending = await this.getPendingOperations(userId);
+        if (!pending || pending.length === 0) return;
+
+        showSyncStatus('syncing');
+        console.log(`[Offline Sync] Sincronizando ${pending.length} operações pendentes para o atleta ${userId}...`);
+
+        let hasError = false;
+        for (const op of pending) {
+          try {
+            if (op.action === 'insert' || op.action === 'update') {
+              const { error } = await _supabase
+                .from(op.table)
+                .upsert(op.payload, { onConflict: 'user_id,client_id' });
+              if (!error) {
+                await this.removeOperation(op.operationId, userId);
+              } else {
+                hasError = true;
+                console.warn(`[Offline Sync] Erro no envio de ${op.table}:`, error);
+              }
+            } else if (op.action === 'delete') {
+              let query = _supabase.from(op.table).delete().eq('user_id', userId);
+              if (op.clientId) {
+                query = query.eq('client_id', op.clientId);
+              } else if (op.payload && op.payload.id) {
+                query = query.eq('id', op.payload.id);
+              }
+              const { error } = await query;
+              if (!error) {
+                await this.removeOperation(op.operationId, userId);
+              } else {
+                hasError = true;
+              }
+            }
+          } catch (err) {
+            hasError = true;
+            console.warn(`[Offline Sync] Falha ao sincronizar:`, err);
+            break;
+          }
+        }
+
+        const remaining = await this.getPendingOperations(userId);
+        if (remaining.length === 0) {
+          showSyncStatus('cloud_saved');
+        } else if (hasError) {
+          showSyncStatus('pending_offline');
+        }
+      }
+    };
 
     let currentAuthUser = null;
 
@@ -4178,31 +4415,19 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           const errMsg = (err.message || '').toLowerCase();
           console.error(`[Cadastro Tratado]: Código ${errStatus} - Mensagem: ${err.message}`);
 
-          // 1. TENTATIVA DE AUTO-LOGIN (se o usuário já foi criado no banco mas falhou o envio de email)
-          if (_supabase && (errMsg.includes('rate limit') || errMsg.includes('already registered') || errMsg.includes('already exists') || err.status === 429)) {
-            try {
-              const { data: loginData, error: loginErr } = await _supabase.auth.signInWithPassword({
-                email: email,
-                password: pass
-              });
-              if (!loginErr && loginData && loginData.user) {
-                currentAuthUser = loginData.user;
-                localStorage.setItem('titannovafit_user', JSON.stringify({
-                  id: loginData.user.id,
-                  email: loginData.user.email,
-                  nome: name || loginData.user.email.split('@')[0]
-                }));
-                // Salvar perfil em usuarios e profiles
-                await syncUserToDatabase(loginData.user, name);
-
-                document.getElementById('bottomNav').style.display = 'flex';
-                updateProfileUI();
-                switchTab('screenHome');
-                showToastNotification(`🎉 Conectado com sucesso como ${email}!`);
-                await refreshAppData();
-                return;
-              }
-            } catch (_) {}
+          // 1. Tratamento para Usuário já existente
+          if (errMsg.includes('already registered') || errMsg.includes('already exists') || errMsg.includes('user already registered')) {
+            showSyncStatus('idle');
+            if (regErrEl) {
+              regErrEl.innerHTML = `
+                <div style="margin-bottom: 6px; font-size: 12px; color: #ffd700; font-weight: 700;">Este e-mail já possui uma conta no TitanNova Fit.</div>
+                <button onclick="switchAuthMode('login')" class="btn btn-outline" style="width: 100%; border-color: var(--accent-cyan); color: var(--accent-cyan); font-weight: 800; padding: 8px;">
+                  🔑 FAZER LOGIN AGORA
+                </button>
+              `;
+              regErrEl.style.display = 'block';
+            }
+            return;
           }
 
           // 2. Tratamento específico para Rate Limit (429 / email rate limit exceeded)
@@ -4329,8 +4554,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         switchTab('screenHome');
         showSyncStatus('saved');
         showToastNotification(`✅ Conectado como ${authUser.email}!`);
-        setupSupabaseRealtimeSync(authUser.id);
-        await refreshAppData();
+        await carregarDadosDoUsuario(authUser.id);
       } catch (err) {
         const errStatus = err.status || err.code || 'UNKNOWN';
         console.error(`[Login Tratado]: Código ${errStatus} - Mensagem: ${err.message}`);
@@ -4348,10 +4572,10 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     }
 
     async function logoutUser() {
-      if (confirm('Deseja realmente sair da sua conta?\n\nSeus dados salvos na nuvem permanecerão seguros e serão restaurados automaticamente quando você entrar novamente com seu e-mail em qualquer aparelho.')) {
+      if (confirm('Deseja realmente sair da sua conta neste aparelho?\n\nOutros aparelhos conectados continuarão ativos e seus dados permanecerão seguros na nuvem.')) {
         if (_supabase) {
           try {
-            await _supabase.auth.signOut();
+            await _supabase.auth.signOut({ scope: 'local' });
           } catch (_) {}
         }
         if (_realtimeSyncChannel && _supabase) {
@@ -4366,15 +4590,46 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         localStorage.removeItem('titannovafit_active_session');
         localStorage.removeItem('titannovafit_active_tab');
 
-        // Nota de Segurança: NÃO apagamos os treinos ou histórico do banco de dados!
+        // Limpar cache privado da memória
         allWorkoutsList = [];
         const navEl = document.getElementById('bottomNav');
         if (navEl) navEl.style.display = 'none';
 
         switchTab('screenAuth');
-        switchAuthMode('login'); // Abre SEMPRE a tela de ENTRAR (Login) por padrão
+        switchAuthMode('login');
         showSyncStatus('idle');
-        showToastNotification('Você saiu da sua conta.');
+        showToastNotification('Você saiu deste aparelho.');
+      }
+    }
+
+    async function logoutAllDevices() {
+      if (confirm('⚠️ Deseja desconectar de TODOS os seus aparelhos?\n\nIsso exigirá login novamente em todos os seus celulares, computadores e tablets onde esta conta estiver conectada.')) {
+        if (_supabase) {
+          try {
+            await _supabase.auth.signOut({ scope: 'global' });
+          } catch (_) {}
+        }
+        if (_realtimeSyncChannel && _supabase) {
+          try {
+            _supabase.removeChannel(_realtimeSyncChannel);
+            _realtimeSyncChannel = null;
+          } catch (_) {}
+        }
+        currentAuthUser = null;
+        isCurrentSessionAdmin = false;
+        localStorage.removeItem('titannovafit_user');
+        localStorage.removeItem('titannovafit_active_session');
+        localStorage.removeItem('titannovafit_active_tab');
+
+        // Limpar cache privado da memória
+        allWorkoutsList = [];
+        const navEl = document.getElementById('bottomNav');
+        if (navEl) navEl.style.display = 'none';
+
+        switchTab('screenAuth');
+        switchAuthMode('login');
+        showSyncStatus('idle');
+        showToastNotification('Você foi desconectado de todos os aparelhos.');
       }
     }
 
@@ -4982,7 +5237,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
               event: '*',
               schema: 'public',
               table: 'treinos',
-              filter: `usuario_id=eq.${uid}`
+              filter: `user_id=eq.${uid}`
             },
             async (payload) => {
               console.log('[Supabase Realtime] Alteração detectada em treinos em outro aparelho:', payload.eventType);
@@ -4995,11 +5250,24 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
               event: '*',
               schema: 'public',
               table: 'sessoes_de_treino',
-              filter: `usuario_id=eq.${uid}`
+              filter: `user_id=eq.${uid}`
             },
             async (payload) => {
               console.log('[Supabase Realtime] Alteração detectada no histórico em outro aparelho:', payload.eventType);
               await loadHistoryFromStorage(true);
+            }
+          )
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'profiles',
+              filter: `id=eq.${uid}`
+            },
+            async () => {
+              console.log('[Supabase Realtime] Alteração de perfil em outro aparelho.');
+              updateProfileUI();
             }
           )
           .subscribe((status) => {
@@ -5022,6 +5290,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       _lastContinuousSync = now;
 
       try {
+        await TitanNovaOfflineSync.flushQueue(uid);
         await loadWorkoutsFromStorage(true);
         await loadHistoryFromStorage(true);
       } catch (e) {
@@ -5265,15 +5534,23 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
         renderAllWorkoutsUI();
 
-        if (_supabase) {
+        if (_supabase && uid) {
           try {
             showSyncStatus('saving');
-            await _supabase.from('treinos').delete().eq('id', workoutId);
-            showSyncStatus('saved');
+            const { error: delErr } = await _supabase.from('treinos').delete().eq('id', workoutId).eq('user_id', uid);
+            if (delErr) throw delErr;
+            showSyncStatus('cloud_saved');
             console.log('[Supabase] Treino excluído na nuvem:', workoutId);
           } catch (e) {
-            console.log('[Supabase] Erro ao excluir treino na nuvem:', e);
-            showSyncStatus('error', () => deleteWorkoutCard(workoutId));
+            console.warn('[Supabase] Erro ao excluir treino na nuvem, enfileirando offline:', e);
+            await TitanNovaOfflineSync.enqueueOperation({
+              userId: uid,
+              table: 'treinos',
+              action: 'delete',
+              clientId: workoutId,
+              payload: { id: workoutId }
+            });
+            showSyncStatus('pending_offline');
           }
         }
       }
@@ -5561,6 +5838,9 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         concluido: true
       };
 
+      const clientId = TitanNovaOfflineSync.generateClientId();
+      historyItem.client_id = clientId;
+
       // 1. Salvar no localStorage por usuário
       const uid = getEffectiveUserId();
       const historyStorageKey = `titannovafit_history_${uid}`;
@@ -5575,24 +5855,38 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       localStorage.setItem('titannovafit_history', JSON.stringify(historyList));
 
       // 2. Sincronizar com Supabase se online
-      if (_supabase) {
+      if (_supabase && uid) {
+        const payload = {
+          id: historyItem.id,
+          user_id: uid,
+          usuario_id: uid,
+          client_id: clientId,
+          nome_treino: title,
+          inicio: historyItem.inicioIso,
+          fim: historyItem.fimIso,
+          concluido: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+
         try {
           showSyncStatus('saving');
-          const isUuid = (uid && uid.length === 36 && uid.includes('-'));
-          await _supabase.from('sessoes_de_treino').upsert({
-            id: historyItem.id,
-            user_id: isUuid ? uid : null,
-            usuario_id: uid,
-            nome_treino: title,
-            inicio: historyItem.inicioIso,
-            fim: historyItem.fimIso,
-            concluido: true
-          });
-          showSyncStatus('saved');
+          const { error: sessErr } = await _supabase
+            .from('sessoes_de_treino')
+            .upsert(payload, { onConflict: 'user_id,client_id' });
+          if (sessErr) throw sessErr;
+          showSyncStatus('cloud_saved');
           console.log('[Supabase] Sessão de treino salva no histórico online para o usuário', uid, ':', title);
         } catch (e) {
-          console.log('[Supabase] Aviso: Histórico mantido offline (sem conexão):', e);
-          showSyncStatus('error', () => finishActiveWorkout());
+          console.warn('[Supabase] Sessão salva offline, enfileirando:', e);
+          await TitanNovaOfflineSync.enqueueOperation({
+            userId: uid,
+            table: 'sessoes_de_treino',
+            action: 'insert',
+            clientId: clientId,
+            payload: payload
+          });
+          showSyncStatus('pending_offline');
         }
       }
 
@@ -5877,35 +6171,41 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
       // 2. Sincronizar com Supabase se online
-      if (_supabase) {
+      if (_supabase && uid) {
+        const clientId = (newWorkout.client_id || TitanNovaOfflineSync.generateClientId());
+        newWorkout.client_id = clientId;
+
+        const payload = {
+          id: workoutId,
+          user_id: uid,
+          usuario_id: uid,
+          client_id: clientId,
+          nome: name,
+          descricao: descInput.value.trim(),
+          dias_semana: selectedDays,
+          cor_hex: '#1E88E5',
+          exercicios: newWorkoutExercises.map(e => ({
+            id: e.id,
+            nome: e.nome,
+            series: e.series,
+            reps: e.reps,
+            grupoMuscular: e.grupoMuscular || 'Geral',
+            gifUrl: e.gifUrl || ''
+          })),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+
         try {
           showSyncStatus('saving');
-          const isUuid = (uid && uid.length === 36 && uid.includes('-'));
-          const payload = {
-            id: workoutId,
-            user_id: isUuid ? uid : null,
-            usuario_id: uid,
-            nome: name,
-            descricao: descInput.value.trim(),
-            dias_semana: selectedDays,
-            cor_hex: '#1E88E5',
-            exercicios: newWorkoutExercises.map(e => ({
-              id: e.id,
-              nome: e.nome,
-              series: e.series,
-              reps: e.reps,
-              grupoMuscular: e.grupoMuscular || 'Geral',
-              gifUrl: e.gifUrl || ''
-            })),
-            criado_em: new Date().toISOString()
-          };
-
-          await _supabase.from('treinos').upsert(payload);
+          const { error: upsertErr } = await _supabase.from('treinos').upsert(payload, { onConflict: 'user_id,client_id' });
+          if (upsertErr) throw upsertErr;
 
           // Sincronizar também com a tabela relacional exercicios_do_treino
           const exRows = newWorkoutExercises.map((ex, idx) => ({
             id: ex.id || `ex_${workoutId}_${idx}`,
             treino_id: workoutId,
+            user_id: uid,
             exercicio_id: ex.id || `ex_${idx}`,
             ordem: idx + 1,
             quantidade_series: parseInt(ex.series) || 4,
@@ -5917,11 +6217,18 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             await _supabase.from('exercicios_do_treino').upsert(exRows);
           } catch (_) {}
 
-          showSyncStatus('saved');
-          console.log('[Supabase] Treino e exercícios salvos na nuvem com sucesso:', name);
+          showSyncStatus('cloud_saved');
+          console.log('[Supabase] Treino salvo na nuvem com sucesso:', name);
         } catch (e) {
-          console.log('[Supabase] Aviso: Treino mantido offline (sem conexão):', e);
-          showSyncStatus('error', () => saveNewWorkout());
+          console.warn('[Supabase] Treino enfileirado para envio offline:', e);
+          await TitanNovaOfflineSync.enqueueOperation({
+            userId: uid,
+            table: 'treinos',
+            action: 'insert',
+            clientId: clientId,
+            payload: payload
+          });
+          showSyncStatus('pending_offline');
         }
       }
 
@@ -6048,13 +6355,21 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           localStorage.setItem(historyStorageKey, JSON.stringify(historyList));
         } catch (e) {}
 
-        if (_supabase) {
+        if (_supabase && uid) {
           try {
             showSyncStatus('saving');
-            await _supabase.from('sessoes_de_treino').delete().eq('id', id);
-            showSyncStatus('saved');
+            const { error: delErr } = await _supabase.from('sessoes_de_treino').delete().eq('id', id).eq('user_id', uid);
+            if (delErr) throw delErr;
+            showSyncStatus('cloud_saved');
           } catch (_) {
-            showSyncStatus('error', () => deleteHistoryItem(id));
+            await TitanNovaOfflineSync.enqueueOperation({
+              userId: uid,
+              table: 'sessoes_de_treino',
+              action: 'delete',
+              clientId: id,
+              payload: { id: id }
+            });
+            showSyncStatus('pending_offline');
           }
         }
 
@@ -7109,21 +7424,37 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         }
         localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
-        if (_supabase) {
+        if (_supabase && uid) {
+          const clientId = TitanNovaOfflineSync.generateClientId();
+          newW.client_id = clientId;
+          const payload = {
+            id: newId,
+            user_id: uid,
+            usuario_id: uid,
+            client_id: clientId,
+            nome: newW.nome,
+            descricao: newW.descricao,
+            dias_semana: newW.diasSemana,
+            cor_hex: newW.corHex,
+            exercicios: newW.exercicios,
+            created_at: newW.criadoEm,
+            updated_at: new Date().toISOString()
+          };
           try {
-            const isUuid = (uid && uid.length === 36 && uid.includes('-'));
-            await _supabase.from('treinos').upsert({
-              id: newId,
-              usuario_id: uid,
-              user_id: isUuid ? uid : null,
-              nome: newW.nome,
-              descricao: newW.descricao,
-              dias_semana: newW.diasSemana,
-              cor_hex: newW.corHex,
-              exercicios: newW.exercicios,
-              criado_em: newW.criadoEm
+            showSyncStatus('saving');
+            const { error: upErr } = await _supabase.from('treinos').upsert(payload, { onConflict: 'user_id,client_id' });
+            if (upErr) throw upErr;
+            showSyncStatus('cloud_saved');
+          } catch (_) {
+            await TitanNovaOfflineSync.enqueueOperation({
+              userId: uid,
+              table: 'treinos',
+              action: 'insert',
+              clientId: clientId,
+              payload: payload
             });
-          } catch (_) {}
+            showSyncStatus('pending_offline');
+          }
         }
       } else {
         const workout = allWorkoutsList.find(w => w.id === targetWorkoutId);
@@ -7137,16 +7468,34 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           }
           localStorage.setItem('titannovafit_custom_workouts', JSON.stringify(allWorkoutsList));
 
-          if (_supabase) {
+          if (_supabase && uid) {
+            const payload = {
+              id: workout.id,
+              user_id: uid,
+              usuario_id: uid,
+              client_id: workout.client_id || TitanNovaOfflineSync.generateClientId(),
+              nome: workout.nome,
+              descricao: workout.descricao || '',
+              dias_semana: workout.diasSemana || [],
+              cor_hex: workout.corHex || '#1E88E5',
+              exercicios: workout.exercicios,
+              updated_at: new Date().toISOString()
+            };
             try {
-              const isUuid = (uid && uid.length === 36 && uid.includes('-'));
-              await _supabase.from('treinos').upsert({
-                id: workout.id,
-                usuario_id: uid,
-                user_id: isUuid ? uid : null,
-                exercicios: workout.exercicios
+              showSyncStatus('saving');
+              const { error: upErr } = await _supabase.from('treinos').upsert(payload, { onConflict: 'user_id,client_id' });
+              if (upErr) throw upErr;
+              showSyncStatus('cloud_saved');
+            } catch (_) {
+              await TitanNovaOfflineSync.enqueueOperation({
+                userId: uid,
+                table: 'treinos',
+                action: 'update',
+                clientId: payload.client_id,
+                payload: payload
               });
-            } catch (_) {}
+              showSyncStatus('pending_offline');
+            }
           }
         }
       }
@@ -7733,13 +8082,140 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       });
     });
 
+    async function checkAndMigrateLocalData(userId) {
+      if (!_supabase || !userId) return;
+      try {
+        const { data: profile } = await _supabase.from('profiles').select('local_migration_completed_at').eq('id', userId).maybeSingle();
+        if (profile && profile.local_migration_completed_at) {
+          return; // Já migrado
+        }
+
+        const localRaw = localStorage.getItem('titannovafit_custom_workouts');
+        if (!localRaw) return;
+        const localList = JSON.parse(localRaw || '[]');
+        if (!Array.isArray(localList) || localList.length === 0) return;
+
+        console.log('[Migração Local] Migrando treinos locais não associados para a conta:', userId);
+        showSyncStatus('saving');
+
+        for (const w of localList) {
+          const clientId = w.client_id || TitanNovaOfflineSync.generateClientId();
+          w.client_id = clientId;
+          await _supabase.from('treinos').upsert({
+            id: w.id || ('treino_' + Date.now()),
+            user_id: userId,
+            usuario_id: userId,
+            client_id: clientId,
+            nome: w.nome || 'Treino Importado',
+            descricao: w.descricao || '',
+            dias_semana: w.diasSemana || [],
+            cor_hex: w.corHex || '#1E88E5',
+            exercicios: w.exercicios || [],
+            created_at: w.criadoEm || new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id,client_id' });
+        }
+
+        await _supabase.from('profiles').upsert({
+          id: userId,
+          local_migration_completed_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+
+        console.log('[Migração Local] Sucesso na migração dos treinos locais!');
+        showSyncStatus('cloud_saved');
+      } catch (err) {
+        console.warn('[Migração Local Notice]:', err);
+      }
+    }
+
+    async function carregarDadosDoUsuario(userId) {
+      if (!userId) return;
+      console.log('[TitanNova Fit] Sincronizando dados completos da conta:', userId);
+
+      // 1. Migração transparente de dados locais pré-existentes caso necessário
+      await checkAndMigrateLocalData(userId);
+
+      // 2. Carregar perfil do Supabase
+      try {
+        if (_supabase) {
+          const { data: prof } = await _supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+          if (prof) {
+            if (prof.theme) {
+              document.body.setAttribute('data-theme', prof.theme);
+            }
+            if (prof.name) {
+              const nameEl = document.getElementById('profileUserName');
+              if (nameEl) nameEl.innerText = prof.name;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[Perfil Load Notice]:', err);
+      }
+
+      // 3. Carregar favoritos do Supabase
+      try {
+        if (_supabase) {
+          const { data: favs } = await _supabase.from('exercicios_favoritos').select('exercicio_id').eq('user_id', userId);
+          if (Array.isArray(favs) && favs.length > 0) {
+            favoritesSet = new Set(favs.map(f => f.exercicio_id));
+            localStorage.setItem(`titannovafit_fav_${userId}`, JSON.stringify(Array.from(favoritesSet)));
+          }
+        }
+      } catch (err) {
+        console.warn('[Favoritos Load Notice]:', err);
+      }
+
+      // 4. Carregar treinos e histórico
+      await loadWorkoutsFromStorage();
+      await loadHistoryFromStorage();
+
+      // 5. Ativar sincronização em tempo real (WebSockets)
+      setupSupabaseRealtimeSync(userId);
+
+      // 6. Esvaziar fila de sincronização pendente se houver
+      await TitanNovaOfflineSync.flushQueue(userId);
+
+      updateHomeScreenUI();
+      updateProfileUI();
+    }
+
+    function continueOfflineMode() {
+      const savedUser = localStorage.getItem('titannovafit_user');
+      if (savedUser) {
+        try {
+          currentAuthUser = JSON.parse(savedUser);
+          const overlay = document.getElementById('appInitialLoadingOverlay');
+          if (overlay) overlay.style.display = 'none';
+          document.getElementById('bottomNav').style.display = 'flex';
+          loadWorkoutsFromStorage(true);
+          loadHistoryFromStorage(true);
+          switchTab('screenHome');
+          showSyncStatus('pending_offline');
+          showToastNotification('⚡ Modo Offline ativado com seus dados salvos localmente.');
+          return;
+        } catch (_) {}
+      }
+      alert('Nenhum dado de conta salvo previamente neste aparelho. Por favor, conecte-se à internet para entrar.');
+    }
+
     // Carregar sessão de usuário, treinos sincronizados na nuvem, histórico e restaurar estado
     window.addEventListener('load', async () => {
+      const loadingOverlay = document.getElementById('appInitialLoadingOverlay');
+      const sessionErrorBox = document.getElementById('appSessionErrorBox');
+      const continueOfflineBtn = document.getElementById('appContinueOfflineBtn');
+
+      let sessionErrorOccurred = false;
+
       // 1. Restaurar sessão do Supabase Authentication
       if (_supabase) {
         try {
           const { data: { session }, error: sessionError } = await _supabase.auth.getSession();
-          if (session && session.user) {
+          if (sessionError) {
+            console.error("Erro ao recuperar sessão:", sessionError);
+            sessionErrorOccurred = true;
+          } else if (session && session.user) {
             currentAuthUser = session.user;
             localStorage.setItem('titannovafit_user', JSON.stringify({
               id: session.user.id,
@@ -7777,10 +8253,23 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           });
         } catch (e) {
           console.warn('[Session Recovery Notice]:', e);
+          sessionErrorOccurred = true;
         }
       }
 
-      console.log("Autenticação validada: cadastro, login, logout e recuperação de dados funcionando.");
+      // Tratar falha de rede na recuperação de sessão
+      if (sessionErrorOccurred && !currentAuthUser) {
+        const cachedUser = localStorage.getItem('titannovafit_user');
+        if (cachedUser) {
+          if (continueOfflineBtn) continueOfflineBtn.style.display = 'inline-block';
+        }
+        if (sessionErrorBox) sessionErrorBox.style.display = 'block';
+        const spinner = document.getElementById('appInitialLoadingSpinner');
+        if (spinner) spinner.style.display = 'none';
+        const statusText = document.getElementById('appInitialLoadingStatus');
+        if (statusText) statusText.style.display = 'none';
+        return;
+      }
 
       // 1. Carregar a biblioteca de 1.500 exercícios da ExerciseDB V1 imediatamente para todos os modos
       try {
@@ -7791,6 +8280,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
       // Se usuário não tiver sessão ativa, exibir tela de Login
       if (!currentAuthUser) {
+        if (loadingOverlay) loadingOverlay.style.display = 'none';
         const navEl = document.getElementById('bottomNav');
         if (navEl) navEl.style.display = 'none';
         switchTab('screenAuth');
@@ -7801,14 +8291,14 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       const navEl = document.getElementById('bottomNav');
       if (navEl) navEl.style.display = 'flex';
       updateProfileUI();
-      setupSupabaseRealtimeSync(currentAuthUser.id);
 
-      // 2. Carregar treinos, histórico e biblioteca sincronizados na nuvem
-      await loadExercisesLibrary();
-      await loadWorkoutsFromStorage();
-      await loadHistoryFromStorage();
+      // 2. Carregar treinos, histórico e dados sincronizados na nuvem
+      await carregarDadosDoUsuario(currentAuthUser.id);
       const hasActiveWorkout = restoreActiveSessionFromStorage();
       updateHomeScreenUI();
+
+      // Esconder overlay inicial suavemente
+      if (loadingOverlay) loadingOverlay.style.display = 'none';
 
       // 3. Roteamento Inteligente e Persistência de Tela ao Atualizar a Página
       const hash = (window.location.hash || '').toLowerCase();
