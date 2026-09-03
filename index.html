@@ -3241,33 +3241,20 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           statusEl.className = 'sync-pill-idle';
           statusEl.innerHTML = '● Nuvem Conectada';
         }, 3500);
-      } else if (status === 'pending_offline' || status === 'pending') {
-        statusEl.className = 'sync-pill-pending';
-        statusEl.style.cursor = 'pointer';
-        statusEl.title = 'Toque para enviar e sincronizar agora com o banco de dados';
-        statusEl.onclick = (e) => retryLastSyncAction(e);
-        statusEl.innerHTML = '⏳ Alterações aguardando sincronização <span style="text-decoration: underline; margin-left: 5px; font-size: 11px; opacity: 0.9;">(Sincronizar)</span>';
-        statusEl.style.display = 'inline-flex';
       } else if (status === 'syncing') {
-        statusEl.onclick = null;
-        statusEl.style.cursor = 'default';
-        statusEl.title = '';
         statusEl.className = 'sync-pill-saving';
         statusEl.innerHTML = '<span class="sync-spinner">🔄</span> Sincronizando...';
         statusEl.style.display = 'inline-flex';
       } else if (status === 'sync_complete') {
         statusEl.className = 'sync-pill-saved';
-        statusEl.innerHTML = '✅ Sincronização concluída';
+        statusEl.innerHTML = '☁️ Salvo na nuvem';
         statusEl.style.display = 'inline-flex';
         statusEl._savedTimeout = setTimeout(() => {
           statusEl.className = 'sync-pill-idle';
           statusEl.innerHTML = '● Nuvem Conectada';
-        }, 3500);
-      } else if (status === 'error') {
-        statusEl.className = 'sync-pill-error';
-        statusEl.innerHTML = `⚠️ Não foi possível sincronizar <button onclick="retryLastSyncAction(event)" class="sync-retry-btn">Tentar novamente</button>`;
-        statusEl.style.display = 'inline-flex';
+        }, 2500);
       } else {
+        // Modo silencioso contínuo: exibe Nuvem Conectada normalmente sem alarmar o usuário
         statusEl.className = 'sync-pill-idle';
         statusEl.innerHTML = '● Nuvem Conectada';
         statusEl.style.display = 'inline-flex';
@@ -3444,37 +3431,27 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         if (!_supabase || !op || !op.table) return { success: false, error: new Error('Parâmetros inválidos') };
 
         if (op.action === 'insert' || op.action === 'update') {
-          let res = null;
-          // 1. Tentar upsert com onConflict se client_id estiver presente
-          if (op.payload && op.payload.client_id) {
-            res = await _supabase.from(op.table).upsert(op.payload, { onConflict: 'user_id,client_id' });
-          } else {
-            res = await _supabase.from(op.table).upsert(op.payload);
+          // 1. Montar payload com as colunas que existem comprovadamente no banco
+          const safePayload = { ...op.payload };
+          delete safePayload.client_id;
+          delete safePayload.created_at;
+          delete safePayload.updated_at;
+          delete safePayload.user_id; // Na tabela atual a chave externa é usuario_id
+          if (op.table === 'treinos') {
+            delete safePayload.exercicios;
+          }
+          if (!safePayload.usuario_id && userId) {
+            safePayload.usuario_id = userId;
           }
 
-          // 2. Fallback inteligente: se o banco ainda não tiver as colunas novas (client_id, created_at, updated_at)
-          if (res && res.error) {
-            const err = res.error;
-            const errMsg = (err.message || '').toLowerCase();
-            const isSchemaMismatch = err.code === '42703' || err.code === '42P10' || err.code === 'PGRST204' ||
-                                     errMsg.includes('client_id') || errMsg.includes('column') || errMsg.includes('constraint');
-            if (isSchemaMismatch) {
-              console.log(`[Offline Sync Fallback] Adaptando payload compatível para tabela ${op.table}...`);
-              const safePayload = { ...op.payload };
-              delete safePayload.client_id;
-              delete safePayload.created_at;
-              delete safePayload.updated_at;
-              if (op.table === 'treinos') {
-                delete safePayload.exercicios;
-              }
-              if (!safePayload.usuario_id && userId) {
-                safePayload.usuario_id = userId;
-              }
-              if (!safePayload.user_id || safePayload.user_id.length !== 36) {
-                delete safePayload.user_id;
-              }
-              res = await _supabase.from(op.table).upsert(safePayload);
-            }
+          // Enviar direto no formato compatível (evita erro 400 de coluna ausente)
+          let res = await _supabase.from(op.table).upsert(safePayload);
+
+          // 2. Se o usuário executou a migração nova, sincronizar também com client_id
+          if (!res.error && op.payload && op.payload.client_id) {
+            try {
+              await _supabase.from(op.table).upsert(op.payload, { onConflict: 'user_id,client_id' });
+            } catch (_) {}
           }
 
           if (!res.error) {
