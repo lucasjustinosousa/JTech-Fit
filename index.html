@@ -3243,9 +3243,15 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         }, 3500);
       } else if (status === 'pending_offline' || status === 'pending') {
         statusEl.className = 'sync-pill-pending';
-        statusEl.innerHTML = '⏳ Alterações aguardando sincronização';
+        statusEl.style.cursor = 'pointer';
+        statusEl.title = 'Toque para enviar e sincronizar agora com o banco de dados';
+        statusEl.onclick = (e) => retryLastSyncAction(e);
+        statusEl.innerHTML = '⏳ Alterações aguardando sincronização <span style="text-decoration: underline; margin-left: 5px; font-size: 11px; opacity: 0.9;">(Sincronizar)</span>';
         statusEl.style.display = 'inline-flex';
       } else if (status === 'syncing') {
+        statusEl.onclick = null;
+        statusEl.style.cursor = 'default';
+        statusEl.title = '';
         statusEl.className = 'sync-pill-saving';
         statusEl.innerHTML = '<span class="sync-spinner">🔄</span> Sincronizando...';
         statusEl.style.display = 'inline-flex';
@@ -3414,6 +3420,65 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         }
       },
 
+      async syncOperationToSupabase(op, userId) {
+        if (!_supabase || !op || !op.table) return { success: false, error: new Error('Parâmetros inválidos') };
+
+        if (op.action === 'insert' || op.action === 'update') {
+          let res = null;
+          // 1. Tentar upsert com onConflict se client_id estiver presente
+          if (op.payload && op.payload.client_id) {
+            res = await _supabase.from(op.table).upsert(op.payload, { onConflict: 'user_id,client_id' });
+          } else {
+            res = await _supabase.from(op.table).upsert(op.payload);
+          }
+
+          // 2. Fallback inteligente: se o banco ainda não tiver as colunas novas (client_id, created_at, updated_at)
+          if (res && res.error) {
+            const err = res.error;
+            const errMsg = (err.message || '').toLowerCase();
+            const isSchemaMismatch = err.code === '42703' || err.code === '42P10' || err.code === 'PGRST204' ||
+                                     errMsg.includes('client_id') || errMsg.includes('column') || errMsg.includes('constraint');
+            if (isSchemaMismatch) {
+              console.log(`[Offline Sync Fallback] Adaptando payload compatível para tabela ${op.table}...`);
+              const safePayload = { ...op.payload };
+              delete safePayload.client_id;
+              delete safePayload.created_at;
+              delete safePayload.updated_at;
+              if (op.table === 'treinos') {
+                delete safePayload.exercicios;
+              }
+              if (!safePayload.usuario_id && userId) {
+                safePayload.usuario_id = userId;
+              }
+              if (!safePayload.user_id || safePayload.user_id.length !== 36) {
+                delete safePayload.user_id;
+              }
+              res = await _supabase.from(op.table).upsert(safePayload);
+            }
+          }
+
+          if (!res.error) {
+            return { success: true };
+          } else {
+            return { success: false, error: res.error };
+          }
+        } else if (op.action === 'delete') {
+          let query = _supabase.from(op.table).delete();
+          if (op.payload && op.payload.id) {
+            query = query.eq('id', op.payload.id);
+          } else if (op.clientId) {
+            query = query.eq('id', op.clientId);
+          }
+          const { error } = await query;
+          if (!error) {
+            return { success: true };
+          } else {
+            return { success: false, error };
+          }
+        }
+        return { success: true };
+      },
+
       async flushQueue(userId) {
         if (!_supabase || !userId) return;
         const currentUid = getEffectiveUserId();
@@ -3428,29 +3493,12 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         let hasError = false;
         for (const op of pending) {
           try {
-            if (op.action === 'insert' || op.action === 'update') {
-              const { error } = await _supabase
-                .from(op.table)
-                .upsert(op.payload, { onConflict: 'user_id,client_id' });
-              if (!error) {
-                await this.removeOperation(op.operationId, userId);
-              } else {
-                hasError = true;
-                console.warn(`[Offline Sync] Erro no envio de ${op.table}:`, error);
-              }
-            } else if (op.action === 'delete') {
-              let query = _supabase.from(op.table).delete().eq('user_id', userId);
-              if (op.clientId) {
-                query = query.eq('client_id', op.clientId);
-              } else if (op.payload && op.payload.id) {
-                query = query.eq('id', op.payload.id);
-              }
-              const { error } = await query;
-              if (!error) {
-                await this.removeOperation(op.operationId, userId);
-              } else {
-                hasError = true;
-              }
+            const outcome = await this.syncOperationToSupabase(op, userId);
+            if (outcome.success) {
+              await this.removeOperation(op.operationId, userId);
+            } else {
+              hasError = true;
+              console.warn(`[Offline Sync] Erro no envio de ${op.table}:`, outcome.error);
             }
           } catch (err) {
             hasError = true;
@@ -5236,12 +5284,14 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             {
               event: '*',
               schema: 'public',
-              table: 'treinos',
-              filter: `user_id=eq.${uid}`
+              table: 'treinos'
             },
             async (payload) => {
-              console.log('[Supabase Realtime] Alteração detectada em treinos em outro aparelho:', payload.eventType);
-              await loadWorkoutsFromStorage(true);
+              const row = payload.new || payload.old;
+              if (!row || row.usuario_id === uid || row.user_id === uid) {
+                console.log('[Supabase Realtime] Alteração detectada em treinos em outro aparelho:', payload.eventType);
+                await loadWorkoutsFromStorage(true);
+              }
             }
           )
           .on(
@@ -5249,12 +5299,14 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             {
               event: '*',
               schema: 'public',
-              table: 'sessoes_de_treino',
-              filter: `user_id=eq.${uid}`
+              table: 'sessoes_de_treino'
             },
             async (payload) => {
-              console.log('[Supabase Realtime] Alteração detectada no histórico em outro aparelho:', payload.eventType);
-              await loadHistoryFromStorage(true);
+              const row = payload.new || payload.old;
+              if (!row || row.usuario_id === uid || row.user_id === uid) {
+                console.log('[Supabase Realtime] Alteração detectada no histórico em outro aparelho:', payload.eventType);
+                await loadHistoryFromStorage(true);
+              }
             }
           )
           .on(
@@ -5334,14 +5386,17 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       if (_supabase) {
         try {
           if (!silent) showSyncStatus('saving');
-          const isUuid = (uid.length === 36 && uid.includes('-'));
-          const queryFilter = isUuid ? `user_id.eq.${uid},usuario_id.eq.${uid}` : `usuario_id.eq.${uid}`;
+          let data = null;
+          let error = null;
 
-          const { data, error } = await _supabase
-            .from('treinos')
-            .select('*')
-            .or(queryFilter)
-            .order('criado_em', { ascending: false });
+          const res1 = await _supabase.from('treinos').select('*').eq('usuario_id', uid).order('criado_em', { ascending: false });
+          if (!res1.error) {
+            data = res1.data;
+          } else {
+            const res2 = await _supabase.from('treinos').select('*').eq('user_id', uid).order('criado_em', { ascending: false });
+            data = res2.data;
+            error = res2.error;
+          }
 
           if (!error && Array.isArray(data)) {
             if (data.length > 0) {
@@ -5537,10 +5592,18 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         if (_supabase && uid) {
           try {
             showSyncStatus('saving');
-            const { error: delErr } = await _supabase.from('treinos').delete().eq('id', workoutId).eq('user_id', uid);
-            if (delErr) throw delErr;
-            showSyncStatus('cloud_saved');
-            console.log('[Supabase] Treino excluído na nuvem:', workoutId);
+            const outcome = await TitanNovaOfflineSync.syncOperationToSupabase({
+              table: 'treinos',
+              action: 'delete',
+              clientId: workoutId,
+              payload: { id: workoutId }
+            }, uid);
+            if (outcome && outcome.success) {
+              showSyncStatus('cloud_saved');
+              console.log('[Supabase] Treino excluído na nuvem:', workoutId);
+            } else {
+              throw outcome.error || new Error('Falha ao excluir treino');
+            }
           } catch (e) {
             console.warn('[Supabase] Erro ao excluir treino na nuvem, enfileirando offline:', e);
             await TitanNovaOfflineSync.enqueueOperation({
@@ -5871,12 +5934,18 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
         try {
           showSyncStatus('saving');
-          const { error: sessErr } = await _supabase
-            .from('sessoes_de_treino')
-            .upsert(payload, { onConflict: 'user_id,client_id' });
-          if (sessErr) throw sessErr;
-          showSyncStatus('cloud_saved');
-          console.log('[Supabase] Sessão de treino salva no histórico online para o usuário', uid, ':', title);
+          const outcome = await TitanNovaOfflineSync.syncOperationToSupabase({
+            table: 'sessoes_de_treino',
+            action: 'insert',
+            payload: payload
+          }, uid);
+
+          if (outcome && outcome.success) {
+            showSyncStatus('cloud_saved');
+            console.log('[Supabase] Sessão de treino salva no histórico online para o usuário', uid, ':', title);
+          } else {
+            throw outcome.error || new Error('Falha no envio de sessão ao Supabase');
+          }
         } catch (e) {
           console.warn('[Supabase] Sessão salva offline, enfileirando:', e);
           await TitanNovaOfflineSync.enqueueOperation({
@@ -6198,27 +6267,34 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
         try {
           showSyncStatus('saving');
-          const { error: upsertErr } = await _supabase.from('treinos').upsert(payload, { onConflict: 'user_id,client_id' });
-          if (upsertErr) throw upsertErr;
+          const outcome = await TitanNovaOfflineSync.syncOperationToSupabase({
+            table: 'treinos',
+            action: 'insert',
+            payload: payload
+          }, uid);
 
-          // Sincronizar também com a tabela relacional exercicios_do_treino
-          const exRows = newWorkoutExercises.map((ex, idx) => ({
-            id: ex.id || `ex_${workoutId}_${idx}`,
-            treino_id: workoutId,
-            user_id: uid,
-            exercicio_id: ex.id || `ex_${idx}`,
-            ordem: idx + 1,
-            quantidade_series: parseInt(ex.series) || 4,
-            repeticoes: ex.reps || '10-12',
-            carga_inicial: 0.0,
-            descanso_segundos: 60
-          }));
-          try {
-            await _supabase.from('exercicios_do_treino').upsert(exRows);
-          } catch (_) {}
+          if (outcome && outcome.success) {
+            // Sincronizar também com a tabela relacional exercicios_do_treino
+            const exRows = newWorkoutExercises.map((ex, idx) => ({
+              id: ex.id || `ex_${workoutId}_${idx}`,
+              treino_id: workoutId,
+              usuario_id: uid,
+              exercicio_id: ex.id || `ex_${idx}`,
+              ordem: idx + 1,
+              quantidade_series: parseInt(ex.series) || 4,
+              repeticoes: ex.reps || '10-12',
+              carga_inicial: 0.0,
+              descanso_segundos: 60
+            }));
+            try {
+              await _supabase.from('exercicios_do_treino').upsert(exRows);
+            } catch (_) {}
 
-          showSyncStatus('cloud_saved');
-          console.log('[Supabase] Treino salvo na nuvem com sucesso:', name);
+            showSyncStatus('cloud_saved');
+            console.log('[Supabase] Treino salvo na nuvem com sucesso:', name);
+          } else {
+            throw outcome.error || new Error('Falha no envio do treino ao Supabase');
+          }
         } catch (e) {
           console.warn('[Supabase] Treino enfileirado para envio offline:', e);
           await TitanNovaOfflineSync.enqueueOperation({
@@ -6287,14 +6363,17 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       // Sincronizar com Supabase (Nuvem / Mobile e outros aparelhos)
       if (_supabase) {
         try {
-          const isUuid = (uid.length === 36 && uid.includes('-'));
-          const queryFilter = isUuid ? `user_id.eq.${uid},usuario_id.eq.${uid}` : `usuario_id.eq.${uid}`;
+          let data = null;
+          let error = null;
 
-          const { data, error } = await _supabase
-            .from('sessoes_de_treino')
-            .select('*')
-            .or(queryFilter)
-            .order('fim', { ascending: false });
+          const res1 = await _supabase.from('sessoes_de_treino').select('*').eq('usuario_id', uid).order('fim', { ascending: false });
+          if (!res1.error) {
+            data = res1.data;
+          } else {
+            const res2 = await _supabase.from('sessoes_de_treino').select('*').eq('user_id', uid).order('fim', { ascending: false });
+            data = res2.data;
+            error = res2.error;
+          }
 
           if (!error && Array.isArray(data)) {
             const onlineHistory = data.map(row => {
@@ -6358,9 +6437,17 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         if (_supabase && uid) {
           try {
             showSyncStatus('saving');
-            const { error: delErr } = await _supabase.from('sessoes_de_treino').delete().eq('id', id).eq('user_id', uid);
-            if (delErr) throw delErr;
-            showSyncStatus('cloud_saved');
+            const outcome = await TitanNovaOfflineSync.syncOperationToSupabase({
+              table: 'sessoes_de_treino',
+              action: 'delete',
+              clientId: id,
+              payload: { id: id }
+            }, uid);
+            if (outcome && outcome.success) {
+              showSyncStatus('cloud_saved');
+            } else {
+              throw outcome.error || new Error('Falha ao excluir histórico');
+            }
           } catch (_) {
             await TitanNovaOfflineSync.enqueueOperation({
               userId: uid,
@@ -7442,9 +7529,16 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           };
           try {
             showSyncStatus('saving');
-            const { error: upErr } = await _supabase.from('treinos').upsert(payload, { onConflict: 'user_id,client_id' });
-            if (upErr) throw upErr;
-            showSyncStatus('cloud_saved');
+            const outcome = await TitanNovaOfflineSync.syncOperationToSupabase({
+              table: 'treinos',
+              action: 'insert',
+              payload: payload
+            }, uid);
+            if (outcome && outcome.success) {
+              showSyncStatus('cloud_saved');
+            } else {
+              throw outcome.error || new Error('Falha no envio');
+            }
           } catch (_) {
             await TitanNovaOfflineSync.enqueueOperation({
               userId: uid,
@@ -7483,9 +7577,16 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             };
             try {
               showSyncStatus('saving');
-              const { error: upErr } = await _supabase.from('treinos').upsert(payload, { onConflict: 'user_id,client_id' });
-              if (upErr) throw upErr;
-              showSyncStatus('cloud_saved');
+              const outcome = await TitanNovaOfflineSync.syncOperationToSupabase({
+                table: 'treinos',
+                action: 'update',
+                payload: payload
+              }, uid);
+              if (outcome && outcome.success) {
+                showSyncStatus('cloud_saved');
+              } else {
+                throw outcome.error || new Error('Falha no envio');
+              }
             } catch (_) {
               await TitanNovaOfflineSync.enqueueOperation({
                 userId: uid,
@@ -8084,10 +8185,18 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
     async function checkAndMigrateLocalData(userId) {
       if (!_supabase || !userId) return;
+      if (localStorage.getItem('titannovafit_migrated_' + userId)) return;
+
       try {
-        const { data: profile } = await _supabase.from('profiles').select('local_migration_completed_at').eq('id', userId).maybeSingle();
+        let profile = null;
+        try {
+          const { data } = await _supabase.from('profiles').select('local_migration_completed_at').eq('id', userId).maybeSingle();
+          profile = data;
+        } catch (_) {}
+
         if (profile && profile.local_migration_completed_at) {
-          return; // Já migrado
+          localStorage.setItem('titannovafit_migrated_' + userId, 'true');
+          return;
         }
 
         const localRaw = localStorage.getItem('titannovafit_custom_workouts');
@@ -8101,27 +8210,34 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         for (const w of localList) {
           const clientId = w.client_id || TitanNovaOfflineSync.generateClientId();
           w.client_id = clientId;
-          await _supabase.from('treinos').upsert({
-            id: w.id || ('treino_' + Date.now()),
-            user_id: userId,
-            usuario_id: userId,
-            client_id: clientId,
-            nome: w.nome || 'Treino Importado',
-            descricao: w.descricao || '',
-            dias_semana: w.diasSemana || [],
-            cor_hex: w.corHex || '#1E88E5',
-            exercicios: w.exercicios || [],
-            created_at: w.criadoEm || new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'user_id,client_id' });
+          await TitanNovaOfflineSync.syncOperationToSupabase({
+            table: 'treinos',
+            action: 'insert',
+            payload: {
+              id: w.id || ('treino_' + Date.now()),
+              user_id: userId,
+              usuario_id: userId,
+              client_id: clientId,
+              nome: w.nome || 'Treino Importado',
+              descricao: w.descricao || '',
+              dias_semana: w.diasSemana || [],
+              cor_hex: w.corHex || '#1E88E5',
+              exercicios: w.exercicios || [],
+              created_at: w.criadoEm || new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          }, userId);
         }
 
-        await _supabase.from('profiles').upsert({
-          id: userId,
-          local_migration_completed_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
+        try {
+          await _supabase.from('profiles').upsert({
+            id: userId,
+            local_migration_completed_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          });
+        } catch (_) {}
 
+        localStorage.setItem('titannovafit_migrated_' + userId, 'true');
         console.log('[Migração Local] Sucesso na migração dos treinos locais!');
         showSyncStatus('cloud_saved');
       } catch (err) {
