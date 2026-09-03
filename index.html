@@ -536,6 +536,34 @@
       padding: 20px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.9);
     }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--divider);
+    }
+    .modal-close-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--divider);
+      color: var(--text-grey);
+      font-size: 20px;
+      line-height: 1;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .modal-close-btn:hover {
+      background: rgba(255, 82, 82, 0.2);
+      color: #ff5252;
+      border-color: rgba(255, 82, 82, 0.4);
+    }
     .color-picker-dot {
       width: 32px;
       height: 32px;
@@ -1005,18 +1033,18 @@
 
           <!-- CAIXAS DE ACEITE DOS TERMOS DE USO E POLÍTICA DE PRIVACIDADE -->
           <div style="background: rgba(22, 26, 36, 0.8); border: 1px solid var(--divider); border-radius: 10px; padding: 12px; margin: 14px 0; display: flex; flex-direction: column; gap: 10px;">
-            <div style="display: flex; align-items: flex-start; gap: 8px;">
-              <input type="checkbox" id="authTermsCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
-              <label for="authTermsCheck" style="font-size: 12px; color: var(--text-white); cursor: pointer; line-height: 1.4;">
-                Li e aceito os <a href="javascript:void(0)" onclick="openTermsModal()" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700;">Termos de Uso</a>.
-              </label>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="authTermsCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; flex-shrink: 0;">
+              <span style="font-size: 12px; color: var(--text-white); line-height: 1.4;">
+                Li e aceito os <a href="javascript:void(0)" onclick="openTermsModal(event)" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700; cursor: pointer;">Termos de Uso</a>.
+              </span>
             </div>
 
-            <div style="display: flex; align-items: flex-start; gap: 8px;">
-              <input type="checkbox" id="authPrivacyCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; margin-top: 2px; flex-shrink: 0;">
-              <label for="authPrivacyCheck" style="font-size: 12px; color: var(--text-white); cursor: pointer; line-height: 1.4;">
-                Li e aceito a <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700;">Política de Privacidade</a>.
-              </label>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="authPrivacyCheck" style="width: 18px; height: 18px; accent-color: var(--accent-cyan); cursor: pointer; flex-shrink: 0;">
+              <span style="font-size: 12px; color: var(--text-white); line-height: 1.4;">
+                Li e aceito a <a href="javascript:void(0)" onclick="openPrivacyModal(event)" style="color: var(--accent-cyan); text-decoration: underline; font-weight: 700; cursor: pointer;">Política de Privacidade</a>.
+              </span>
             </div>
           </div>
 
@@ -3345,7 +3373,11 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     // ==========================================
     // CONTROLE DE MODAIS DE TERMOS, PRIVACIDADE E RECUPERAÇÃO DE SENHA
     // ==========================================
-    function openForgotPasswordModal() {
+    function openForgotPasswordModal(e) {
+      if (e) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+      }
       const emailInput = document.getElementById('authEmailInput');
       const forgotInput = document.getElementById('forgotPasswordEmailInput');
       if (emailInput && forgotInput && emailInput.value) {
@@ -3354,12 +3386,24 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       const err = document.getElementById('forgotPasswordErrorMessage');
       if (err) err.style.display = 'none';
       const modal = document.getElementById('forgotPasswordModal');
-      if (modal) modal.style.display = 'flex';
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.visibility = 'visible';
+        modal.style.pointerEvents = 'auto';
+      }
     }
 
     function closeForgotPasswordModal() {
       const modal = document.getElementById('forgotPasswordModal');
-      if (modal) modal.style.display = 'none';
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
+        modal.style.pointerEvents = 'none';
+      }
     }
 
     async function sendPasswordResetEmail() {
@@ -3412,26 +3456,62 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     const CURRENT_TERMS_VERSION = "1.0";
     const CURRENT_PRIVACY_VERSION = "1.0";
 
-    function openTermsModal() {
+    function openTermsModal(e) {
+      if (e) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+      }
       const modal = document.getElementById('termsModal');
-      if (modal) modal.style.display = 'flex';
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.visibility = 'visible';
+        modal.style.pointerEvents = 'auto';
+      }
     }
     function closeTermsModal() {
       const modal = document.getElementById('termsModal');
-      if (modal) modal.style.display = 'none';
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
+        modal.style.pointerEvents = 'none';
+      }
     }
 
-    function openPrivacyModal() {
+    function openPrivacyModal(e) {
+      if (e) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+      }
       const modal = document.getElementById('privacyModal');
-      if (modal) modal.style.display = 'flex';
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.visibility = 'visible';
+        modal.style.pointerEvents = 'auto';
+      }
     }
     function closePrivacyModal() {
       const modal = document.getElementById('privacyModal');
-      if (modal) modal.style.display = 'none';
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
+        modal.style.pointerEvents = 'none';
+      }
     }
 
     // Gerenciamento de Consentimento Analítico e Cookies
-    function openPrivacySettingsModal() {
+    function openPrivacySettingsModal(e) {
+      if (e) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+      }
       const modal = document.getElementById('privacySettingsModal');
       const toggle = document.getElementById('modalAnalyticsConsentToggle');
       if (toggle) {
@@ -3439,12 +3519,24 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       }
       const feedback = document.getElementById('modalPrivacyFeedback');
       if (feedback) feedback.style.display = 'none';
-      if (modal) modal.style.display = 'flex';
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.visibility = 'visible';
+        modal.style.pointerEvents = 'auto';
+      }
     }
 
     function closePrivacySettingsModal() {
       const modal = document.getElementById('privacySettingsModal');
-      if (modal) modal.style.display = 'none';
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
+        modal.style.pointerEvents = 'none';
+      }
     }
 
     function setModalAnalyticsChoice(allowed) {
@@ -3467,7 +3559,11 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     }
 
     // Exclusão de Conta e Dados (LGPD)
-    function openDeleteAccountModal() {
+    function openDeleteAccountModal(e) {
+      if (e) {
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+      }
       const modal = document.getElementById('deleteAccountModal');
       const statusEl = document.getElementById('deleteModalUserStatus');
       const confirmInput = document.getElementById('deleteModalConfirmInput');
@@ -3484,12 +3580,24 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       if (statusEl) {
         statusEl.innerHTML = `Conta autenticada: <strong style="color: white;">${email}</strong>`;
       }
-      if (modal) modal.style.display = 'flex';
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        modal.style.visibility = 'visible';
+        modal.style.pointerEvents = 'auto';
+      }
     }
 
     function closeDeleteAccountModal() {
       const modal = document.getElementById('deleteAccountModal');
-      if (modal) modal.style.display = 'none';
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
+        modal.style.pointerEvents = 'none';
+      }
     }
 
     function checkModalDeleteConfirm() {
@@ -3667,7 +3775,11 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         const p = document.getElementById('mandatoryPrivacyCheck');
         if (t) t.checked = false;
         if (p) p.checked = false;
+        m.classList.add('active');
         m.style.display = 'flex';
+        m.style.opacity = '1';
+        m.style.visibility = 'visible';
+        m.style.pointerEvents = 'auto';
       }
     }
 
@@ -3687,7 +3799,13 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       const uid = currentAuthUser ? currentAuthUser.id : null;
       await recordLegalAcceptance(uid, localStorage.getItem('titannovafit_analytics_consent') === 'true');
       const m = document.getElementById('mandatoryLegalModal');
-      if (m) m.style.display = 'none';
+      if (m) {
+        m.classList.remove('active');
+        m.style.display = 'none';
+        m.style.opacity = '0';
+        m.style.visibility = 'hidden';
+        m.style.pointerEvents = 'none';
+      }
       showToastNotification('✅ Aceite dos termos registrado com sucesso!');
     }
 
