@@ -1169,10 +1169,6 @@
             <button onclick="toggleOnlyFavoritesFilter()" id="btnFavFilter" class="btn btn-outline" style="width: auto; padding: 5px 10px; font-size: 11px; color: var(--text-grey); border-color: var(--divider);" title="Filtrar apenas favoritos">
               ⭐ Favoritos
             </button>
-            <div id="btnSyncExerciseDb" onclick="startExerciseDbSync(false)" style="cursor: pointer; display: flex; align-items: center; gap: 5px; background: rgba(76, 175, 80, 0.12); border: 1px solid rgba(76, 175, 80, 0.35); padding: 5px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; color: var(--success-green);" title="Catálogo de 1.500 exercícios sincronizado automaticamente.">
-              <span id="syncBtnIcon">✅</span>
-              <span id="syncBtnText">Auto-Sincronizado</span>
-            </div>
           </div>
         </div>
 
@@ -7142,7 +7138,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     // Inicializar carregamento automático imediato
     loadExercisesLibrary();
 
-    async function startExerciseDbSync(isAutomatic = false) {
+    async function startExerciseDbSync(isAutomatic = true) {
       if (isSyncInProgress) return;
       isSyncInProgress = true;
 
