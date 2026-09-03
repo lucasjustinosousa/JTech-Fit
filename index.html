@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>TitanNova Fit — Acompanhamento de Treinos</title>
 
   <!-- PWA Meta Tags & Manifest -->
@@ -56,16 +56,19 @@
       background-color: var(--bg-black);
       color: var(--text-white);
       font-family: var(--font-main);
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
       display: flex;
       justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      overflow-x: hidden;
+      align-items: stretch;
     }
 
     .app-frame {
       width: 100%;
-      max-width: 480px;
+      max-width: 100%;
       height: 100vh;
       height: 100dvh;
       background: var(--bg-black);
@@ -73,15 +76,24 @@
       flex-direction: column;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-      border-radius: 0;
+      margin: 0 auto;
     }
 
-    @media (min-width: 500px) {
+    @media (min-width: 768px) {
+      body {
+        background: radial-gradient(circle at 50% 0%, #161d2b 0%, #0a0c10 65%, #050608 100%);
+      }
       .app-frame {
-        border-radius: 40px;
-        height: 90vh;
-        border: 10px solid #1c1f26;
+        max-width: 1240px;
+        box-shadow: 0 0 60px rgba(0, 0, 0, 0.7);
+        border-left: 1px solid var(--divider);
+        border-right: 1px solid var(--divider);
+      }
+    }
+
+    @media (min-width: 1440px) {
+      .app-frame {
+        max-width: 1400px;
       }
     }
 
@@ -122,8 +134,23 @@
     .content-area {
       flex: 1;
       overflow-y: auto;
-      padding: 16px;
-      padding-bottom: 90px;
+      overflow-x: hidden;
+      padding: 14px;
+      padding-bottom: 85px;
+      width: 100%;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    @media (min-width: 768px) {
+      .content-area {
+        padding: 24px 32px 95px 32px;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .content-area {
+        padding: 30px 44px 105px 44px;
+      }
     }
 
     .screen {
@@ -202,13 +229,42 @@
       bottom: 0;
       left: 0;
       right: 0;
-      height: 70px;
+      height: 68px;
       background: var(--surface-dark);
       display: flex;
       justify-content: space-around;
       align-items: center;
       border-top: 1px solid var(--divider);
       z-index: 20;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+
+    @media (min-width: 768px) {
+      .bottom-nav {
+        height: 64px;
+        max-width: 700px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 20px 20px 0 0;
+        border: 1px solid var(--divider);
+        border-bottom: none;
+        background: rgba(22, 24, 28, 0.96);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6);
+        padding: 0 12px;
+      }
+      .nav-item {
+        flex-direction: row !important;
+        gap: 8px !important;
+        font-size: 13px !important;
+        padding: 8px 16px !important;
+        border-radius: 12px !important;
+      }
+      .nav-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+      }
     }
 
     .nav-item {
@@ -413,6 +469,24 @@
     @keyframes slideUpFloating {
       from { transform: translateY(20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
+    }
+    @media (min-width: 768px) {
+      .active-workout-floating-bar {
+        max-width: 700px;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        right: auto !important;
+        width: 100% !important;
+        bottom: 74px !important;
+      }
+      .active-workout-floating-bar:active {
+        transform: translateX(-50%) scale(0.98) !important;
+      }
+      .exercise-bulk-bar {
+        max-width: 700px;
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
     }
     .pulsing-live-dot {
       width: 10px;
@@ -650,6 +724,151 @@
       border: 1px solid rgba(255, 215, 0, 0.3);
     }
 
+    /* =======================================================
+       SISTEMA DE GRIDS RESPONSIVAS MULTI-APARELHOS (TITANNOVA)
+       ======================================================= */
+    .responsive-exercise-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (min-width: 580px) {
+      .responsive-exercise-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+      }
+    }
+    @media (min-width: 1024px) {
+      .responsive-exercise-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 18px;
+      }
+    }
+    @media (min-width: 1400px) {
+      .responsive-exercise-grid {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+      }
+    }
+
+    .responsive-workout-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 640px) {
+      .responsive-workout-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 18px;
+      }
+    }
+    @media (min-width: 1100px) {
+      .responsive-workout-grid {
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 20px;
+      }
+    }
+
+    .responsive-history-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 640px) {
+      .responsive-history-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 16px;
+      }
+    }
+
+    .admin-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    @media (min-width: 768px) {
+      .admin-kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+    }
+
+    .admin-list-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      max-height: 550px;
+      overflow-y: auto;
+    }
+    @media (min-width: 680px) {
+      .admin-list-grid {
+        grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+        gap: 14px;
+      }
+    }
+
+    .home-stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    @media (min-width: 768px) {
+      .home-stats-row {
+        gap: 18px;
+      }
+    }
+
+    .exercise-item-card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      margin-bottom: 0 !important;
+    }
+
+    /* Centralização elegante da tela de autenticação em telas grandes */
+    @media (min-width: 768px) {
+      #screenAuth > div:first-child,
+      #authLoginFormContainer,
+      #authRegisterFormContainer,
+      #authEmailConfirmationContainer {
+        max-width: 440px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      #screenAuth .safety-banner {
+        max-width: 440px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      #screenAuth > button {
+        max-width: 440px;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+      }
+      #screenAuth > div:nth-child(2) {
+        max-width: 440px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .hero-card {
+        padding: 26px 30px;
+      }
+    }
+
+    /* Modais responsivos e com largura confortável em tablets e computadores */
+    @media (min-width: 768px) {
+      .modal-card {
+        max-width: 620px !important;
+        padding: 26px !important;
+        border-radius: 24px !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -823,7 +1042,7 @@
         </div>
 
         <!-- Estatísticas da Semana e do Mês -->
-        <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+        <div class="home-stats-row">
           <div class="card" style="flex: 1; margin: 0; position: relative;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
               <div style="font-size: 20px;">📊</div>
@@ -869,7 +1088,7 @@
           <button onclick="openCreateWorkoutModal()" class="btn btn-primary" style="width: auto; padding: 8px 14px; font-size: 12px;">+ Criar Treino</button>
         </div>
 
-        <div id="workoutListContainer" style="display: flex; flex-direction: column; gap: 12px;">
+        <div id="workoutListContainer" class="responsive-workout-grid">
           <!-- Cards de treinos e seus exercícios montados renderizados dinamicamente via JS -->
         </div>
       </div>
@@ -1023,7 +1242,7 @@
         </div>
 
         <!-- CONTAINER DA LISTA DE EXERCÍCIOS -->
-        <div id="exerciseListContainer" style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">
+        <div id="exerciseListContainer" class="responsive-exercise-grid">
           <!-- Exercícios renderizados dinamicamente via JS -->
         </div>
 
@@ -1093,7 +1312,7 @@
         </div>
 
         <!-- KPI Cards (Visão Geral do Sistema) -->
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;">
+        <div class="admin-kpi-grid">
           <div class="card" style="margin: 0; padding: 12px; border-left: 4px solid var(--accent-cyan);">
             <div style="font-size: 11px; color: var(--text-grey); font-weight: 700;">👥 USUÁRIOS</div>
             <div id="adminKpiUsers" style="font-size: 20px; font-weight: 900; color: white; margin-top: 4px;">--</div>
@@ -1137,7 +1356,7 @@
               + Novo
             </button>
           </div>
-          <div id="adminExercisesListContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 480px; overflow-y: auto; padding-right: 2px;">
+          <div id="adminExercisesListContainer" class="admin-list-grid" style="padding-right: 2px;">
             <!-- Renderizado dinamicamente -->
           </div>
         </div>
@@ -1145,7 +1364,7 @@
         <!-- Sub-aba 2: Gerenciamento de Usuários -->
         <div id="adminSubTabUsers" style="display: none;">
           <div style="font-size: 12px; color: var(--text-grey); margin-bottom: 10px;">Atletas e contas registradas no Supabase:</div>
-          <div id="adminUsersListContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 480px; overflow-y: auto;">
+          <div id="adminUsersListContainer" class="admin-list-grid">
             <!-- Renderizado dinamicamente -->
           </div>
         </div>
@@ -1153,7 +1372,7 @@
         <!-- Sub-aba 3: Auditoria / Logs Administrativos -->
         <div id="adminSubTabLogs" style="display: none;">
           <div style="font-size: 12px; color: var(--text-grey); margin-bottom: 10px;">Registro cronológico de auditoria e ações administrativas:</div>
-          <div id="adminLogsListContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 480px; overflow-y: auto;">
+          <div id="adminLogsListContainer" class="admin-list-grid">
             <!-- Renderizado dinamicamente -->
           </div>
         </div>
@@ -1166,7 +1385,7 @@
           <button onclick="clearAllHistory()" class="btn btn-outline" style="width: auto; padding: 4px 10px; font-size: 11px; color: var(--text-grey); border-color: var(--divider);">Limpar Histórico</button>
         </div>
 
-        <div id="historyListContainer">
+        <div id="historyListContainer" class="responsive-history-grid">
           <!-- Histórico de treinos concluídos renderizado dinamicamente -->
         </div>
       </div>
