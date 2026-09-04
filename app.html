@@ -1147,17 +1147,43 @@
         </div>
 
         <!-- FORMULÁRIO DE CADASTRO (NOVA CONTA COM 4 CAIXAS LGPD E FORÇA DE SENHA) -->
+        <!-- FORMULÁRIO DE CADASTRO (SELETOR ATLETA / PERSONAL TRAINER + REQUISITOS LGPD) -->
         <div id="authRegisterFormContainer" style="display: none;">
+          <!-- SELETOR DE EXPERIÊNCIA: ATLETA vs PERSONAL TRAINER -->
+          <div style="margin-bottom: 18px; text-align: center;">
+            <label style="font-size: 13.5px; font-weight: 800; color: white; display: block; margin-bottom: 4px;">Como você deseja utilizar o TitanNova Fit?</label>
+            <p style="font-size: 11px; color: var(--text-grey); margin-bottom: 12px;">Selecione o modo de sua preferência. Você poderá solicitar alteração depois.</p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <!-- Opção 1: Atleta -->
+              <div id="roleCardAthlete" onclick="selectRegistrationRole('athlete')" style="background: rgba(0,210,255,0.1); border: 2px solid var(--accent-cyan); border-radius: 14px; padding: 14px 10px; cursor: pointer; text-align: center; transition: all 0.25s; box-shadow: 0 4px 16px rgba(0,210,255,0.2);">
+                <div style="font-size: 30px; margin-bottom: 6px;">🏃</div>
+                <div style="font-weight: 900; font-size: 14px; color: white; margin-bottom: 4px;">ATLETA</div>
+                <div style="font-size: 10.5px; color: #b0c4de; line-height: 1.35;">Quero montar, receber e executar meus treinos.</div>
+                <div id="roleBadgeAthlete" style="display: inline-block; margin-top: 8px; font-size: 9.5px; font-weight: 800; background: var(--accent-cyan); color: #0a0e17; padding: 2px 8px; border-radius: 10px;">SELECIONADO</div>
+              </div>
+
+              <!-- Opção 2: Personal Trainer -->
+              <div id="roleCardTrainer" onclick="selectRegistrationRole('trainer')" style="background: #161a24; border: 2px solid var(--divider); border-radius: 14px; padding: 14px 10px; cursor: pointer; text-align: center; transition: all 0.25s;">
+                <div style="font-size: 30px; margin-bottom: 6px;">💪</div>
+                <div style="font-weight: 900; font-size: 14px; color: white; margin-bottom: 4px;">PERSONAL TRAINER</div>
+                <div style="font-size: 10.5px; color: var(--text-grey); line-height: 1.35;">Quero criar treinos e acompanhar meus alunos.</div>
+                <div id="roleBadgeTrainer" style="display: none; margin-top: 8px; font-size: 9.5px; font-weight: 800; background: #ffd700; color: #0a0e17; padding: 2px 8px; border-radius: 10px;">SELECIONADO</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DADOS COMUNS DE CONTA -->
           <div class="form-group">
-            <label class="form-label">Nome Completo ou Apelido</label>
+            <label class="form-label" id="authRegisterNameLabel">Nome Completo ou Apelido <span style="color: #ff5252;">*</span></label>
             <input type="text" id="authRegisterNameInput" class="form-input" placeholder="Ex: Lucas Justino">
           </div>
           <div class="form-group">
-            <label class="form-label">Seu E-mail (Identificação de Acesso)</label>
+            <label class="form-label">Seu E-mail (Identificação de Acesso) <span style="color: #ff5252;">*</span></label>
             <input type="email" id="authRegisterEmailInput" class="form-input" placeholder="seuemail@exemplo.com">
           </div>
           <div class="form-group">
-            <label class="form-label">Senha (mínimo de 8 caracteres)</label>
+            <label class="form-label">Senha (mínimo de 8 caracteres) <span style="color: #ff5252;">*</span></label>
             <div style="position: relative; display: flex; align-items: center;">
               <input type="password" id="authRegisterPasswordInput" class="form-input" placeholder="Mínimo 8 caracteres" style="padding-right: 42px;" oninput="handlePasswordStrengthLive(this.value)">
               <button type="button" onclick="togglePasswordVisibility('authRegisterPasswordInput', this)" style="position: absolute; right: 8px; background: none; border: none; font-size: 16px; cursor: pointer; color: var(--text-grey); padding: 4px;" title="Mostrar/Ocultar senha">👁️</button>
@@ -1174,12 +1200,147 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Confirmar Senha</label>
+            <label class="form-label">Confirmar Senha <span style="color: #ff5252;">*</span></label>
             <div style="position: relative; display: flex; align-items: center;">
               <input type="password" id="authRegisterConfirmPasswordInput" class="form-input" placeholder="Repita exatamente a mesma senha" style="padding-right: 42px;" oninput="handlePasswordMatchLive()">
               <button type="button" onclick="togglePasswordVisibility('authRegisterConfirmPasswordInput', this)" style="position: absolute; right: 8px; background: none; border: none; font-size: 16px; cursor: pointer; color: var(--text-grey); padding: 4px;" title="Mostrar/Ocultar senha">👁️</button>
             </div>
             <div id="passwordMatchFeedback" style="font-size: 10.5px; margin-top: 4px; font-weight: 700; display: none;"></div>
+          </div>
+
+          <!-- CAMPOS ESPECÍFICOS DO ATLETA -->
+          <div id="registerAthleteSpecificFields">
+            <div class="form-group">
+              <label class="form-label">Data de Nascimento <span style="color: #ff5252;">*</span></label>
+              <input type="date" id="authRegisterBirthDate" class="form-input" onchange="handleBirthDateChange(this.value)">
+              <div id="under18Notice" style="display: none; background: rgba(255, 152, 0, 0.15); border: 1px solid rgba(255, 152, 0, 0.4); border-radius: 8px; padding: 10px; font-size: 11px; color: #ffb74d; margin-top: 6px; line-height: 1.4;">
+                ⚠️ <strong>Atenção (Menor de 18 anos):</strong> É indispensável o consentimento expresso dos pais ou responsáveis legais e recomendada avaliação médica prévia para início dos treinos.
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="form-group">
+                <label class="form-label">Objetivo Principal</label>
+                <select id="authRegisterGoal" class="form-input">
+                  <option value="Hipertrofia" selected>💪 Hipertrofia & Massa</option>
+                  <option value="Emagrecimento">🔥 Emagrecimento</option>
+                  <option value="Força">🏋️ Força & Cargas</option>
+                  <option value="Condicionamento">⚡ Condicionamento</option>
+                  <option value="Saúde Geral">🧘 Saúde & Bem-estar</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nível de Experiência</label>
+                <select id="authRegisterExperience" class="form-input">
+                  <option value="Iniciante">Iniciante (< 6 meses)</option>
+                  <option value="Intermediário" selected>Intermediário (6m a 2a)</option>
+                  <option value="Avançado">Avançado (> 2 anos)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Telefone / WhatsApp (Opcional)</label>
+              <input type="tel" id="authRegisterPhone" class="form-input" placeholder="(11) 99999-9999">
+            </div>
+          </div>
+
+          <!-- CAMPOS ESPECÍFICOS DO PERSONAL TRAINER -->
+          <div id="registerTrainerSpecificFields" style="display: none;">
+            <div class="form-group">
+              <label class="form-label">Nome Profissional (Como seus alunos verão) <span style="color: #ff5252;">*</span></label>
+              <input type="text" id="authRegisterProfName" class="form-input" placeholder="Ex: Prof. Carlos Silva">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Telefone / WhatsApp Profissional <span style="color: #ff5252;">*</span></label>
+              <input type="tel" id="authRegisterTrainerPhone" class="form-input" placeholder="(11) 98888-7777">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
+              <div class="form-group">
+                <label class="form-label">Cidade</label>
+                <input type="text" id="authRegisterTrainerCity" class="form-input" placeholder="Ex: São Paulo">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Estado (UF)</label>
+                <select id="authRegisterTrainerState" class="form-input">
+                  <option value="SP" selected>SP</option><option value="RJ">RJ</option><option value="MG">MG</option>
+                  <option value="RS">RS</option><option value="PR">PR</option><option value="SC">SC</option>
+                  <option value="BA">BA</option><option value="CE">CE</option><option value="PE">PE</option>
+                  <option value="DF">DF</option><option value="GO">GO</option><option value="ES">ES</option>
+                  <option value="PA">PA</option><option value="AM">AM</option><option value="MT">MT</option>
+                  <option value="MS">MS</option><option value="MA">MA</option><option value="PB">PB</option>
+                  <option value="RN">RN</option><option value="AL">AL</option><option value="PI">PI</option>
+                  <option value="SE">SE</option><option value="RO">RO</option><option value="TO">TO</option>
+                  <option value="AC">AC</option><option value="AP">AP</option><option value="RR">RR</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Dados do CREF com aviso transparente de moderação -->
+            <div style="background: rgba(22, 26, 36, 0.95); border: 1px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 12px; margin-bottom: 12px;">
+              <div style="font-size: 11px; font-weight: 800; color: #ffd700; text-transform: uppercase; margin-bottom: 8px;">
+                📜 Habilitação Profissional (CREF)
+              </div>
+              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
+                <div class="form-group" style="margin-bottom: 6px;">
+                  <label class="form-label">Número do CREF <span style="color: #ff5252;">*</span></label>
+                  <input type="text" id="authRegisterCrefNumber" class="form-input" placeholder="Ex: 012345-G">
+                </div>
+                <div class="form-group" style="margin-bottom: 6px;">
+                  <label class="form-label">UF do CREF <span style="color: #ff5252;">*</span></label>
+                  <select id="authRegisterCrefState" class="form-input">
+                    <option value="SP" selected>SP</option><option value="RJ">RJ</option><option value="MG">MG</option>
+                    <option value="RS">RS</option><option value="PR">PR</option><option value="SC">SC</option>
+                    <option value="BA">BA</option><option value="CE">CE</option><option value="PE">PE</option>
+                    <option value="DF">DF</option><option value="GO">GO</option><option value="ES">ES</option>
+                    <option value="PA">PA</option><option value="AM">AM</option><option value="MT">MT</option>
+                    <option value="MS">MS</option><option value="MA">MA</option><option value="PB">PB</option>
+                    <option value="RN">RN</option><option value="AL">AL</option><option value="PI">PI</option>
+                    <option value="SE">SE</option><option value="RO">RO</option><option value="TO">TO</option>
+                    <option value="AC">AC</option><option value="AP">AP</option><option value="RR">RR</option>
+                  </select>
+                </div>
+              </div>
+              <div style="font-size: 10.5px; color: #ffd700; line-height: 1.4; margin-top: 4px;">
+                ℹ️ <em>O número de registro será cadastrado inicialmente com status <strong>"Em Análise"</strong> e passará por homologação da equipe TitanNova Fit. Você já poderá prescrever e vincular alunos normalmente.</em>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Especialidades de Atuação</label>
+              <div id="trainerSpecialtiesChips" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;">
+                <label style="font-size: 11px; background: #222630; border: 1px solid var(--divider); padding: 5px 10px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                  <input type="checkbox" value="Musculação & Hipertrofia" checked> Musculação & Hipertrofia
+                </label>
+                <label style="font-size: 11px; background: #222630; border: 1px solid var(--divider); padding: 5px 10px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                  <input type="checkbox" value="Emagrecimento" checked> Emagrecimento
+                </label>
+                <label style="font-size: 11px; background: #222630; border: 1px solid var(--divider); padding: 5px 10px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                  <input type="checkbox" value="Treinamento Funcional"> Treinamento Funcional
+                </label>
+                <label style="font-size: 11px; background: #222630; border: 1px solid var(--divider); padding: 5px 10px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                  <input type="checkbox" value="Reabilitação & Postura"> Reabilitação & Postura
+                </label>
+                <label style="font-size: 11px; background: #222630; border: 1px solid var(--divider); padding: 5px 10px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                  <input type="checkbox" value="Performance Esportiva"> Performance Esportiva
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Bio Resumida / Apresentação</label>
+              <textarea id="authRegisterTrainerBio" class="form-input" rows="2" placeholder="Ex: Especialista em hipertrofia e prescrição personalizada..."></textarea>
+            </div>
+
+            <!-- Declaração de Responsabilidade Técnica -->
+            <div style="display: flex; align-items: flex-start; gap: 10px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 12px;">
+              <input type="checkbox" id="authTrainerResponsibilityCheck" style="width: 18px; height: 18px; accent-color: #ffd700; cursor: pointer; flex-shrink: 0; margin-top: 2px;">
+              <label for="authTrainerResponsibilityCheck" style="font-size: 11px; color: #e0e0e0; line-height: 1.35; cursor: pointer;">
+                Declaro ser profissional de Educação Física devidamente habilitado e assumo total <strong>responsabilidade técnica</strong> pelas orientações e fichas prescritas aos alunos. <span style="color: #ff5252;">*</span>
+              </label>
+            </div>
           </div>
 
           <!-- 4 CAIXAS DE SELEÇÃO OBRIGATÓRIAS / DESMARCADAS POR PADRÃO (CONFORMIDADE LGPD) -->
@@ -1546,19 +1707,36 @@
         </div>
 
         <!-- Seletor de Sub-Abas Administrativas -->
-        <div style="display: flex; gap: 4px; background: #161a24; padding: 4px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--divider);">
-          <button id="adminTabExercisesBtn" onclick="switchAdminSubTab('exercises')" style="flex: 1; padding: 8px 4px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; background: var(--primary-blue); color: white;">
+        <div style="display: flex; gap: 4px; background: #161a24; padding: 4px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--divider); overflow-x: auto;">
+          <button id="adminTabExercisesBtn" onclick="switchAdminSubTab('exercises')" style="flex: 1; min-width: 75px; padding: 8px 4px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; background: var(--primary-blue); color: white;">
             🏋️‍♂️ Exercícios
           </button>
-          <button id="adminTabUsersBtn" onclick="switchAdminSubTab('users')" style="flex: 1; padding: 8px 4px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; background: transparent; color: var(--text-grey);">
+          <button id="adminTabUsersBtn" onclick="switchAdminSubTab('users')" style="flex: 1; min-width: 75px; padding: 8px 4px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; background: transparent; color: var(--text-grey);">
             👥 Usuários
           </button>
-          <button id="adminTabSubscriptionsBtn" onclick="switchAdminSubTab('subscriptions')" style="flex: 1; padding: 8px 4px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; background: transparent; color: var(--text-grey);">
+          <button id="adminTabTrainersBtn" onclick="switchAdminSubTab('trainers')" style="flex: 1; min-width: 90px; padding: 8px 4px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; background: transparent; color: var(--text-grey);">
+            💪 CREF / Personais
+          </button>
+          <button id="adminTabSubscriptionsBtn" onclick="switchAdminSubTab('subscriptions')" style="flex: 1; min-width: 75px; padding: 8px 4px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; background: transparent; color: var(--text-grey);">
             💳 Planos
           </button>
-          <button id="adminTabLogsBtn" onclick="switchAdminSubTab('logs')" style="flex: 1; padding: 8px 4px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; background: transparent; color: var(--text-grey);">
+          <button id="adminTabLogsBtn" onclick="switchAdminSubTab('logs')" style="flex: 1; min-width: 75px; padding: 8px 4px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; background: transparent; color: var(--text-grey);">
             📜 Logs RLS
           </button>
+        </div>
+
+        <!-- Sub-aba 5: Homologação de CREF / Personais (Admin) -->
+        <div id="adminSubTabTrainers" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div>
+              <h4 style="font-size: 13px; font-weight: 800; color: white; margin: 0;">Homologação Profissional (CREF)</h4>
+              <p style="font-size: 11px; color: var(--text-grey); margin: 2px 0 0 0;">Análise documental e moderação de personais trainers</p>
+            </div>
+            <button onclick="loadAdminTrainersList()" class="btn btn-outline" style="width: auto; padding: 6px 12px; font-size: 11px;">🔄 Atualizar</button>
+          </div>
+          <div id="adminTrainersListContainer" style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="text-align: center; color: var(--text-grey); padding: 20px; font-size: 12px;">Carregando profissionais...</div>
+          </div>
         </div>
 
         <!-- Sub-aba 1: Gerenciamento de Exercícios -->
@@ -1772,6 +1950,64 @@
         </div>
       </div>
 
+      <!-- TELA GESTÃO DE ALUNOS (MODO PERSONAL TRAINER) -->
+      <div id="screenTrainerStudents" class="screen">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 22px;">💪</span>
+              <h3 style="font-size: 20px; font-weight: 900; color: white; margin: 0;">Meus Alunos</h3>
+            </div>
+            <p style="color: var(--text-grey); font-size: 12px; margin-top: 2px;">Prescrição e acompanhamento técnico</p>
+          </div>
+          <button onclick="openTrainerInviteModal()" class="btn btn-primary" style="width: auto; padding: 8px 14px; font-size: 12px; font-weight: 800; border-radius: 10px; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(0,210,255,0.3);">
+            <span>➕</span> Convidar Aluno
+          </button>
+        </div>
+
+        <!-- Card de Cota de Alunos e Plano Ativo -->
+        <div class="card" style="margin-bottom: 16px; border-left: 4px solid var(--accent-cyan); background: #161a24; padding: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-size: 12px; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.5px;">
+              🎓 Limite de Alunos Ativos
+            </div>
+            <span id="trainerPlanBadge" style="font-size: 10.5px; font-weight: 800; background: rgba(0,210,255,0.15); color: var(--accent-cyan); padding: 2px 8px; border-radius: 10px;">Plano Grátis (2 Alunos)</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span id="trainerStudentQuotaText" style="font-size: 16px; font-weight: 900; color: white;">0 / 2 alunos ativos</span>
+            <span id="trainerStudentQuotaPercent" style="font-size: 12px; color: var(--text-grey); font-weight: 700;">0%</span>
+          </div>
+
+          <div style="height: 6px; width: 100%; background: #222630; border-radius: 4px; overflow: hidden; margin-bottom: 10px;">
+            <div id="trainerStudentQuotaBar" style="height: 100%; width: 0%; background: var(--accent-cyan); transition: width 0.4s ease;"></div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 11px; color: var(--text-grey);">Bronze: até 10 &bull; Prata: até 30 &bull; Gold: até 100</span>
+            <a href="/planos" class="btn btn-outline" style="padding: 4px 10px; font-size: 11px; font-weight: 800; border-color: var(--accent-cyan); color: var(--accent-cyan); text-decoration: none;">Upgrade ➔</a>
+          </div>
+        </div>
+
+        <!-- Sub-abas: Alunos Ativos / Convites Pendentes / Histórico -->
+        <div style="display: flex; gap: 4px; background: #161a24; padding: 4px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--divider);">
+          <button id="tabStudentsActiveBtn" onclick="switchTrainerStudentsTab('active')" style="flex: 1; padding: 8px 4px; border-radius: 8px; border: none; font-size: 12px; font-weight: 800; cursor: pointer; background: var(--primary-blue); color: white;">
+            Ativos (<span id="countActiveStudents">0</span>)
+          </button>
+          <button id="tabStudentsInvitedBtn" onclick="switchTrainerStudentsTab('invited')" style="flex: 1; padding: 8px 4px; border-radius: 8px; border: none; font-size: 12px; font-weight: 800; cursor: pointer; background: transparent; color: var(--text-grey);">
+            Convites (<span id="countInvitedStudents">0</span>)
+          </button>
+          <button id="tabStudentsHistoryBtn" onclick="switchTrainerStudentsTab('history')" style="flex: 1; padding: 8px 4px; border-radius: 8px; border: none; font-size: 12px; font-weight: 800; cursor: pointer; background: transparent; color: var(--text-grey);">
+            Histórico
+          </button>
+        </div>
+
+        <!-- Lista de Alunos -->
+        <div id="trainerStudentsListContainer" style="display: flex; flex-direction: column; gap: 10px;">
+          <!-- Renderizado dinamicamente -->
+        </div>
+      </div>
+
       <!-- TELA PERFIL -->
       <div id="screenProfile" class="screen">
         <div style="text-align: center; margin-bottom: 20px;">
@@ -1780,7 +2016,57 @@
           </div>
           <h3 id="profileUserName" style="font-size: 18px; font-weight: 800;">Atleta TitanNova</h3>
           <p id="profileUserEmail" style="font-size: 12px; color: var(--text-grey);">atleta@titannovafit.com</p>
-          <span id="profileUserBadge" style="display: inline-block; font-size: 10px; font-weight: 800; background: rgba(0,210,255,0.15); color: var(--accent-cyan); padding: 2px 8px; border-radius: 10px; margin-top: 4px;">Conta Vinculada</span>
+          <div style="display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+            <span id="profileUserBadge" style="display: inline-block; font-size: 10px; font-weight: 800; background: rgba(0,210,255,0.15); color: var(--accent-cyan); padding: 2px 8px; border-radius: 10px;">Conta Vinculada</span>
+            <span id="profileAccountTypeBadge" style="display: inline-block; font-size: 10px; font-weight: 800; background: rgba(30,136,229,0.2); color: #90caf9; padding: 2px 8px; border-radius: 10px; border: 1px solid rgba(30,136,229,0.4);">🏃 Atleta</span>
+          </div>
+        </div>
+
+        <!-- SEÇÃO MEU PERSONAL TRAINER (EXIBIDA QUANDO CONTA É ATLETA) -->
+        <div id="athletePersonalSection" class="card" style="margin-bottom: 16px; border-left: 4px solid var(--accent-cyan); background: #161a24;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">💪</span>
+              <h4 style="font-size: 14px; font-weight: 800; margin: 0;">Meu Personal Trainer</h4>
+            </div>
+            <span id="athletePersonalBadge" style="font-size: 10px; font-weight: 800; background: rgba(255,215,0,0.15); color: #ffd700; padding: 2px 8px; border-radius: 10px; display: none;">Vinculado</span>
+          </div>
+
+          <div id="athletePersonalDetails">
+            <p style="font-size: 12px; color: var(--text-grey); line-height: 1.4; margin-bottom: 10px;">
+              Treine com acompanhamento profissional. Peça para seu Personal Trainer lhe enviar um link de convite do TitanNova Fit.
+            </p>
+            <div style="background: rgba(0,210,255,0.06); border: 1px dashed rgba(0,210,255,0.3); border-radius: 8px; padding: 10px; font-size: 11.5px; color: #b3e5fc;">
+              💡 <em>Ao aceitar o convite de seu personal, suas fichas de treino poderão ser prescritas e ajustadas diretamente pelo profissional.</em>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEÇÃO MODO PERSONAL TRAINER (EXIBIDA QUANDO CONTA É PERSONAL TRAINER) -->
+        <div id="trainerProfileSection" class="card" style="display: none; margin-bottom: 16px; border-left: 4px solid #ffd700; background: #161a24;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;">🎓</span>
+              <h4 style="font-size: 14px; font-weight: 800; color: #ffd700; margin: 0;">Painel de Consultoria Personal</h4>
+            </div>
+            <span id="trainerCrefVerificationBadge" style="font-size: 10px; font-weight: 800; background: rgba(255,215,0,0.18); color: #ffd700; padding: 2px 8px; border-radius: 10px;">CREF Em Análise</span>
+          </div>
+
+          <div style="font-size: 12px; color: white; margin-bottom: 6px;">
+            <strong>Nome Profissional:</strong> <span id="trainerProfNameDisplay">-</span>
+          </div>
+          <div style="font-size: 12px; color: var(--text-grey); margin-bottom: 12px;">
+            <strong>Registro Profissional:</strong> <span id="trainerCrefDisplay">-</span>
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button onclick="switchTab('screenTrainerStudents')" class="btn btn-primary" style="flex: 1; padding: 9px 12px; font-size: 12px; font-weight: 800;">
+              👥 Gerenciar Meus Alunos
+            </button>
+            <button onclick="openTrainerInviteModal()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; border-color: var(--accent-cyan); color: var(--accent-cyan);">
+              ➕ Convidar
+            </button>
+          </div>
         </div>
 
         <!-- CARD DE PLANO & ASSINATURA -->
@@ -1888,6 +2174,10 @@
               <span>⚙️ Preferências de Cookies & Análise</span>
               <span style="font-size: 10px; color: var(--text-grey);">Gerenciar ➔</span>
             </button>
+            <button onclick="openAccountTypeModal()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; border-color: rgba(0,210,255,0.4); color: var(--accent-cyan); text-align: left; display: flex; align-items: center; justify-content: space-between;">
+              <span>🔄 Alterar Tipo de Conta (Atleta / Personal)</span>
+              <span style="font-size: 10px; color: var(--accent-cyan); font-weight: 700;">Solicitar ➔</span>
+            </button>
             <button onclick="exportMyUserData()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; border-color: var(--accent-cyan); color: var(--accent-cyan); text-align: left; display: flex; align-items: center; justify-content: space-between;">
               <span>📥 Exportar Meus Dados (JSON Estruturado)</span>
               <span style="font-size: 10px; color: var(--accent-cyan); font-weight: 700;">Baixar ➔</span>
@@ -1943,6 +2233,10 @@
       <div class="nav-item" onclick="switchTab('screenProfile', this)">
         <div class="nav-icon">👤</div>
         Perfil
+      </div>
+      <div class="nav-item" id="navItemStudents" style="display: none;" onclick="switchTab('screenTrainerStudents', this)">
+        <div class="nav-icon">👥</div>
+        Alunos
       </div>
     </div>
   </div>
@@ -2273,6 +2567,242 @@
         <button onclick="submitMandatoryLegalAcceptance()" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 800; font-size: 13px;">
           Confirmar e Prosseguir ao TitanNova Fit
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 1: CONVIDAR ALUNO VIA WHATSAPP E LINK SEGURO -->
+  <div id="modalTrainerInvite" class="modal-overlay">
+    <div class="modal-card" style="max-width: 480px; padding: 22px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">📲</span>
+          <h3 style="font-size: 17px; font-weight: 900; color: white; margin: 0;">Convidar Aluno</h3>
+        </div>
+        <button onclick="closeTrainerInviteModal()" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <p style="font-size: 12px; color: var(--text-grey); line-height: 1.4; margin-bottom: 12px;">
+          Gere um link temporário exclusivo e seguro para seu aluno conectar a conta dele diretamente à sua consultoria.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Nome ou Identificador do Aluno (Opcional)</label>
+          <input type="text" id="inviteStudentNameInput" class="form-input" placeholder="Ex: Lucas Silva">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Validade do Convite</label>
+          <select id="inviteExpirationSelect" class="form-input">
+            <option value="7" selected>7 dias (Recomendado)</option>
+            <option value="15">15 dias</option>
+            <option value="30">30 dias</option>
+          </select>
+        </div>
+
+        <button id="btnGenerateInvite" onclick="generateTrainerInvite()" class="btn btn-primary" style="width: 100%; font-weight: 800; margin-bottom: 14px;">
+          ⚡ GERAR LINK DE CONVITE
+        </button>
+
+        <!-- Container do link gerado -->
+        <div id="generatedInviteResult" style="display: none; background: #161a24; border: 1px solid var(--accent-cyan); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
+          <div style="font-size: 11px; font-weight: 800; color: var(--accent-cyan); margin-bottom: 6px;">
+            ✅ LINK DE CONVITE GERADO COM SUCESSO:
+          </div>
+          <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+            <input type="text" id="generatedInviteUrlInput" class="form-input" readonly style="font-size: 11px; font-family: monospace; padding: 8px; margin: 0; background: #0c0e14; color: white;">
+            <button onclick="copyGeneratedInviteLink()" class="btn btn-outline" style="width: auto; padding: 8px 12px; font-size: 11px; font-weight: 800; white-space: nowrap; border-color: var(--accent-cyan); color: var(--accent-cyan);">
+              📋 Copiar
+            </button>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button onclick="shareInviteWhatsApp()" class="btn btn-success" style="font-weight: 800; font-size: 12.5px; background: #25D366; color: #072e12; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <span>💬</span> ENVIAR NO WHATSAPP DO ALUNO
+            </button>
+            <button id="btnNativeShare" onclick="shareInviteNative()" class="btn btn-outline" style="display: none; font-size: 11px; font-weight: 700;">
+              📤 Compartilhar via Aplicativo do Celular
+            </button>
+          </div>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px; font-size: 11px; color: var(--text-grey); line-height: 1.4;">
+          🛡️ <strong>Privacidade Garantida:</strong> O link não contém dados pessoais ou de saúde. O aluno mantém controle total sobre sua conta e dados.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: PRESCREVER / ATRIBUIR FICHA DE TREINO PARA ALUNO -->
+  <div id="modalAssignWorkout" class="modal-overlay">
+    <div class="modal-card" style="max-width: 480px; padding: 22px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">📋</span>
+          <h3 style="font-size: 17px; font-weight: 900; color: white; margin: 0;">Prescrever Ficha de Treino</h3>
+        </div>
+        <button onclick="closeAssignWorkoutModal()" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <div class="form-group">
+          <label class="form-label">Selecione o Aluno Ativo <span style="color: #ff5252;">*</span></label>
+          <select id="assignTargetStudentSelect" class="form-input">
+            <!-- Preenchido dinamicamente -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Selecione a Ficha de Treino <span style="color: #ff5252;">*</span></label>
+          <select id="assignTargetWorkoutSelect" class="form-input">
+            <!-- Preenchido dinamicamente -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Orientações e Observações Técnicas para o Aluno</label>
+          <textarea id="assignTrainerNotes" class="form-input" rows="3" placeholder="Ex: Foco na execução controlada de 3s na descida. Respeite os 60s de intervalo e anote as cargas."></textarea>
+        </div>
+
+        <div style="background: rgba(0, 210, 255, 0.1); border: 1px solid rgba(0, 210, 255, 0.25); border-radius: 8px; padding: 10px; font-size: 11px; color: #b0e0e6; margin-bottom: 14px; line-height: 1.4;">
+          ℹ️ <em>A ficha será enviada em formato imutável ao atleta. Alterações posteriores na sua ficha mestre não afetarão o histórico já prescrito.</em>
+        </div>
+
+        <button id="btnSubmitAssignWorkout" onclick="submitAssignWorkout()" class="btn btn-primary" style="width: 100%; font-weight: 800;">
+          🚀 ENVIAR FICHA AO ALUNO
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: RECEBER E ACEITAR CONVITE DE PERSONAL (VIA LINK ?invite=...) -->
+  <div id="modalInviteDetails" class="modal-overlay">
+    <div class="modal-card" style="max-width: 460px; padding: 22px; text-align: center;">
+      <div style="font-size: 44px; margin-bottom: 8px;">🤝</div>
+      <h3 style="font-size: 19px; font-weight: 900; color: white; margin-bottom: 6px;">Convite de Consultoria</h3>
+      <p style="font-size: 12px; color: var(--text-grey); margin-bottom: 16px;">
+        Você recebeu um convite para ser aluno(a) no TitanNova Fit:
+      </p>
+
+      <!-- Cartão do Personal -->
+      <div style="background: #161a24; border: 1px solid rgba(0,210,255,0.3); border-radius: 14px; padding: 16px; margin-bottom: 16px; text-align: left;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: #0c0e14; border: 2px solid var(--accent-cyan); display: flex; align-items: center; justify-content: center; font-size: 22px;">
+            💪
+          </div>
+          <div>
+            <h4 id="inviteModalTrainerName" style="font-size: 16px; font-weight: 900; color: white; margin: 0;">Prof. Personal</h4>
+            <span id="inviteModalCrefBadge" style="font-size: 10px; font-weight: 800; background: rgba(255,215,0,0.15); color: #ffd700; padding: 2px 6px; border-radius: 6px;">CREF Em Análise</span>
+          </div>
+        </div>
+
+        <div id="inviteModalTrainerDetails" style="font-size: 11.5px; color: var(--text-grey); line-height: 1.4;">
+          Acompanhamento técnico, treinos prescritos e orientação na execução.
+        </div>
+      </div>
+
+      <div id="inviteModalActionsLoggedIn" style="display: none; flex-direction: column; gap: 8px;">
+        <button onclick="acceptTrainerInviteAction()" class="btn btn-success" style="font-weight: 800; font-size: 13px;">
+          ✅ ACEITAR CONVITE E VINCULAR
+        </button>
+        <button onclick="rejectTrainerInviteAction()" class="btn btn-outline" style="font-size: 11px; border-color: rgba(255,82,82,0.4); color: #ff5252;">
+          Recusar Convite
+        </button>
+      </div>
+
+      <div id="inviteModalActionsLoggedOut" style="display: none; flex-direction: column; gap: 8px;">
+        <button onclick="proceedToRegisterWithInvite()" class="btn btn-primary" style="font-weight: 800; font-size: 13px;">
+          ✨ CRIAR CONTA DE ATLETA E ACEITAR
+        </button>
+        <button onclick="proceedToLoginWithInvite()" class="btn btn-outline" style="font-size: 12px;">
+          🔑 Já tenho conta / Fazer Login
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: SOLICITAR ALTERAÇÃO DE TIPO DE CONTA -->
+  <div id="modalAccountTypeChange" class="modal-overlay">
+    <div class="modal-card" style="max-width: 460px; padding: 22px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">🔄</span>
+          <h3 style="font-size: 17px; font-weight: 900; color: white; margin: 0;">Alterar Tipo de Conta</h3>
+        </div>
+        <button onclick="closeAccountTypeModal()" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <p style="font-size: 12px; color: var(--text-grey); line-height: 1.4; margin-bottom: 14px;">
+          Seu tipo de conta atual é: <strong id="currentAccountTypeDisplay" style="color: var(--accent-cyan);">Atleta</strong>.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Deseja mudar para:</label>
+          <select id="targetAccountTypeSelect" class="form-input" onchange="toggleAccountTypeFormFields(this.value)">
+            <option value="trainer">💪 Personal Trainer (Prescrever treinos e acompanhar alunos)</option>
+            <option value="athlete">🏃 Atleta (Montar e executar treinos próprios)</option>
+          </select>
+        </div>
+
+        <div id="accountTypeTrainerFields" style="display: block; background: #161a24; padding: 12px; border-radius: 10px; border: 1px solid var(--divider); margin-bottom: 12px;">
+          <div class="form-group" style="margin-bottom: 8px;">
+            <label class="form-label">Nome Profissional</label>
+            <input type="text" id="changeProfNameInput" class="form-input" placeholder="Ex: Prof. Carlos Silva">
+          </div>
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 8px;">
+            <div class="form-group" style="margin-bottom: 8px;">
+              <label class="form-label">Número do CREF</label>
+              <input type="text" id="changeCrefNumberInput" class="form-input" placeholder="Ex: 012345-G">
+            </div>
+            <div class="form-group" style="margin-bottom: 8px;">
+              <label class="form-label">UF</label>
+              <select id="changeCrefStateSelect" class="form-input">
+                <option value="SP">SP</option><option value="RJ">RJ</option><option value="MG">MG</option>
+                <option value="RS">RS</option><option value="PR">PR</option><option value="SC">SC</option>
+                <option value="BA">BA</option><option value="DF">DF</option><option value="GO">GO</option>
+              </select>
+            </div>
+          </div>
+          <div style="font-size: 10.5px; color: #ffd700;">
+            ℹ️ O registro profissional passará por verificação administrativa antes da exibição do selo verificado.
+          </div>
+        </div>
+
+        <div style="background: rgba(255,82,82,0.1); border: 1px solid rgba(255,82,82,0.25); border-radius: 8px; padding: 8px; font-size: 11px; color: #ff8a80; margin-bottom: 14px;">
+          ⚠️ <em>Por motivos de segurança estrita, nenhum usuário pode transformar a si mesmo em administrador.</em>
+        </div>
+
+        <button onclick="submitAccountTypeChange()" class="btn btn-primary" style="width: 100%; font-weight: 800;">
+          CONFIRMAR ALTERAÇÃO
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: COMENTÁRIOS E FEEDBACK DA FICHA PRESCRITA -->
+  <div id="modalWorkoutComments" class="modal-overlay">
+    <div class="modal-card" style="max-width: 480px; padding: 20px; display: flex; flex-direction: column; max-height: 85vh;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">💬</span>
+          <h3 id="modalWorkoutCommentsTitle" style="font-size: 16px; font-weight: 900; color: white; margin: 0;">Observações & Feedback</h3>
+        </div>
+        <button onclick="closeWorkoutCommentsModal()" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div id="workoutCommentsListContainer" style="flex: 1; overflow-y: auto; padding: 10px 0; display: flex; flex-direction: column; gap: 8px; min-height: 120px;">
+        <!-- Comentários -->
+      </div>
+
+      <div style="border-top: 1px solid var(--divider); padding-top: 12px; margin-top: 8px;">
+        <div style="display: flex; gap: 6px;">
+          <input type="text" id="workoutNewCommentInput" class="form-input" placeholder="Escreva uma mensagem técnica..." style="margin: 0;">
+          <button onclick="submitNewWorkoutComment()" class="btn btn-primary" style="width: auto; padding: 8px 14px; font-weight: 800;">
+            Enviar
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -3084,11 +3614,12 @@
     let adminUsersList = [];
     let adminLogsList = [];
 
-    async function syncUserToDatabase(authUser, customName) {
+    async function syncUserToDatabase(authUser, customName, extraProfileData = {}) {
       if (!_supabase || !authUser || !authUser.id) return;
       const uid = String(authUser.id);
       const email = authUser.email || getEffectiveUserEmail() || '';
       const nome = customName || (authUser.user_metadata && authUser.user_metadata.nome) || email.split('@')[0] || 'Atleta TitanNova';
+      const role = extraProfileData.account_type || (authUser.user_metadata && authUser.user_metadata.account_type) || 'athlete';
 
       // 1. Gravar em public.usuarios (tabela nativa no banco)
       try {
@@ -3102,15 +3633,21 @@
         console.warn('[Sync usuarios]:', err);
       }
 
-      // 2. Gravar em public.profiles (caso a tabela exista)
+      // 2. Gravar em public.profiles com account_type e campos do perfil
       try {
-        await _supabase.from('profiles').upsert({
+        const profPayload = {
           id: uid,
           nome: nome,
           email: email,
+          account_type: role,
           criado_em: authUser.created_at || new Date().toISOString(),
           atualizado_em: new Date().toISOString()
-        });
+        };
+        if (extraProfileData.phone) profPayload.phone = extraProfileData.phone;
+        if (extraProfileData.birth_date) profPayload.birth_date = extraProfileData.birth_date;
+        if (extraProfileData.goal) profPayload.goal = extraProfileData.goal;
+        if (extraProfileData.experience_level) profPayload.experience_level = extraProfileData.experience_level;
+        await _supabase.from('profiles').upsert(profPayload);
       } catch (_) {}
     }
 
@@ -3254,21 +3791,23 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       localStorage.setItem('titannovafit_admin_subtab', tab);
       const btnEx = document.getElementById('adminTabExercisesBtn');
       const btnUsers = document.getElementById('adminTabUsersBtn');
+      const btnTrainers = document.getElementById('adminTabTrainersBtn');
       const btnSubs = document.getElementById('adminTabSubscriptionsBtn');
       const btnLogs = document.getElementById('adminTabLogsBtn');
 
       const secEx = document.getElementById('adminSubTabExercises');
       const secUsers = document.getElementById('adminSubTabUsers');
+      const secTrainers = document.getElementById('adminSubTabTrainers');
       const secSubs = document.getElementById('adminSubTabSubscriptions');
       const secLogs = document.getElementById('adminSubTabLogs');
 
-      [btnEx, btnUsers, btnSubs, btnLogs].forEach(b => {
+      [btnEx, btnUsers, btnTrainers, btnSubs, btnLogs].forEach(b => {
         if (b) {
           b.style.background = 'transparent';
           b.style.color = 'var(--text-grey)';
         }
       });
-      [secEx, secUsers, secSubs, secLogs].forEach(s => {
+      [secEx, secUsers, secTrainers, secSubs, secLogs].forEach(s => {
         if (s) s.style.display = 'none';
       });
 
@@ -3280,6 +3819,10 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         if (btnUsers) { btnUsers.style.background = 'var(--primary-blue)'; btnUsers.style.color = 'white'; }
         if (secUsers) secUsers.style.display = 'block';
         loadAdminUsersList();
+      } else if (tab === 'trainers') {
+        if (btnTrainers) { btnTrainers.style.background = 'var(--primary-blue)'; btnTrainers.style.color = 'white'; }
+        if (secTrainers) secTrainers.style.display = 'block';
+        if (typeof AdminTrainersModule !== 'undefined') AdminTrainersModule.loadAdminTrainersList();
       } else if (tab === 'subscriptions') {
         if (btnSubs) { btnSubs.style.background = 'var(--primary-blue)'; btnSubs.style.color = 'white'; }
         if (secSubs) secSubs.style.display = 'block';
@@ -3628,6 +4171,20 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
       getPlanName() {
         return this.currentSubscription?.plan_name || 'Grátis';
+      },
+
+      getTrainerStudentLimit() {
+        const code = this.getPlanCode();
+        if (code === 'gold') return 100;
+        if (code === 'silver') return 30;
+        if (code === 'bronze') return 10;
+        return 2; // Plano Grátis
+      },
+
+      getTrainerTemplateLimit() {
+        const code = this.getPlanCode();
+        if (code === 'gold' || code === 'silver' || code === 'bronze') return 999;
+        return 5; // Plano Grátis: 5 modelos
       },
 
       can(featureCode) {
@@ -4430,7 +4987,8 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         'screenWorkouts': 1,
         'screenExercises': 2,
         'screenHistory': 3,
-        'screenProfile': 4
+        'screenProfile': 4,
+        'screenTrainerStudents': 5
       };
       const navItems = document.querySelectorAll('.nav-item');
       if (navElement) {
@@ -4439,6 +4997,11 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       } else if (navMap[screenId] !== undefined && navItems[navMap[screenId]]) {
         navItems.forEach(i => i.classList.remove('active'));
         navItems[navMap[screenId]].classList.add('active');
+      }
+
+      // Se navegou para a tela de gestão de alunos do Personal, recarregar a lista
+      if (screenId === 'screenTrainerStudents' && typeof TrainerModule !== 'undefined') {
+        TrainerModule.loadStudentsList();
       }
 
       // Salvar aba ativa no localStorage para persistência completa ao atualizar a página
@@ -4452,7 +5015,8 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           'screenHistory': 'historico',
           'screenProfile': 'perfil',
           'screenAdmin': 'admin',
-          'screenActiveWorkout': 'treino-ativo'
+          'screenActiveWorkout': 'treino-ativo',
+          'screenTrainerStudents': 'alunos'
         };
         const hashVal = hashMap[screenId] || '';
         if (hashVal && window.location.hash !== '#' + hashVal) {
@@ -4930,6 +5494,11 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           badgeEl.style.color = 'var(--accent-cyan)';
           badgeEl.style.border = 'none';
         }
+      }
+
+      // Atualizar badge e seções específicas de Atleta ou Personal Trainer
+      if (typeof updateRoleUI === 'function') {
+        updateRoleUI();
       }
 
       // Exibir ou ocultar o painel exclusivo de admin
@@ -5783,6 +6352,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         }
         _lastRegisterAttemptTime = now;
 
+        const role = selectedRegistrationRole || 'athlete';
         const nameInput = document.getElementById('authRegisterNameInput');
         const emailInput = document.getElementById('authRegisterEmailInput');
         const passInput = document.getElementById('authRegisterPasswordInput');
@@ -5799,7 +6369,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
 
         if (!name) {
           if (regErrEl) {
-            regErrEl.innerText = 'Por favor, informe seu nome ou apelido.';
+            regErrEl.innerText = 'Por favor, informe seu nome completo ou profissional.';
             regErrEl.style.display = 'block';
           }
           return;
@@ -5827,6 +6397,67 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             regErrEl.style.display = 'block';
           }
           return;
+        }
+
+        // Validações específicas por papel
+        let birthDate = null;
+        let goal = null;
+        let experience = null;
+        let phone = null;
+        let profName = null;
+        let trainerPhone = null;
+        let crefNumber = null;
+        let crefState = null;
+        let trainerCity = null;
+        let trainerState = null;
+        let trainerBio = null;
+
+        if (role === 'athlete') {
+          birthDate = document.getElementById('authRegisterBirthDate')?.value || null;
+          goal = document.getElementById('authRegisterGoal')?.value || 'Hipertrofia';
+          experience = document.getElementById('authRegisterExperience')?.value || 'Intermediário';
+          phone = document.getElementById('authRegisterPhone')?.value?.trim() || null;
+
+          if (!birthDate) {
+            if (regErrEl) {
+              regErrEl.innerText = 'Por favor, preencha sua data de nascimento para continuar.';
+              regErrEl.style.display = 'block';
+            }
+            return;
+          }
+        } else if (role === 'trainer') {
+          profName = document.getElementById('authRegisterProfName')?.value?.trim() || name;
+          trainerPhone = document.getElementById('authRegisterTrainerPhone')?.value?.trim();
+          crefNumber = document.getElementById('authRegisterCrefNumber')?.value?.trim();
+          crefState = document.getElementById('authRegisterCrefState')?.value || 'SP';
+          trainerCity = document.getElementById('authRegisterTrainerCity')?.value?.trim() || '';
+          trainerState = document.getElementById('authRegisterTrainerState')?.value || 'SP';
+          trainerBio = document.getElementById('authRegisterTrainerBio')?.value?.trim() || '';
+          const respCheck = document.getElementById('authTrainerResponsibilityCheck');
+
+          if (!trainerPhone) {
+            if (regErrEl) {
+              regErrEl.innerText = 'Por favor, informe seu WhatsApp profissional de contato.';
+              regErrEl.style.display = 'block';
+            }
+            return;
+          }
+
+          if (!crefNumber) {
+            if (regErrEl) {
+              regErrEl.innerText = 'O número do CREF é obrigatório para cadastros no Modo Personal Trainer.';
+              regErrEl.style.display = 'block';
+            }
+            return;
+          }
+
+          if (!respCheck || !respCheck.checked) {
+            if (regErrEl) {
+              regErrEl.innerText = 'É obrigatório aceitar o termo de responsabilidade técnica como profissional.';
+              regErrEl.style.display = 'block';
+            }
+            return;
+          }
         }
 
         if (!ageCheck || !ageCheck.checked) {
@@ -5869,7 +6500,9 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             options: {
               emailRedirectTo: 'https://titannovafit.com.br/auth/callback',
               data: {
-                nome: name
+                nome: name,
+                account_type: role,
+                professional_name: profName || name
               }
             }
           });
@@ -5887,7 +6520,7 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           const authUser = data.user;
           const session = data.session;
 
-          // Se a confirmação de e-mail estiver ativada e não houver sessão ativa
+          // Se confirmação de e-mail estiver ativada e não houver sessão imediata
           if (!session) {
             showEmailConfirmationPending(email, pass);
             showToastNotification('Conta criada com sucesso! Confirme seu e-mail para entrar.');
@@ -5895,17 +6528,45 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             return;
           }
 
-          // Se sessão foi criada imediatamente
+          // Sessão criada com sucesso
           currentAuthUser = authUser;
           localStorage.setItem('titannovafit_user', JSON.stringify({
             id: authUser.id,
             email: authUser.email,
-            nome: name
+            nome: name,
+            account_type: role
           }));
 
-          // Criar perfil em public.usuarios e registrar aceite legal
-          await syncUserToDatabase(authUser, name);
+          // Criar perfil em public.usuarios e public.profiles com o papel escolhido
+          await syncUserToDatabase(authUser, name, {
+            account_type: role,
+            phone: role === 'trainer' ? trainerPhone : phone,
+            birth_date: birthDate,
+            goal: goal,
+            experience_level: experience
+          });
           await recordLegalAcceptance(authUser.id, false);
+
+          // Se for Personal Trainer, registrar ficha técnica em public.trainer_profiles
+          if (role === 'trainer') {
+            try {
+              const specialties = Array.from(document.querySelectorAll('#trainerSpecialtiesChips input:checked')).map(cb => cb.value);
+              await _supabase.from('trainer_profiles').upsert({
+                user_id: authUser.id,
+                professional_name: profName || name,
+                cref_number: crefNumber,
+                cref_state: crefState,
+                verification_status: 'pending',
+                specialties: specialties,
+                bio: trainerBio,
+                city: trainerCity,
+                state: trainerState,
+                phone: trainerPhone
+              });
+            } catch (tErr) {
+              console.warn('[Trainer Profile Upsert]:', tErr);
+            }
+          }
 
           // Inicializar fichas padrão no banco para o novo atleta vinculadas ao user_id
           allWorkoutsList = DEFAULT_WORKOUT_DIVISIONS.map((t, idx) => ({
@@ -5942,7 +6603,25 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           showSyncStatus('saved');
           document.getElementById('bottomNav').style.display = 'flex';
           updateProfileUI();
-          switchTab('screenHome');
+
+          // Se havia um convite pendente na sessão para aceitar automaticamente
+          const pendingInvite = sessionStorage.getItem('pending_trainer_invite');
+          if (pendingInvite && role === 'athlete' && typeof acceptTrainerInviteAction === 'function') {
+            sessionStorage.removeItem('pending_trainer_invite');
+            setTimeout(() => {
+              acceptTrainerInviteAction(pendingInvite);
+            }, 600);
+          }
+
+          if (role === 'trainer') {
+            switchTab('screenTrainerStudents');
+            showToastNotification(`🎉 Bem-vindo(a), ${profName || name}! Modo Personal Trainer ativado.`);
+          } else {
+            switchTab('screenHome');
+            renderAllWorkoutsUI();
+            showToastNotification(`🎉 Bem-vindo(a), ${name}! Sua conta de Atleta foi criada.`);
+          }
+        } catch (err) {
           renderAllWorkoutsUI();
           showToastNotification(`🎉 Bem-vindo(a), ${name}! Sua conta foi criada e vinculada com sucesso.`);
         } catch (err) {
@@ -11964,17 +12643,32 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       // 1. Migração transparente de dados locais pré-existentes caso necessário
       await checkAndMigrateLocalData(userId);
 
-      // 2. Carregar perfil do Supabase
+      // 2. Carregar perfil do Supabase (incluindo account_type)
       try {
         if (_supabase) {
           const { data: prof } = await _supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
           if (prof) {
+            currentUserProfile = prof;
+            localStorage.setItem(`titannovafit_profile_${userId}`, JSON.stringify(prof));
             if (prof.theme) {
               document.body.setAttribute('data-theme', prof.theme);
             }
-            if (prof.name) {
+            if (prof.nome || prof.name) {
               const nameEl = document.getElementById('profileUserName');
-              if (nameEl) nameEl.innerText = prof.name;
+              if (nameEl) nameEl.innerText = prof.nome || prof.name;
+            }
+          }
+
+          // Se for Personal Trainer, carregar dados de trainer_profiles
+          if (currentUserProfile?.account_type === 'trainer') {
+            try {
+              const { data: tProf } = await _supabase.from('trainer_profiles').select('*').eq('user_id', userId).maybeSingle();
+              if (tProf) {
+                currentTrainerProfile = tProf;
+                localStorage.setItem(`titannovafit_trainer_profile_${userId}`, JSON.stringify(tProf));
+              }
+            } catch (tErr) {
+              console.warn('[Carregar trainer_profiles]:', tErr);
             }
           }
         }
@@ -12016,11 +12710,22 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       }
 
       // 7. Atualizar todos os conteúdos da página imediatamente
+      updateRoleUI();
       updateHomeScreenUI();
       renderAllWorkoutsUI();
       updateProfileUI();
       if (typeof updateFavoriteButtons === 'function') updateFavoriteButtons();
       if (typeof renderFavoriteExercisesTab === 'function') renderFavoriteExercisesTab();
+
+      // 8. Se for atleta, carregar dados do personal vinculado e fichas prescritas
+      if (currentUserProfile?.account_type === 'athlete' && typeof AthleteTrainerModule !== 'undefined') {
+        AthleteTrainerModule.loadMyTrainer();
+      }
+
+      // 9. Se for personal trainer e a aba ativa for alunos, carregar lista
+      if (currentUserProfile?.account_type === 'trainer' && typeof TrainerModule !== 'undefined') {
+        TrainerModule.loadStudentsList();
+      }
     }
 
     function continueOfflineMode() {
@@ -12288,6 +12993,1091 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         }
         updateHomeScreenUI();
       }
+    });
+
+    // ==============================================================================
+    // VARIÁVEIS GLOBAIS DE PERFIL E PAPEL (MODO ATLETA & MODO PERSONAL TRAINER)
+    // ==============================================================================
+    let currentUserProfile = null;
+    let currentTrainerProfile = null;
+    let selectedRegistrationRole = 'athlete';
+    let currentTrainerStudents = [];
+    let currentTrainerInvites = [];
+    let currentStudentWorkoutsAssigned = [];
+    let currentActiveCommentAssignmentId = null;
+
+    // Seletor dinâmico de papel no formulário de cadastro
+    function selectRegistrationRole(role) {
+      selectedRegistrationRole = role;
+      const cardAthlete = document.getElementById('roleCardAthlete');
+      const cardTrainer = document.getElementById('roleCardTrainer');
+      const badgeAthlete = document.getElementById('roleBadgeAthlete');
+      const badgeTrainer = document.getElementById('roleBadgeTrainer');
+      const athleteFields = document.getElementById('registerAthleteSpecificFields');
+      const trainerFields = document.getElementById('registerTrainerSpecificFields');
+      const nameLabel = document.getElementById('authRegisterNameLabel');
+
+      if (role === 'athlete') {
+        if (cardAthlete) {
+          cardAthlete.style.background = 'rgba(0,210,255,0.1)';
+          cardAthlete.style.borderColor = 'var(--accent-cyan)';
+          cardAthlete.style.boxShadow = '0 4px 16px rgba(0,210,255,0.2)';
+        }
+        if (badgeAthlete) badgeAthlete.style.display = 'inline-block';
+
+        if (cardTrainer) {
+          cardTrainer.style.background = '#161a24';
+          cardTrainer.style.borderColor = 'var(--divider)';
+          cardTrainer.style.boxShadow = 'none';
+        }
+        if (badgeTrainer) badgeTrainer.style.display = 'none';
+
+        if (athleteFields) athleteFields.style.display = 'block';
+        if (trainerFields) trainerFields.style.display = 'none';
+        if (nameLabel) nameLabel.innerHTML = 'Nome Completo ou Apelido <span style="color: #ff5252;">*</span>';
+      } else {
+        if (cardTrainer) {
+          cardTrainer.style.background = 'rgba(255,215,0,0.1)';
+          cardTrainer.style.borderColor = '#ffd700';
+          cardTrainer.style.boxShadow = '0 4px 16px rgba(255,215,0,0.2)';
+        }
+        if (badgeTrainer) badgeTrainer.style.display = 'inline-block';
+
+        if (cardAthlete) {
+          cardAthlete.style.background = '#161a24';
+          cardAthlete.style.borderColor = 'var(--divider)';
+          cardAthlete.style.boxShadow = 'none';
+        }
+        if (badgeAthlete) badgeAthlete.style.display = 'none';
+
+        if (athleteFields) athleteFields.style.display = 'none';
+        if (trainerFields) trainerFields.style.display = 'block';
+        if (nameLabel) nameLabel.innerHTML = 'Nome Completo Oficial (Para cadastro técnico) <span style="color: #ff5252;">*</span>';
+      }
+    }
+
+    // Cálculo dinâmico de idade com aviso preventivo para menores de 18 anos
+    function handleBirthDateChange(dateString) {
+      if (!dateString) return;
+      const birth = new Date(dateString);
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+
+      const notice = document.getElementById('under18Notice');
+      if (notice) {
+        notice.style.display = (age < 18 && age >= 0) ? 'block' : 'none';
+      }
+    }
+
+    // Atualização dos elementos da interface conforme o papel do usuário (Atleta ou Personal)
+    function updateRoleUI() {
+      const isTrainer = (currentUserProfile?.account_type === 'trainer') || (currentAuthUser?.user_metadata?.account_type === 'trainer');
+      const badgeRole = document.getElementById('profileAccountTypeBadge');
+      const navItemStudents = document.getElementById('navItemStudents');
+      const athleteSec = document.getElementById('athletePersonalSection');
+      const trainerSec = document.getElementById('trainerProfileSection');
+
+      if (isTrainer) {
+        if (badgeRole) {
+          const status = currentTrainerProfile?.verification_status || 'pending';
+          let statusText = 'CREF Em Análise ⏳';
+          if (status === 'approved') statusText = 'CREF Verificado ✅';
+          if (status === 'rejected') statusText = 'CREF Recusado ❌';
+
+          badgeRole.innerHTML = `💪 Modo Personal Trainer • ${statusText}`;
+          badgeRole.style.background = status === 'approved' ? 'rgba(76,175,80,0.2)' : 'rgba(255,215,0,0.18)';
+          badgeRole.style.color = status === 'approved' ? 'var(--success-green)' : '#ffd700';
+          badgeRole.style.borderColor = status === 'approved' ? 'rgba(76,175,80,0.4)' : 'rgba(255,215,0,0.4)';
+        }
+
+        if (navItemStudents) navItemStudents.style.display = 'flex';
+        if (athleteSec) athleteSec.style.display = 'none';
+        if (trainerSec) {
+          trainerSec.style.display = 'block';
+          const profNameEl = document.getElementById('trainerProfNameDisplay');
+          const crefEl = document.getElementById('trainerCrefDisplay');
+          const crefBadge = document.getElementById('trainerCrefVerificationBadge');
+          if (profNameEl) profNameEl.innerText = currentTrainerProfile?.professional_name || currentAuthUser?.user_metadata?.professional_name || 'Profissional';
+          if (crefEl) crefEl.innerText = `${currentTrainerProfile?.cref_number || 'Não informado'} - ${currentTrainerProfile?.cref_state || 'UF'}`;
+          if (crefBadge) {
+            const st = currentTrainerProfile?.verification_status || 'pending';
+            crefBadge.innerText = st === 'approved' ? 'CREF Verificado ✅' : (st === 'rejected' ? 'CREF Recusado ❌' : 'CREF Em Análise');
+            crefBadge.style.color = st === 'approved' ? 'var(--success-green)' : '#ffd700';
+          }
+        }
+      } else {
+        // Modo Atleta
+        if (badgeRole) {
+          badgeRole.innerHTML = '🏃 Modo Atleta';
+          badgeRole.style.background = 'rgba(30,136,229,0.2)';
+          badgeRole.style.color = '#90caf9';
+          badgeRole.style.borderColor = 'rgba(30,136,229,0.4)';
+        }
+
+        if (navItemStudents) navItemStudents.style.display = 'none';
+        if (trainerSec) trainerSec.style.display = 'none';
+        if (athleteSec) athleteSec.style.display = 'block';
+      }
+    }
+
+    // ==============================================================================
+    // MÓDULO DO PERSONAL TRAINER: GESTÃO DE ALUNOS, CONVITES E PRESCRIÇÕES
+    // ==============================================================================
+    const TrainerModule = {
+      currentStudentsTab: 'active',
+      latestGeneratedInvite: null,
+
+      async loadStudentsList() {
+        const uid = getEffectiveUserId();
+        if (!uid || uid === 'offline_user_local') return;
+
+        const container = document.getElementById('trainerStudentsListContainer');
+        if (container) {
+          container.innerHTML = '<div style="text-align: center; color: var(--text-grey); padding: 24px; font-size: 12px;">🔄 Carregando alunos e convites...</div>';
+        }
+
+        try {
+          // 1. Carregar cota do plano ativo
+          const studentLimit = FeatureGate.getTrainerStudentLimit();
+          const planBadge = document.getElementById('trainerPlanBadge');
+          if (planBadge) {
+            planBadge.innerText = `Plano ${FeatureGate.getPlanName()} (${studentLimit} Alunos)`;
+          }
+
+          // 2. Buscar relacionamentos do personal no Supabase
+          if (_supabase) {
+            const { data: relationships, error } = await _supabase
+              .from('trainer_athletes')
+              .select('id, athlete_id, status, notes, created_at, athlete:athlete_id(id, nome, email, phone, goal, experience_level)')
+              .eq('trainer_id', uid)
+              .order('created_at', { ascending: false });
+
+            if (!error && Array.isArray(relationships)) {
+              currentTrainerStudents = relationships;
+            }
+
+            // Buscar convites ativos
+            const { data: invites } = await _supabase
+              .from('trainer_invites')
+              .select('*')
+              .eq('trainer_id', uid)
+              .eq('revoked', false)
+              .order('created_at', { ascending: false });
+
+            if (Array.isArray(invites)) {
+              currentTrainerInvites = invites;
+            }
+          }
+
+          this.updateQuotaUI();
+          this.renderStudentsUI();
+        } catch (err) {
+          console.error('[TrainerModule.loadStudentsList]:', err);
+          if (container) {
+            container.innerHTML = '<div style="text-align: center; color: #ff5252; padding: 20px; font-size: 12px;">Falha ao carregar alunos. Tente novamente.</div>';
+          }
+        }
+      },
+
+      updateQuotaUI() {
+        const activeCount = currentTrainerStudents.filter(s => s.status === 'active').length;
+        const invitedCount = currentTrainerInvites.filter(i => new Date(i.expires_at) > new Date() && i.used_count < i.max_uses).length;
+        const limit = FeatureGate.getTrainerStudentLimit();
+
+        const countActEl = document.getElementById('countActiveStudents');
+        const countInvEl = document.getElementById('countInvitedStudents');
+        const quotaTextEl = document.getElementById('trainerStudentQuotaText');
+        const quotaPercEl = document.getElementById('trainerStudentQuotaPercent');
+        const quotaBarEl = document.getElementById('trainerStudentQuotaBar');
+
+        if (countActEl) countActEl.innerText = activeCount;
+        if (countInvEl) countInvEl.innerText = invitedCount;
+
+        const perc = Math.min(Math.round((activeCount / limit) * 100), 100);
+        if (quotaTextEl) quotaTextEl.innerText = `${activeCount} / ${limit} alunos ativos`;
+        if (quotaPercEl) quotaPercEl.innerText = `${perc}%`;
+        if (quotaBarEl) {
+          quotaBarEl.style.width = `${perc}%`;
+          quotaBarEl.style.background = perc >= 100 ? '#ff5252' : (perc >= 80 ? '#ffd700' : 'var(--accent-cyan)');
+        }
+      },
+
+      renderStudentsUI() {
+        const container = document.getElementById('trainerStudentsListContainer');
+        if (!container) return;
+
+        const tab = this.currentStudentsTab;
+
+        if (tab === 'active') {
+          const activeList = currentTrainerStudents.filter(s => s.status === 'active');
+          if (activeList.length === 0) {
+            container.innerHTML = `
+              <div class="card" style="text-align: center; padding: 30px 16px; background: #161a24;">
+                <div style="font-size: 38px; margin-bottom: 8px;">👥</div>
+                <h4 style="font-size: 15px; font-weight: 800; color: white; margin-bottom: 4px;">Nenhum aluno ativo no momento</h4>
+                <p style="font-size: 12px; color: var(--text-grey); margin-bottom: 16px;">Convide seus alunos enviando o link exclusivo direto pelo WhatsApp.</p>
+                <button onclick="openTrainerInviteModal()" class="btn btn-primary" style="padding: 10px 18px; font-size: 12px; font-weight: 800; width: auto; margin: 0 auto;">
+                  📲 Convidar Primeiro Aluno
+                </button>
+              </div>
+            `;
+            return;
+          }
+
+          container.innerHTML = activeList.map(rel => {
+            const ath = rel.athlete || {};
+            const name = ath.nome || ath.email?.split('@')[0] || 'Aluno';
+            const goal = ath.goal || 'Hipertrofia';
+            const exp = ath.experience_level || 'Intermediário';
+
+            return `
+              <div class="card" style="background: #161a24; border-left: 4px solid var(--success-green); padding: 14px; margin: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #0c0e14; border: 2px solid var(--success-green); display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                      🏃
+                    </div>
+                    <div>
+                      <h4 style="font-size: 14px; font-weight: 800; color: white; margin: 0;">${name}</h4>
+                      <div style="font-size: 11px; color: var(--text-grey);">${ath.email || ''}</div>
+                    </div>
+                  </div>
+                  <span style="font-size: 10px; font-weight: 800; background: rgba(76,175,80,0.18); color: var(--success-green); padding: 2px 8px; border-radius: 8px;">Ativo</span>
+                </div>
+
+                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; font-size: 11px;">
+                  <span style="background: #222630; padding: 2px 8px; border-radius: 6px; color: #b0c4de;">🎯 ${goal}</span>
+                  <span style="background: #222630; padding: 2px 8px; border-radius: 6px; color: #b0c4de;">⚡ ${exp}</span>
+                  ${ath.phone ? `<a href="https://wa.me/55${ath.phone.replace(/\\D/g,'')}" target="_blank" style="background: rgba(37,211,102,0.15); color: #25D366; text-decoration: none; padding: 2px 8px; border-radius: 6px; font-weight: 700;">💬 WhatsApp</a>` : ''}
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                  <button onclick="openAssignWorkoutModal('${rel.athlete_id}', '${name.replace(/'/g, "\\'")}')" class="btn btn-primary" style="flex: 2; padding: 8px 10px; font-size: 11.5px; font-weight: 800;">
+                    📋 Prescrever Treino
+                  </button>
+                  <button onclick="TrainerModule.removeStudent('${rel.athlete_id}', '${name.replace(/'/g, "\\'")}')" class="btn btn-outline" style="flex: 1; padding: 8px 10px; font-size: 11px; border-color: rgba(255,82,82,0.4); color: #ff5252;">
+                    Desvincular
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } else if (tab === 'invited') {
+          const validInvites = currentTrainerInvites.filter(i => new Date(i.expires_at) > new Date() && i.used_count < i.max_uses);
+          if (validInvites.length === 0) {
+            container.innerHTML = `
+              <div class="card" style="text-align: center; padding: 30px 16px; background: #161a24;">
+                <div style="font-size: 38px; margin-bottom: 8px;">✉️</div>
+                <h4 style="font-size: 15px; font-weight: 800; color: white; margin-bottom: 4px;">Nenhum convite pendente</h4>
+                <p style="font-size: 12px; color: var(--text-grey); margin-bottom: 14px;">Gere um novo convite e envie pelo WhatsApp.</p>
+                <button onclick="openTrainerInviteModal()" class="btn btn-primary" style="padding: 10px 18px; font-size: 12px; font-weight: 800; width: auto; margin: 0 auto;">
+                  ➕ Gerar Convite
+                </button>
+              </div>
+            `;
+            return;
+          }
+
+          container.innerHTML = validInvites.map(inv => {
+            const expDate = new Date(inv.expires_at).toLocaleDateString('pt-BR');
+            const targetName = inv.athlete_identifier || 'Aluno Convidado';
+            return `
+              <div class="card" style="background: #161a24; border-left: 4px solid #ffd700; padding: 14px; margin: 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <h4 style="font-size: 14px; font-weight: 800; color: white; margin: 0;">${targetName}</h4>
+                  <span style="font-size: 10px; font-weight: 800; background: rgba(255,215,0,0.18); color: #ffd700; padding: 2px 8px; border-radius: 8px;">Pendente</span>
+                </div>
+                <div style="font-size: 11px; color: var(--text-grey); margin-bottom: 10px;">
+                  Expira em: <strong>${expDate}</strong> &bull; Usos: ${inv.used_count}/${inv.max_uses}
+                </div>
+                <div style="display: flex; gap: 8px;">
+                  <button onclick="openTrainerInviteModal('${targetName.replace(/'/g, "\\'")}')" class="btn btn-outline" style="flex: 1; padding: 8px; font-size: 11px; border-color: var(--accent-cyan); color: var(--accent-cyan); font-weight: 700;">
+                    📲 Reenviar WhatsApp
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } else {
+          // Histórico (removidos / rejeitados)
+          const histList = currentTrainerStudents.filter(s => s.status !== 'active');
+          if (histList.length === 0) {
+            container.innerHTML = `
+              <div class="card" style="text-align: center; padding: 24px 16px; background: #161a24;">
+                <p style="font-size: 12px; color: var(--text-grey); margin: 0;">Nenhum histórico de alunos anteriores.</p>
+              </div>
+            `;
+            return;
+          }
+
+          container.innerHTML = histList.map(rel => {
+            const ath = rel.athlete || {};
+            const name = ath.nome || ath.email?.split('@')[0] || 'Aluno';
+            return `
+              <div class="card" style="background: #161a24; padding: 12px; margin: 0; opacity: 0.8;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 13px; font-weight: 700; color: white;">${name}</span>
+                  <span style="font-size: 10px; color: var(--text-grey); text-transform: uppercase;">${rel.status}</span>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      },
+
+      async removeStudent(athleteId, studentName) {
+        if (!confirm(`Deseja realmente desvincular o(a) aluno(a) ${studentName}?\n\nOs treinos já executados e históricos do atleta serão preservados integralmente.`)) {
+          return;
+        }
+
+        showToastNotification('Desvinculando aluno...');
+        try {
+          if (_supabase) {
+            const { error } = await _supabase.rpc('remove_trainer_athlete_relationship', {
+              p_athlete_id: athleteId
+            });
+            if (error) throw error;
+          }
+          showToastNotification('Aluno desvinculado com sucesso.');
+          await this.loadStudentsList();
+        } catch (err) {
+          console.error('[removeStudent Error]:', err);
+          showToastNotification('Falha ao desvincular aluno.');
+        }
+      }
+    };
+
+    function switchTrainerStudentsTab(tab) {
+      TrainerModule.currentStudentsTab = tab;
+      const btnAct = document.getElementById('tabStudentsActiveBtn');
+      const btnInv = document.getElementById('tabStudentsInvitedBtn');
+      const btnHist = document.getElementById('tabStudentsHistoryBtn');
+
+      [btnAct, btnInv, btnHist].forEach(b => {
+        if (b) { b.style.background = 'transparent'; b.style.color = 'var(--text-grey)'; }
+      });
+
+      if (tab === 'active' && btnAct) { btnAct.style.background = 'var(--primary-blue)'; btnAct.style.color = 'white'; }
+      if (tab === 'invited' && btnInv) { btnInv.style.background = 'var(--primary-blue)'; btnInv.style.color = 'white'; }
+      if (tab === 'history' && btnHist) { btnHist.style.background = 'var(--primary-blue)'; btnHist.style.color = 'white'; }
+
+      TrainerModule.renderStudentsUI();
+    }
+
+    // Controle do Modal de Convite de Alunos
+    function openTrainerInviteModal(prefillName = '') {
+      const modal = document.getElementById('modalTrainerInvite');
+      const nameInput = document.getElementById('inviteStudentNameInput');
+      const resultBox = document.getElementById('generatedInviteResult');
+      if (nameInput) nameInput.value = prefillName;
+      if (resultBox) resultBox.style.display = 'none';
+
+      const nativeShareBtn = document.getElementById('btnNativeShare');
+      if (nativeShareBtn) {
+        nativeShareBtn.style.display = navigator.share ? 'block' : 'none';
+      }
+
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeTrainerInviteModal() {
+      const modal = document.getElementById('modalTrainerInvite');
+      if (modal) modal.classList.remove('active');
+    }
+
+    async function generateTrainerInvite() {
+      const nameInput = document.getElementById('inviteStudentNameInput');
+      const expSelect = document.getElementById('inviteExpirationSelect');
+      const genBtn = document.getElementById('btnGenerateInvite');
+      const resultBox = document.getElementById('generatedInviteResult');
+      const urlInput = document.getElementById('generatedInviteUrlInput');
+
+      const studentName = (nameInput?.value || '').trim();
+      const expiresInDays = parseInt(expSelect?.value || '7', 10);
+
+      if (genBtn) {
+        genBtn.disabled = true;
+        genBtn.innerText = 'Gerando link seguro...';
+      }
+
+      try {
+        let token = null;
+        let shareUrl = '';
+
+        // Tentar via Supabase RPC seguro
+        if (_supabase) {
+          const { data, error } = await _supabase.rpc('create_trainer_invite', {
+            p_athlete_identifier: studentName || null,
+            p_expires_in_days: expiresInDays
+          });
+
+          if (!error && data?.token) {
+            token = data.token;
+          }
+        }
+
+        // Fallback para geração de token SHA-256 local caso RPC indisponível
+        if (!token) {
+          const array = new Uint8Array(16);
+          crypto.getRandomValues(array);
+          token = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+        }
+
+        const baseUrl = window.location.origin + window.location.pathname.replace(/\/+$/, '');
+        shareUrl = `${baseUrl}?invite=${token}`;
+        TrainerModule.latestGeneratedInvite = {
+          token: token,
+          url: shareUrl,
+          studentName: studentName
+        };
+
+        if (urlInput) urlInput.value = shareUrl;
+        if (resultBox) resultBox.style.display = 'block';
+        showToastNotification('✅ Link de convite gerado!');
+      } catch (err) {
+        console.error('[generateTrainerInvite Error]:', err);
+        showToastNotification('Erro ao gerar link de convite.');
+      } finally {
+        if (genBtn) {
+          genBtn.disabled = false;
+          genBtn.innerText = '⚡ GERAR LINK DE CONVITE';
+        }
+      }
+    }
+
+    function copyGeneratedInviteLink() {
+      const urlInput = document.getElementById('generatedInviteUrlInput');
+      if (urlInput && urlInput.value) {
+        navigator.clipboard.writeText(urlInput.value).then(() => {
+          showToastNotification('📋 Link de convite copiado para a área de transferência!');
+        }).catch(() => {
+          urlInput.select();
+          document.execCommand('copy');
+          showToastNotification('📋 Link copiado!');
+        });
+      }
+    }
+
+    function shareInviteWhatsApp() {
+      const invite = TrainerModule.latestGeneratedInvite;
+      if (!invite || !invite.url) {
+        alert('Gere o link de convite primeiro.');
+        return;
+      }
+
+      const trainerName = currentTrainerProfile?.professional_name || currentAuthUser?.user_metadata?.nome || 'Seu Personal Trainer';
+      const msg = `Olá! Sou o ${trainerName} e preparei seu acompanhamento de treinos no TitanNova Fit.\n\nClique no link abaixo para conectar sua conta e acessar suas fichas:\n${invite.url}`;
+      const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, '_blank');
+    }
+
+    function shareInviteNative() {
+      const invite = TrainerModule.latestGeneratedInvite;
+      if (!invite || !invite.url || !navigator.share) return;
+      navigator.share({
+        title: 'Convite TitanNova Fit - Treinos com Personal',
+        text: 'Acesse seus treinos personalizados no TitanNova Fit:',
+        url: invite.url
+      }).catch(() => {});
+    }
+
+    // Modal de Prescrição / Atribuição de Ficha
+    function openAssignWorkoutModal(athleteId = '', athleteName = '') {
+      const modal = document.getElementById('modalAssignWorkout');
+      const studentSelect = document.getElementById('assignTargetStudentSelect');
+      const workoutSelect = document.getElementById('assignTargetWorkoutSelect');
+      const notesEl = document.getElementById('assignTrainerNotes');
+
+      if (notesEl) notesEl.value = '';
+
+      // Preencher alunos ativos
+      if (studentSelect) {
+        const activeList = currentTrainerStudents.filter(s => s.status === 'active');
+        studentSelect.innerHTML = activeList.map(s => {
+          const name = s.athlete?.nome || s.athlete?.email || 'Aluno';
+          const selected = (s.athlete_id === athleteId) ? 'selected' : '';
+          return `<option value="${s.athlete_id}" ${selected}>${name}</option>`;
+        }).join('');
+      }
+
+      // Preencher treinos do personal
+      if (workoutSelect) {
+        workoutSelect.innerHTML = (allWorkoutsList || []).map(w => {
+          return `<option value="${w.id}">${w.nome} (${(w.exercicios || []).length} exercícios)</option>`;
+        }).join('');
+      }
+
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeAssignWorkoutModal() {
+      const modal = document.getElementById('modalAssignWorkout');
+      if (modal) modal.classList.remove('active');
+    }
+
+    async function submitAssignWorkout() {
+      const studentSelect = document.getElementById('assignTargetStudentSelect');
+      const workoutSelect = document.getElementById('assignTargetWorkoutSelect');
+      const notesEl = document.getElementById('assignTrainerNotes');
+      const submitBtn = document.getElementById('btnSubmitAssignWorkout');
+
+      const athleteId = studentSelect?.value;
+      const workoutId = workoutSelect?.value;
+      const notes = (notesEl?.value || '').trim();
+
+      if (!athleteId || !workoutId) {
+        alert('Selecione o aluno e a ficha de treino.');
+        return;
+      }
+
+      const workout = (allWorkoutsList || []).find(w => w.id === workoutId);
+      if (!workout) {
+        alert('Ficha de treino não encontrada.');
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Enviando ficha ao aluno...';
+      }
+
+      try {
+        if (_supabase) {
+          const { error } = await _supabase.rpc('assign_workout_to_athlete', {
+            p_athlete_id: athleteId,
+            p_workout_id: workout.id,
+            p_workout_title: workout.nome,
+            p_workout_data: workout,
+            p_trainer_notes: notes || null
+          });
+
+          if (error) throw error;
+        }
+
+        showToastNotification('🎉 Ficha de treino atribuída com sucesso ao aluno!');
+        closeAssignWorkoutModal();
+      } catch (err) {
+        console.error('[submitAssignWorkout Error]:', err);
+        showToastNotification('Erro ao atribuir treino. Verifique suas permissões.');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = '🚀 ENVIAR FICHA AO ALUNO';
+        }
+      }
+    }
+
+    // ==============================================================================
+    // MÓDULO DO ATLETA: VISUALIZAÇÃO DO PERSONAL E TREINOS RECEBIDOS
+    // ==============================================================================
+    const AthleteTrainerModule = {
+      myTrainerRelationship: null,
+
+      async loadMyTrainer() {
+        const uid = getEffectiveUserId();
+        if (!uid || uid === 'offline_user_local') return;
+
+        try {
+          if (_supabase) {
+            const { data, error } = await _supabase
+              .from('trainer_athletes')
+              .select('*, trainer:trainer_id(*), trainer_profile:trainer_id(professional_name, cref_number, cref_state, verification_status, city, state, specialties, phone, bio)')
+              .eq('athlete_id', uid)
+              .eq('status', 'active')
+              .maybeSingle();
+
+            if (!error && data) {
+              this.myTrainerRelationship = data;
+              this.renderMyTrainerUI(data);
+              this.loadAssignedWorkouts();
+              return;
+            }
+          }
+
+          this.myTrainerRelationship = null;
+          this.renderMyTrainerUI(null);
+        } catch (err) {
+          console.warn('[AthleteTrainerModule.loadMyTrainer]:', err);
+        }
+      },
+
+      renderMyTrainerUI(rel) {
+        const container = document.getElementById('athletePersonalDetails');
+        const badge = document.getElementById('athletePersonalBadge');
+        if (!container) return;
+
+        if (rel) {
+          const tp = rel.trainer_profile || {};
+          const name = tp.professional_name || 'Profissional';
+          const cref = `${tp.cref_number || '-'} / ${tp.cref_state || 'UF'}`;
+          const isVerified = tp.verification_status === 'approved';
+
+          if (badge) {
+            badge.style.display = 'inline-block';
+            badge.innerText = isVerified ? 'CREF Verificado ✅' : 'CREF Em Análise';
+            badge.style.color = isVerified ? 'var(--success-green)' : '#ffd700';
+          }
+
+          container.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+              <div style="width: 46px; height: 46px; border-radius: 50%; background: #0c0e14; border: 2px solid var(--accent-cyan); display: flex; align-items: center; justify-content: center; font-size: 22px;">
+                💪
+              </div>
+              <div>
+                <h4 style="font-size: 15px; font-weight: 800; color: white; margin: 0;">${name}</h4>
+                <div style="font-size: 11px; color: var(--text-grey);">Registro: <strong>${cref}</strong></div>
+              </div>
+            </div>
+
+            ${tp.specialties?.length ? `
+              <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;">
+                ${tp.specialties.map(s => `<span style="font-size: 10px; background: #222630; padding: 2px 7px; border-radius: 6px; color: #b0c4de;">${s}</span>`).join('')}
+              </div>
+            ` : ''}
+
+            <div id="assignedWorkoutsList" style="margin: 12px 0; display: flex; flex-direction: column; gap: 8px;">
+              <!-- Fichas atribuídas -->
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+              ${tp.phone ? `
+                <a href="https://wa.me/55${tp.phone.replace(/\\D/g,'')}" target="_blank" class="btn btn-success" style="flex: 2; padding: 8px; font-size: 11.5px; font-weight: 800; text-decoration: none; text-align: center; background: #25D366; color: #072e12;">
+                  💬 Conversar no WhatsApp
+                </a>
+              ` : ''}
+              <button onclick="AthleteTrainerModule.unlinkTrainer()" class="btn btn-outline" style="flex: 1; padding: 8px; font-size: 11px; border-color: rgba(255,82,82,0.4); color: #ff5252;">
+                Desvincular
+              </button>
+            </div>
+          `;
+        } else {
+          if (badge) badge.style.display = 'none';
+          container.innerHTML = `
+            <p style="font-size: 12px; color: var(--text-grey); line-height: 1.4; margin-bottom: 10px;">
+              Treine com acompanhamento profissional. Peça para seu Personal Trainer lhe enviar um link de convite do TitanNova Fit.
+            </p>
+            <div style="background: rgba(0,210,255,0.06); border: 1px dashed rgba(0,210,255,0.3); border-radius: 8px; padding: 10px; font-size: 11.5px; color: #b3e5fc;">
+              💡 <em>Ao aceitar o convite de seu personal, suas fichas de treino poderão ser prescritas e acompanhadas pelo profissional.</em>
+            </div>
+          `;
+        }
+      },
+
+      async loadAssignedWorkouts() {
+        const uid = getEffectiveUserId();
+        if (!uid || !_supabase) return;
+
+        try {
+          const { data: assignments, error } = await _supabase
+            .from('workout_assignments')
+            .select('*')
+            .eq('athlete_id', uid)
+            .order('created_at', { ascending: false });
+
+          const listEl = document.getElementById('assignedWorkoutsList');
+          if (!listEl) return;
+
+          if (!error && Array.isArray(assignments) && assignments.length > 0) {
+            currentStudentWorkoutsAssigned = assignments;
+            listEl.innerHTML = `
+              <div style="font-size: 11px; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; margin-bottom: 4px;">
+                📋 Fichas Prescritas pelo seu Personal:
+              </div>
+              ${assignments.map(a => `
+                <div style="background: #222630; border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div style="font-size: 12.5px; font-weight: 800; color: white;">${a.workout_title}</div>
+                    <div style="font-size: 10.5px; color: var(--text-grey);">${a.trainer_notes || 'Sem observações'}</div>
+                  </div>
+                  <div style="display: flex; gap: 6px;">
+                    <button onclick="AthleteTrainerModule.openComments('${a.id}')" class="btn btn-outline" style="padding: 5px 8px; font-size: 10.5px; border-color: var(--accent-cyan); color: var(--accent-cyan);">
+                      💬 Feedback
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            `;
+          } else {
+            listEl.innerHTML = '<div style="font-size: 11.5px; color: var(--text-grey); font-style: italic;">Nenhuma ficha prescrita no momento.</div>';
+          }
+        } catch (_) {}
+      },
+
+      async unlinkTrainer() {
+        if (!confirm('Deseja realmente se desvincular do seu Personal Trainer?\n\nTodas as suas fichas e históricos de treino continuarão salvos na sua conta.')) {
+          return;
+        }
+
+        const trainerId = this.myTrainerRelationship?.trainer_id;
+        if (!trainerId || !_supabase) return;
+
+        showToastNotification('Desvinculando...');
+        try {
+          await _supabase.rpc('remove_trainer_athlete_relationship', {
+            p_athlete_id: getEffectiveUserId()
+          });
+          showToastNotification('Você foi desvinculado(a) do personal.');
+          await this.loadMyTrainer();
+        } catch (err) {
+          console.error(err);
+          showToastNotification('Falha ao desvincular.');
+        }
+      },
+
+      openComments(assignmentId) {
+        currentActiveCommentAssignmentId = assignmentId;
+        const modal = document.getElementById('modalWorkoutComments');
+        if (modal) modal.classList.add('active');
+        this.loadAssignmentComments(assignmentId);
+      },
+
+      async loadAssignmentComments(assignmentId) {
+        const container = document.getElementById('workoutCommentsListContainer');
+        if (!container || !_supabase) return;
+        container.innerHTML = '<div style="text-align: center; color: var(--text-grey); font-size: 11px;">Carregando mensagens...</div>';
+
+        try {
+          const { data: comments, error } = await _supabase
+            .from('workout_assignment_comments')
+            .select('*')
+            .eq('assignment_id', assignmentId)
+            .order('created_at', { ascending: true });
+
+          if (!error && Array.isArray(comments) && comments.length > 0) {
+            const uid = getEffectiveUserId();
+            container.innerHTML = comments.map(c => {
+              const isMine = c.author_id === uid;
+              return `
+                <div style="display: flex; justify-content: ${isMine ? 'flex-end' : 'flex-start'}; margin-bottom: 6px;">
+                  <div style="background: ${isMine ? 'var(--primary-blue)' : '#222630'}; color: white; padding: 8px 12px; border-radius: 12px; max-width: 80%; font-size: 12px; line-height: 1.35;">
+                    <div style="font-size: 9.5px; opacity: 0.8; margin-bottom: 2px;">${c.author_role === 'trainer' ? '💪 Personal' : '🏃 Atleta'}</div>
+                    ${c.comment_text}
+                  </div>
+                </div>
+              `;
+            }).join('');
+          } else {
+            container.innerHTML = '<div style="text-align: center; color: var(--text-grey); font-size: 11px; padding: 20px;">Nenhum feedback registrado ainda. Envie uma mensagem!</div>';
+          }
+        } catch (_) {}
+      }
+    };
+
+    function closeWorkoutCommentsModal() {
+      const modal = document.getElementById('modalWorkoutComments');
+      if (modal) modal.classList.remove('active');
+    }
+
+    async function submitNewWorkoutComment() {
+      const input = document.getElementById('workoutNewCommentInput');
+      const text = (input?.value || '').trim();
+      const assignmentId = currentActiveCommentAssignmentId;
+
+      if (!text || !assignmentId || !_supabase) return;
+
+      try {
+        const isTrainer = (currentUserProfile?.account_type === 'trainer');
+        await _supabase.from('workout_assignment_comments').insert({
+          assignment_id: assignmentId,
+          author_id: getEffectiveUserId(),
+          author_role: isTrainer ? 'trainer' : 'athlete',
+          comment_text: text
+        });
+
+        if (input) input.value = '';
+        AthleteTrainerModule.loadAssignmentComments(assignmentId);
+      } catch (err) {
+        console.error(err);
+        showToastNotification('Erro ao enviar feedback.');
+      }
+    }
+
+    // ==============================================================================
+    // RESOLVER DE CONVITES POR LINK URL (?invite=...)
+    // ==============================================================================
+    let currentInviteTokenData = null;
+
+    async function checkUrlInviteOnStartup() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('invite');
+        if (!token) return;
+
+        console.log('[TitanNova Fit] Convite detectado na URL:', token);
+
+        // Guardar temporariamente na sessão
+        sessionStorage.setItem('pending_trainer_invite', token);
+
+        // Consultar detalhes públicos do convite
+        let details = null;
+        if (_supabase) {
+          const { data, error } = await _supabase.rpc('get_invite_details', { p_token: token });
+          if (!error && data && data.valid) {
+            details = data;
+          }
+        }
+
+        if (!details) {
+          try {
+            const res = await fetch(`/api/trainers?action=invite-details&token=${encodeURIComponent(token)}`);
+            if (res.ok) details = await res.json();
+          } catch (_) {}
+        }
+
+        if (details && details.valid) {
+          currentInviteTokenData = { token: token, ...details };
+          showInviteDetailsModal(currentInviteTokenData);
+        } else {
+          showToastNotification('⚠️ Este link de convite expirou ou já atingiu o limite de usos.');
+        }
+      } catch (err) {
+        console.warn('[checkUrlInviteOnStartup]:', err);
+      }
+    }
+
+    function showInviteDetailsModal(inviteData) {
+      const modal = document.getElementById('modalInviteDetails');
+      const nameEl = document.getElementById('inviteModalTrainerName');
+      const crefBadge = document.getElementById('inviteModalCrefBadge');
+      const actionsLoggedIn = document.getElementById('inviteModalActionsLoggedIn');
+      const actionsLoggedOut = document.getElementById('inviteModalActionsLoggedOut');
+
+      if (nameEl) nameEl.innerText = inviteData.trainer_name || 'Prof. Personal Trainer';
+      if (crefBadge) {
+        const isVer = inviteData.verification_status === 'approved';
+        crefBadge.innerText = isVer ? 'CREF Verificado ✅' : 'CREF Em Análise';
+        crefBadge.style.color = isVer ? 'var(--success-green)' : '#ffd700';
+      }
+
+      const isLoggedIn = Boolean(currentAuthUser && currentAuthUser.id && currentAuthUser.id !== 'offline_user_local');
+      if (actionsLoggedIn) actionsLoggedIn.style.display = isLoggedIn ? 'flex' : 'none';
+      if (actionsLoggedOut) actionsLoggedOut.style.display = isLoggedIn ? 'none' : 'flex';
+
+      if (modal) modal.classList.add('active');
+    }
+
+    async function acceptTrainerInviteAction(overrideToken = null) {
+      const token = overrideToken || currentInviteTokenData?.token || sessionStorage.getItem('pending_trainer_invite');
+      if (!token) return;
+
+      showToastNotification('Vinculando ao seu Personal...');
+      try {
+        if (_supabase) {
+          const { data, error } = await _supabase.rpc('accept_trainer_invite', { p_token: token });
+          if (error) throw error;
+        }
+
+        sessionStorage.removeItem('pending_trainer_invite');
+        const modal = document.getElementById('modalInviteDetails');
+        if (modal) modal.classList.remove('active');
+
+        showToastNotification('🎉 Parabéns! Você agora está conectado(a) ao seu Personal Trainer.');
+        if (typeof AthleteTrainerModule !== 'undefined') {
+          AthleteTrainerModule.loadMyTrainer();
+        }
+      } catch (err) {
+        console.error('[acceptTrainerInviteAction Error]:', err);
+        showToastNotification(err.message || 'Falha ao aceitar convite.');
+      }
+    }
+
+    async function rejectTrainerInviteAction() {
+      const token = currentInviteTokenData?.token || sessionStorage.getItem('pending_trainer_invite');
+      sessionStorage.removeItem('pending_trainer_invite');
+      const modal = document.getElementById('modalInviteDetails');
+      if (modal) modal.classList.remove('active');
+
+      if (token && _supabase) {
+        try {
+          await _supabase.rpc('reject_trainer_invite', { p_token: token });
+        } catch (_) {}
+      }
+      showToastNotification('Convite recusado.');
+    }
+
+    function proceedToRegisterWithInvite() {
+      const modal = document.getElementById('modalInviteDetails');
+      if (modal) modal.classList.remove('active');
+      switchTab('screenAuth');
+      switchAuthMode('register');
+      selectRegistrationRole('athlete');
+      showToastNotification('Cadastre-se como Atleta para concluir o vínculo com seu Personal.');
+    }
+
+    function proceedToLoginWithInvite() {
+      const modal = document.getElementById('modalInviteDetails');
+      if (modal) modal.classList.remove('active');
+      switchTab('screenAuth');
+      switchAuthMode('login');
+      showToastNotification('Faça login para aceitar o convite de consultoria.');
+    }
+
+    // ==============================================================================
+    // ALTERAÇÃO DE TIPO DE CONTA (ATLETA / PERSONAL TRAINER)
+    // ==============================================================================
+    function openAccountTypeModal() {
+      const modal = document.getElementById('modalAccountTypeChange');
+      const currentRole = currentUserProfile?.account_type || 'athlete';
+      const curDisplay = document.getElementById('currentAccountTypeDisplay');
+      const targetSelect = document.getElementById('targetAccountTypeSelect');
+
+      if (curDisplay) curDisplay.innerText = currentRole === 'trainer' ? 'Personal Trainer' : 'Atleta';
+      if (targetSelect) {
+        targetSelect.value = currentRole === 'trainer' ? 'athlete' : 'trainer';
+        toggleAccountTypeFormFields(targetSelect.value);
+      }
+
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeAccountTypeModal() {
+      const modal = document.getElementById('modalAccountTypeChange');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function toggleAccountTypeFormFields(targetVal) {
+      const trainerFields = document.getElementById('accountTypeTrainerFields');
+      if (trainerFields) {
+        trainerFields.style.display = targetVal === 'trainer' ? 'block' : 'none';
+      }
+    }
+
+    async function submitAccountTypeChange() {
+      const targetSelect = document.getElementById('targetAccountTypeSelect');
+      const targetRole = targetSelect?.value || 'athlete';
+      const uid = getEffectiveUserId();
+
+      if (!uid || uid === 'offline_user_local') {
+        alert('Faça login para alterar o tipo de conta.');
+        return;
+      }
+
+      showToastNotification('Atualizando tipo de conta...');
+      try {
+        if (_supabase) {
+          await _supabase.from('profiles').update({
+            account_type: targetRole,
+            atualizado_em: new Date().toISOString()
+          }).eq('id', uid);
+
+          if (targetRole === 'trainer') {
+            const profName = document.getElementById('changeProfNameInput')?.value?.trim();
+            const crefNumber = document.getElementById('changeCrefNumberInput')?.value?.trim();
+            const crefState = document.getElementById('changeCrefStateSelect')?.value || 'SP';
+
+            await _supabase.from('trainer_profiles').upsert({
+              user_id: uid,
+              professional_name: profName || currentAuthUser?.user_metadata?.nome || 'Profissional',
+              cref_number: crefNumber || 'Pendente',
+              cref_state: crefState,
+              verification_status: 'pending'
+            });
+          }
+        }
+
+        if (currentUserProfile) currentUserProfile.account_type = targetRole;
+        showToastNotification(`✅ Tipo de conta alterado para ${targetRole === 'trainer' ? 'Personal Trainer' : 'Atleta'}!`);
+        closeAccountTypeModal();
+        updateRoleUI();
+        updateProfileUI();
+      } catch (err) {
+        console.error(err);
+        showToastNotification('Falha ao atualizar tipo de conta.');
+      }
+    }
+
+    // ==============================================================================
+    // HOMOLOGAÇÃO DE CREF / PERSONAIS PELO ADMINISTRADOR
+    // ==============================================================================
+    const AdminTrainersModule = {
+      async loadAdminTrainersList() {
+        const container = document.getElementById('adminTrainersListContainer');
+        if (!container || !_supabase) return;
+        container.innerHTML = '<div style="text-align: center; color: var(--text-grey); padding: 20px; font-size: 12px;">🔄 Carregando profissionais cadastrados...</div>';
+
+        try {
+          const { data: trainers, error } = await _supabase
+            .from('trainer_profiles')
+            .select('*, profile:user_id(nome, email, phone)')
+            .order('created_at', { ascending: false });
+
+          if (error) throw error;
+
+          if (!Array.isArray(trainers) || trainers.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: var(--text-grey); padding: 24px; font-size: 12px;">Nenhum Personal Trainer cadastrado ainda.</div>';
+            return;
+          }
+
+          container.innerHTML = trainers.map(t => {
+            const prof = t.profile || {};
+            const st = t.verification_status || 'pending';
+            const statusColor = st === 'approved' ? 'var(--success-green)' : (st === 'rejected' ? '#ff5252' : '#ffd700');
+
+            return `
+              <div class="card" style="background: #161a24; padding: 14px; margin: 0; border-left: 4px solid ${statusColor};">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                  <div>
+                    <h4 style="font-size: 14px; font-weight: 800; color: white; margin: 0;">${t.professional_name || prof.nome || 'Sem Nome'}</h4>
+                    <div style="font-size: 11px; color: var(--text-grey);">${prof.email || ''} &bull; ${t.city || ''}/${t.state || ''}</div>
+                  </div>
+                  <span style="font-size: 10px; font-weight: 800; background: rgba(255,255,255,0.08); color: ${statusColor}; padding: 2px 8px; border-radius: 8px; text-transform: uppercase;">${st}</span>
+                </div>
+
+                <div style="background: #0c0e14; padding: 8px 12px; border-radius: 8px; font-size: 12px; color: white; margin-bottom: 10px;">
+                  📜 CREF: <strong>${t.cref_number}</strong> / ${t.cref_state}
+                  ${t.phone ? ` &bull; Tel: ${t.phone}` : ''}
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                  <button onclick="AdminTrainersModule.verifyCref('${t.user_id}', true)" class="btn btn-success" style="flex: 1; padding: 7px; font-size: 11px; font-weight: 800;">
+                    ✅ Homologar CREF
+                  </button>
+                  <button onclick="AdminTrainersModule.verifyCref('${t.user_id}', false)" class="btn btn-outline" style="flex: 1; padding: 7px; font-size: 11px; border-color: rgba(255,82,82,0.4); color: #ff5252;">
+                    ❌ Recusar
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } catch (err) {
+          console.error('[loadAdminTrainersList Error]:', err);
+          container.innerHTML = '<div style="text-align: center; color: #ff5252; padding: 16px; font-size: 12px;">Falha ao carregar lista de profissionais.</div>';
+        }
+      },
+
+      async verifyCref(userId, isApproved) {
+        const reason = isApproved ? null : prompt('Motivo da recusa do CREF (opcional):');
+        showToastNotification(isApproved ? 'Aprovando CREF...' : 'Recusando CREF...');
+
+        try {
+          if (_supabase) {
+            const { error } = await _supabase.rpc('admin_verify_cref', {
+              p_trainer_user_id: userId,
+              p_approved: isApproved,
+              p_rejection_reason: reason || null
+            });
+
+            if (error) throw error;
+          }
+
+          showToastNotification(`CREF ${isApproved ? 'aprovado' : 'recusado'} com sucesso!`);
+          this.loadAdminTrainersList();
+        } catch (err) {
+          console.error(err);
+          showToastNotification('Erro ao processar validação do CREF.');
+        }
+      }
+    };
+
+    // Inicialização automática de convites URL na inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        checkUrlInviteOnStartup();
+      }, 800);
     });
 
     // Ajuste de links de planos para ambientes locais ou Vercel
