@@ -6622,9 +6622,6 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
             showToastNotification(`🎉 Bem-vindo(a), ${name}! Sua conta de Atleta foi criada.`);
           }
         } catch (err) {
-          renderAllWorkoutsUI();
-          showToastNotification(`🎉 Bem-vindo(a), ${name}! Sua conta foi criada e vinculada com sucesso.`);
-        } catch (err) {
           const errStatus = err.status || err.code || 'UNKNOWN';
           const errMsg = (err.message || '').toLowerCase();
           console.error(`[Cadastro Tratado]: Código ${errStatus} - Mensagem: ${err.message}`);
