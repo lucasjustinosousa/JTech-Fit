@@ -771,6 +771,7 @@
         <li><a href="#funcionalidades">Funcionalidades</a></li>
         <li><a href="#comparativo">Comparativo</a></li>
         <li><a href="#exercicios">Exercícios</a></li>
+        <li><a href="/planos" class="planos-link" style="color: var(--accent-cyan); font-weight: 700;">Planos</a></li>
         <li><a href="#duvidas">Dúvidas</a></li>
       </ul>
 
@@ -1167,6 +1168,7 @@
             <li><a href="/app#screenWorkouts" class="app-link">Fichas de Treino</a></li>
             <li><a href="/app#screenExercises" class="app-link">Biblioteca de Exercícios</a></li>
             <li><a href="/app#screenHistory" class="app-link">Histórico & Recordes</a></li>
+            <li><a href="/planos" class="planos-link" style="color: var(--accent-cyan); font-weight: 700;">Planos & Assinaturas</a></li>
           </ul>
         </div>
 
@@ -1176,6 +1178,7 @@
             <li><a href="#funcionalidades">Cronômetro de Descanso</a></li>
             <li><a href="#funcionalidades">Modo Offline</a></li>
             <li><a href="#comparativo">Tabela Comparativa</a></li>
+            <li><a href="/planos" class="planos-link">Comparar Planos</a></li>
             <li><a href="#duvidas">Perguntas Frequentes</a></li>
           </ul>
         </div>
@@ -1216,7 +1219,7 @@
       }
     }
 
-    // Suporte a navegação tanto em servidor Vercel (/app) quanto em ambiente de teste local (app.html)
+    // Suporte a navegação tanto em servidor Vercel (/app, /planos) quanto em ambiente de teste local (.html)
     document.addEventListener('DOMContentLoaded', () => {
       const isLocalFileOrStatic = (window.location.protocol === 'file:' || window.location.port !== '' || window.location.pathname.endsWith('.html'));
       if (isLocalFileOrStatic) {
@@ -1226,6 +1229,9 @@
             const hash = href.includes('#') ? href.substring(href.indexOf('#')) : '';
             link.setAttribute('href', 'app.html' + hash);
           }
+        });
+        document.querySelectorAll('a.planos-link').forEach(link => {
+          link.setAttribute('href', 'planos.html');
         });
       }
     });

@@ -50,6 +50,10 @@
       "destination": "/app.html"
     },
     {
+      "source": "/planos",
+      "destination": "/planos.html"
+    },
+    {
       "source": "/termos-de-uso",
       "destination": "/termos-de-uso.html"
     },

@@ -1553,6 +1553,9 @@
           <button id="adminTabUsersBtn" onclick="switchAdminSubTab('users')" style="flex: 1; padding: 8px 4px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; background: transparent; color: var(--text-grey);">
             👥 Usuários
           </button>
+          <button id="adminTabSubscriptionsBtn" onclick="switchAdminSubTab('subscriptions')" style="flex: 1; padding: 8px 4px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; background: transparent; color: var(--text-grey);">
+            💳 Planos
+          </button>
           <button id="adminTabLogsBtn" onclick="switchAdminSubTab('logs')" style="flex: 1; padding: 8px 4px; border-radius: 8px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; background: transparent; color: var(--text-grey);">
             📜 Logs RLS
           </button>
@@ -1579,7 +1582,72 @@
           </div>
         </div>
 
-        <!-- Sub-aba 3: Auditoria / Logs Administrativos -->
+        <!-- Sub-aba 3: Gestão de Planos & Assinaturas -->
+        <div id="adminSubTabSubscriptions" style="display: none;">
+          <div style="font-size: 12px; color: var(--text-grey); margin-bottom: 12px;">Atribuição segura de planos para testes e gestão de assinaturas:</div>
+          
+          <div class="card" style="margin-bottom: 14px; background: #1a1e2b; border: 1px solid var(--border-cyan);">
+            <div style="font-weight: 800; font-size: 13px; color: var(--accent-cyan); margin-bottom: 10px;">🔍 Buscar Atleta por E-mail</div>
+            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+              <input type="email" id="adminSubSearchEmail" class="form-input" style="flex: 1; margin: 0; padding: 8px 12px; font-size: 12px;" placeholder="atleta@exemplo.com">
+              <button onclick="adminSearchUserPlan()" class="btn btn-primary" style="width: auto; padding: 8px 14px; font-size: 12px; font-weight: 800;">Buscar</button>
+            </div>
+
+            <!-- Informações do Usuário Encontrado -->
+            <div id="adminSubUserFoundCard" style="display: none; background: rgba(0,0,0,0.25); border-radius: 10px; padding: 12px; margin-bottom: 14px; border: 1px solid var(--divider);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div>
+                  <div style="font-weight: 800; font-size: 13px; color: white;" id="adminSubFoundUserName">-</div>
+                  <div style="font-size: 11px; color: var(--text-grey);" id="adminSubFoundUserEmail">-</div>
+                </div>
+                <span id="adminSubFoundPlanBadge" style="font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 6px; background: rgba(0,210,255,0.15); color: var(--accent-cyan);">Grátis</span>
+              </div>
+              <div style="font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between;">
+                <span>Vencimento / Validade:</span>
+                <span id="adminSubFoundRenewal" style="color: white; font-weight: 600;">Permanente</span>
+              </div>
+            </div>
+
+            <!-- Formulário de Atribuição de Plano -->
+            <div id="adminSubAssignForm" style="display: none; border-top: 1px solid var(--divider); padding-top: 12px;">
+              <div style="font-weight: 800; font-size: 12px; color: white; margin-bottom: 8px;">Atribuir Novo Plano para Teste:</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+                <div>
+                  <label class="form-label" style="font-size: 10.5px;">Plano</label>
+                  <select id="adminSubSelectPlan" class="form-input" style="padding: 8px; font-size: 12px;">
+                    <option value="free">🌱 Grátis</option>
+                    <option value="bronze">🥉 Bronze</option>
+                    <option value="silver" selected>🥈 Prata (Mais Escolhido)</option>
+                    <option value="gold">👑 Gold</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label" style="font-size: 10.5px;">Duração</label>
+                  <select id="adminSubSelectDuration" class="form-input" style="padding: 8px; font-size: 12px;">
+                    <option value="7">7 dias (Degustação)</option>
+                    <option value="30" selected>30 dias (1 mês)</option>
+                    <option value="90">90 dias (3 meses)</option>
+                    <option value="365">365 dias (1 ano)</option>
+                    <option value="0">Vitalício / Sem expiração</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 8px;">
+                <button onclick="adminExecutePlanAssignment()" class="btn btn-success" style="flex: 1; padding: 10px; font-size: 12px; font-weight: 800;">
+                  ✅ Salvar e Atribuir Plano
+                </button>
+                <button onclick="adminRevertToFreePlan()" class="btn btn-outline" style="padding: 10px; font-size: 11px; border-color: rgba(255,82,82,0.4); color: #ff5252;">
+                  Reverter para Grátis
+                </button>
+              </div>
+            </div>
+
+            <div id="adminSubActionFeedback" style="display: none; margin-top: 10px; font-size: 11.5px; padding: 8px; border-radius: 8px; text-align: center; font-weight: 700;"></div>
+          </div>
+        </div>
+
+        <!-- Sub-aba 4: Auditoria / Logs Administrativos -->
         <div id="adminSubTabLogs" style="display: none;">
           <div style="font-size: 12px; color: var(--text-grey); margin-bottom: 10px;">Registro cronológico de auditoria e ações administrativas:</div>
           <div id="adminLogsListContainer" class="admin-list-grid">
@@ -1713,6 +1781,39 @@
           <h3 id="profileUserName" style="font-size: 18px; font-weight: 800;">Atleta TitanNova</h3>
           <p id="profileUserEmail" style="font-size: 12px; color: var(--text-grey);">atleta@titannovafit.com</p>
           <span id="profileUserBadge" style="display: inline-block; font-size: 10px; font-weight: 800; background: rgba(0,210,255,0.15); color: var(--accent-cyan); padding: 2px 8px; border-radius: 10px; margin-top: 4px;">Conta Vinculada</span>
+        </div>
+
+        <!-- CARD DE PLANO & ASSINATURA -->
+        <div class="card" style="margin-bottom: 16px; border-left: 4px solid var(--accent-cyan); background: #161a24;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 18px;" id="profilePlanEmoji">🌱</span>
+              <h4 style="font-size: 14px; font-weight: 800; margin: 0;">Meu Plano</h4>
+            </div>
+            <span id="profilePlanBadge" style="font-size: 11px; font-weight: 800; background: rgba(0,210,255,0.15); color: var(--accent-cyan); padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border-cyan);">Plano Grátis</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--divider); font-size: 12px;">
+            <span>Situação</span>
+            <span id="profilePlanStatus" style="color: var(--success-green); font-weight: 700;">Ativo</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--divider); font-size: 12px;">
+            <span>Fichas de Treino</span>
+            <span id="profilePlanWorkoutCount" style="color: white; font-weight: 700;">0 / 3 fichas</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--divider); font-size: 12px;">
+            <span>Renovação / Validade</span>
+            <span id="profilePlanRenewal" style="color: var(--text-grey); font-weight: 600;">Acesso Permanente</span>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap;">
+            <a href="/planos" class="btn btn-primary app-planos-link" style="flex: 1; padding: 9px 12px; font-size: 12px; text-decoration: none; text-align: center;">
+              ⭐ Conhecer Planos & Upgrade
+            </a>
+            <button onclick="restoreUserPurchases()" class="btn btn-outline" style="padding: 9px 12px; font-size: 12px; border-color: var(--divider); color: var(--text-grey);">
+              🔄 Restaurar
+            </button>
+          </div>
         </div>
 
         <div class="card" style="margin-bottom: 16px;">
@@ -2882,6 +2983,39 @@
     </div>
   </div>
 
+  <!-- MODAL DE UPGRADE / CONTROLE DE RECURSOS (FEATURE GATE) -->
+  <div id="modalUpgradePlan" class="modal-overlay" style="z-index: 100003;">
+    <div class="modal-card" style="max-width: 460px; width: 95%; text-align: center; padding: 26px 20px; background: radial-gradient(circle at 50% 0%, #152538 0%, #0d1017 80%); border: 2px solid var(--accent-cyan); border-radius: 24px; box-shadow: 0 0 50px rgba(0,210,255,0.35);">
+      <div style="font-size: 42px; margin-bottom: 8px;" id="upgradeModalEmoji">⭐</div>
+      <span style="font-size: 11px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 1px; text-transform: uppercase;" id="upgradeModalBadge">Recurso Exclusivo</span>
+      <h2 id="upgradeModalTitle" style="font-size: 20px; font-weight: 900; color: white; margin: 4px 0 10px 0;">Limite de Fichas Atingido</h2>
+      
+      <p id="upgradeModalMessage" style="font-size: 13px; color: var(--text-grey); line-height: 1.5; margin-bottom: 18px;">
+        Seu plano Grátis permite até 3 fichas de treino. Faça upgrade para o plano Bronze ou superior para criar fichas ilimitadas.
+      </p>
+
+      <!-- Comparativo Rápido do Benefício -->
+      <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--divider); border-radius: 14px; padding: 14px; text-align: left; margin-bottom: 20px;">
+        <div style="font-size: 11.5px; font-weight: 800; color: white; margin-bottom: 8px;">Benefícios ao Fazer Upgrade:</div>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--text-grey);">
+          <div style="display: flex; align-items: center; gap: 8px;"><span style="color: var(--accent-green); font-weight: 800;">✓</span> <span>Fichas de treino <strong>ilimitadas</strong></span></div>
+          <div style="display: flex; align-items: center; gap: 8px;"><span style="color: var(--accent-green); font-weight: 800;">✓</span> <span>Histórico <strong>vitalício e completo</strong></span></div>
+          <div style="display: flex; align-items: center; gap: 8px;"><span style="color: var(--accent-green); font-weight: 800;">✓</span> <span>Gráficos de sobrecarga e <strong>Recordes Pessoais (PRs)</strong></span></div>
+          <div style="display: flex; align-items: center; gap: 8px;"><span style="color: var(--accent-green); font-weight: 800;">✓</span> <span>Exercícios personalizados e <strong>zero anúncios</strong></span></div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <a href="/planos" class="btn btn-primary app-planos-link" style="padding: 12px; font-size: 13.5px; font-weight: 800; text-decoration: none; text-align: center;">
+          🚀 Conhecer Planos a partir de R$ 7,90/mês
+        </a>
+        <button type="button" onclick="closeUpgradePlanModal()" class="btn btn-text" style="font-size: 12px; color: var(--text-grey); cursor: pointer;">
+          Continuar com Plano Atual
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     console.log("[BOOT 1] App iniciou");
     // Migração automática transparente de dados legados (jtech_fit_* -> titannovafit_*)
@@ -3131,19 +3265,21 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       localStorage.setItem('titannovafit_admin_subtab', tab);
       const btnEx = document.getElementById('adminTabExercisesBtn');
       const btnUsers = document.getElementById('adminTabUsersBtn');
+      const btnSubs = document.getElementById('adminTabSubscriptionsBtn');
       const btnLogs = document.getElementById('adminTabLogsBtn');
 
       const secEx = document.getElementById('adminSubTabExercises');
       const secUsers = document.getElementById('adminSubTabUsers');
+      const secSubs = document.getElementById('adminSubTabSubscriptions');
       const secLogs = document.getElementById('adminSubTabLogs');
 
-      [btnEx, btnUsers, btnLogs].forEach(b => {
+      [btnEx, btnUsers, btnSubs, btnLogs].forEach(b => {
         if (b) {
           b.style.background = 'transparent';
           b.style.color = 'var(--text-grey)';
         }
       });
-      [secEx, secUsers, secLogs].forEach(s => {
+      [secEx, secUsers, secSubs, secLogs].forEach(s => {
         if (s) s.style.display = 'none';
       });
 
@@ -3155,10 +3291,536 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         if (btnUsers) { btnUsers.style.background = 'var(--primary-blue)'; btnUsers.style.color = 'white'; }
         if (secUsers) secUsers.style.display = 'block';
         loadAdminUsersList();
+      } else if (tab === 'subscriptions') {
+        if (btnSubs) { btnSubs.style.background = 'var(--primary-blue)'; btnSubs.style.color = 'white'; }
+        if (secSubs) secSubs.style.display = 'block';
       } else if (tab === 'logs') {
         if (btnLogs) { btnLogs.style.background = 'var(--primary-blue)'; btnLogs.style.color = 'white'; }
         if (secLogs) secLogs.style.display = 'block';
         loadAdminLogsList();
+      }
+    }
+
+    // ==============================================================================
+    // GESTÃO DE PLANOS & ASSINATURAS PELO ADMINISTRADOR
+    // ==============================================================================
+    let _adminSelectedTargetUser = null;
+
+    async function adminSearchUserPlan() {
+      const emailInput = document.getElementById('adminSubSearchEmail');
+      const email = (emailInput ? emailInput.value : '').trim().toLowerCase();
+      const feedback = document.getElementById('adminSubActionFeedback');
+      const card = document.getElementById('adminSubUserFoundCard');
+      const form = document.getElementById('adminSubAssignForm');
+
+      if (!email || !email.includes('@')) {
+        alert('Por favor, informe um endereço de e-mail válido para busca.');
+        return;
+      }
+
+      if (feedback) { feedback.style.display = 'none'; }
+      showToastNotification(`🔍 Buscando dados de ${email}...`);
+
+      try {
+        let foundUser = null;
+
+        // 1. Consultar tabela usuarios ou perfis
+        if (_supabase) {
+          const { data: uList } = await _supabase
+            .from('usuarios')
+            .select('id, user_id, nome, email')
+            .ilike('email', email)
+            .limit(1);
+
+          if (Array.isArray(uList) && uList.length > 0) {
+            foundUser = {
+              id: uList[0].user_id || uList[0].id,
+              nome: uList[0].nome,
+              email: uList[0].email
+            };
+          }
+        }
+
+        // 2. Se não encontrou, buscar via API administrativa de usuários
+        if (!foundUser) {
+          const res = await fetch('/api/users');
+          if (res.ok) {
+            const allUsers = await res.json();
+            const target = (Array.isArray(allUsers) ? allUsers : (allUsers.users || [])).find(u => (u.email || '').toLowerCase() === email);
+            if (target) {
+              foundUser = {
+                id: target.id,
+                nome: target.nome || target.email.split('@')[0],
+                email: target.email
+              };
+            }
+          }
+        }
+
+        if (!foundUser) {
+          alert(`Nenhum usuário com o e-mail "${email}" foi encontrado.`);
+          if (card) card.style.display = 'none';
+          if (form) form.style.display = 'none';
+          return;
+        }
+
+        _adminSelectedTargetUser = foundUser;
+
+        // Consultar plano atual do usuário no Supabase
+        let currentPlanCode = 'free';
+        let currentRenewal = 'Permanente';
+        let currentPlanName = 'Grátis';
+
+        if (_supabase) {
+          const { data: subData } = await _supabase
+            .from('subscriptions')
+            .select('status, current_period_end, plans(code, name)')
+            .eq('user_id', foundUser.id)
+            .in('status', ['active', 'trialing'])
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+          if (Array.isArray(subData) && subData.length > 0) {
+            const s = subData[0];
+            currentPlanCode = s.plans?.code || 'free';
+            currentPlanName = s.plans?.name || 'Grátis';
+            if (s.current_period_end) {
+              try { currentRenewal = new Date(s.current_period_end).toLocaleDateString('pt-BR'); }
+              catch (_) { currentRenewal = s.current_period_end; }
+            }
+          }
+        }
+
+        // Atualizar painel de exibição
+        const nameEl = document.getElementById('adminSubFoundUserName');
+        const emailEl = document.getElementById('adminSubFoundUserEmail');
+        const badgeEl = document.getElementById('adminSubFoundPlanBadge');
+        const renewalEl = document.getElementById('adminSubFoundRenewal');
+
+        if (nameEl) nameEl.innerText = foundUser.nome || 'Atleta';
+        if (emailEl) emailEl.innerText = foundUser.email;
+        if (renewalEl) renewalEl.innerText = currentRenewal;
+
+        if (badgeEl) {
+          badgeEl.innerText = currentPlanName;
+          if (currentPlanCode === 'gold') {
+            badgeEl.style.background = 'rgba(255, 215, 0, 0.2)';
+            badgeEl.style.color = '#ffd700';
+          } else if (currentPlanCode === 'silver') {
+            badgeEl.style.background = 'rgba(0, 210, 255, 0.2)';
+            badgeEl.style.color = 'var(--accent-cyan)';
+          } else if (currentPlanCode === 'bronze') {
+            badgeEl.style.background = 'rgba(205, 127, 50, 0.2)';
+            badgeEl.style.color = '#cd7f32';
+          } else {
+            badgeEl.style.background = 'rgba(255, 255, 255, 0.1)';
+            badgeEl.style.color = 'var(--text-grey)';
+          }
+        }
+
+        if (card) card.style.display = 'block';
+        if (form) form.style.display = 'block';
+        showToastNotification(`✓ Dados de ${foundUser.email} carregados.`);
+      } catch (err) {
+        console.error('[Admin Search User Error]:', err);
+        alert('Erro ao pesquisar usuário: ' + (err.message || 'Erro desconhecido'));
+      }
+    }
+
+    async function adminExecutePlanAssignment() {
+      if (!_adminSelectedTargetUser || !_adminSelectedTargetUser.id) {
+        alert('Selecione primeiro um usuário válido.');
+        return;
+      }
+
+      const planCode = document.getElementById('adminSubSelectPlan')?.value || 'free';
+      const durationVal = parseInt(document.getElementById('adminSubSelectDuration')?.value || '30', 10);
+      const feedback = document.getElementById('adminSubActionFeedback');
+
+      const token = (await _supabase?.auth?.getSession())?.data?.session?.access_token;
+      if (!token) {
+        alert('Sessão administrativa expirada. Por favor, reconecte-se.');
+        return;
+      }
+
+      showToastNotification(`Salvando atribuição do plano ${planCode}...`);
+
+      try {
+        const res = await fetch('/api/subscriptions?action=admin-assign', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            targetUserId: _adminSelectedTargetUser.id,
+            targetEmail: _adminSelectedTargetUser.email,
+            planCode: planCode,
+            durationDays: durationVal
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Falha na resposta do servidor.');
+        }
+
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.style.background = 'rgba(76, 175, 80, 0.15)';
+          feedback.style.color = 'var(--success-green)';
+          feedback.style.border = '1px solid rgba(76, 175, 80, 0.35)';
+          feedback.innerText = `✓ ${data.message}`;
+        }
+
+        showToastNotification(`🎉 Plano atribuído com sucesso para ${_adminSelectedTargetUser.email}!`);
+        await logAdminAction('ASSIGN_PLAN', 'subscriptions', _adminSelectedTargetUser.id, { plan: planCode, days: durationVal });
+
+        // Se for o próprio usuário logado, recarregar FeatureGate
+        const currentUid = getEffectiveUserId();
+        if (currentUid === _adminSelectedTargetUser.id) {
+          await FeatureGate.loadSubscription(currentUid);
+        }
+
+        // Atualizar visualização do usuário na tela
+        adminSearchUserPlan();
+      } catch (err) {
+        console.error('[Admin Assign Plan Error]:', err);
+        if (feedback) {
+          feedback.style.display = 'block';
+          feedback.style.background = 'rgba(255, 82, 82, 0.15)';
+          feedback.style.color = '#ff5252';
+          feedback.style.border = '1px solid rgba(255, 82, 82, 0.35)';
+          feedback.innerText = `Erro: ${err.message}`;
+        }
+      }
+    }
+
+    async function adminRevertToFreePlan() {
+      if (!_adminSelectedTargetUser || !_adminSelectedTargetUser.id) {
+        alert('Selecione primeiro um usuário válido.');
+        return;
+      }
+
+      if (!confirm(`Deseja cancelar o plano de testes e reverter "${_adminSelectedTargetUser.email}" para o plano Grátis?`)) {
+        return;
+      }
+
+      const token = (await _supabase?.auth?.getSession())?.data?.session?.access_token;
+      if (!token) {
+        alert('Sessão administrativa expirada.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/subscriptions?action=admin-assign', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            targetUserId: _adminSelectedTargetUser.id,
+            targetEmail: _adminSelectedTargetUser.email,
+            cancelPromotional: true
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'Erro no servidor.');
+
+        showToastNotification(`✓ Usuário revertido para o plano Grátis.`);
+        await logAdminAction('REVERT_PLAN', 'subscriptions', _adminSelectedTargetUser.id, { plan: 'free' });
+
+        const currentUid = getEffectiveUserId();
+        if (currentUid === _adminSelectedTargetUser.id) {
+          await FeatureGate.loadSubscription(currentUid);
+        }
+
+        adminSearchUserPlan();
+      } catch (err) {
+        alert('Falha ao reverter plano: ' + err.message);
+      }
+    }
+
+    // ==============================================================================
+    // FEATURE GATE - SISTEMA DE CONTROLE DE LIMITES E RECURSOS
+    // ==============================================================================
+    const FeatureGate = {
+      defaultSubscription: {
+        plan_code: 'free',
+        plan_name: 'Grátis',
+        status: 'active',
+        billing_cycle: 'free',
+        provider: 'manual',
+        current_period_start: new Date().toISOString(),
+        current_period_end: null,
+        features: {
+          workout_limit: true,
+          exercise_library: true,
+          gif_demonstrations: true,
+          sets_and_reps: true,
+          rest_timer: true,
+          multi_device_sync: true,
+          beginner_templates: true,
+          offline_mode: true
+        },
+        limits: {
+          workout_limit: 3,
+          history_days: 30
+        }
+      },
+
+      currentSubscription: null,
+
+      init() {
+        const cached = localStorage.getItem('titannovafit_subscription');
+        if (cached) {
+          try {
+            this.currentSubscription = JSON.parse(cached);
+          } catch (_) {
+            this.currentSubscription = { ...this.defaultSubscription };
+          }
+        } else {
+          this.currentSubscription = { ...this.defaultSubscription };
+        }
+      },
+
+      async loadSubscription(userId = null) {
+        const uid = userId || getEffectiveUserId();
+        if (!uid || uid === 'offline_user_local') {
+          this.init();
+          this.updateProfilePlanUI();
+          return this.currentSubscription;
+        }
+
+        try {
+          // 1. Tentar chamar a função segura get_my_subscription() via RPC
+          if (_supabase) {
+            try {
+              const { data, error } = await _supabase.rpc('get_my_subscription');
+              if (!error && data && data.plan_code) {
+                this.currentSubscription = data;
+                localStorage.setItem('titannovafit_subscription', JSON.stringify(data));
+                this.updateProfilePlanUI();
+                return data;
+              }
+            } catch (_) {}
+          }
+
+          // 2. Fallback via API segura /api/subscriptions
+          const token = (await _supabase?.auth?.getSession())?.data?.session?.access_token;
+          if (token) {
+            const res = await fetch('/api/subscriptions', {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) {
+              const resData = await res.json();
+              if (resData.subscription) {
+                this.currentSubscription = resData.subscription;
+                localStorage.setItem('titannovafit_subscription', JSON.stringify(resData.subscription));
+                this.updateProfilePlanUI();
+                return resData.subscription;
+              }
+            }
+          }
+        } catch (err) {
+          console.warn('[FeatureGate Notice]: Usando cache local para plano de assinatura:', err);
+        }
+
+        this.init();
+        this.updateProfilePlanUI();
+        return this.currentSubscription;
+      },
+
+      getPlanCode() {
+        return (this.currentSubscription?.plan_code || 'free').toLowerCase();
+      },
+
+      getPlanName() {
+        return this.currentSubscription?.plan_name || 'Grátis';
+      },
+
+      can(featureCode) {
+        if (!this.currentSubscription) this.init();
+        const code = this.getPlanCode();
+
+        // Plano Gold: tudo liberado (exceto recursos 'Em breve')
+        if (code === 'gold') {
+          if (featureCode === 'teacher_student_mode' || featureCode === 'smartwatch_integration') {
+            return false;
+          }
+          return true;
+        }
+
+        // Plano Prata: tudo de Bronze + assistente + gráficos + PRs + superséries
+        if (code === 'silver') {
+          const silverForbidden = ['advanced_assistant', 'full_reports', 'workout_sharing', 'priority_support', 'teacher_student_mode', 'smartwatch_integration'];
+          return !silverForbidden.includes(featureCode);
+        }
+
+        // Plano Bronze: tudo de Grátis + treinos ilimitados + histórico completo + exercícios próprios + sem anúncios
+        if (code === 'bronze') {
+          const bronzeAllowed = ['workout_limit', 'history_days', 'unlimited_history', 'exercise_library', 'gif_demonstrations', 'sets_and_reps', 'rest_timer', 'multi_device_sync', 'custom_exercises', 'beginner_templates', 'data_export', 'offline_mode', 'remove_ads'];
+          return bronzeAllowed.includes(featureCode);
+        }
+
+        // Plano Grátis (free)
+        if (this.currentSubscription?.features && typeof this.currentSubscription.features[featureCode] !== 'undefined') {
+          return Boolean(this.currentSubscription.features[featureCode]);
+        }
+
+        const freeAllowed = ['exercise_library', 'gif_demonstrations', 'sets_and_reps', 'rest_timer', 'multi_device_sync', 'beginner_templates', 'offline_mode'];
+        return freeAllowed.includes(featureCode);
+      },
+
+      getLimit(featureCode) {
+        if (!this.currentSubscription) this.init();
+        const code = this.getPlanCode();
+        if (code !== 'free') return null; // ilimitado para Bronze, Prata e Gold
+        return this.currentSubscription?.limits?.[featureCode] ?? (featureCode === 'workout_limit' ? 3 : (featureCode === 'history_days' ? 30 : null));
+      },
+
+      canCreateWorkout(additionalCount = 1) {
+        const limit = this.getLimit('workout_limit');
+        if (limit === null) {
+          return { allowed: true, currentCount: allWorkoutsList.length, limit: null, message: 'Fichas ilimitadas liberadas no seu plano.' };
+        }
+
+        const currentCount = Array.isArray(allWorkoutsList) ? allWorkoutsList.length : 0;
+        if (currentCount + additionalCount > limit) {
+          return {
+            allowed: false,
+            currentCount,
+            limit,
+            message: `Seu plano Grátis permite até ${limit} fichas de treino. Você já possui ${currentCount} fichas criadas. Faça upgrade para o plano Bronze ou superior para criar fichas ilimitadas.`
+          };
+        }
+
+        return {
+          allowed: true,
+          currentCount,
+          limit,
+          message: `Você possui ${currentCount} de ${limit} fichas utilizadas.`
+        };
+      },
+
+      updateProfilePlanUI() {
+        const planCode = this.getPlanCode();
+        const badgeEl = document.getElementById('profilePlanBadge');
+        const emojiEl = document.getElementById('profilePlanEmoji');
+        const statusEl = document.getElementById('profilePlanStatus');
+        const countEl = document.getElementById('profilePlanWorkoutCount');
+        const renewalEl = document.getElementById('profilePlanRenewal');
+
+        const currentCount = Array.isArray(allWorkoutsList) ? allWorkoutsList.length : 0;
+        const limit = this.getLimit('workout_limit');
+
+        if (countEl) {
+          countEl.innerText = limit === null ? `${currentCount} fichas (Ilimitadas)` : `${currentCount} / ${limit} fichas`;
+        }
+
+        if (statusEl) {
+          const st = this.currentSubscription?.status || 'active';
+          statusEl.innerText = st === 'active' ? 'Ativo' : (st === 'trialing' ? 'Período de Teste' : st);
+          statusEl.style.color = st === 'active' ? 'var(--success-green)' : '#ffa726';
+        }
+
+        if (renewalEl) {
+          const end = this.currentSubscription?.current_period_end;
+          if (end) {
+            try {
+              renewalEl.innerText = new Date(end).toLocaleDateString('pt-BR');
+            } catch (_) {
+              renewalEl.innerText = end;
+            }
+          } else {
+            renewalEl.innerText = planCode === 'free' ? 'Acesso Permanente' : 'Vitalício / Teste';
+          }
+        }
+
+        if (badgeEl && emojiEl) {
+          if (planCode === 'gold') {
+            emojiEl.innerText = '👑';
+            badgeEl.innerText = 'Plano Gold';
+            badgeEl.style.background = 'rgba(255, 215, 0, 0.18)';
+            badgeEl.style.color = '#ffd700';
+            badgeEl.style.borderColor = 'rgba(255, 215, 0, 0.4)';
+          } else if (planCode === 'silver') {
+            emojiEl.innerText = '🥈';
+            badgeEl.innerText = 'Plano Prata';
+            badgeEl.style.background = 'rgba(0, 210, 255, 0.18)';
+            badgeEl.style.color = 'var(--accent-cyan)';
+            badgeEl.style.borderColor = 'var(--border-cyan)';
+          } else if (planCode === 'bronze') {
+            emojiEl.innerText = '🥉';
+            badgeEl.innerText = 'Plano Bronze';
+            badgeEl.style.background = 'rgba(205, 127, 50, 0.18)';
+            badgeEl.style.color = '#cd7f32';
+            badgeEl.style.borderColor = 'rgba(205, 127, 50, 0.4)';
+          } else {
+            emojiEl.innerText = '🌱';
+            badgeEl.innerText = 'Plano Grátis';
+            badgeEl.style.background = 'rgba(255, 255, 255, 0.08)';
+            badgeEl.style.color = 'var(--text-grey)';
+            badgeEl.style.borderColor = 'var(--divider)';
+          }
+        }
+      }
+    };
+
+    // Modal de Upgrade de Plano
+    function openUpgradePlanModal(featureCode = 'workout_limit', customMsg = '') {
+      const modal = document.getElementById('modalUpgradePlan');
+      const titleEl = document.getElementById('upgradeModalTitle');
+      const msgEl = document.getElementById('upgradeModalMessage');
+      const emojiEl = document.getElementById('upgradeModalEmoji');
+      const badgeEl = document.getElementById('upgradeModalBadge');
+
+      if (featureCode === 'workout_limit') {
+        if (emojiEl) emojiEl.innerText = '📋';
+        if (badgeEl) badgeEl.innerText = 'Limite de Fichas de Treino';
+        if (titleEl) titleEl.innerText = 'Limite de 3 Fichas Atingido';
+        if (msgEl) msgEl.innerText = customMsg || 'Seu plano Grátis permite até 3 fichas de treino. Faça upgrade para o plano Bronze ou superior para criar fichas ilimitadas e manter seu histórico vitalício.';
+      } else if (featureCode === 'custom_exercises') {
+        if (emojiEl) emojiEl.innerText = '🏋️‍♂️';
+        if (badgeEl) badgeEl.innerText = 'Exercícios Próprios';
+        if (titleEl) titleEl.innerText = 'Exercícios Personalizados';
+        if (msgEl) msgEl.innerText = customMsg || 'Cadastrar seus próprios exercícios personalizados é um recurso exclusivo dos planos Bronze, Prata e Gold. Faça upgrade para liberar sua biblioteca própria.';
+      } else if (featureCode === 'advanced_charts' || featureCode === 'personal_records') {
+        if (emojiEl) emojiEl.innerText = '📈';
+        if (badgeEl) badgeEl.innerText = 'Sobrecarga Progressiva';
+        if (titleEl) titleEl.innerText = 'Gráficos & Recordes Pessoais';
+        if (msgEl) msgEl.innerText = customMsg || 'Os gráficos analíticos de carga máxima, volume total e detecção de PRs fazem parte dos planos Prata e Gold. Descubra sua evolução!';
+      } else {
+        if (emojiEl) emojiEl.innerText = '⭐';
+        if (badgeEl) badgeEl.innerText = 'Recurso Exclusivo';
+        if (titleEl) titleEl.innerText = 'Desbloqueie este Recurso';
+        if (msgEl) msgEl.innerText = customMsg || 'Este recurso está disponível nos planos pagos do TitanNova Fit. Conheça nossos planos e acelere seus resultados!';
+      }
+
+      if (modal) {
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+      }
+    }
+
+    function closeUpgradePlanModal() {
+      const modal = document.getElementById('modalUpgradePlan');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+      }
+    }
+
+    async function restoreUserPurchases() {
+      showToastNotification('🔄 Consultando assinaturas na nuvem...');
+      try {
+        const uid = getEffectiveUserId();
+        await FeatureGate.loadSubscription(uid);
+        showToastNotification(`✓ Plano atualizado: ${FeatureGate.getPlanName()}`);
+      } catch (err) {
+        showToastNotification('Erro ao restaurar assinatura.');
       }
     }
 
@@ -4267,6 +4929,11 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       const adminPanel = document.getElementById('adminPanelCard');
       if (adminPanel) {
         adminPanel.style.display = isAdmin ? 'block' : 'none';
+      }
+
+      // Atualizar card de planos na tela de perfil
+      if (typeof FeatureGate !== 'undefined') {
+        FeatureGate.updateProfilePlanUI();
       }
     }
 
@@ -8025,6 +8692,14 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
     let _currentPreviewTemplate = null;
 
     function openCreateWorkoutModal() {
+      if (typeof FeatureGate !== 'undefined') {
+        const check = FeatureGate.canCreateWorkout(1);
+        if (!check.allowed) {
+          openUpgradePlanModal('workout_limit', check.message);
+          return;
+        }
+      }
+
       _wizardState = {
         step: 1,
         goal: 'Hipertrofia',
@@ -8465,6 +9140,14 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         };
       });
 
+      if (typeof FeatureGate !== 'undefined') {
+        const check = FeatureGate.canCreateWorkout(newWorkouts.length);
+        if (!check.allowed) {
+          openUpgradePlanModal('workout_limit', check.message);
+          return;
+        }
+      }
+
       allWorkoutsList.unshift(...newWorkouts);
 
       // Salvar imediatamente no localStorage
@@ -8660,6 +9343,14 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         exerciciosCount: newWorkoutExercises.length,
         criadoEm: new Date().toISOString()
       };
+
+      if (typeof FeatureGate !== 'undefined') {
+        const check = FeatureGate.canCreateWorkout(1);
+        if (!check.allowed) {
+          openUpgradePlanModal('workout_limit', check.message);
+          return;
+        }
+      }
 
       allWorkoutsList.unshift(newWorkout);
 
@@ -11308,6 +11999,15 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       TitanNovaOfflineSync.scheduleAutoRetry(userId);
       await TitanNovaOfflineSync.flushQueue(userId);
 
+      // 6.1. Carregar plano e limites ativos da assinatura
+      try {
+        if (typeof FeatureGate !== 'undefined') {
+          await FeatureGate.loadSubscription(userId);
+        }
+      } catch (subErr) {
+        console.warn('[Assinatura Load Notice]:', subErr);
+      }
+
       // 7. Atualizar todos os conteúdos da página imediatamente
       updateHomeScreenUI();
       renderAllWorkoutsUI();
@@ -11333,6 +12033,9 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
         if (navEl) navEl.style.display = 'flex';
         loadWorkoutsFromStorage(true);
         loadHistoryFromStorage(true);
+        if (typeof FeatureGate !== 'undefined') {
+          FeatureGate.init();
+        }
         updateProfileUI();
         switchTab('screenWorkouts');
         showSyncStatus('pending_offline');
@@ -11577,6 +12280,16 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
           restoreActiveSessionFromStorage();
         }
         updateHomeScreenUI();
+      }
+    });
+
+    // Ajuste de links de planos para ambientes locais ou Vercel
+    document.addEventListener('DOMContentLoaded', () => {
+      const isLocal = (window.location.protocol === 'file:' || window.location.port !== '' || window.location.pathname.endsWith('.html'));
+      if (isLocal) {
+        document.querySelectorAll('a.app-planos-link').forEach(link => {
+          link.setAttribute('href', 'planos.html');
+        });
       }
     });
   </script>

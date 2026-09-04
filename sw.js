@@ -1,8 +1,9 @@
-const CACHE_NAME = 'titannova-fit-v3.0.0';
+const CACHE_NAME = 'titannova-fit-v3.1.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './app.html',
+  './planos.html',
   './manifest.json',
   './sw.js',
   './exercises_seed.js',
@@ -48,7 +49,9 @@ self.addEventListener('fetch', (event) => {
                         (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html')) ||
                         event.request.url.endsWith('index.html') ||
                         event.request.url.endsWith('app.html') ||
+                        event.request.url.endsWith('planos.html') ||
                         event.request.url.includes('/app') ||
+                        event.request.url.includes('/planos') ||
                         event.request.url.endsWith('/');
 
   if (isHtmlRequest) {
