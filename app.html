@@ -2983,34 +2983,23 @@
     </div>
   </div>
 
-  <!-- MODAL DE UPGRADE / CONTROLE DE RECURSOS (FEATURE GATE) -->
+  <!-- MODAL DE RECURSO BLOQUEADO (FEATURE GATE) -->
   <div id="modalUpgradePlan" class="modal-overlay" style="z-index: 100003;">
-    <div class="modal-card" style="max-width: 460px; width: 95%; text-align: center; padding: 26px 20px; background: radial-gradient(circle at 50% 0%, #152538 0%, #0d1017 80%); border: 2px solid var(--accent-cyan); border-radius: 24px; box-shadow: 0 0 50px rgba(0,210,255,0.35);">
-      <div style="font-size: 42px; margin-bottom: 8px;" id="upgradeModalEmoji">⭐</div>
-      <span style="font-size: 11px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 1px; text-transform: uppercase;" id="upgradeModalBadge">Recurso Exclusivo</span>
-      <h2 id="upgradeModalTitle" style="font-size: 20px; font-weight: 900; color: white; margin: 4px 0 10px 0;">Limite de Fichas Atingido</h2>
+    <div class="modal-card" style="max-width: 440px; width: 92%; text-align: center; padding: 26px 22px; background: radial-gradient(circle at 50% 0%, #152538 0%, #0d1017 85%); border: 2px solid var(--accent-cyan); border-radius: 24px; box-shadow: 0 0 45px rgba(0,210,255,0.3);">
+      <div style="font-size: 38px; margin-bottom: 6px;" id="upgradeModalEmoji">🔒</div>
+      <span style="font-size: 11px; font-weight: 800; color: var(--accent-cyan); letter-spacing: 1px; text-transform: uppercase;" id="upgradeModalBadge">Recurso do Plano</span>
+      <h2 id="upgradeModalTitle" style="font-size: 19px; font-weight: 800; color: white; margin: 8px 0 10px 0;">Este recurso está disponível no plano Prata.</h2>
       
-      <p id="upgradeModalMessage" style="font-size: 13px; color: var(--text-grey); line-height: 1.5; margin-bottom: 18px;">
-        Seu plano Grátis permite até 3 fichas de treino. Faça upgrade para o plano Bronze ou superior para criar fichas ilimitadas.
+      <p id="upgradeModalMessage" style="font-size: 13.5px; color: var(--text-grey); line-height: 1.5; margin-bottom: 22px;">
+        Veja os recursos do plano antes de decidir.
       </p>
 
-      <!-- Comparativo Rápido do Benefício -->
-      <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--divider); border-radius: 14px; padding: 14px; text-align: left; margin-bottom: 20px;">
-        <div style="font-size: 11.5px; font-weight: 800; color: white; margin-bottom: 8px;">Benefícios ao Fazer Upgrade:</div>
-        <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--text-grey);">
-          <div style="display: flex; align-items: center; gap: 8px;"><span style="color: var(--accent-green); font-weight: 800;">✓</span> <span>Fichas de treino <strong>ilimitadas</strong></span></div>
-          <div style="display: flex; align-items: center; gap: 8px;"><span style="color: var(--accent-green); font-weight: 800;">✓</span> <span>Histórico <strong>vitalício e completo</strong></span></div>
-          <div style="display: flex; align-items: center; gap: 8px;"><span style="color: var(--accent-green); font-weight: 800;">✓</span> <span>Gráficos de sobrecarga e <strong>Recordes Pessoais (PRs)</strong></span></div>
-          <div style="display: flex; align-items: center; gap: 8px;"><span style="color: var(--accent-green); font-weight: 800;">✓</span> <span>Exercícios personalizados e <strong>zero anúncios</strong></span></div>
-        </div>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        <a href="/planos" class="btn btn-primary app-planos-link" style="padding: 12px; font-size: 13.5px; font-weight: 800; text-decoration: none; text-align: center;">
-          🚀 Conhecer Planos a partir de R$ 7,90/mês
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <a href="/planos" class="btn btn-primary app-planos-link" style="padding: 12px; font-size: 14px; font-weight: 800; text-decoration: none; text-align: center; border-radius: 12px;">
+          Ver planos
         </a>
-        <button type="button" onclick="closeUpgradePlanModal()" class="btn btn-text" style="font-size: 12px; color: var(--text-grey); cursor: pointer;">
-          Continuar com Plano Atual
+        <button type="button" onclick="closeUpgradePlanModal()" class="btn btn-outline" style="padding: 10px; font-size: 13px; color: var(--text-grey); cursor: pointer; border-radius: 12px;">
+          Agora não
         </button>
       </div>
     </div>
@@ -3769,35 +3758,53 @@ CREATE POLICY "Permitir leitura de usuarios para admin e autenticados" ON public
       }
     };
 
-    // Modal de Upgrade de Plano
-    function openUpgradePlanModal(featureCode = 'workout_limit', customMsg = '') {
+    // ==============================================================================
+    // FUNÇÃO CENTRAL DE PERMISSÃO DE PLANOS (hasPlanFeature)
+    // ==============================================================================
+    async function hasPlanFeature(featureKey) {
+      if (!_supabase) return FeatureGate.can(featureKey);
+      try {
+        const uid = getEffectiveUserId();
+        if (!uid || uid === 'offline_user_local') {
+          return FeatureGate.can(featureKey);
+        }
+        // Consultar o servidor através da RPC can_use_feature
+        const { data, error } = await _supabase.rpc('can_use_feature', {
+          p_user_id: uid,
+          p_feature_key: featureKey
+        });
+        if (!error && typeof data === 'boolean') {
+          return data;
+        }
+      } catch (err) {
+        console.warn('[hasPlanFeature Notice]: Fallback local:', err);
+      }
+      return FeatureGate.can(featureKey);
+    }
+    window.hasPlanFeature = hasPlanFeature;
+
+    // Modal de Recurso Bloqueado
+    function openUpgradePlanModal(targetPlanOrFeature = 'Prata', customMsg = '') {
       const modal = document.getElementById('modalUpgradePlan');
       const titleEl = document.getElementById('upgradeModalTitle');
       const msgEl = document.getElementById('upgradeModalMessage');
-      const emojiEl = document.getElementById('upgradeModalEmoji');
       const badgeEl = document.getElementById('upgradeModalBadge');
 
-      if (featureCode === 'workout_limit') {
-        if (emojiEl) emojiEl.innerText = '📋';
-        if (badgeEl) badgeEl.innerText = 'Limite de Fichas de Treino';
-        if (titleEl) titleEl.innerText = 'Limite de 3 Fichas Atingido';
-        if (msgEl) msgEl.innerText = customMsg || 'Seu plano Grátis permite até 3 fichas de treino. Faça upgrade para o plano Bronze ou superior para criar fichas ilimitadas e manter seu histórico vitalício.';
-      } else if (featureCode === 'custom_exercises') {
-        if (emojiEl) emojiEl.innerText = '🏋️‍♂️';
-        if (badgeEl) badgeEl.innerText = 'Exercícios Próprios';
-        if (titleEl) titleEl.innerText = 'Exercícios Personalizados';
-        if (msgEl) msgEl.innerText = customMsg || 'Cadastrar seus próprios exercícios personalizados é um recurso exclusivo dos planos Bronze, Prata e Gold. Faça upgrade para liberar sua biblioteca própria.';
-      } else if (featureCode === 'advanced_charts' || featureCode === 'personal_records') {
-        if (emojiEl) emojiEl.innerText = '📈';
-        if (badgeEl) badgeEl.innerText = 'Sobrecarga Progressiva';
-        if (titleEl) titleEl.innerText = 'Gráficos & Recordes Pessoais';
-        if (msgEl) msgEl.innerText = customMsg || 'Os gráficos analíticos de carga máxima, volume total e detecção de PRs fazem parte dos planos Prata e Gold. Descubra sua evolução!';
-      } else {
-        if (emojiEl) emojiEl.innerText = '⭐';
-        if (badgeEl) badgeEl.innerText = 'Recurso Exclusivo';
-        if (titleEl) titleEl.innerText = 'Desbloqueie este Recurso';
-        if (msgEl) msgEl.innerText = customMsg || 'Este recurso está disponível nos planos pagos do TitanNova Fit. Conheça nossos planos e acelere seus resultados!';
+      let planName = 'Prata';
+      if (typeof targetPlanOrFeature === 'string') {
+        const lower = targetPlanOrFeature.toLowerCase();
+        if (lower === 'bronze' || lower === 'workout_limit' || lower === 'unlimited_workouts') {
+          planName = 'Bronze';
+        } else if (lower === 'gold') {
+          planName = 'Gold';
+        } else {
+          planName = 'Prata';
+        }
       }
+
+      if (badgeEl) badgeEl.innerText = `Plano ${planName}`;
+      if (titleEl) titleEl.innerText = `Este recurso está disponível no plano ${planName}.`;
+      if (msgEl) msgEl.innerText = customMsg || `Veja os recursos do plano antes de decidir.`;
 
       if (modal) {
         modal.classList.add('active');

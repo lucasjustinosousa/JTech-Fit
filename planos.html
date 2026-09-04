@@ -552,175 +552,228 @@
         Comece gratuitamente com tudo o que é essencial ou desbloqueie fichas ilimitadas, gráficos de sobrecarga progressiva e assistência de ponta.
       </p>
 
-      <!-- Toggle Mensal / Anual -->
-      <div class="billing-toggle-container">
-        <span style="font-size: 13.5px; font-weight: 700; color: var(--text-grey);">Mensal</span>
-        <div class="billing-toggle">
-          <button id="btnMonthly" class="active" onclick="setBillingCycle('monthly')">Mensal</button>
-          <button id="btnAnnual" onclick="setBillingCycle('annual')">Anual</button>
-        </div>
-        <div class="discount-pill">
-          🎉 Economize até 27% no Anual
-        </div>
+      <div class="plans-age-alert" style="background: rgba(0, 210, 255, 0.05); border: 1px solid rgba(0, 210, 255, 0.2); border-radius: 14px; padding: 14px 20px; font-size: 13px; color: var(--text-grey); text-align: center; margin: 20px auto 30px auto; max-width: 650px;">
+        <span>ℹ️ <strong>Aviso legal:</strong> Se você tem menos de 18 anos, confirme a contratação com seu responsável legal.</span>
       </div>
     </section>
 
     <!-- CARDS DOS 4 PLANOS -->
     <section class="plans-grid">
       <!-- 1. GRÁTIS -->
-      <div class="plan-card" id="cardPlanFree">
+      <div class="plan-card" id="cardPlanFree" style="border-color: rgba(0, 210, 255, 0.3);">
         <div class="current-plan-badge" id="badgeCurrentFree">Seu plano atual</div>
         <div class="plan-header">
           <div class="plan-name">
-            <span>Grátis</span>
+            <span style="color: var(--accent-cyan);">Grátis</span>
             <span style="font-size: 20px;">🌱</span>
           </div>
-          <p class="plan-desc">O essencial para registrar treinos diários e cronometrar descansos com praticidade.</p>
+          <p class="plan-desc">Recursos essenciais para começar a organizar seus treinos.</p>
         </div>
 
         <div class="plan-price-wrapper">
-          <div class="plan-price">
-            <span class="currency">R$</span>
-            <span id="priceFree">0</span>
-            <span class="period">/mês</span>
+          <div class="plan-price" style="font-size: 24px; color: var(--accent-cyan);">
+            Em breve
           </div>
-          <div class="plan-price-sub" id="subFree">Acesso 100% gratuito para sempre</div>
+          <div class="plan-price-sub" id="subFree">Acesso gratuito para começar</div>
         </div>
 
         <ul class="features-list">
+          <li><span class="icon check">✓</span> <span>Cadastro e login</span></li>
+          <li><span class="icon check">✓</span> <span>Sincronização básica na nuvem</span></li>
+          <li><span class="icon check">✓</span> <span>Acesso em diferentes aparelhos</span></li>
           <li><span class="icon check">✓</span> <span>Até <strong>3 fichas de treino</strong></span></li>
-          <li><span class="icon check">✓</span> <span>Biblioteca com <strong>1.500+ exercícios</strong></span></li>
-          <li><span class="icon check">✓</span> <span>GIFs demonstrativos em HD</span></li>
-          <li><span class="icon check">✓</span> <span>Séries, cargas, reps e timer de descanso</span></li>
-          <li><span class="icon check">✓</span> <span>Histórico de <strong>30 dias</strong></span></li>
-          <li><span class="icon check">✓</span> <span>Sincronização entre aparelhos</span></li>
-          <li><span class="icon check">✓</span> <span>Modo offline com auto-recuperação</span></li>
-          <li class="disabled"><span class="icon cross">✗</span> <span>Fichas de treino ilimitadas</span></li>
-          <li class="disabled"><span class="icon cross">✗</span> <span>Exercícios personalizados</span></li>
-          <li class="disabled"><span class="icon cross">✗</span> <span>Gráficos avançados e PRs</span></li>
-          <li class="disabled"><span class="icon cross">✗</span> <span>Experiência sem anúncios</span></li>
+          <li><span class="icon check">✓</span> <span>Biblioteca completa de exercícios</span></li>
+          <li><span class="icon check">✓</span> <span>GIFs demonstrativos</span></li>
+          <li><span class="icon check">✓</span> <span>Exercícios personalizados</span></li>
+          <li><span class="icon check">✓</span> <span>Registro de séries, repetições e carga</span></li>
+          <li><span class="icon check">✓</span> <span>Cronômetro de descanso</span></li>
+          <li><span class="icon check">✓</span> <span>Histórico dos últimos 30 dias</span></li>
+          <li><span class="icon check">✓</span> <span>Modelos para iniciantes</span></li>
+          <li><span class="icon check">✓</span> <span>Tema escuro</span></li>
+          <li><span class="icon check">✓</span> <span>Funcionamento offline básico</span></li>
+          <li><span class="icon check">✓</span> <span>Exportação dos próprios dados</span></li>
+          <li><span class="icon check">✓</span> <span>Exclusão da conta</span></li>
+          <li><span class="icon check">✓</span> <span>Configurações de privacidade</span></li>
         </ul>
 
-        <button class="plan-action-btn" disabled>
-          <span>Plano Inicial Gratuito</span>
-          <span class="plan-action-subtext">Incluso em todas as contas</span>
-        </button>
+        <a href="/app" class="plan-action-btn" style="text-align: center; text-decoration: none; display: flex; align-items: center; justify-content: center; background: var(--accent-blue); color: #fff; cursor: pointer;">
+          <span>Começar gratuitamente</span>
+        </a>
       </div>
 
       <!-- 2. BRONZE -->
-      <div class="plan-card" id="cardPlanBronze">
+      <div class="plan-card" id="cardPlanBronze" style="border-color: rgba(205, 127, 50, 0.4);">
+        <div class="plan-badge-tag" style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #CD7F32; color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase;">Para quem treina regularmente</div>
         <div class="current-plan-badge" id="badgeCurrentBronze">Seu plano atual</div>
         <div class="plan-header">
           <div class="plan-name">
-            <span>Bronze</span>
+            <span style="color: #CD7F32;">Bronze</span>
             <span style="font-size: 20px;">🥉</span>
           </div>
-          <p class="plan-desc">Treinos ilimitados, histórico completo e exercícios próprios sem anúncios.</p>
+          <p class="plan-desc">Mais liberdade para montar e acompanhar sua rotina.</p>
         </div>
 
         <div class="plan-price-wrapper">
-          <div class="plan-price">
-            <span class="currency">R$</span>
-            <span id="priceBronze">7,90</span>
-            <span class="period" id="periodBronze">/mês</span>
+          <div class="plan-price" style="font-size: 24px; color: #CD7F32;">
+            Em breve
           </div>
-          <div class="plan-price-sub" id="subBronze">Cobrado mensalmente</div>
+          <div class="plan-price-sub" id="subBronze">Valores serão divulgados em breve</div>
         </div>
 
         <ul class="features-list">
-          <li><span class="icon check">✓</span> <span>Tudo do plano Grátis</span></li>
+          <li style="color: #fff; font-weight: 700;">Tudo do plano Grátis, mais:</li>
           <li><span class="icon check">✓</span> <span><strong>Fichas de treino ilimitadas</strong></span></li>
-          <li><span class="icon check">✓</span> <span><strong>Histórico completo</strong> (sem limite de 30 dias)</span></li>
-          <li><span class="icon check">✓</span> <span><strong>Exercícios personalizados</strong></span></li>
-          <li><span class="icon check">✓</span> <span>Treinos prontos para iniciantes</span></li>
-          <li><span class="icon check">✓</span> <span>Exportação de dados (CSV / JSON)</span></li>
-          <li><span class="icon check">✓</span> <span>Offline completo</span></li>
-          <li><span class="icon check">✓</span> <span><strong>Zero anúncios</strong></span></li>
-          <li class="disabled"><span class="icon cross">✗</span> <span>Assistente de montagem de treinos</span></li>
-          <li class="disabled"><span class="icon cross">✗</span> <span>Gráficos de evolução e PRs</span></li>
+          <li><span class="icon check">✓</span> <span><strong>Histórico completo</strong></span></li>
+          <li><span class="icon check">✓</span> <span>Favoritos ilimitados</span></li>
+          <li><span class="icon check">✓</span> <span>Assistente de montagem completo</span></li>
+          <li><span class="icon check">✓</span> <span>Modelos para iniciante e intermediário</span></li>
+          <li><span class="icon check">✓</span> <span>Filtros avançados na biblioteca</span></li>
+          <li><span class="icon check">✓</span> <span>Duplicação de fichas</span></li>
+          <li><span class="icon check">✓</span> <span>Notas por exercício</span></li>
+          <li><span class="icon check">✓</span> <span>Séries de aquecimento</span></li>
+          <li><span class="icon check">✓</span> <span>Tipos diferentes de série</span></li>
+          <li><span class="icon check">✓</span> <span>Cronômetros personalizados</span></li>
+          <li><span class="icon check">✓</span> <span>Exportação CSV e JSON</span></li>
+          <li><span class="icon check">✓</span> <span>Sincronização offline completa</span></li>
+          <li><span class="icon check">✓</span> <span>Sem publicidade</span></li>
         </ul>
 
-        <button class="plan-action-btn" disabled>
-          <span>Assinaturas em breve</span>
-          <span class="plan-action-subtext">Integração de pagamento em andamento</span>
+        <button class="plan-action-btn" onclick="alert('O Plano Bronze estará disponível para contratação em breve!\n\nNo momento, utilize todos os recursos essenciais do Plano Grátis.');" style="cursor: pointer; border: 1px solid #CD7F32; color: #CD7F32; background: transparent;">
+          <span>Escolher Bronze</span>
         </button>
       </div>
 
       <!-- 3. PRATA (Mais Escolhido) -->
-      <div class="plan-card featured" id="cardPlanSilver">
-        <div class="featured-badge">🔥 Mais Escolhido</div>
+      <div class="plan-card featured" id="cardPlanSilver" style="border-color: #C0C0C0; background: linear-gradient(180deg, rgba(192, 192, 192, 0.08) 0%, rgba(20, 24, 33, 0.95) 100%);">
+        <div class="featured-badge" style="background: #C0C0C0; color: #0c0e14; font-weight: 800;">Mais escolhido</div>
         <div class="current-plan-badge" id="badgeCurrentSilver">Seu plano atual</div>
         <div class="plan-header">
           <div class="plan-name">
-            <span style="color: var(--accent-cyan);">Prata</span>
+            <span style="color: #E0E0E0;">Prata</span>
             <span style="font-size: 20px;">🥈</span>
           </div>
-          <p class="plan-desc">Assistente de treinos, gráficos de sobrecarga progressiva, PRs e superséries.</p>
+          <p class="plan-desc">Acompanhamento avançado para entender sua evolução.</p>
         </div>
 
         <div class="plan-price-wrapper">
-          <div class="plan-price">
-            <span class="currency">R$</span>
-            <span id="priceSilver">14,90</span>
-            <span class="period" id="periodSilver">/mês</span>
+          <div class="plan-price" style="font-size: 24px; color: #E0E0E0;">
+            Em breve
           </div>
-          <div class="plan-price-sub" id="subSilver">Cobrado mensalmente</div>
+          <div class="plan-price-sub" id="subSilver">Valores serão divulgados em breve</div>
         </div>
 
         <ul class="features-list">
-          <li><span class="icon check">✓</span> <span>Tudo do plano Bronze</span></li>
-          <li><span class="icon check">✓</span> <span><strong>Assistente de montagem</strong> de treinos</span></li>
-          <li><span class="icon check">✓</span> <span>Treinos prontos para todos os níveis</span></li>
-          <li><span class="icon check">✓</span> <span><strong>Gráficos avançados</strong> de sobrecarga</span></li>
-          <li><span class="icon check">✓</span> <span>Detecção de <strong>Recordes Pessoais (PRs)</strong></span></li>
-          <li><span class="icon check">✓</span> <span>Comparação de treinos</span></li>
-          <li><span class="icon check">✓</span> <span>Superséries e drop sets</span></li>
-          <li><span class="icon check">✓</span> <span>Medidas e fotos corporais privadas</span></li>
-          <li><span class="icon check">✓</span> <span>Relatório mensal de constância</span></li>
+          <li style="color: #fff; font-weight: 700;">Tudo do Bronze, mais:</li>
+          <li><span class="icon check">✓</span> <span><strong>Gráficos avançados</strong></span></li>
+          <li><span class="icon check">✓</span> <span>Evolução por exercício</span></li>
+          <li><span class="icon check">✓</span> <span>Evolução de cargas e repetições</span></li>
+          <li><span class="icon check">✓</span> <span>Volume total registrado</span></li>
+          <li><span class="icon check">✓</span> <span>Séries semanais por grupo muscular</span></li>
+          <li><span class="icon check">✓</span> <span>Calendário completo</span></li>
+          <li><span class="icon check">✓</span> <span><strong>Recordes pessoais (PRs)</strong></span></li>
+          <li><span class="icon check">✓</span> <span>Relatório mensal</span></li>
+          <li><span class="icon check">✓</span> <span>Comparação com treino anterior</span></li>
+          <li><span class="icon check">✓</span> <span>Distribuição muscular</span></li>
+          <li><span class="icon check">✓</span> <span>Medidas corporais opcionais</span></li>
+          <li><span class="icon check">✓</span> <span>Fotos de progresso privadas</span></li>
+          <li><span class="icon check">✓</span> <span>Superséries</span></li>
+          <li><span class="icon check">✓</span> <span>RPE opcional</span></li>
+          <li><span class="icon check">✓</span> <span>Calculadora de anilhas</span></li>
+          <li><span class="icon check">✓</span> <span>Modelos intermediários e avançados</span></li>
+          <li><span class="icon check">✓</span> <span>Compartilhamento de resumo</span></li>
+          <li><span class="icon check">✓</span> <span>Backup aprimorado</span></li>
         </ul>
 
-        <button class="plan-action-btn active-choice" disabled>
-          <span>Assinaturas em breve</span>
-          <span class="plan-action-subtext" style="color: #fff;">Integração de pagamento em andamento</span>
+        <button class="plan-action-btn active-choice" onclick="alert('O Plano Prata estará disponível para contratação em breve!\n\nNo momento, utilize todos os recursos essenciais do Plano Grátis.');" style="cursor: pointer; background: #C0C0C0; color: #0c0e14; font-weight: 800; border: none;">
+          <span>Escolher Prata</span>
         </button>
       </div>
 
       <!-- 4. GOLD -->
-      <div class="plan-card" id="cardPlanGold">
+      <div class="plan-card" id="cardPlanGold" style="border-color: rgba(255, 215, 0, 0.4);">
+        <div class="plan-badge-tag" style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #FFD700; color: #0c0e14; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase;">Experiência completa</div>
         <div class="current-plan-badge" id="badgeCurrentGold">Seu plano atual</div>
         <div class="plan-header">
           <div class="plan-name">
-            <span style="color: #ffd700;">Gold</span>
+            <span style="color: #FFD700;">Gold</span>
             <span style="font-size: 20px;">👑</span>
           </div>
-          <p class="plan-desc">Assistência avançada, relatórios profundos de hipertrofia e suporte prioritário.</p>
+          <p class="plan-desc">Todos os recursos e acesso antecipado às novidades.</p>
         </div>
 
         <div class="plan-price-wrapper">
-          <div class="plan-price">
-            <span class="currency">R$</span>
-            <span id="priceGold">24,90</span>
-            <span class="period" id="periodGold">/mês</span>
+          <div class="plan-price" style="font-size: 24px; color: #FFD700;">
+            Em breve
           </div>
-          <div class="plan-price-sub" id="subGold">Cobrado mensalmente</div>
+          <div class="plan-price-sub" id="subGold">Valores serão divulgados em breve</div>
         </div>
 
         <ul class="features-list">
-          <li><span class="icon check">✓</span> <span>Tudo do plano Prata</span></li>
-          <li><span class="icon check">✓</span> <span><strong>Assistente avançado</strong> de treino</span></li>
-          <li><span class="icon check">✓</span> <span>Relatórios completos de evolução</span></li>
-          <li><span class="icon check">✓</span> <span>Compartilhamento de fichas</span></li>
-          <li><span class="icon check">✓</span> <span><strong>Suporte prioritário</strong></span></li>
-          <li><span class="icon coming">⏳</span> <span>Modo Professor & Aluno <span class="badge-soon">Em breve</span></span></li>
-          <li><span class="icon coming">⏳</span> <span>Integração com Relógios <span class="badge-soon">Em breve</span></span></li>
-          <li><span class="icon coming">⏳</span> <span>Novidades antecipadas</span></li>
+          <li style="color: #fff; font-weight: 700;">Tudo do Prata, mais:</li>
+          <li><span class="icon check">✓</span> <span>Todos os modelos disponíveis</span></li>
+          <li><span class="icon check">✓</span> <span>Assistente avançado de montagem</span></li>
+          <li><span class="icon check">✓</span> <span>Modelos completamente personalizados</span></li>
+          <li><span class="icon check">✓</span> <span>Relatórios avançados</span></li>
+          <li><span class="icon check">✓</span> <span>Compartilhamento por QR Code <span class="badge-soon" style="background: rgba(255, 167, 38, 0.2); color: #ffa726; border-color: #ffa726;">Em desenvolvimento</span></span></li>
+          <li><span class="icon check">✓</span> <span>Pastas de treino</span></li>
+          <li><span class="icon coming">⏳</span> <span>Recursos Professor e Aluno <span class="badge-soon">Disponível em breve</span></span></li>
+          <li><span class="icon coming">⏳</span> <span>Integração com Relógios <span class="badge-soon">Disponível em breve</span></span></li>
+          <li><span class="icon check">✓</span> <span>Acesso antecipado a novos recursos</span></li>
+          <li><span class="icon check">✓</span> <span>Personalização adicional</span></li>
+          <li><span class="icon check">✓</span> <span>Suporte prioritário</span></li>
+          <li><span class="icon check">✓</span> <span>Sem publicidade</span></li>
         </ul>
 
-        <button class="plan-action-btn" disabled>
-          <span>Assinaturas em breve</span>
-          <span class="plan-action-subtext">Integração de pagamento em andamento</span>
+        <button class="plan-action-btn" onclick="alert('O Plano Gold estará disponível para contratação em breve!\n\nNo momento, utilize todos os recursos essenciais do Plano Grátis.');" style="cursor: pointer; background: #FFD700; color: #0c0e14; font-weight: 800; border: none;">
+          <span>Escolher Gold</span>
         </button>
       </div>
+    </section>
+
+    <!-- TABELA COMPARATIVA COMPLETA -->
+    <section style="margin: 50px 0 40px 0;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h3 style="font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 8px;">Comparação Detalhada de Recursos</h3>
+        <p style="font-size: 13.5px; color: var(--text-grey);">Confira lado a lado todas as funcionalidades disponíveis em cada nível de acesso.</p>
+      </div>
+
+      <div style="overflow-x: auto; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 20px; padding: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.4);">
+        <table style="width: 100%; border-collapse: collapse; min-width: 650px; text-align: left;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--border-light);">
+              <th style="padding: 14px 18px; font-size: 13px; font-weight: 800; color: var(--text-grey); text-transform: uppercase;">Recurso</th>
+              <th style="padding: 14px 18px; font-size: 13px; font-weight: 800; text-align: center; color: var(--accent-cyan);">Grátis</th>
+              <th style="padding: 14px 18px; font-size: 13px; font-weight: 800; text-align: center; color: #CD7F32;">Bronze</th>
+              <th style="padding: 14px 18px; font-size: 13px; font-weight: 800; text-align: center; color: #E0E0E0; background: rgba(192, 192, 192, 0.05);">Prata</th>
+              <th style="padding: 14px 18px; font-size: 13px; font-weight: 800; text-align: center; color: #FFD700;">Gold</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Fichas de treino</strong></td><td style="text-align: center; padding: 12px 18px;">Até 3</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Ilimitadas</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700; background: rgba(192,192,192,0.03);">Ilimitadas</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Ilimitadas</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Biblioteca de exercícios</strong></td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700; background: rgba(192,192,192,0.03);">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Registro de séries e cargas</strong></td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700; background: rgba(192,192,192,0.03);">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Cronômetro</strong></td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td><td style="text-align: center; padding: 12px 18px;">Avançado</td><td style="text-align: center; padding: 12px 18px; background: rgba(192,192,192,0.03);">Avançado</td><td style="text-align: center; padding: 12px 18px;">Avançado</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Histórico</strong></td><td style="text-align: center; padding: 12px 18px;">30 dias</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Completo</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700; background: rgba(192,192,192,0.03);">Completo</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Completo</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Modelos</strong></td><td style="text-align: center; padding: 12px 18px;">Iniciante</td><td style="text-align: center; padding: 12px 18px;">Inic. e Intermed.</td><td style="text-align: center; padding: 12px 18px; background: rgba(192,192,192,0.03);">Todos</td><td style="text-align: center; padding: 12px 18px;">Todos</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Assistente de montagem</strong></td><td style="text-align: center; padding: 12px 18px;">Básico</td><td style="text-align: center; padding: 12px 18px;">Completo</td><td style="text-align: center; padding: 12px 18px; background: rgba(192,192,192,0.03);">Completo</td><td style="text-align: center; padding: 12px 18px;">Avançado</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Funcionamento offline</strong></td><td style="text-align: center; padding: 12px 18px;">Básico</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Completo</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700; background: rgba(192,192,192,0.03);">Completo</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Completo</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Gráficos básicos</strong></td><td style="text-align: center; padding: 12px 18px; color: #ef4444; font-weight: 700;">Não</td><td style="text-align: center; padding: 12px 18px;">Básicos</td><td style="text-align: center; padding: 12px 18px; background: rgba(192,192,192,0.03);">Avançados</td><td style="text-align: center; padding: 12px 18px;">Avançados</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Relatório mensal</strong></td><td style="text-align: center; padding: 12px 18px; color: #ef4444; font-weight: 700;">Não</td><td style="text-align: center; padding: 12px 18px; color: #ef4444; font-weight: 700;">Não</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700; background: rgba(192,192,192,0.03);">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Superséries</strong></td><td style="text-align: center; padding: 12px 18px; color: #ef4444; font-weight: 700;">Não</td><td style="text-align: center; padding: 12px 18px; color: #ef4444; font-weight: 700;">Não</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700; background: rgba(192,192,192,0.03);">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Calculadora de anilhas</strong></td><td style="text-align: center; padding: 12px 18px; color: #ef4444; font-weight: 700;">Não</td><td style="text-align: center; padding: 12px 18px; color: #ef4444; font-weight: 700;">Não</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700; background: rgba(192,192,192,0.03);">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>QR Code</strong></td><td style="text-align: center; padding: 12px 18px; color: #ef4444; font-weight: 700;">Não</td><td style="text-align: center; padding: 12px 18px; color: #ef4444; font-weight: 700;">Não</td><td style="text-align: center; padding: 12px 18px; color: #ef4444; font-weight: 700; background: rgba(192,192,192,0.03);">Não</td><td style="text-align: center; padding: 12px 18px;"><span style="font-size: 11px; padding: 3px 8px; border-radius: 6px; background: rgba(255,167,38,0.15); color: #ffa726;">Em breve</span></td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Professor e aluno</strong></td><td style="text-align: center; padding: 12px 18px; color: #ef4444; font-weight: 700;">Não</td><td style="text-align: center; padding: 12px 18px; color: #ef4444; font-weight: 700;">Não</td><td style="text-align: center; padding: 12px 18px; color: #ef4444; font-weight: 700; background: rgba(192,192,192,0.03);">Não</td><td style="text-align: center; padding: 12px 18px;"><span style="font-size: 11px; padding: 3px 8px; border-radius: 6px; background: rgba(255,167,38,0.15); color: #ffa726;">Em breve</span></td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Publicidade</strong></td><td style="text-align: center; padding: 12px 18px; color: var(--text-muted);">Poderá existir</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Não</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700; background: rgba(192,192,192,0.03);">Não</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Não</td></tr>
+            <tr style="border-bottom: 1px solid var(--border-light);"><td style="padding: 12px 18px;"><strong>Exportação de dados</strong></td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700; background: rgba(192,192,192,0.03);">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td></tr>
+            <tr><td style="padding: 12px 18px;"><strong>Exclusão da conta</strong></td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700; background: rgba(192,192,192,0.03);">Sim</td><td style="text-align: center; padding: 12px 18px; color: var(--accent-green); font-weight: 700;">Sim</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top: 18px; font-size: 12px; color: var(--text-muted); text-align: center; line-height: 1.6;">
+        🛡️ <strong>Garantia de Direitos Fundamentais:</strong> Exclusão da conta, Termos de Uso, Política de Privacidade, Configurações de privacidade, Correção de dados pessoais, Segurança da conta, Recuperação de senha e Exportação básica dos próprios dados são garantias invioláveis e nunca serão bloqueadas por nenhum plano.
+      </div>
+    </section>
     </section>
 
     <!-- FAQ SOBRE OS PLANOS -->

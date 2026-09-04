@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>TitanNova Fit | O Rastreador de Treinos Definitivo - Simplicidade, Foco e Alta Performance</title>
-  <meta name="description" content="TitanNova Fit é o rastreador de musculação definitivo: registro ágil de séries no padrão Hevy e Strong, cronômetro de descanso inteligente, biblioteca com mais de 1.500 exercícios, gráficos de sobrecarga progressiva e sincronização em nuvem com funcionamento 100% offline.">
-  <meta name="keywords" content="rastreador de treino, musculação, hipertrofia, registro de séries, hevy, strong, jefit, cronometro de descanso, sobrecarga progressiva, titan nova fit, academia">
+  <meta name="description" content="TitanNova Fit é o rastreador de musculação definitivo: registro ágil de séries de alta performance, cronômetro de descanso inteligente, biblioteca com mais de 1.500 exercícios, gráficos de sobrecarga progressiva e sincronização em nuvem com funcionamento 100% offline.">
+  <meta name="keywords" content="rastreador de treino, musculação, hipertrofia, registro de séries, progressao de carga, cronometro de descanso, sobrecarga progressiva, titan nova fit, academia">
   <meta name="author" content="TitanNova Fit">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://titannovafit.com.br/">
@@ -525,7 +525,255 @@
       line-height: 1.6;
     }
 
-    /* Comparison Section */
+    /* Plans Section */
+    .plans-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 1024px) {
+      .plans-grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .plans-grid-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .landing-plan-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 20px;
+      padding: 28px 22px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .landing-plan-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .landing-plan-card.plan-free {
+      border-color: rgba(0, 210, 255, 0.3);
+    }
+    .landing-plan-card.plan-free:hover {
+      box-shadow: 0 10px 30px rgba(0, 210, 255, 0.12);
+    }
+
+    .landing-plan-card.plan-bronze {
+      border-color: rgba(205, 127, 50, 0.35);
+    }
+    .landing-plan-card.plan-bronze:hover {
+      box-shadow: 0 10px 30px rgba(205, 127, 50, 0.15);
+    }
+
+    /* Prata: destaque visual equilibrado e legível */
+    .landing-plan-card.plan-silver {
+      border-color: #C0C0C0;
+      background: linear-gradient(180deg, rgba(192, 192, 192, 0.08) 0%, rgba(20, 24, 33, 0.95) 100%);
+      box-shadow: 0 8px 30px rgba(192, 192, 192, 0.1);
+    }
+    .landing-plan-card.plan-silver:hover {
+      box-shadow: 0 12px 35px rgba(192, 192, 192, 0.2);
+    }
+
+    .landing-plan-card.plan-gold {
+      border-color: rgba(255, 215, 0, 0.4);
+    }
+    .landing-plan-card.plan-gold:hover {
+      box-shadow: 0 10px 30px rgba(255, 215, 0, 0.18);
+    }
+
+    .plan-badge-tag {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .badge-bronze-tag {
+      background: #CD7F32;
+      color: #ffffff;
+    }
+
+    .badge-silver-tag {
+      background: #C0C0C0;
+      color: #0c0e14;
+    }
+
+    .badge-gold-tag {
+      background: #FFD700;
+      color: #0c0e14;
+    }
+
+    .plan-header {
+      margin-bottom: 16px;
+    }
+
+    .plan-name {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .plan-name.color-free { color: var(--accent-cyan); }
+    .plan-name.color-bronze { color: #CD7F32; }
+    .plan-name.color-silver { color: #E0E0E0; }
+    .plan-name.color-gold { color: #FFD700; }
+
+    .plan-desc {
+      font-size: 13px;
+      color: var(--text-grey);
+      line-height: 1.45;
+      min-height: 38px;
+    }
+
+    .plan-price-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .plan-price-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .plan-price-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .plan-features-ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 22px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      flex-grow: 1;
+    }
+
+    .plan-features-ul li {
+      font-size: 13px;
+      color: var(--text-grey);
+      line-height: 1.4;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .plan-features-ul li .check-icon {
+      color: var(--accent-green);
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .plan-tag-future {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(255, 167, 38, 0.15);
+      color: #ffa726;
+      border: 1px solid rgba(255, 167, 38, 0.3);
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    .btn-plan-action {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      display: inline-block;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+
+    .btn-plan-free {
+      background: var(--accent-blue);
+      color: #ffffff;
+      border: none;
+    }
+    .btn-plan-free:hover {
+      background: #1976D2;
+    }
+
+    .btn-plan-bronze {
+      background: transparent;
+      color: #CD7F32;
+      border: 1px solid #CD7F32;
+    }
+    .btn-plan-bronze:hover {
+      background: rgba(205, 127, 50, 0.12);
+    }
+
+    .btn-plan-silver {
+      background: #C0C0C0;
+      color: #0c0e14;
+      border: none;
+      font-weight: 800;
+    }
+    .btn-plan-silver:hover {
+      background: #d5d5d5;
+    }
+
+    .btn-plan-gold {
+      background: #FFD700;
+      color: #0c0e14;
+      border: none;
+      font-weight: 800;
+    }
+    .btn-plan-gold:hover {
+      background: #ffe234;
+    }
+
+    .plans-age-alert {
+      background: rgba(0, 210, 255, 0.05);
+      border: 1px solid rgba(0, 210, 255, 0.2);
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-size: 13px;
+      color: var(--text-grey);
+      text-align: center;
+      margin-bottom: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    /* Comparison Table in Plans */
     .comparison-table-wrapper {
       overflow-x: auto;
       background: var(--bg-card);
@@ -539,33 +787,21 @@
       width: 100%;
       border-collapse: collapse;
       text-align: left;
-      min-width: 600px;
+      min-width: 650px;
     }
 
     .comparison-table th,
     .comparison-table td {
-      padding: 16px 20px;
+      padding: 14px 18px;
       border-bottom: 1px solid var(--border-light);
     }
 
     .comparison-table th {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
       color: var(--text-grey);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-    }
-
-    .comparison-table th.highlight {
-      color: var(--accent-cyan);
-      background: rgba(0, 210, 255, 0.05);
-      border-radius: 12px 12px 0 0;
-    }
-
-    .comparison-table td.highlight {
-      background: rgba(0, 210, 255, 0.05);
-      font-weight: 700;
-      color: #ffffff;
     }
 
     .comparison-table tr:last-child td {
@@ -574,12 +810,96 @@
 
     .status-check {
       color: var(--accent-green);
-      font-weight: 900;
+      font-weight: 800;
     }
 
     .status-cross {
       color: #ef4444;
-      font-weight: 900;
+      font-weight: 800;
+    }
+
+    .plans-table-desktop {
+      display: block;
+    }
+
+    .plans-mobile-accordion {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .plans-table-desktop {
+        display: none;
+      }
+      .plans-mobile-accordion {
+        display: block;
+      }
+    }
+
+    .plans-accordion-details {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .plans-accordion-summary {
+      padding: 16px 20px;
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      font-size: 15px;
+      list-style: none;
+    }
+    .plans-accordion-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .plans-accordion-content {
+      padding: 16px 18px;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .plans-mobile-item-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .plans-mobile-item-title {
+      font-weight: 700;
+      font-size: 13px;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .plans-mobile-item-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .plans-mobile-item-col {
+      padding: 6px 4px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .plans-mobile-item-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 3px;
     }
 
     /* FAQ Section */
@@ -769,9 +1089,8 @@
 
       <ul class="nav-links">
         <li><a href="#funcionalidades">Funcionalidades</a></li>
-        <li><a href="#comparativo">Comparativo</a></li>
+        <li><a href="#planos">Planos</a></li>
         <li><a href="#exercicios">Exercícios</a></li>
-        <li><a href="/planos" class="planos-link" style="color: var(--accent-cyan); font-weight: 700;">Planos</a></li>
         <li><a href="#duvidas">Dúvidas</a></li>
       </ul>
 
@@ -796,7 +1115,7 @@
         </h1>
 
         <p class="lead">
-          Eleve seus treinos de musculação ao padrão Hevy e Strong. Registre séries, repetições, cargas e tempos de descanso com velocidade recorde. Sincronização em nuvem em tempo real e funcionamento 100% offline para treinar onde você quiser.
+          Eleve seus treinos de musculação ao mais alto nível de performance. Registre séries, repetições, cargas e tempos de descanso com velocidade recorde. Sincronização em nuvem em tempo real e funcionamento 100% offline para treinar onde você quiser.
         </p>
 
         <div class="hero-actions">
@@ -913,7 +1232,7 @@
           <!-- Feature 1 -->
           <div class="feature-card">
             <div class="feature-icon">⚡</div>
-            <h3>Registro Ágil no Padrão Hevy & Strong</h3>
+            <h3>Registro Ágil e Inteligente de Séries</h3>
             <p>
               Preencha cargas e repetições em segundos com botões de incremento rápido (+/-2.5kg, +/-1 rep). Classifique séries como Normal, Aquecimento, Preparação ou Drop set com cálculo automático de 1RM estimada.
             </p>
@@ -967,78 +1286,509 @@
       </div>
     </section>
 
-    <!-- COMPARISON SECTION -->
-    <section class="section" id="comparativo" style="background: rgba(14, 18, 26, 0.4);">
+    <!-- PLANS SECTION -->
+    <section class="section" id="planos" style="background: rgba(14, 18, 26, 0.45);">
       <div class="container">
         <div class="section-header">
-          <span class="section-tag">Por Que Mudar?</span>
-          <h2 class="section-title">TitanNova Fit vs Outros Rastreadores</h2>
-          <p class="section-subtitle">Veja como o TitanNova Fit combina o melhor do mercado em uma plataforma ágil, focada e 100% em português.</p>
+          <span class="section-tag" style="background: rgba(0, 210, 255, 0.1); color: var(--accent-cyan); border-color: rgba(0, 210, 255, 0.3);">Planos & Assinaturas</span>
+          <h2 class="section-title">Escolha o plano ideal para sua rotina</h2>
+          <p class="section-subtitle">Comece gratuitamente e evolua quando precisar de mais recursos para organizar e acompanhar seus treinos.</p>
         </div>
 
-        <div class="comparison-table-wrapper">
-          <table class="comparison-table">
-            <thead>
-              <tr>
-                <th>Funcionalidade</th>
-                <th class="highlight">TitanNova Fit</th>
-                <th>Hevy</th>
-                <th>Strong</th>
-                <th>Apps Tradicionais</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Interface e Suporte 100% em Português</strong></td>
-                <td class="highlight status-check">✓ Nativo pt-BR</td>
-                <td>Parcial</td>
-                <td>Parcial</td>
-                <td>Varia</td>
-              </tr>
-              <tr>
-                <td><strong>Modo Offline Completo com Auto-Recuperação</strong></td>
-                <td class="highlight status-check">✓ Sim (Resiliente)</td>
-                <td class="status-check">✓ Sim</td>
-                <td class="status-check">✓ Sim</td>
-                <td class="status-cross">✗ Trava sem internet</td>
-              </tr>
-              <tr>
-                <td><strong>Biblioteca com +1.500 Exercícios</strong></td>
-                <td class="highlight status-check">✓ Gratuito sem travas</td>
-                <td>Limitado no Grátis</td>
-                <td>Limitado no Grátis</td>
-                <td class="status-cross">✗ Poucos exercícios</td>
-              </tr>
-              <tr>
-                <td><strong>Séries Normais, Aquecimento e Drop set</strong></td>
-                <td class="highlight status-check">✓ Incluso</td>
-                <td class="status-check">✓ Sim</td>
-                <td class="status-check">✓ Sim</td>
-                <td class="status-cross">✗ Apenas texto</td>
-              </tr>
-              <tr>
-                <td><strong>Histórico e Volume Total de Cargas</strong></td>
-                <td class="highlight status-check">✓ Ilimitado</td>
-                <td>Limitado no Grátis</td>
-                <td>Limitado a 3 treinos</td>
-                <td class="status-cross">✗ Básico</td>
-              </tr>
-              <tr>
-                <td><strong>Sincronização em Nuvem em Tempo Real</strong></td>
-                <td class="highlight status-check">✓ Supabase Cloud</td>
-                <td class="status-check">✓ Sim</td>
-                <td class="status-check">✓ Sim</td>
-                <td class="status-cross">✗ Manual</td>
-              </tr>
-              <tr>
-                <td><strong>Preço e Acessibilidade</strong></td>
-                <td class="highlight status-check">✓ 100% Gratuito</td>
-                <td>Assinatura Cara</td>
-                <td>Assinatura Cara</td>
-                <td>Anúncios Invasivos</td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- 4 Cards Grid -->
+        <div class="plans-grid-4">
+          <!-- 1. PLANO GRÁTIS -->
+          <div class="landing-plan-card plan-free">
+            <div class="plan-header">
+              <div class="plan-name color-free">🌱 Grátis</div>
+              <p class="plan-desc">Recursos essenciais para começar a organizar seus treinos.</p>
+            </div>
+
+            <div class="plan-price-box">
+              <div class="plan-price-val" style="color: var(--accent-cyan);">Em breve</div>
+              <div class="plan-price-sub">Acesso gratuito para iniciar</div>
+            </div>
+
+            <ul class="plan-features-ul">
+              <li><span class="check-icon">✓</span> <span>Cadastro e login</span></li>
+              <li><span class="check-icon">✓</span> <span>Sincronização básica na nuvem</span></li>
+              <li><span class="check-icon">✓</span> <span>Acesso em diferentes aparelhos</span></li>
+              <li><span class="check-icon">✓</span> <span>Até <strong>3 fichas de treino</strong></span></li>
+              <li><span class="check-icon">✓</span> <span>Biblioteca completa de exercícios</span></li>
+              <li><span class="check-icon">✓</span> <span>GIFs demonstrativos</span></li>
+              <li><span class="check-icon">✓</span> <span>Exercícios personalizados</span></li>
+              <li><span class="check-icon">✓</span> <span>Registro de séries, repetições e carga</span></li>
+              <li><span class="check-icon">✓</span> <span>Cronômetro de descanso</span></li>
+              <li><span class="check-icon">✓</span> <span>Histórico dos últimos 30 dias</span></li>
+              <li><span class="check-icon">✓</span> <span>Modelos para iniciantes</span></li>
+              <li><span class="check-icon">✓</span> <span>Tema escuro</span></li>
+              <li><span class="check-icon">✓</span> <span>Funcionamento offline básico</span></li>
+              <li><span class="check-icon">✓</span> <span>Exportação dos próprios dados</span></li>
+              <li><span class="check-icon">✓</span> <span>Exclusão da conta</span></li>
+              <li><span class="check-icon">✓</span> <span>Configurações de privacidade</span></li>
+            </ul>
+
+            <a href="/app" class="btn-plan-action btn-plan-free app-link" id="landingBtnPlanFree">Começar gratuitamente</a>
+          </div>
+
+          <!-- 2. PLANO BRONZE -->
+          <div class="landing-plan-card plan-bronze">
+            <div class="plan-badge-tag badge-bronze-tag">Para quem treina regularmente</div>
+
+            <div class="plan-header">
+              <div class="plan-name color-bronze">🥉 Bronze</div>
+              <p class="plan-desc">Mais liberdade para montar e acompanhar sua rotina.</p>
+            </div>
+
+            <div class="plan-price-box">
+              <div class="plan-price-val" style="color: #CD7F32;">Em breve</div>
+              <div class="plan-price-sub">Valores serão divulgados em breve</div>
+            </div>
+
+            <ul class="plan-features-ul">
+              <li style="color: #ffffff; font-weight: 700; margin-bottom: 2px;">Tudo do plano Grátis, mais:</li>
+              <li><span class="check-icon">✓</span> <span><strong>Fichas de treino ilimitadas</strong></span></li>
+              <li><span class="check-icon">✓</span> <span><strong>Histórico completo</strong></span></li>
+              <li><span class="check-icon">✓</span> <span>Favoritos ilimitados</span></li>
+              <li><span class="check-icon">✓</span> <span>Assistente de montagem completo</span></li>
+              <li><span class="check-icon">✓</span> <span>Modelos para iniciante e intermediário</span></li>
+              <li><span class="check-icon">✓</span> <span>Filtros avançados na biblioteca</span></li>
+              <li><span class="check-icon">✓</span> <span>Duplicação de fichas</span></li>
+              <li><span class="check-icon">✓</span> <span>Notas por exercício</span></li>
+              <li><span class="check-icon">✓</span> <span>Séries de aquecimento</span></li>
+              <li><span class="check-icon">✓</span> <span>Tipos diferentes de série</span></li>
+              <li><span class="check-icon">✓</span> <span>Cronômetros personalizados</span></li>
+              <li><span class="check-icon">✓</span> <span>Exportação CSV e JSON</span></li>
+              <li><span class="check-icon">✓</span> <span>Sincronização offline completa</span></li>
+              <li><span class="check-icon">✓</span> <span>Sem publicidade</span></li>
+            </ul>
+
+            <button type="button" class="btn-plan-action btn-plan-bronze" onclick="handlePlanSelection('Bronze')">Escolher Bronze</button>
+          </div>
+
+          <!-- 3. PLANO PRATA (DESTAQUE) -->
+          <div class="landing-plan-card plan-silver">
+            <div class="plan-badge-tag badge-silver-tag">Mais escolhido</div>
+
+            <div class="plan-header">
+              <div class="plan-name color-silver">🥈 Prata</div>
+              <p class="plan-desc">Acompanhamento avançado para entender sua evolução.</p>
+            </div>
+
+            <div class="plan-price-box">
+              <div class="plan-price-val" style="color: #E0E0E0;">Em breve</div>
+              <div class="plan-price-sub">Valores serão divulgados em breve</div>
+            </div>
+
+            <ul class="plan-features-ul">
+              <li style="color: #ffffff; font-weight: 700; margin-bottom: 2px;">Tudo do Bronze, mais:</li>
+              <li><span class="check-icon">✓</span> <span><strong>Gráficos avançados</strong></span></li>
+              <li><span class="check-icon">✓</span> <span>Evolução por exercício</span></li>
+              <li><span class="check-icon">✓</span> <span>Evolução de cargas e repetições</span></li>
+              <li><span class="check-icon">✓</span> <span>Volume total registrado</span></li>
+              <li><span class="check-icon">✓</span> <span>Séries semanais por grupo muscular</span></li>
+              <li><span class="check-icon">✓</span> <span>Calendário completo</span></li>
+              <li><span class="check-icon">✓</span> <span><strong>Recordes pessoais (PRs)</strong></span></li>
+              <li><span class="check-icon">✓</span> <span>Relatório mensal</span></li>
+              <li><span class="check-icon">✓</span> <span>Comparação com treino anterior</span></li>
+              <li><span class="check-icon">✓</span> <span>Distribuição muscular</span></li>
+              <li><span class="check-icon">✓</span> <span>Medidas corporais opcionais</span></li>
+              <li><span class="check-icon">✓</span> <span>Fotos de progresso privadas</span></li>
+              <li><span class="check-icon">✓</span> <span>Superséries</span></li>
+              <li><span class="check-icon">✓</span> <span>RPE opcional</span></li>
+              <li><span class="check-icon">✓</span> <span>Calculadora de anilhas</span></li>
+              <li><span class="check-icon">✓</span> <span>Modelos intermediários e avançados</span></li>
+              <li><span class="check-icon">✓</span> <span>Compartilhamento de resumo</span></li>
+              <li><span class="check-icon">✓</span> <span>Backup aprimorado</span></li>
+            </ul>
+
+            <button type="button" class="btn-plan-action btn-plan-silver" onclick="handlePlanSelection('Prata')">Escolher Prata</button>
+          </div>
+
+          <!-- 4. PLANO GOLD -->
+          <div class="landing-plan-card plan-gold">
+            <div class="plan-badge-tag badge-gold-tag">Experiência completa</div>
+
+            <div class="plan-header">
+              <div class="plan-name color-gold">👑 Gold</div>
+              <p class="plan-desc">Todos os recursos e acesso antecipado às novidades.</p>
+            </div>
+
+            <div class="plan-price-box">
+              <div class="plan-price-val" style="color: #FFD700;">Em breve</div>
+              <div class="plan-price-sub">Valores serão divulgados em breve</div>
+            </div>
+
+            <ul class="plan-features-ul">
+              <li style="color: #ffffff; font-weight: 700; margin-bottom: 2px;">Tudo do Prata, mais:</li>
+              <li><span class="check-icon">✓</span> <span>Todos os modelos disponíveis</span></li>
+              <li><span class="check-icon">✓</span> <span>Assistente avançado de montagem</span></li>
+              <li><span class="check-icon">✓</span> <span>Modelos completamente personalizados</span></li>
+              <li><span class="check-icon">✓</span> <span>Relatórios avançados</span></li>
+              <li><span class="check-icon">✓</span> <span>Compartilhamento por QR Code <span class="plan-tag-future">Em desenvolvimento</span></span></li>
+              <li><span class="check-icon">✓</span> <span>Pastas de treino</span></li>
+              <li><span class="check-icon">✓</span> <span>Professor e aluno <span class="plan-tag-future">Disponível em breve</span></span></li>
+              <li><span class="check-icon">✓</span> <span>Integração com relógios <span class="plan-tag-future">Disponível em breve</span></span></li>
+              <li><span class="check-icon">✓</span> <span>Acesso antecipado a novos recursos</span></li>
+              <li><span class="check-icon">✓</span> <span>Personalização adicional</span></li>
+              <li><span class="check-icon">✓</span> <span>Suporte prioritário</span></li>
+              <li><span class="check-icon">✓</span> <span>Sem publicidade</span></li>
+            </ul>
+
+            <button type="button" class="btn-plan-action btn-plan-gold" onclick="handlePlanSelection('Gold')">Escolher Gold</button>
+          </div>
+        </div>
+
+        <!-- Aviso para menores de 18 anos -->
+        <div class="plans-age-alert">
+          <span>ℹ️ <strong>Aviso para menores de idade:</strong> Se você tem menos de 18 anos, confirme a contratação com seu responsável legal.</span>
+        </div>
+
+        <!-- TABELA DE RECURSOS -->
+        <div class="plans-table-container">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <h3 style="font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 6px;">Comparação Completa de Recursos</h3>
+            <p style="font-size: 13px; color: var(--text-grey);">Confira lado a lado todos os recursos de cada categoria.</p>
+          </div>
+
+          <!-- Tabela Desktop / Tablet -->
+          <div class="comparison-table-wrapper plans-table-desktop">
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th style="width: 32%;">Recurso</th>
+                  <th style="text-align: center; color: var(--accent-cyan);">Grátis</th>
+                  <th style="text-align: center; color: #CD7F32;">Bronze</th>
+                  <th style="text-align: center; color: #E0E0E0; background: rgba(192, 192, 192, 0.05);">Prata</th>
+                  <th style="text-align: center; color: #FFD700;">Gold</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Fichas de treino</strong></td>
+                  <td style="text-align: center;">Até 3</td>
+                  <td style="text-align: center;" class="status-check">Ilimitadas</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);" class="status-check">Ilimitadas</td>
+                  <td style="text-align: center;" class="status-check">Ilimitadas</td>
+                </tr>
+                <tr>
+                  <td><strong>Biblioteca de exercícios</strong></td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);" class="status-check">Sim</td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                </tr>
+                <tr>
+                  <td><strong>Registro de séries e cargas</strong></td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);" class="status-check">Sim</td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                </tr>
+                <tr>
+                  <td><strong>Cronômetro</strong></td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                  <td style="text-align: center;">Avançado</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);">Avançado</td>
+                  <td style="text-align: center;">Avançado</td>
+                </tr>
+                <tr>
+                  <td><strong>Histórico</strong></td>
+                  <td style="text-align: center;">30 dias</td>
+                  <td style="text-align: center;" class="status-check">Completo</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);" class="status-check">Completo</td>
+                  <td style="text-align: center;" class="status-check">Completo</td>
+                </tr>
+                <tr>
+                  <td><strong>Modelos</strong></td>
+                  <td style="text-align: center;">Iniciante</td>
+                  <td style="text-align: center;">Iniciante e intermediário</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);">Todos</td>
+                  <td style="text-align: center;">Todos</td>
+                </tr>
+                <tr>
+                  <td><strong>Assistente de montagem</strong></td>
+                  <td style="text-align: center;">Básico</td>
+                  <td style="text-align: center;">Completo</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);">Completo</td>
+                  <td style="text-align: center;">Avançado</td>
+                </tr>
+                <tr>
+                  <td><strong>Funcionamento offline</strong></td>
+                  <td style="text-align: center;">Básico</td>
+                  <td style="text-align: center;" class="status-check">Completo</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);" class="status-check">Completo</td>
+                  <td style="text-align: center;" class="status-check">Completo</td>
+                </tr>
+                <tr>
+                  <td><strong>Gráficos básicos</strong></td>
+                  <td style="text-align: center;" class="status-cross">Não</td>
+                  <td style="text-align: center;">Básicos</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);">Avançados</td>
+                  <td style="text-align: center;">Avançados</td>
+                </tr>
+                <tr>
+                  <td><strong>Relatório mensal</strong></td>
+                  <td style="text-align: center;" class="status-cross">Não</td>
+                  <td style="text-align: center;" class="status-cross">Não</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);" class="status-check">Sim</td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                </tr>
+                <tr>
+                  <td><strong>Superséries</strong></td>
+                  <td style="text-align: center;" class="status-cross">Não</td>
+                  <td style="text-align: center;" class="status-cross">Não</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);" class="status-check">Sim</td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                </tr>
+                <tr>
+                  <td><strong>Calculadora de anilhas</strong></td>
+                  <td style="text-align: center;" class="status-cross">Não</td>
+                  <td style="text-align: center;" class="status-cross">Não</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);" class="status-check">Sim</td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                </tr>
+                <tr>
+                  <td><strong>QR Code</strong></td>
+                  <td style="text-align: center;" class="status-cross">Não</td>
+                  <td style="text-align: center;" class="status-cross">Não</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);" class="status-cross">Não</td>
+                  <td style="text-align: center;"><span class="plan-tag-future">Em breve</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Professor e aluno</strong></td>
+                  <td style="text-align: center;" class="status-cross">Não</td>
+                  <td style="text-align: center;" class="status-cross">Não</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);" class="status-cross">Não</td>
+                  <td style="text-align: center;"><span class="plan-tag-future">Em breve</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Publicidade</strong></td>
+                  <td style="text-align: center; color: var(--text-muted);">Poderá existir</td>
+                  <td style="text-align: center;" class="status-check">Não</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);" class="status-check">Não</td>
+                  <td style="text-align: center;" class="status-check">Não</td>
+                </tr>
+                <tr>
+                  <td><strong>Exportação de dados</strong></td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);" class="status-check">Sim</td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                </tr>
+                <tr>
+                  <td><strong>Exclusão da conta</strong></td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                  <td style="text-align: center; background: rgba(192, 192, 192, 0.03);" class="status-check">Sim</td>
+                  <td style="text-align: center;" class="status-check">Sim</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Tabela Mobile Expansível (Accordion sem rolagem horizontal excessiva) -->
+          <div class="plans-mobile-accordion">
+            <details class="plans-accordion-details">
+              <summary class="plans-accordion-summary">
+                <span>🔍 Ver comparação completa de recursos</span>
+                <span style="font-size: 18px;">▾</span>
+              </summary>
+              <div class="plans-accordion-content">
+                <!-- Item 1 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Fichas de treino</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Até 3</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Ilimitadas</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Ilimitadas</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Ilimitadas</div>
+                  </div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Biblioteca de exercícios</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Sim</div>
+                  </div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Registro de séries e cargas</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Sim</div>
+                  </div>
+                </div>
+
+                <!-- Item 4 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Cronômetro</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Avançado</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Avançado</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Avançado</div>
+                  </div>
+                </div>
+
+                <!-- Item 5 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Histórico</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>30 dias</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Completo</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Completo</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Completo</div>
+                  </div>
+                </div>
+
+                <!-- Item 6 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Modelos</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Iniciante</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Inic. / Interm.</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Todos</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Todos</div>
+                  </div>
+                </div>
+
+                <!-- Item 7 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Assistente de montagem</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Básico</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Completo</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Completo</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Avançado</div>
+                  </div>
+                </div>
+
+                <!-- Item 8 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Funcionamento offline</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Básico</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Completo</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Completo</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Completo</div>
+                  </div>
+                </div>
+
+                <!-- Item 9 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Gráficos básicos</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Básicos</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Avançados</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Avançados</div>
+                  </div>
+                </div>
+
+                <!-- Item 10 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Relatório mensal</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Sim</div>
+                  </div>
+                </div>
+
+                <!-- Item 11 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Superséries</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Sim</div>
+                  </div>
+                </div>
+
+                <!-- Item 12 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Calculadora de anilhas</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Sim</div>
+                  </div>
+                </div>
+
+                <!-- Item 13 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">QR Code</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Em breve</div>
+                  </div>
+                </div>
+
+                <!-- Item 14 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Professor e aluno</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Em breve</div>
+                  </div>
+                </div>
+
+                <!-- Item 15 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Publicidade</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Poderá existir</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Não</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Não</div>
+                  </div>
+                </div>
+
+                <!-- Item 16 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Exportação de dados</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Sim</div>
+                  </div>
+                </div>
+
+                <!-- Item 17 -->
+                <div class="plans-mobile-item-card">
+                  <div class="plans-mobile-item-title">Exclusão da conta</div>
+                  <div class="plans-mobile-item-grid">
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: var(--accent-cyan);">Grátis</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #CD7F32;">Bronze</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #E0E0E0;">Prata</div>Sim</div>
+                    <div class="plans-mobile-item-col"><div class="plans-mobile-item-label" style="color: #FFD700;">Gold</div>Sim</div>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- Nota de direitos irrestritos -->
+          <div style="margin-top: 24px; font-size: 12px; color: var(--text-muted); text-align: center; line-height: 1.6;">
+            🛡️ <strong>Garantia de Direitos Fundamentais:</strong> Exclusão da conta, Termos de Uso, Política de Privacidade, Configurações de privacidade, Correção de dados pessoais, Segurança da conta, Recuperação de senha e Exportação básica dos próprios dados são garantias invioláveis e nunca serão bloqueadas por nenhum plano.
+          </div>
         </div>
       </div>
     </section>
@@ -1177,8 +1927,7 @@
           <ul>
             <li><a href="#funcionalidades">Cronômetro de Descanso</a></li>
             <li><a href="#funcionalidades">Modo Offline</a></li>
-            <li><a href="#comparativo">Tabela Comparativa</a></li>
-            <li><a href="/planos" class="planos-link">Comparar Planos</a></li>
+            <li><a href="#planos">Planos & Assinaturas</a></li>
             <li><a href="#duvidas">Perguntas Frequentes</a></li>
           </ul>
         </div>
@@ -1219,8 +1968,28 @@
       }
     }
 
+    // Seleção de planos na landing page
+    function handlePlanSelection(planName) {
+      alert(`O Plano ${planName} estará disponível para contratação em breve!\n\nNo momento, você pode começar gratuitamente e aproveitar todos os recursos essenciais no TitanNova Fit.`);
+    }
+
     // Suporte a navegação tanto em servidor Vercel (/app, /planos) quanto em ambiente de teste local (.html)
     document.addEventListener('DOMContentLoaded', () => {
+      // Verificar se o usuário já possui plano gratuito ativo
+      try {
+        const cached = localStorage.getItem('titannovafit_subscription');
+        if (cached) {
+          const sub = JSON.parse(cached);
+          const freeBtn = document.getElementById('landingBtnPlanFree');
+          if (freeBtn && (sub.plan_code === 'free' || sub.plan_id === 'free')) {
+            freeBtn.innerText = 'Plano atual';
+            freeBtn.style.background = 'rgba(0, 210, 255, 0.15)';
+            freeBtn.style.color = 'var(--accent-cyan)';
+            freeBtn.style.border = '1px solid var(--border-cyan)';
+          }
+        }
+      } catch (_) {}
+
       const isLocalFileOrStatic = (window.location.protocol === 'file:' || window.location.port !== '' || window.location.pathname.endsWith('.html'));
       if (isLocalFileOrStatic) {
         document.querySelectorAll('a.app-link').forEach(link => {

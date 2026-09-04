@@ -100,7 +100,7 @@ export default async function handler(req, res) {
 
       // 2. Se a RPC não estiver disponível ou falhar, consultar diretamente via Service Role
       if (!subscriptionData || subscriptionData.error) {
-        const subRes = await fetch(`${SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${encodeURIComponent(user.id)}&status=in.(active,trialing)&select=id,status,billing_cycle,provider,current_period_start,current_period_end,plan_id,plans(id,code,name,monthly_price,annual_price)&order=created_at.desc&limit=1`, {
+        const subRes = await fetch(`${SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${encodeURIComponent(user.id)}&status=in.(active,trialing)&select=id,status,provider,current_period_start,current_period_end,plan_id,plans(id,name,description)&order=created_at.desc&limit=1`, {
           headers: {
             apikey: SERVICE_ROLE_KEY,
             Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
@@ -113,10 +113,10 @@ export default async function handler(req, res) {
             const activeSub = subs[0];
             subscriptionData = {
               subscription_id: activeSub.id,
-              plan_code: activeSub.plans?.code || "free",
+              plan_id: activeSub.plans?.id || activeSub.plan_id || "free",
+              plan_code: activeSub.plans?.id || activeSub.plan_id || "free",
               plan_name: activeSub.plans?.name || "Grátis",
               status: activeSub.status,
-              billing_cycle: activeSub.billing_cycle,
               provider: activeSub.provider,
               current_period_start: activeSub.current_period_start,
               current_period_end: activeSub.current_period_end,
@@ -278,7 +278,7 @@ export default async function handler(req, res) {
 
       // 2. Localizar o plano alvo
       const targetPlanCode = cancelPromotional ? "free" : planCode;
-      const planRes = await fetch(`${SUPABASE_URL}/rest/v1/plans?code=eq.${encodeURIComponent(targetPlanCode)}&select=id,code,name`, {
+      const planRes = await fetch(`${SUPABASE_URL}/rest/v1/plans?id=eq.${encodeURIComponent(targetPlanCode)}&select=id,name`, {
         headers: {
           apikey: SERVICE_ROLE_KEY,
           Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
@@ -292,23 +292,7 @@ export default async function handler(req, res) {
       }
       const selectedPlan = plans[0];
 
-      // 3. Encerrar / cancelar assinaturas ativas anteriores
-      await fetch(`${SUPABASE_URL}/rest/v1/subscriptions?user_id=eq.${encodeURIComponent(resolvedUserId)}&status=in.(active,trialing)`, {
-        method: "PATCH",
-        headers: {
-          apikey: SERVICE_ROLE_KEY,
-          Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
-          "Content-Type": "application/json",
-          Prefer: "return=representation"
-        },
-        body: JSON.stringify({
-          status: "canceled",
-          canceled_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-      });
-
-      // 4. Calcular período de vigência
+      // 3. Calcular período de vigência
       let periodEnd = null;
       if (durationDays && durationDays > 0) {
         const d = new Date();
@@ -316,36 +300,34 @@ export default async function handler(req, res) {
         periodEnd = d.toISOString();
       }
 
-      // 5. Inserir a nova assinatura atribuída pelo admin
-      const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/subscriptions`, {
+      // 4. Upsert da assinatura atribuída pelo admin (respeitando UNIQUE(user_id))
+      const upsertRes = await fetch(`${SUPABASE_URL}/rest/v1/subscriptions`, {
         method: "POST",
         headers: {
           apikey: SERVICE_ROLE_KEY,
           Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
           "Content-Type": "application/json",
-          Prefer: "return=representation"
+          Prefer: "resolution=merge-duplicates,return=representation"
         },
         body: JSON.stringify({
           user_id: resolvedUserId,
           plan_id: selectedPlan.id,
           status: "active",
-          billing_cycle: durationDays ? "monthly" : (targetPlanCode === "free" ? "free" : "annual"),
           provider: "manual",
           provider_subscription_id: `admin_assigned_by_${adminUser.id.substring(0, 8)}`,
-          started_at: new Date().toISOString(),
           current_period_start: new Date().toISOString(),
           current_period_end: periodEnd,
-          created_at: new Date().toISOString(),
+          cancel_at_period_end: false,
           updated_at: new Date().toISOString()
         })
       });
 
-      if (!insertRes.ok) {
-        const errBody = await insertRes.text();
-        throw new Error(`Falha ao inserir nova assinatura: ${errBody}`);
+      if (!upsertRes.ok) {
+        const errBody = await upsertRes.text();
+        throw new Error(`Falha ao atribuir assinatura: ${errBody}`);
       }
 
-      const createdSub = await insertRes.json();
+      const createdSub = await upsertRes.json();
 
       return sendResponse(200, {
         success: true,
