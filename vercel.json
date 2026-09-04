@@ -42,6 +42,14 @@
       "destination": "/api/$1"
     },
     {
+      "source": "/app",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/app/(.*)",
+      "destination": "/app.html"
+    },
+    {
       "source": "/termos-de-uso",
       "destination": "/termos-de-uso.html"
     },

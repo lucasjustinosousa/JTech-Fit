@@ -1,7 +1,8 @@
-const CACHE_NAME = 'titannova-fit-v2.3.0';
+const CACHE_NAME = 'titannova-fit-v3.0.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
+  './app.html',
   './manifest.json',
   './sw.js',
   './exercises_seed.js',
@@ -46,6 +47,8 @@ self.addEventListener('fetch', (event) => {
   const isHtmlRequest = event.request.mode === 'navigate' || 
                         (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html')) ||
                         event.request.url.endsWith('index.html') ||
+                        event.request.url.endsWith('app.html') ||
+                        event.request.url.includes('/app') ||
                         event.request.url.endsWith('/');
 
   if (isHtmlRequest) {
@@ -61,7 +64,9 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => {
           console.log('[ServiceWorker] Offline - Servindo HTML do cache');
-          return caches.match('./index.html').then((cached) => cached || caches.match(event.request));
+          const isAppPath = event.request.url.includes('/app') || event.request.url.includes('app.html');
+          const targetFallback = isAppPath ? './app.html' : './index.html';
+          return caches.match(targetFallback).then((cached) => cached || caches.match(event.request) || caches.match('./index.html'));
         })
     );
     return;

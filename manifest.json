@@ -2,12 +2,12 @@
   "name": "TitanNova Fit — Acompanhamento de Treinos",
   "short_name": "TitanNova Fit",
   "description": "Aplicativo de acompanhamento de treinos de musculação, divisões de treino, biblioteca de exercícios, cronômetro de descanso e histórico offline.",
-  "start_url": "./",
+  "start_url": "app.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0d0d0d",
-  "theme_color": "#1e88e5",
+  "background_color": "#0c0e14",
+  "theme_color": "#00d2ff",
   "lang": "pt-BR",
   "icons": [
     {
@@ -29,14 +29,14 @@
       "name": "Iniciar Treino",
       "short_name": "Treinar",
       "description": "Iniciar treino em andamento imediatamente",
-      "url": "./#start",
+      "url": "app.html#start",
       "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Exercícios",
       "short_name": "Exercícios",
       "description": "Abrir biblioteca de exercícios",
-      "url": "./#exercises",
+      "url": "app.html#exercises",
       "icons": [{ "src": "assets/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
